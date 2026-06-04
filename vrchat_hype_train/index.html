@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>VRChat HypeTrain Detector</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111;
+      color: #eee;
+      padding: 24px;
+    }
+
+    button {
+      margin-right: 8px;
+      margin-bottom: 12px;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+
+    textarea {
+      width: 100%;
+      height: 90px;
+      background: #1b1b1b;
+      color: #eee;
+      border: 1px solid #444;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    pre {
+      background: #1b1b1b;
+      border: 1px solid #333;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 60vh;
+      overflow: auto;
+    }
+
+    .warn {
+      color: #ffcc66;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>VRChat HypeTrain Detector</h1>
+
+  <p class="warn">
+    这个页面不会读取你的 Cookie，也不会让你填写 Cookie。
+    它只会尝试让浏览器请求 VRChat API 时自动携带你自己的登录 Cookie。
+  </p>
+
+  <div>
+    <button id="btnNotify">启用网页通知</button>
+    <button id="btnTestAuth">测试 VRChat 登录状态</button>
+    <button id="btnStart">开始监控</button>
+    <button id="btnStop">停止监控</button>
+    <button id="btnScanOnce">扫一次</button>
+  </div>
+
+  <p>World ID，一行一个：</p>
+  <textarea id="worldIds">wrld_005f92e8-140d-4e67-8d09-f64a3acfa333</textarea>
+
+  <pre id="log"></pre>
+
+<script>
+const BASE = "https://api.vrchat.cloud/api/1";
+
+const REQUEST_INTERVAL_SECONDS = 1;
+const SCAN_INTERVAL_SECONDS = 60;
+
+let timer = null;
+
+// key: location，例如 wrld_xxx:12345~region(jp)
+// value: 当前已经通知过的 alert key
+const notifiedByLocation = new Map();
+
+function log(...args) {
+  const text = args.map(x => {
+    if (typeof x === "string") return x;
+    try {
+      return JSON.stringify(x, null, 2);
+    } catch {
+      return String(x);
+    }
+  }).join(" ");
+
+  const el = document.getElementById("log");
+  el.textContent += `[${new Date().toLocaleTimeString()}] ${text}\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getWorldIds() {
+  return document
+    .getElementById("worldIds")
+    .value
+    .split(/\r?\n/)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
+async function enableNotification() {
+  if (!("Notification" in window)) {
+    alert("当前浏览器不支持网页通知");
+    return;
+  }
+
+  const result = await Notification.requestPermission();
+  log("网页通知权限:", result);
+}
+
+function webNotify(title, message, launchUrl, tag) {
+  if (!("Notification" in window)) {
+    log("当前浏览器不支持 Notification API");
+    return;
+  }
+
+  if (Notification.permission !== "granted") {
+    log("没有通知权限，跳过网页通知:", title);
+    return;
+  }
+
+  const n = new Notification(title, {
+    body: message,
+    tag: tag || title,
+    requireInteraction: false
+  });
+
+  n.onclick = () => {
+    window.focus();
+    if (launchUrl) {
+      window.open(launchUrl, "_blank");
+    }
+    n.close();
+  };
+}
+
+async function requestGet(path) {
+  const url = `${BASE}${path}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+
+      // 核心：让浏览器自动携带 api.vrchat.cloud 的 cookie
+      // 注意：JS 不能读取 Cookie，只能让浏览器自动带。
+      credentials: "include",
+
+      headers: {
+        "Accept": "application/json"
+        // 浏览器 JS 不能设置 User-Agent，这是 forbidden header。
+      }
+    });
+
+    log("GET", url, response.status, response.statusText);
+
+    if (!response.ok) {
+      const text = await response.text();
+      log("请求失败:", text.slice(0, 500));
+      return null;
+    }
+
+    return await response.json();
+
+  } catch (err) {
+    log("请求异常，常见原因是 CORS 被 VRChat API 拦截:", err.message || err);
+    return null;
+  }
+}
+
+async function testAuth() {
+  const data = await requestGet("/auth/user");
+
+  if (!data) {
+    log("无法确认登录状态。可能是没登录，也可能是 CORS 阻止了 github.io 请求。");
+    return;
+  }
+
+  if (data.id || data.username || data.displayName) {
+    log("当前 VRChat 登录用户:", {
+      id: data.id,
+      username: data.username,
+      displayName: data.displayName
+    });
+  } else {
+    log("返回了数据，但不像已登录用户:", data);
+  }
+}
+
+function buildInstanceLocation(worldId, instanceId) {
+  return `${worldId}:${instanceId}`;
+}
+
+function buildVrchatLaunchUrl(worldId, instanceId) {
+  const query = new URLSearchParams({
+    worldId,
+    instanceId
+  });
+
+  return `https://vrchat.com/home/launch?${query.toString()}`;
+}
+
+function getInstanceTypeName(detail) {
+  const instanceType = detail.type;
+  const groupAccessType = detail.groupAccessType;
+  const instanceId = detail.instanceId || "";
+
+  if (instanceType === "public") {
+    return "公开";
+  }
+
+  if (instanceType === "group") {
+    if (groupAccessType === "public") return "群组公开";
+    if (groupAccessType === "plus") return "群组Plus";
+    if (groupAccessType === "members") return "群组成员";
+    return "群组";
+  }
+
+  if (instanceId.includes("~hidden(")) {
+    return "好友+";
+  }
+
+  if (instanceId.includes("~friends(")) {
+    return "好友";
+  }
+
+  if (instanceId.includes("~private(")) {
+    if (instanceId.includes("~canRequestInvite")) {
+      return "邀请+";
+    }
+    return "邀请";
+  }
+
+  return instanceType || "未知类型";
+}
+
+function getHypeTrainStatus(detail) {
+  const hypeTrain = detail.hypeTrain || {};
+
+  const current = hypeTrain.current;
+  const potential = hypeTrain.potentialTrain;
+  const history = hypeTrain.history || [];
+
+  let currentCount = 0;
+  let totalGoal = 0;
+
+  if (current && typeof current === "object") {
+    currentCount = current.currentGiftCount || 0;
+    totalGoal = current.totalGiftGoal || 0;
+  }
+
+  let successCount = 0;
+  let failedCount = 0;
+  let vrcPlusCount = 0;
+
+  for (const item of history) {
+    if (!item || typeof item !== "object") {
+      failedCount++;
+      continue;
+    }
+
+    const historyCount = item.currentGiftCount || 0;
+    const historyGoal = item.totalGiftGoal || 0;
+
+    vrcPlusCount += historyCount;
+
+    if (historyGoal > 0 && historyCount >= historyGoal) {
+      successCount++;
+    } else {
+      failedCount++;
+    }
+  }
+
+  const potentialText = potential ? "是" : "否";
+
+  return (
+    `HypeTrain(` +
+    `现有:${currentCount}/${totalGoal}, ` +
+    `历史(成功:${successCount},失败:${failedCount},总共送出${vrcPlusCount}个鸡蛋), ` +
+    `预热:${potentialText}` +
+    `)`
+  );
+}
+
+function getHypeNotifyState(detail) {
+  const hypeTrain = detail.hypeTrain || {};
+
+  const current = hypeTrain.current;
+  const potential = hypeTrain.potentialTrain;
+
+  const location = detail.location || detail.id;
+  if (!location) return null;
+
+  if (current && typeof current === "object") {
+    const trainId =
+      current.hypeTrainId ||
+      current.campaignId ||
+      "current";
+
+    return {
+      location,
+      alertKey: `${location}:current:${trainId}`,
+      title: "VRChat HypeTrain 已开启"
+    };
+  }
+
+  if (potential && typeof potential === "object") {
+    const trainId =
+      potential.hypeTrainId ||
+      potential.campaignId ||
+      "potential";
+
+    return {
+      location,
+      alertKey: `${location}:potential:${trainId}`,
+      title: "VRChat HypeTrain 预热中"
+    };
+  }
+
+  return null;
+}
+
+function clearNotifyRecord(location) {
+  if (notifiedByLocation.has(location)) {
+    log("通知记录已清除:", location);
+    notifiedByLocation.delete(location);
+  }
+}
+
+function shouldSkipInstanceDetail(detail) {
+  if (!detail) return true;
+  if (typeof detail !== "object") return true;
+  if ("error" in detail) return true;
+
+  const message = String(detail.message || "");
+  if (message.toLowerCase().includes("closed")) return true;
+
+  if (detail.active === false) return true;
+  if (detail.closedAt !== null && detail.closedAt !== undefined) return true;
+
+  let userCount = detail.userCount;
+  if (userCount === null || userCount === undefined) {
+    userCount = detail.n_users;
+  }
+
+  if (userCount === null || userCount === undefined) return true;
+  if (userCount <= 0) return true;
+
+  return false;
+}
+
+function formatInstanceLine(detail) {
+  const worldId = detail.worldId;
+  const instanceId = detail.instanceId;
+
+  const instanceName =
+    detail.displayName ||
+    detail.name ||
+    instanceId ||
+    "未知实例";
+
+  const typeName = getInstanceTypeName(detail);
+
+  let userCount = detail.userCount;
+  if (userCount === null || userCount === undefined) {
+    userCount = detail.n_users;
+  }
+
+  const capacity = detail.capacity;
+  const queueSize = detail.queueSize || 0;
+
+  const hypeStatus = getHypeTrainStatus(detail);
+  const launchUrl = buildVrchatLaunchUrl(worldId, instanceId);
+  const worldName = detail.world?.name || "";
+
+  const line =
+    `${worldName}(${instanceName}) ` +
+    `${typeName} ` +
+    `${detail.ageGate ? "🪪 " : ""}` +
+    `👤${userCount}/${capacity} ` +
+    `${queueSize > 0 ? `👥${queueSize} ` : ""}` +
+    `${hypeStatus} ` +
+    `${launchUrl}`;
+
+  return { line, launchUrl };
+}
+
+function handleWebNotify(detail, line, launchUrl) {
+  const location = detail.location || detail.id;
+  if (!location) return;
+
+  const state = getHypeNotifyState(detail);
+
+  if (!state) {
+    clearNotifyRecord(location);
+    return;
+  }
+
+  const newAlertKey = state.alertKey;
+  const oldAlertKey = notifiedByLocation.get(location);
+
+  if (oldAlertKey === newAlertKey) {
+    return;
+  }
+
+  notifiedByLocation.set(location, newAlertKey);
+
+  webNotify(
+    state.title,
+    line,
+    launchUrl,
+    newAlertKey
+  );
+}
+
+async function getWorld(worldId) {
+  return await requestGet(`/worlds/${encodeURIComponent(worldId)}`);
+}
+
+async function getInstance(worldId, instanceId) {
+  const location = `${worldId}:${instanceId}`;
+  return await requestGet(`/instances/${encodeURIComponent(location)}`);
+}
+
+async function scanWorld(worldId) {
+  const seenLocations = new Set();
+
+  const fullWorld = await getWorld(worldId);
+
+  if (!fullWorld) {
+    log("获取 World 失败:", worldId);
+    return seenLocations;
+  }
+
+  const worldName = fullWorld.name || worldId;
+  const instances = fullWorld.instances || [];
+
+  log("=".repeat(80));
+  log(`World: ${worldName}`);
+  log(`WorldId: ${worldId}`);
+  log(`实例数量: ${instances.length}`);
+  log("=".repeat(80));
+
+  for (const item of instances) {
+    if (!item) continue;
+
+    const instanceId = Array.isArray(item) ? item[0] : item.instanceId;
+    const approxUsers = Array.isArray(item) ? item[1] : item.userCount;
+
+    if (!instanceId) continue;
+
+    const location = buildInstanceLocation(worldId, instanceId);
+    seenLocations.add(location);
+
+    if (!approxUsers || approxUsers === 0) {
+      clearNotifyRecord(location);
+      continue;
+    }
+
+    const detail = await getInstance(worldId, instanceId);
+
+    await sleep(REQUEST_INTERVAL_SECONDS * 1000);
+
+    if (shouldSkipInstanceDetail(detail)) {
+      clearNotifyRecord(location);
+      continue;
+    }
+
+    const { line, launchUrl } = formatInstanceLine(detail);
+
+    log(line);
+    log("-".repeat(80));
+
+    handleWebNotify(detail, line, launchUrl);
+  }
+
+  return seenLocations;
+}
+
+async function scanOnce() {
+  const worldIds = getWorldIds();
+
+  if (worldIds.length === 0) {
+    log("没有 World ID");
+    return;
+  }
+
+  for (const worldId of worldIds) {
+    await scanWorld(worldId);
+    await sleep(REQUEST_INTERVAL_SECONDS * 1000);
+  }
+
+  log(`本轮扫描结束，等待 ${SCAN_INTERVAL_SECONDS} 秒`);
+  log(`当前网页通知记录数量: ${notifiedByLocation.size}`);
+}
+
+function startMonitor() {
+  if (timer) {
+    log("已经在监控中");
+    return;
+  }
+
+  log("开始监控");
+  scanOnce();
+
+  timer = setInterval(() => {
+    scanOnce();
+  }, SCAN_INTERVAL_SECONDS * 1000);
+}
+
+function stopMonitor() {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+
+  log("已停止监控");
+}
+
+document.getElementById("btnNotify").onclick = enableNotification;
+document.getElementById("btnTestAuth").onclick = testAuth;
+document.getElementById("btnStart").onclick = startMonitor;
+document.getElementById("btnStop").onclick = stopMonitor;
+document.getElementById("btnScanOnce").onclick = scanOnce;
+</script>
+</body>
+</html>
