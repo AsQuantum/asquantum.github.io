@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><meta content="#0b1020" name="theme-color"/><title>Orbital Genesis Calculator | 创世计算器</title><style>
+:root{color-scheme:dark;--bg:#090e1a;--surface:#111a2b;--surface2:#172338;--border:#2a3a51;--text:#edf3ff;--muted:#9caec6;--accent:#7dafff;--teal:#70dbc6;--orange:#f5c47b}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% -10%,#1a3457 0,transparent 46%),radial-gradient(ellipse at 100% 10%,#13243e 0,transparent 35%),var(--bg);font:15px/1.6 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:var(--text)}.wrap{max-width:1180px;margin:auto;padding:25px 22px 80px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px}.logo{font-weight:850;letter-spacing:.17em;font-size:13px;color:var(--teal)}button,select,input{font:inherit}button{cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:11px;padding:10px 15px}button:hover{border-color:var(--accent)}button.active{background:#203b60;border-color:#6199e3;color:#fff}.hero{padding:48px 0 26px}.eyebrow{color:var(--teal);font-size:12px;letter-spacing:.2em;text-transform:uppercase}.hero h1{font-size:clamp(30px,5vw,53px);line-height:1.1;letter-spacing:-.035em;margin:12px 0 15px}.hero p{max-width:750px;color:var(--muted);font-size:16px}.pill{display:inline-block;padding:4px 10px;border:1px solid #34516d;border-radius:50px;color:#c1d8f9;font-size:12px;margin-right:8px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:28px 0 12px}.section-title h2{font-size:20px;margin:0}.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:15px}.card{background:linear-gradient(140deg,rgba(22,34,53,.97),rgba(13,23,38,.98));border:1px solid var(--border);border-radius:17px;padding:19px;min-width:0}.col4{grid-column:span 4}.col6{grid-column:span 6}.col8{grid-column:span 8}.col12{grid-column:span 12}.card h3{margin:0 0 9px;font-size:16px}.sub{color:var(--muted);font-size:13px}.formula{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#0a1323;border:1px solid #23354d;border-radius:10px;padding:12px;overflow:auto;color:#a9d3ff;white-space:pre-wrap;overflow-wrap:anywhere}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:12px 0}.field{min-width:0}.field label{display:flex;align-items:center;gap:6px;color:#cfdded;font-size:13px;margin-bottom:6px}.hint{display:inline-grid;place-items:center;width:17px;height:17px;border:1px solid #647a94;border-radius:50%;color:#9ab5d5;font-size:11px;cursor:help}.field input,.field select{width:100%;background:#0b1424;border:1px solid #33455d;border-radius:10px;color:#fff;padding:10px 11px;outline:none}.field input:focus,.field select:focus{border-color:#80b3ff;box-shadow:0 0 0 3px #588bcd22}.metric{font-size:29px;letter-spacing:-.03em;font-weight:750;color:#a4e8d7}.metric.orange{color:var(--orange)}.note{padding:12px 14px;border-left:3px solid #6285ae;background:#15243a;border-radius:0 8px 8px 0;color:#b9cde3;font-size:13px}.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0}.hidden{display:none!important}.table-scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px;min-width:720px}th,td{padding:11px 10px;text-align:left;border-bottom:1px solid #263850;vertical-align:top}th{color:#a6bbd5;font-weight:600}td:nth-child(3),td:nth-child(4){font-variant-numeric:tabular-nums}.tag{display:inline-block;border:1px solid #425b77;border-radius:7px;padding:2px 7px;color:#bdd4f4;font-size:11px}.mini{font-size:12px;color:var(--muted)}.flex{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.wide{width:100%}.bar{height:9px;border-radius:10px;background:#24344a;overflow:hidden}.bar>div{height:100%;background:linear-gradient(90deg,#5188d6,#72d8c7)}.footer{margin-top:35px;padding-top:22px;border-top:1px solid var(--border);color:var(--muted);font-size:12px}.status{font-size:12px;color:var(--orange)}@media(max-width:780px){.col4,.col6,.col8{grid-column:span 12}.fields{grid-template-columns:1fr}.hero{padding-top:28px}.wrap{padding:18px 14px 50px}} .math-panel{background:#0a1323;border:1px solid #23354d;border-radius:12px;padding:12px 8px;overflow-x:auto;color:#c6e2ff}.math-line{padding:7px 0;border-bottom:1px solid #23334a}.math-line:last-child{border:0}.math-panel math{font-family:"Cambria Math","STIX Two Math",serif;font-size:1.14rem}.hint{position:relative;cursor:help}.hint:hover,.hint:focus-visible{color:#fff;border-color:#94c6ff;outline:0}.hint[data-tooltip]:hover::after,.hint[data-tooltip]:focus-visible::after{content:attr(data-tooltip);position:absolute;z-index:100;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);width:max-content;max-width:min(330px,80vw);min-width:180px;white-space:normal;overflow-wrap:break-word;color:#f0f6ff;background:#263d59;border:1px solid #82a8d7;border-radius:9px;padding:10px 12px;font:13px/1.5 system-ui,"Microsoft YaHei",sans-serif;text-align:left;box-shadow:0 12px 30px #0008;pointer-events:none}.formula-pretty{font-family:"Cambria Math",serif;font-size:16px;color:#c6e2ff}.eqstep{margin:14px 0;padding:14px;border:1px solid #2b425d;border-radius:13px;background:#0d1829}.step-head{font-weight:700;color:#b9dcff;margin-bottom:10px}.eqrow{display:flex;gap:16px;flex-wrap:wrap;align-items:center;overflow-x:auto;padding:8px 4px;color:#d5e9ff}.eqrow math{font-family:"Cambria Math","STIX Two Math",serif;font-size:1.22rem;white-space:nowrap}.derived{color:#79e1ca;font-weight:700;font-variant-numeric:tabular-nums;margin:8px 0}.eqstep .fields{margin-top:13px}.eqstep button{margin:6px 0 10px} .eqstep:first-of-type .eqrow{padding:14px 0}.eqstep:first-of-type math{font-size:1.25rem}
+.card.col8{grid-column:1/-1}.eqstep{margin:14px 0;padding:18px 18px 14px;border:1px solid #293d56;border-radius:14px;background:#0c1526}.eqstep .step-head{font-size:16px;font-weight:750;color:#c4e1ff;margin-bottom:14px}.eqrow{display:flex;flex-wrap:wrap;align-items:center;gap:20px;padding:14px 10px;background:#0a1220;border-radius:10px;overflow-x:auto}.eqrow math{font-family:Cambria Math,STIX Two Math,serif;font-size:1.12rem;color:#dcecff}.eqstep .fields{margin-top:14px}.eqstep .field label{display:block;margin-bottom:8px}.param-hint{margin-left:5px;color:#83b4f6;display:inline-block}.hint{cursor:help;position:relative;display:inline-flex!important;align-items:center;justify-content:center;vertical-align:middle;line-height:1!important;padding:0!important;flex:0 0 17px;box-sizing:border-box}.hint:hover::after,.hint:focus-visible::after{content:attr(data-tooltip);display:block;position:absolute;left:0;bottom:calc(100% + 8px);width:max-content;max-width:300px;white-space:normal;padding:10px 12px;color:#fff;background:#223854;border:1px solid #638dc0;border-radius:9px;font:13px/1.5 system-ui;z-index:30;box-shadow:0 9px 25px #0009}.bh-inline{border-top:1px solid #334b67;margin-top:16px;padding-top:16px}.bh-inline h3{margin:0 0 12px}.bh-inline .fields{margin-top:12px} .obs-row{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:12px}.obs-row .obs-action{align-self:end}.obs-row .remove-obs{white-space:nowrap;margin:0 0 1px;padding:10px 12px}@media(max-width:650px){.obs-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.obs-row .obs-action{grid-column:2;justify-self:end}} 
+/* Readable equation layout: inspired by the original poster's stacked fractions. */
+.db-math{font-family:Georgia,'Times New Roman',serif!important;font-size:18px!important;display:inline-flex;align-items:center;flex-wrap:wrap;gap:2px;line-height:1.45;white-space:normal;overflow-wrap:anywhere;color:#e6f4ff}
+.db-math sub,.db-math sup{font-size:.67em;line-height:0;position:relative}
+.math-frac-native{display:inline-flex;vertical-align:middle;flex-direction:column;align-items:center;justify-content:center;line-height:1.22;margin:0 3px;max-width:100%}
+.math-frac-native>span:first-child{border-bottom:1.5px solid #dcecff;padding:0 5px 3px;text-align:center}
+.math-frac-native>span:last-child{padding:3px 5px 0;text-align:center}
+.db-table td:nth-child(3){min-width:280px}
+.db-legend{border:1px solid #2a4966;border-radius:10px;background:#0c1c2e;padding:13px 16px;margin:10px 0 16px;line-height:1.7;color:#cfe6fa}
+.db-legend strong{color:#78e3ba}
+.db-model-note{display:block;color:#a8c2da;font-size:12px;margin-top:6px}
+
+/* v23: original poster hierarchy, no nested opaque blue badge boxes */
+.db-inline-name{display:inline-flex;align-items:center;gap:7px;flex-wrap:nowrap;white-space:nowrap;color:#f1f8ff;font-size:19px}
+.db-inline-name .db-glyph{flex:0 0 31px;width:31px;height:31px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--db-accent);background:color-mix(in srgb,var(--db-accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--db-accent) 65%,transparent);text-shadow:0 0 12px var(--db-accent);box-shadow:0 0 12px color-mix(in srgb,var(--db-accent) 24%,transparent)}
+.db-lv-word{font-size:17px;color:#dbeafa;margin-left:3px}
+.db-inline-name .db-title-level,.db-custom-name .db-title-level{min-width:60px!important;width:60px!important;min-height:34px!important;padding:2px 3px!important;background:transparent!important;border:1px solid #607b8f!important;color:inherit!important;border-radius:5px!important;font-size:17px!important}
+.db-combo-badges .db-name-picker,.db-combo-badges .db-inline-name{border:0!important;background:transparent!important;padding:0!important}
+.db-combo-badges{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.db-combo-title{background:linear-gradient(110deg,color-mix(in srgb,var(--db-a) 11%,#071321),color-mix(in srgb,var(--db-b) 11%,#071321));}
+.db-combo-title>strong{margin-bottom:12px}
+.db-custom-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.db-table td:nth-child(2){line-height:1.5}
+
+/* Keep scientific constant symbols together; wrap only at word boundaries. */
+.db-reward strong,.db-reward small{overflow-wrap:normal!important;word-break:normal!important;}
+.db-reward strong{white-space:normal;}
+.db-constant-symbol{display:inline-block;white-space:nowrap;word-break:keep-all;}
+.db-reward>div{min-width:0;}
+</style><style>.deb-tabs{display:flex;flex-wrap:wrap;gap:9px;margin:16px 0}.deb-tabs button{padding:10px 18px}.db-table{width:100%;border-collapse:collapse}.db-table th,.db-table td{padding:13px 10px;border-bottom:1px solid #29465a;vertical-align:middle}.db-table td:nth-child(3){min-width:260px}.db-table select,.db-custom-grid select{width:auto;max-width:200px;background:#0c2437;color:#eff9ff;border:1px solid #386785;border-radius:6px;padding:7px;margin:3px}.db-custom-grid{display:flex;flex-direction:column;align-items:stretch;gap:12px;margin:16px 0;max-width:760px}.db-custom-item{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px;border:1px solid #29465a;border-radius:10px;background:#0c192b}.db-custom-item button{padding:7px 12px}.db-math{font-family:Georgia,serif;font-size:1.07em;overflow-wrap:anywhere}.db-table .mini{margin-top:5px}.db-table label{display:inline-block;margin:3px}.db-level-cell{display:flex;flex-direction:column;gap:6px}.db-per-level{font-size:12px;color:#a9c7e5}.db-current-x{color:#7de3ca;font-variant-numeric:tabular-nums}.db-math math{font-family:"Cambria Math","STIX Two Math",serif;font-size:1.16rem;color:#d3eaff}.db-table td:nth-child(3){min-width:300px}.db-model-note{display:block;font-size:11px;color:#91a9c5}</style><style>
+/* v0.19: readability and source-poster-inspired sizing */
+body{font-size:18px;line-height:1.6}.wrap{max-width:1520px!important}.hero p,.sub,.note,.mini,.db-legend,.db-per-level,.db-model-note{font-size:16px!important;line-height:1.55!important}
+.card h3,.step-head{font-size:23px!important}label,.field label{font-size:17px!important}input,select,button{font-size:17px!important;min-height:42px}.db-table th{font-size:19px!important;padding:17px 13px!important}.db-table td{font-size:18px!important;padding:17px 13px!important;line-height:1.6!important}.db-table math{font-size:1.45rem!important}.db-table .db-per-level{font-size:16px!important}.db-level-cell{gap:10px}.db-current-x{font-size:18px!important}.db-model-note{font-size:15px!important}.db-tabs button,.deb-tabs button{font-size:18px!important;padding:13px 20px!important}
+.db-custom-grid{max-width:none!important;gap:10px!important}.db-custom-item{display:grid!important;grid-template-columns:minmax(130px,1.1fr) minmax(190px,1.6fr) minmax(140px,.8fr) minmax(150px,.8fr);gap:14px!important;padding:16px 20px!important;align-items:center!important}.db-custom-name{font-weight:700;font-size:20px}.db-custom-rule{font-size:17px;color:#b6d1e6}.db-custom-x{font-size:18px;color:#7de3ca;font-variant-numeric:tabular-nums}.db-custom-summary{font-size:18px;color:#a9d5f4;margin:15px 0}.db-custom-item label{white-space:nowrap}
+@media(max-width:900px){.db-custom-item{grid-template-columns:1fr 1fr!important}.db-table{min-width:780px}.db-custom-item label{white-space:normal}}
+</style><style id="v20-typography-and-debuff-colors">
+/* Full-page readability pass: all sections, not just Debuff tables */
+html{font-size:19px}body{font-size:19px!important;line-height:1.65!important}
+.wrap{max-width:1580px!important;padding:30px 28px 90px!important}
+.logo{font-size:17px!important}.eyebrow{font-size:16px!important}
+.hero h1{font-size:clamp(40px,5vw,66px)!important}.hero p{font-size:21px!important;max-width:1100px!important}
+.section-title h2{font-size:28px!important}.card{padding:26px!important}.card h3,.eqstep .step-head{font-size:24px!important}
+.sub,.note,.mini,.status,.footer,.db-legend,.db-per-level,.db-model-note,.db-custom-rule,.db-custom-summary{font-size:17px!important;line-height:1.6!important}
+.field label,.db-level-cell label,label{font-size:18px!important}.hint{width:23px!important;height:23px!important;font-size:15px!important;flex-basis:23px!important}
+.field input,.field select,input,select,button{font-size:19px!important;min-height:48px!important}
+.formula,.formula-pretty,.math-panel,.eqrow,.eqstep{font-size:19px!important}
+.eqrow math,.math-panel math,.db-table math{font-size:1.45rem!important}
+.derived{font-size:20px!important}.metric{font-size:34px!important}.pill,.tag{font-size:16px!important}
+table:not(.db-table){font-size:18px!important}th,td{padding:15px!important}.db-table{font-size:19px!important;min-width:1000px}.db-table th{font-size:20px!important}.db-table td{font-size:19px!important;padding:18px 16px!important}
+.db-table td:first-child{min-width:225px}.db-table td:nth-child(2){min-width:280px}.db-table td:nth-child(3){min-width:330px}
+.db-table tr{background:linear-gradient(90deg,color-mix(in srgb,var(--db-row,#5a8dbf) 9%,#0d1a2a),#0d1a2a 62%)!important}
+.db-table td:first-child{border-left:4px solid var(--db-row,#4e779f)}
+.db-table td:last-child strong{font-size:25px;color:#86e7ce}
+.db-badge{--db-accent:#86cfff;display:inline-flex;align-items:center;gap:11px;max-width:100%;padding:9px 12px;border:1px solid color-mix(in srgb,var(--db-accent) 65%,#182b3d);border-radius:11px;background:linear-gradient(110deg,color-mix(in srgb,var(--db-accent) 19%,#071321),#071321);color:var(--db-accent);font-size:19px;font-weight:800;line-height:1.35;box-shadow:inset 0 0 12px color-mix(in srgb,var(--db-accent) 8%,transparent)}
+.db-glyph{display:inline-grid;place-items:center;flex:0 0 39px;width:39px;height:39px;border-radius:50%;border:2px solid var(--db-accent);font-size:24px;color:var(--db-accent);text-shadow:0 0 10px var(--db-accent);box-shadow:0 0 13px color-mix(in srgb,var(--db-accent) 60%,transparent),inset 0 0 9px color-mix(in srgb,var(--db-accent) 30%,transparent)}
+.db-badge-name small{font-size:14px;white-space:nowrap;color:#dceaff}.db-combo-title{border-radius:11px;padding:12px;background:linear-gradient(125deg,color-mix(in srgb,var(--db-a) 23%,#071321),color-mix(in srgb,var(--db-b) 15%,#071321));border:1px solid color-mix(in srgb,var(--db-a) 45%,#152b3e)}
+.db-combo-title>strong{font-size:20px;display:block;margin-bottom:9px}.db-combo-badges{display:flex;gap:7px;flex-wrap:wrap}.db-combo-badges .db-badge{font-size:15px;padding:5px 7px;gap:6px}.db-combo-badges .db-glyph{width:25px;height:25px;flex-basis:25px;font-size:16px}.db-combo-badges .db-badge-name small{font-size:12px}
+.db-custom-grid{max-width:none!important}.db-custom-item{border-left:4px solid var(--db-row)!important;background:linear-gradient(90deg,color-mix(in srgb,var(--db-row) 13%,#0a1727),#0a1727)!important;min-height:90px;padding:17px 20px!important}
+.db-custom-name{font-size:19px!important}.db-custom-x{font-size:20px!important;color:#8fe5d0}.db-custom-item label{font-size:19px!important}
+.db-custom-summary{font-size:20px!important;margin:12px 0}.math-panel p{font-size:19px!important}.math-panel .db-combo-title{display:inline-block;margin:6px}
+@media(max-width:800px){.wrap{padding:20px 14px 60px!important}.card{padding:17px!important}.db-custom-item{grid-template-columns:1fr 1fr!important}.db-custom-name{grid-column:1/-1}.db-table{min-width:1050px}}
+</style><style>
+.db-pair-levels{display:flex;flex-direction:column;gap:12px}.db-pair-level{display:flex;flex-direction:column;gap:7px;padding:12px;border:1px solid #31526b;border-radius:10px;background:#0c2133}.db-level-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.db-level-controls b{color:#85e6cf}.db-reward{display:flex;gap:13px;align-items:center;padding:12px 14px;border:1px solid #456178;border-radius:10px;background:linear-gradient(115deg,#1a3345,#0c1d2d);min-width:205px}.db-reward-icon{font-size:25px;font-weight:800;color:#ffe4a1;text-shadow:0 0 10px #f9bc6380;border:1px solid #bd9967;border-radius:50%;min-width:52px;height:52px;display:grid;place-items:center}.db-reward strong{display:block;font-size:18px}.db-reward small{display:block;font-size:16px;line-height:1.5;color:#bed8e8}.db-constant-list{margin-top:25px;padding:20px;border:1px solid #41657c;border-radius:14px}.db-constant-list summary{font-size:23px;font-weight:700;cursor:pointer}.db-constant-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:15px;margin-top:18px}.db-constant-grid>div{display:flex;flex-direction:column;gap:8px;border:1px solid #2a4b62;padding:12px;border-radius:12px}.db-custom-constants{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:20px 0}.db-custom-constants h3{grid-column:1/-1;margin:10px 0 0}.db-table td:nth-child(3){min-width:270px}.db-table td:nth-child(4){min-width:280px}.db-table td{vertical-align:top}.db-pair-level .db-badge{max-width:max-content}
+</style><style id="v22-clean-layout">
+.db-name-picker,.db-combo-badges .db-name-picker{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.db-title-level{width:95px!important;min-width:95px!important;min-height:44px!important;font-size:18px!important;background:#152d42!important;border:1px solid #527b9b!important;color:#e8f6ff!important;border-radius:9px!important;padding:5px 8px!important}
+.db-combo-badges .db-name-picker{border:1px solid #35536c;border-radius:10px;padding:4px}
+.db-custom-name{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.db-custom-item{grid-template-columns:minmax(310px,1.2fr) minmax(280px,1.4fr) minmax(140px,.6fr)!important}
+#freezePanel>.grid{grid-template-columns:1fr!important}
+#freezePanel .card{grid-column:1/-1!important}
+#freezeAssumptionsText math{font-size:1.5em;vertical-align:middle}
+@media(max-width:850px){.db-custom-item{grid-template-columns:1fr!important}}
+</style><style id="v24-css">
+.db-inline-name{background:linear-gradient(90deg,color-mix(in srgb,var(--db-accent) 15%,#06172a),#071b31);border:1px solid color-mix(in srgb,var(--db-accent) 35%,#18344c);border-radius:9px;padding:7px 10px;gap:7px}
+.db-combo-badges .db-inline-name{background:linear-gradient(90deg,color-mix(in srgb,var(--db-accent) 15%,#06172a),#071b31)!important;border:1px solid color-mix(in srgb,var(--db-accent) 30%,#18344c)!important;padding:6px 9px!important}
+.db-inline-name .db-glyph{background:none;border:0;box-shadow:none;width:auto;height:auto;flex-basis:auto;font-size:27px;text-shadow:0 0 7px var(--db-accent),0 0 18px var(--db-accent)}
+.db-inline-name .db-title-level,.db-custom-name .db-title-level{background:#0a2338!important;color:#eff8ff!important;border:1px solid #6d9db9!important;appearance:auto!important;min-width:55px!important;width:55px!important;box-shadow:none!important}
+.db-title-level option{background:#0b253b!important;color:#eff8ff!important}
+.db-reward{--constant-color:#7be8ff;align-items:center}.db-reward-icon{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:var(--constant-color)!important;text-shadow:0 0 8px var(--constant-color),0 0 20px var(--constant-color)!important;font-size:31px!important;min-width:55px;text-align:center}
+
+.db-constant-grid>div{--constant-color:#7be8ff}.db-constant-grid>div .db-reward{--constant-color:inherit}
+.freeze-chart-wrap{margin-top:22px;border-top:1px solid #2b4d65;padding-top:16px}.freeze-chart-wrap canvas{display:block;width:100%;height:310px;max-height:none;background:#061a2a;border-radius:12px}
+</style><style>
+/* v0.28: pair-constant glyphs align with the reward text; no circle decoration. */
+.db-reward{display:grid!important;grid-template-columns:56px minmax(0,1fr);align-items:center!important;gap:12px!important;}
+.db-reward-icon{display:flex!important;align-items:center!important;justify-content:center!important;width:56px!important;min-width:56px!important;height:60px!important;line-height:1!important;margin:0!important;padding:0!important;vertical-align:middle!important;}
+.db-reward>div{min-width:0;align-self:center;}
+.db-reward strong,.db-reward small{overflow-wrap:anywhere;}
+.db-quad-caveat{font-size:15px;color:#a8c4d5;margin-top:8px;line-height:1.5;}
+</style>
+
+<style>
+/* v33: always-visible navigation and responsive formula viewport */
+.top{position:sticky;top:0;z-index:1000;padding:12px 16px;margin:0 -16px;background:rgba(9,18,32,.97);border:1px solid #29445c;border-radius:0 0 12px 12px;backdrop-filter:blur(12px);box-shadow:0 7px 22px #0007}
+.top .logo{font-size:clamp(12px,1.5vw,17px);letter-spacing:.07em;overflow-wrap:anywhere}
+.top #language{flex-shrink:0}
+.db-table{width:100%;table-layout:fixed;min-width:0!important}
+.db-table th,.db-table td{min-width:0!important;max-width:100%;overflow-wrap:anywhere}
+.db-table td .db-math{display:block;width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;white-space:nowrap;overscroll-behavior-x:contain;padding:8px 2px}
+.db-table td .db-math math{display:inline-block;max-width:none;font-size:clamp(.86rem,1.15vw,1.22rem)!important;white-space:nowrap}
+.db-table td .db-math math *{white-space:nowrap}
+.db-table th:nth-child(1){width:23%}.db-table th:nth-child(2){width:20%}.db-table th:nth-child(3){width:20%}.db-table th:nth-child(4){width:27%}.db-table th:nth-child(5){width:10%}
+.db-table td:last-child strong{font-size:clamp(17px,1.8vw,25px)}
+.math-panel,.eqrow,.formula,.eqstep{max-width:100%;min-width:0;overflow-x:auto}
+@media(max-width:900px){.db-table{min-width:760px!important}.db-table td .db-math math{font-size:1rem!important}.top{margin:0 -8px}}
+</style><style>.db-table-page-1 th:nth-child(1){width:29%}.db-table-page-1 th:nth-child(2){width:21%}.db-table-page-1 th:nth-child(3){width:38%}.db-table-page-1 th:nth-child(4){width:12%}.db-table-page-2 th:nth-child(1){width:32%}.db-table-page-2 th:nth-child(2){width:54%}.db-table-page-2 th:nth-child(3){width:14%}</style><style>
+.db-x-definition{display:block;margin-top:5px;max-width:100%;min-width:0;overflow:visible;white-space:normal;overflow-wrap:anywhere;font-size:16px!important;line-height:1.5!important;color:#bed8e8;font-variant-numeric:tabular-nums}
+
+
+</style>
+
+<style id="v36-responsive-equations">
+/* Theoretical equation cells: proportional, compact MathML rather than internal scrolling. */
+.db-table{width:100%!important;table-layout:fixed!important;min-width:0!important}
+.db-table th,.db-table td{box-sizing:border-box;min-width:0!important;overflow-wrap:break-word}
+.db-table th{font-size:clamp(12px,1.18vw,18px)!important;line-height:1.3!important;word-break:normal;hyphens:auto;padding:12px 7px!important}
+.db-table td{padding:12px 7px!important}
+.db-table td .db-math{display:block;box-sizing:border-box;width:100%;max-width:100%;overflow:visible!important;white-space:normal!important;padding:3px 0!important;min-width:0}
+.db-table td .db-math math{display:inline-block;max-width:100%;font-size:clamp(9px,.88vw,15px)!important;white-space:normal!important}
+.db-table td .db-math math *{white-space:normal!important}
+.db-table-page-0 th:nth-child(1){width:22%}.db-table-page-0 th:nth-child(2){width:20%}.db-table-page-0 th:nth-child(3){width:20%}.db-table-page-0 th:nth-child(4){width:29%}.db-table-page-0 th:nth-child(5){width:9%}
+.db-table-page-1 th:nth-child(1){width:27%}.db-table-page-1 th:nth-child(2){width:21%}.db-table-page-1 th:nth-child(3){width:41%}.db-table-page-1 th:nth-child(4){width:11%}
+@media(max-width:900px){.db-table{min-width:0!important}.db-table th{font-size:clamp(10px,1.6vw,13px)!important;padding:8px 3px!important}.db-table td{padding:9px 3px!important}.db-table td .db-math math{font-size:clamp(8px,1.5vw,12px)!important}}
+@media(max-width:600px){.db-table{min-width:620px!important}.db-table td .db-math math{font-size:11px!important}}
+</style>
+<style>.db-custom-model-ratio{display:inline-block;color:#7de3ca!important;font-weight:800;font-size:clamp(21px,2vw,27px);font-variant-numeric:tabular-nums;text-shadow:0 0 12px #4acaa544}.db-inherit-toggle{display:flex;align-items:center;gap:10px;margin:14px 0;padding:10px 12px;border:1px solid #40516a;border-radius:10px;font-size:14px;color:#a9bdd2;cursor:pointer}.db-inherit-toggle input{width:17px;height:17px;flex-shrink:0;accent-color:#66c8ef}.db-inherit-toggle span{min-width:0}</style></head><body><main class="wrap"><header class="top" role="banner"><div class="logo">◉ ORBITAL GENESIS <span style="color:#7e9cba">/ CALCULATOR</span></div><button aria-label="Switch language" id="language">ENGLISH</button></header><section class="hero"><div class="eyebrow" data-i="eyebrow">交互式理论模型 · PATH OF GRAVITY</div><h1 data-i="title">Orbital Genesis<br/>创世计算器</h1><p data-i="intro">计算 Debuff 对创世时间的影响，估算黑洞与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。</p><span class="pill">v0.21 beta</span></section>
+<div class="section-title"><h2 data-i="general">01 / 基础参数与公式</h2></div>
+<div class="grid"><div class="card col8"><h3 data-i="equations">计算顺序 · 核心方程</h3>
+<p class="sub" data-i="orderExplain">先读取游戏常量，再测量黑洞增长，最后用实际创世耗时校准时间参数；避免用耗时反推尚未确定的增长速度。</p>
+<div class="eqstep"><div class="step-head" data-i="step1">① 每级最终能量需求</div><div class="eqrow"><math display="block"><msub><mi>E</mi><mtext>final</mtext></msub><mo>=</mo><mo>{</mo><mtable><mtr><mtd><msup><mn>10</mn><mrow><mn>1000</mn><mo>·</mo><msub><mi>k</mi><mtext>bonus</mtext></msub><mo>·</mo><mi>k</mi></mrow></msup></mtd><mtd><mtext>n ≤ 20</mtext></mtd></mtr><mtr><mtd><msup><mn>10</mn><mrow><mn>1000</mn><mo>·</mo><msub><mi>k</mi><mtext>bonus</mtext></msub><mo>·</mo><msup><mi>k</mi><mrow><mi>n</mi><mo>−</mo><mn>20</mn></mrow></msup></mrow></msup></mtd><mtd><mtext>n &gt; 20</mtext></mtd></mtr></mtable></math></div><div class="fields"><div class="field"><label>k · <span data-i="kInlineLabel">目标指数等级增长倍率</span><span class="hint param-hint" data-tip-key="k" tabindex="0"> ?</span></label><input id="k" inputmode="decimal" type="text" value="1.11"/></div><div class="field"><label>k<sub>bonus</sub> · <span data-i="bonusLabel">创世条件奖励倍率</span><span class="hint param-hint" data-tip-key="k_bonus" tabindex="0"> ?</span></label><input id="k_bonus" inputmode="decimal" type="text" value="0.5"/></div></div><div class="derived" id="targetParams">k = 1.11 · k_bonus = 0.5</div></div>
+<div class="eqstep"><div class="step-head" data-i="inheritStep">② 黑洞质量继承与初始能量比例</div><div class="eqrow"><math><msubsup><mi>M</mi><mi>n</mi><mtext>initial</mtext></msubsup><mo>=</mo><msup><mrow><mo>(</mo><msubsup><mi>M</mi><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow><mtext>final</mtext></msubsup><mo>)</mo></mrow><mi>q</mi></msup></math><math><mi>g</mi><mo>=</mo><mfrac><mrow><msub><mi>log</mi><mn>10</mn></msub><msub><mi>E</mi><mtext>initial</mtext></msub></mrow><mrow><msub><mi>log</mi><mn>10</mn></msub><msub><mi>E</mi><mtext>final</mtext></msub></mrow></mfrac></math></div><div class="fields"><div class="field"><label>q · <span data-i="qCombinedLabel">黑洞质量继承指数</span><span class="hint" data-tip-key="qCombined" tabindex="0">?</span></label><input id="qCombined" inputmode="decimal" type="text" value="0.79"/></div></div><div class="derived" id="qDisplay">q = 0.79</div></div>
+<div class="eqstep"><div class="step-head" data-i="step2">③ 黑洞质量增长与威力</div><div class="eqrow"><math display="block" aria-label="E blackhole equals M to the power e"><msub><mi>E</mi><mtext>blackhole</mtext></msub><mo>=</mo><msup><mi>M</mi><mi>e</mi></msup></math></div><div class="eqrow"><math><mi>M</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><msub><mi>M</mi><mn>0</mn></msub><mo>·</mo><msup><mn>10</mn><mrow><mi>t</mi><msub><mi>log</mi><mn>10</mn></msub><mo>(</mo><mi>v</mi><mo>)</mo></mrow></msup></math><math><mi>v</mi><mo>(</mo><msub><mi>P</mi><mtext>max</mtext></msub><mo>)</mo><mo>=</mo><msup><mn>10</mn><mrow><mi>τ</mi><msub><mi>c</mi><mtext>BH</mtext></msub><msub><mi>k</mi><mtext>BH</mtext></msub><msub><mi>P</mi><mtext>max</mtext></msub></mrow></msup></math></div><div class="fields"><div class="field"><label>c<sub>BH</sub> · <span data-i="bhBonusLabel">黑洞增长加成系数</span><span class="hint" data-tip-key="bhBonus" tabindex="0">?</span></label><input id="bhBonus" inputmode="decimal" type="text" value="2.5"/></div><div class="field"><label>P<sub>max</sub> · <span data-i="powerLabel">黑洞威力</span><span class="hint" data-tip-key="power" tabindex="0">?</span></label><input id="power" inputmode="decimal" type="text" value="66.8"/></div><div class="field"><label>v · <span data-i="growthLabel">每秒质量增长倍率</span><span class="hint" data-tip-key="growth" tabindex="0">?</span></label><input id="growth" inputmode="decimal" type="text" value="8.29e14"/></div><div class="field"><label>τ · <span data-i="timeFlowLabel">时间流速因子</span><span class="hint" data-tip-key="timeFlow" tabindex="0">?</span></label><input id="timeFlow" inputmode="decimal" type="text" value="1"/></div><div class="field"><label><i>e</i> · <span data-i="massEffectLabel">黑洞质量能量贡献指数</span><span class="hint param-hint" data-tip-key="massEffect" tabindex="0">?</span></label><input id="massEffect" inputmode="decimal" type="text" value="2.5"/></div><div class="field"><label>k<sub>BH</sub> · <span data-i="kappaLabel">黑洞增长拟合系数</span><span class="hint" data-tip-key="kappa" tabindex="0">?</span></label><input id="kappa" inputmode="decimal" type="text" value="0.0893333333"/></div></div><div class="derived" id="growthDisplay">—</div><div class="mini" id="growthPreview"></div><div class="fit-subsection"><div class="step-head" data-i="fitBhHeading">多组观测 · 拟合 k</div><div class="eqrow"><math><msub><mi>k</mi><mtext>BH</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>log</mi><mn>10</mn></msub><msub><mi>v</mi><mn>2</mn></msub><mo>−</mo><msub><mi>log</mi><mn>10</mn></msub><msub><mi>v</mi><mn>1</mn></msub></mrow><mrow><msub><mi>c</mi><mtext>BH</mtext></msub><mo>(</mo><msub><mi>P</mi><mn>2</mn></msub><mo>−</mo><msub><mi>P</mi><mn>1</mn></msub><mo>)</mo></mrow></mfrac></math></div><p class="mini" data-i="fitBhHelp">至少两组不同 Pmax 与对应每秒增长速度；增加观测后采用线性最小二乘拟合。</p><p class="mini" id="obsDisclaimer" style="color:#c78a39">第二组为演示假设数据，并非玩家实测；请替换后再使用拟合结果。</p><div id="observationList"></div><button id="addObservation" type="button" data-i="addObservation">+ 添加观测</button> <button id="applyBhFit" type="button" data-i="applyBhFit">应用拟合结果</button><div class="derived" id="fitBhResult">—</div><p class="mini" id="fitBhDetail"></p></div></div>
+<div class="eqstep"><div class="step-head" data-i="step3">④ 读取能量指数贡献</div><div class="eqrow"><math display="block"><msub><mi>r</mi><mtext>spark</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>log</mi><mn>10</mn></msub><msub><mi>E</mi><mtext>spark</mtext></msub></mrow><mrow><msub><mi>log</mi><mn>10</mn></msub><msub><mi>E</mi><mtext>total</mtext></msub></mrow></mfrac></math><math display="block"><msub><mi>r</mi><mtext>blackhole</mtext></msub><mo>=</mo><mfrac><mrow><msub><mi>log</mi><mn>10</mn></msub><msub><mi>E</mi><mtext>black hole</mtext></msub></mrow><mrow><msub><mi>log</mi><mn>10</mn></msub><msub><mi>E</mi><mtext>total</mtext></msub></mrow></mfrac></math></div><div class="fields"><div class="field"><label data-i="sparkLabel">火花对 log 能量的贡献<span class="hint param-hint" data-tip-key="rs" tabindex="0"> ?</span></label><input id="rs" inputmode="decimal" max="1" min="0" step="0.01" type="text" value="16191/36650"/></div></div><div class="fields"><div class="field hidden"><label id="layersLabel">8 · Generator chain layers (fixed)</label><input id="layers" inputmode="decimal" type="text" value="8" readonly/></div></div><div class="bh-inline"><h3>r<sub>blackhole</sub> <span class="hint" id="bhHelp">?</span></h3><div class="flex" style="margin-top:12px"><button type="button" id="bhTime" data-i="timeMethod">耗时反推</button><button type="button" id="bhDirect" data-i="direct">菜单读数</button></div><div class="fields" id="bhDirectFields"><div class="field"><label data-i="bhExponent">黑洞指数项</label><input id="bhExp" inputmode="decimal" type="text" value="550"/></div><div class="field"><label data-i="totalExponent">总能量指数</label><input id="totalExp" inputmode="decimal" type="text" value="1000"/></div></div><div class="fields" id="bhTimeFitFields"><div class="field"><label data-i="bhFitEndLabel">目标创世等级</label><input id="bhFitEnd" type="text" inputmode="numeric" value="64"/></div><div class="field"><label data-i="bhFitMinutesLabel">Lv0 至目标等级总耗时（分钟）</label><input id="bhFitMinutes" type="text" inputmode="decimal" value="29" placeholder="Required / 必填"/></div><div class="field"><label data-i="priorGenesisLabel">大冰冻前最高创世等级</label><input id="priorGenesis" type="text" inputmode="numeric" value="69"/></div></div><div class="mini" id="bhFitNote"></div><div class="metric" id="bhResult">0.55000</div><div class="mini" id="bhMethodDescription"></div></div></div>
+<p class="mini" data-i="equationNote">F 是目标能量的十进制指数；时间倍率始终采用「有 Debuff / 无 Debuff」。所有公式属于简化模型。</p></div>
+</div>
+<div class="section-title"><h2 data-i="calculators">02 / 计算工具</h2></div><div class="tabs"><button class="active" data-i="debuffTab" id="tabDebuffs">Debuff 倍率</button><button data-i="freezeTab" id="tabFreeze">大冰冻最优创世</button></div>
+<section id="debuffPanel"><div class="card"><h3 data-i="debuffHeading">Debuff 理论倍率</h3><p class="sub" data-i="debuffExplain">统一按黑洞质量指数继承与增长计算，单项、双组合、四组合、自由组合共用同一模型。结果依赖固定贡献比例、上一轮在阈值处创世等假设；不是实际逐轮模拟。</p><div class="deb-tabs"><button id="dbTab0" class="active" type="button">① Single</button><button id="dbTab1" type="button">② Pairs</button><button id="dbTab2" type="button">③ Four</button><button id="dbTab3" type="button">④ Custom</button></div><label class="db-inherit-toggle"><input type="checkbox" id="dbSameInheritance"/><span id="dbSameInheritanceText">继承上一轮相同 Debuff 组合（上一轮终点质量作为本轮继承基准）</span></label><div id="dbContent"></div><p class="mini" id="dbFootnote"></p></div></section>
+<section class="hidden" id="freezePanel"><div class="grid"><div class="card col8"><h3 data-i="freezeSettings">大冰冻参数</h3><div class="fields"><div class="field"><label data-i="freezeStart">起始创世等级</label><input id="freezeStart" inputmode="decimal" step="1" type="text" value="62"/></div><div class="field"><label data-i="freezeMax">最高比较等级</label><input id="freezeMax" inputmode="decimal" step="1" type="text" value="100"/></div><div class="field"><label data-i="freezePriorGenesis">大冰冻前最高创世等级</label><input id="freezePriorGenesis" inputmode="numeric" step="1" type="text" value="69"/><span class="mini" data-i="freezePriorHint">用于计算进入 Lv0 时继承的初始黑洞质量；与上方耗时反推参数独立。</span></div><div class="field"><label data-i="minGenesis">自动创世检测间隔（分钟）</label><input id="minTime" inputmode="decimal" type="text" value="1"/></div><div class="field"><label id="freezeRewardStartLabel">start_reward · 起始潜热</label><input id="freezeRewardStart" type="text" value="3" inputmode="decimal"/></div><div class="field"><label id="freezeRewardStepLabel">reward_per_level · 每级潜热增量</label><input id="freezeRewardStep" type="text" value="4" inputmode="decimal"/></div></div><div class="card col8"><h3 data-i="freezeBest">推荐终点（当前简化模型）</h3><div class="metric" id="bestLevel">—</div><div class="sub" id="bestDetail"></div><div class="freeze-chart-wrap"><h3 id="freezeChartTitle">累计潜热曲线</h3><canvas id="freezeChart" role="img" aria-label="累计潜热除以累计耗时的效率曲线"></canvas></div><div class="table-scroll" style="margin-top:18px"><table><thead><tr><th data-i="endAt">结束等级</th><th data-i="totalReward">累计奖励</th><th data-i="totalTime">累计耗时</th><th data-i="efficiency">每分钟奖励</th></tr></thead><tbody id="freezeRows"></tbody></table></div></div></div></section>
+<footer class="footer"><div data-i="footer">社区独立制作的理论计算工具，与游戏开发者无关。游戏预估、玩家实测与理论模型分别标记。数据仅保存在当前浏览器本地。</div><div style="margin-top:7px">Orbital Genesis Calculator · MIT · GitHub Pages ready</div></footer></main><script>'use strict';
+const safeStorage={getItem(key){try{return window.localStorage.getItem(key)}catch(e){return null}},setItem(key,value){try{window.localStorage.setItem(key,String(value))}catch(e){}},removeItem(key){try{window.localStorage.removeItem(key)}catch(e){}}};
+
+const $=id=>document.getElementById(id), clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+function arithmetic(raw){
+ const t=String(raw).replace(/\s+/g,'').replace(/×/g,'*').replace(/÷/g,'/');let i=0;
+ function atom(){if(t[i]==='+'){i++;return atom()}if(t[i]==='-'){i++;return -atom()}if(t[i]==='('){i++;const x=sum();if(t[i++]!==')')throw Error('parentheses');return x}const m=t.slice(i).match(/^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/);if(!m)throw Error('number');i+=m[0].length;return Number(m[0])}
+ function power(){let a=atom();if(t[i]==='^'){i++;a=Math.pow(a,power())}return a}
+ function product(){let a=power();while(t[i]==='*'||t[i]==='/'){const op=t[i++],b=power();a=op==='*'?a*b:a/b}return a}
+ function sum(){let a=product();while(t[i]==='+'||t[i]==='-'){const op=t[i++],b=product();a=op==='+'?a+b:a-b}return a}
+ try{const x=sum();return i===t.length&&Number.isFinite(x)?x:NaN}catch{return NaN}
+}
+const val=id=>arithmetic($(id).value);
+const dict={zh:{eyebrow:'交互式理论模型',title:'Orbital Genesis<br>创世计算器',intro:'计算 Debuff 对创世时间的影响，估算黑洞与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。',badge1:'中英双语',badge2:'本地计算 · 无需账号',general:'01 / 基础参数与公式',equations:'计算顺序 · 核心方程',equationNote:'F 是目标能量的十进制指数；时间倍率始终采用「有 Debuff / 无 Debuff」。下方估算基于简化增长模型，并非游戏源代码。',constants:'默认常数',gravityOnly:'常数可编辑。',bonusLabel:'创世条件奖励倍率',bonusGuide:'游戏中打开「多元 → 当前宇宙」，查看右侧「创世阶数 · 当前能量 × 倍率 = 目标能量」中的倍率。示例为 0.5。',sparkSub:'火花',sparkLabel:'火花对 log 能量的贡献',sparkGuide:'游戏中找到「星图」最下方，读取火花数量的指数 / 总能量指数。静态占比不一定等于增长斜率占比。',bhSub:'黑洞',direct:'菜单读数',timeMethod:'耗时反推',bhExponent:'黑洞指数项',totalExponent:'总能量指数',startLevel:'起始创世等级',endLevel:'结束创世等级',elapsed:'总用时（分钟）',minGenesis:'自动创世检测间隔（分钟）',calculators:'02 / 计算工具',debuffTab:'Debuff 倍率',freezeTab:'大冰冻潜热最优计算',debuffHeading:'单项 / 组合理论倍率',debuffExplain:'游戏预估与模型结果分开显示。各等级使用逐级效果公式，耗时倍率为简化近似。',name:'名称',effects:'机制 / 公式',gameEstimate:'游戏预估',modelEstimate:'模型结果',heavyModel:'沉重引力：八层假设',heavyIntro:'八层轨道简化模型，使用固定指数 8；价格与产能反馈未经验证。',heavySub:'沉重',layers:'有效层数',heavyCaveat:'注意：该公式仅提供近似估算，结果不可靠。指数 8 仅作为八层轨道的简化假设，并非已验证的游戏机制。',heavyCompare:'游戏预估：×2.2；理论假设结果与其分开。',freezeSettings:'大冰冻潜热优化参数',freezeStart:'起始创世等级',freezeMax:'最高比较等级',rewardBase:'Lv64 奖励',rewardStep:'后续每级奖励',resetOverhead:'每轮冰冻额外耗时（秒）',effectiveR:'Debuff 近似公式系数（待实测）',freezeAssumptions:'优化指标：累计潜热 ÷ Lv0 至终点的总耗时（包含 Lv0–20 的前置耗时）；最低每次 1 秒。',freezeBest:'推荐终点（当前简化模型）',endAt:'结束等级',totalReward:'累计潜热',totalTime:'累计耗时',efficiency:'每分钟奖励',footer:'社区独立制作的理论计算工具，与游戏开发者无关。游戏预估、玩家实测与理论模型分别标记。数据仅保存在当前浏览器本地。',directDesc:'菜单比例：黑洞质量指数 / 总能量指数。不是时间增长斜率。',timeDesc:'耗时反推：估计时间模型的 （已移除的旧系数），不等于黑洞指数占比。',invalid:'请输入有效参数',seconds:'秒',minutes:'分钟',best:'推荐',assumed:'假设模型',empirical:'经验值',single:'单项',double:'双组合',quad:'四组合',none:'未建模',bhHint:'打开「星图」下方的「能量倍率」，查看黑洞质量指数与总能量指数。',sparkHint:'「星图」最下方：火花数量指数 ÷ 总能量指数。静态占比与增长斜率占比需区分。',bonusHint:'多元 → 当前宇宙，右侧「当前能量 × 倍率 = 目标能量」中的倍率。'},en:{eyebrow:'INTERACTIVE MODEL',title:'Orbital Genesis<br>Calculator',intro:'Estimate Debuff time ratios, measure black-hole and Spark contributions, and compare Big Freeze stopping levels. All model assumptions are disclosed.',badge1:'Chinese / English',badge2:'Runs locally · No account',general:'01 / Parameters & Equations',equations:'Calculation order · Core equations',equationNote:'F is the base-10 exponent of the target energy. Time ratio always means Debuff / no Debuff. These are simplified models, not game source code.',constants:'Default constant',gravityOnly:'Constants are editable.',bonusLabel:'Genesis threshold bonus',bonusGuide:'Open Multiverse → Current Universe. Read the multiplier on the right beside “Genesis Tier · Current Energy × Multiplier = Target Energy”. Example: 0.5.',sparkSub:'Spark',sparkLabel:'Spark share of log energy',sparkGuide:'Star Map → bottom: Spark count exponent divided by total energy exponent. A static share is not necessarily a growth-rate share.',bhSub:'Black hole',direct:'Menu values',timeMethod:'Fit from time',bhExponent:'Black-hole exponent',totalExponent:'Total energy exponent',startLevel:'Start Genesis level',endLevel:'End Genesis level',elapsed:'Elapsed time (minutes)',minGenesis:'Auto-Genesis polling interval (minutes)',calculators:'02 / Calculators',debuffTab:'Debuff ratios',freezeTab:'Big Freeze Latent Heat Optimizer',debuffHeading:'Singles & combinations',debuffExplain:'Level effects follow per-level rules; time ratios remain model approximations.',name:'Name',effects:'Effect / equation',gameEstimate:'Game estimate',modelEstimate:'Model result',heavyModel:'Heavy Gravity: 8-layer scenario',heavyIntro:'Simplified eight-tier model with fixed exponent 8; pricing and production feedback are unverified.',heavySub:'heavy',layers:'Effective tiers',heavyCaveat:'Warning: this formula is only a rough approximation and is unreliable. Exponent 8 is an unverified eight-tier simplification, not a confirmed game mechanic.',heavyCompare:'Game estimate: ×2.2; shown separately from the theoretical scenario.',freezeSettings:'Big Freeze Latent Heat Optimizer · Settings',freezeStart:'Start Genesis level',freezeMax:'Maximum candidate level',rewardBase:'Reward at Lv64',rewardStep:'Reward for subsequent levels',resetOverhead:'Freeze overhead per cycle (sec)',effectiveR:'Time-model coefficient',freezeAssumptions:'Objective: cumulative latent heat / total time from Lv0 to the endpoint, including Lv0–20; minimum 1 second per Genesis.',freezeBest:'Suggested endpoint (simplified model)',endAt:'End level',totalReward:'Cumulative latent heat',totalTime:'Total time',efficiency:'Reward / minute',footer:'Unofficial community theory tool, not affiliated with the game. Game estimates, empirical results, and theory are kept separate. Data is stored locally in your browser.',directDesc:'Menu ratio: black-hole mass exponent / total energy exponent. Not a time-growth slope.',timeDesc:'Time-fit result: estimates （已移除的旧系数） for the time model, NOT black-hole exponent share.',invalid:'Enter valid parameters',seconds:'sec',minutes:'min',best:'Best',assumed:'Scenario',empirical:'Empirical',single:'Single',double:'Pair',quad:'Four',none:'Not modeled',bhHint:'Open Star Map → Energy Multiplier below; read the black-hole mass exponent and total energy exponent.',sparkHint:'Star Map → bottom: Spark count exponent / total energy exponent. This is a snapshot ratio.',bonusHint:'Multiverse → Current Universe; read the multiplier in “Current energy × multiplier = target energy”.'}};
+
+const extraI18n={
+zh:{orderExplain:'先读取游戏常量，再测量黑洞增长，最后用实际创世耗时校准时间参数；避免用耗时反推尚未确定的增长速度。',step1:'① 读取继承与目标条件',step2:'③ 黑洞质量增长与威力（待测）',step3:'④ 读取能量指数贡献',step4:'⑤ 创世耗时校准（可选）',qTreeLabel:'起源之树 → 继承',qMultiLabel:'多元 → 常数与组合：继承加成',qHelp:'两处黑洞质量继承比例相加；默认 0.75 + 0.04 = 0.79。',growthHelp:'P：虚无 → 吸积盘 → 黑洞威力；g：虚无 → 活跃期每秒增长。输入科学计数法后自动取 log₁₀；仅适用于每秒增长倍率。a 为额外加速倍率，默认 1。κ 是简化模型的校准系数。',powerLabel:'Pmax · 黑洞威力',growthLabel:'每秒质量指数增长 g',accelLabel:'a · 额外加速倍率',kappaLabel:'κ · 当前模型系数',applyKappa:'使用观测值更新 κ',ratioHelp:'火花：「星图」最下方的火花数量指数 ÷ 总能量指数；黑洞：M 菜单 → 星图下方的黑洞指数项 ÷ 总能量指数。静态占比不一定等于增长斜率占比。',fitHelp:'确定 k、q、P、κ 和 k_bonus 后，才使用创世次数与总时间拟合 （已移除的旧系数）。它不是黑洞指数占比。',kGuide:'k 是创世目标指数的等级增长倍率（默认 1.11），不是黑洞增长系数 κ。可比较 Lv21 与 Lv22 的目标能量指数：k ≈ F(22)/F(21)。'},
+en:{orderExplain:'Read game constants first, measure black-hole growth next, and fit the time coefficient from observed Genesis runs last.',step1:'① Read inheritance and target threshold',step2:'③ Black-hole growth and power (measurement)',step3:'④ Read energy exponent shares',step4:'⑤ Fit Genesis time (optional)',qTreeLabel:'Origin Tree → Inheritance',qMultiLabel:'Multiverse → Constants & Combinations: inheritance bonus',qHelp:'Add the two black-hole mass inheritance values; default 0.75 + 0.04 = 0.79.',growthHelp:'P: Void → Accretion Disk → Black-hole Power. g: Void → Active phase growth per second. Measure Δlog₁₀(mass)/Δt from two readings. There is no reliable default. The game display may show an additive mass gain instead; do not directly substitute it. a is additional acceleration (default 1). κ is a model calibration coefficient.',powerLabel:'P · Black-hole power',growthLabel:'γ · log₁₀ mass growth per second',accelLabel:'a · Additional acceleration',kappaLabel:'κ · Current model coefficient',applyKappa:'Apply measured κ',ratioHelp:'Spark: Star Map bottom, Spark count exponent / total energy exponent. Black hole: Star Map → Energy Multiplier below: black-hole mass exponent / total energy exponent. Snapshot shares are not necessarily slope shares.',fitHelp:'Fit （已移除的旧系数） from Genesis counts and elapsed time only after establishing k, q, P, κ and k_bonus. It is not the black-hole exponent share.',kGuide:'k is the Genesis target-exponent level growth factor (default 1.11), distinct from black-hole growth coefficient κ. Compare target energy exponents at Lv21 and Lv22: k ≈ F(22)/F(21).'}};
+Object.assign(dict.zh,extraI18n.zh,{step1:'① 每级最终能量需求',inheritStep:'② 黑洞质量继承与初始能量比例',kInlineLabel:'目标指数等级增长倍率',constantSidebar:'仅 k 默认 1.11。所有可修改参数放在对应公式下方。支持 0.5/2、2*(3+4)。'});Object.assign(dict.en,extraI18n.en,{step1:'① Final energy requirement per Genesis level',inheritStep:'② Black-hole inheritance and initial energy ratio',kInlineLabel:'Threshold exponent growth per level',constantSidebar:'Only k defaults to 1.11. All editable values appear beneath their equations. Expressions such as 0.5/2 and 2*(3+4) work.'});
+const names={zh:['沉重引力','微光宇宙','迟缓时间','残破星图','元素不足','短夜','冷寂连珠','真空衰变','下沉宇宙','霜冻之时','冷寂真空','崩塌真空','迷途之夜','余晖宇宙','饥饿熔炉','空无宇宙','方案 A','方案 B'],en:['Heavy Gravity','Dim Universe','Sluggish Time','Broken Star Map','Element Shortage','Short Night','Cold Conjunction','Vacuum Decay','Sinking Universe','Frozen Time','Cold Vacuum','Collapsing Vacuum','Lost Night','Afterglow Universe','Hungry Furnace','Empty Universe','Plan A','Plan B']};
+const game=[2.2,1.8,1.9,1.4,1.6,1.6,1.9,1.9,4.2,3.6,3.5,4.1,2.2,2.8,2.7,2.2,14.7,6.1];
+let lang=safeStorage.getItem('og-lang')==='zh'?'zh':'en';
+let bhMode=safeStorage.getItem('og-bhMode')||'time';
+const format=(v,d=3)=>Number.isFinite(v)?v.toFixed(d):'—';
+function F(n){const k=val('k'),bonus=val('k_bonus');if(n<1)return 0;return 1000*bonus*(n<=20?k:Math.pow(k,n-20));}
+// A shared polling clock applies only to sub-interval Genesis; multiple levels may finish on the same poll.
+// Stateful simulation: mass continues growing while automation waits.
+// Panel v is the observed effective mass multiplier per real second.
+// The theoretical growth law includes tau inside v(P), not in M(t) again.
+function elapsedTo(n,r,priorOverride){
+ if(n<0)return 0;
+ const q=val('qCombined'),e=val('massEffect');
+ // Panel v already includes the current time-flow multiplier. Do not apply tau twice.
+ const g=scientificLog10($('growth').value);
+ const tick=val('minTime')*60,prior=Math.trunc(priorOverride===undefined?val('priorGenesis'):priorOverride);
+ if(!(q>=0&&q<=1&&e>0&&g>0&&tick>0&&prior>=0&&r>=0&&Number.isFinite(r)))return NaN;
+ // Previous no-Debuff Genesis ended at Lv(prior); its equivalent BH mass is inherited once.
+ let mass=q*F(prior)*r/e, time=0;
+ for(let level=0;level<=n;level++){
+  const target=F(level)*r/e;
+  const needed=Math.max(0,(target-mass)/g);
+  if(needed>1e-9){
+   let finish;
+   if(needed>=tick-1e-9){finish=time+needed;}
+   else {finish=Math.ceil((time+needed-1e-9)/tick)*tick;}
+   // Mass continues to grow even after the target is first reached.
+   mass+=g*(finish-time);time=finish;
+  }
+  // Inherit actual accumulated mass; an already-met next target can Genesis instantly.
+  mass*=q;
+ }
+ return time;
+}
+function latestRBlackhole(){
+ const direct=val('bhExp')/val('totalExp');
+ if(bhMode!=='time')return direct;
+ const end=Math.trunc(val('bhFitEnd')),minutes=val('bhFitMinutes');
+ if(!(end>=21&&end<=500&&minutes>0))return NaN;
+ const target=minutes*60,baseline=elapsedTo(end,0);
+ if(!Number.isFinite(baseline)||target<baseline-1e-8)return NaN;
+ // At the clock floor the measurement only gives an upper bound on r.
+ if(Math.abs(target-baseline)<1e-8)return NaN;
+ let lo=0,hi=1;
+ while(elapsedTo(end,hi)<target&&hi<1e12)hi*=2;
+ if(elapsedTo(end,hi)<target)return NaN;
+ for(let i=0;i<72;i++){const mid=(lo+hi)/2;if(elapsedTo(end,mid)<target)lo=mid;else hi=mid;}
+ return (lo+hi)/2;
+}
+function levelSeconds(n){const r=latestRBlackhole();return elapsedTo(n,r)-elapsedTo(n-1,r);}
+function totalSeconds(a,b){if(b<a)return 0;const r=latestRBlackhole();return elapsedTo(b,r)-elapsedTo(a-1,r);}
+function bhUpdate(){const r=latestRBlackhole(),fit=bhMode==='time';$('bhDirect').classList.toggle('active',!fit);$('bhTime').classList.toggle('active',fit);$('bhDirectFields').classList.toggle('hidden',fit);$('bhResult').textContent=format(r,5);$('bhMethodDescription').textContent=fit?(lang==='zh'?'耗时反推值；下方 Big Freeze 和其他耗时计算引用当前 r_blackhole。':'Time-inferred value; Big Freeze and time calculations use the current r_blackhole.'):dict[lang].directDesc;$('bhFitNote').textContent=fit?(lang==='zh'?'反推从大冰冻前最高创世等级的终点质量继承进入 Lv0；自动检测等待时质量继续增长，并继承实际质量，允许连续瞬间创世。需 e、面板 v 和实测分钟数；τ 已包含在面板 v 中。':'Fit inherits mass from the prior no-Debuff Genesis; mass keeps growing during polling waits, and actual mass is inherited each Genesis.'):(lang==='zh'?'当前使用菜单读数。':'Currently using menu readings.');$('bhTimeFitFields').style.display=fit?'grid':'none';$('bhResult').className='metric'+(!Number.isFinite(r)||r<=0?' orange':'');}
+function computeDebuffs(){if(typeof renderDebuffsV14==='function')renderDebuffsV14();}
+function computeFreeze(){
+ const start=Math.trunc(val('freezeStart')),end=Math.trunc(val('freezeMax')),freezePrior=Math.trunc(val('freezePriorGenesis'));
+ const body=$('freezeRows');body.replaceChildren();
+ if(!(start>=1&&end>=start&&end-start<=300&&freezePrior>=0&&Number.isFinite(freezePrior))){$('bestLevel').textContent=dict[lang].invalid;$('bestDetail').textContent='';return;}
+ const activeR=latestRBlackhole();const calibrated=Number.isFinite(elapsedTo(end,activeR,freezePrior));const chartPoints=[];
+ let reward=0,total=calibrated?elapsedTo(start-1,activeR,freezePrior):0,best=null;
+ for(let n=start;n<=end;n++){
+  const single=(n===start?val('freezeRewardStart'):val('freezeRewardStep'));reward+=single;
+  if(calibrated)total=elapsedTo(n,activeR,freezePrior);
+  const eff=calibrated&&total>0?60*reward/total:NaN;chartPoints.push({n,reward,eff});
+  if(Number.isFinite(eff)&&(!best||eff>best.eff))best={n,reward,total,eff};
+  const tr=document.createElement('tr');if(best&&best.n===n)tr.style.background='#1c3a4a';
+  for(const t of [`Lv ${n}`,format(reward,0),calibrated?format(total/60,2)+' min':'—',Number.isFinite(eff)?format(eff,3):'—']){const td=document.createElement('td');td.textContent=t;tr.append(td)}body.append(tr);
+ }
+ requestAnimationFrame(()=>drawFreezeChart(chartPoints));
+ $('bestLevel').textContent=best?`Lv ${best.n}`:(lang==='zh'?'等待质量效果指数':'Awaiting mass-effect exponent');
+ $('bestDetail').textContent=best?`${format(best.eff)} / min · ${format(best.reward,0)} reward · ${format(best.total/60,2)} min`:(lang==='zh'?'累计奖励已计算；请在③填写 e 后比较时间效率。':'Rewards calculated; enter e in ③ to calculate time efficiency.');
+ $('freezeRewardStartLabel').textContent=lang==='zh'?'start_reward · 起始潜热':'start_reward · Starting latent heat';$('freezeRewardStepLabel').textContent=lang==='zh'?'reward_next · 后续每级潜热':'reward_next · Reward for each following level';$('freezeChartTitle').textContent=lang==='zh'?'累计潜热 ÷ Lv0至当前累计耗时（每分钟）':'Cumulative latent heat / total elapsed time from Lv0 (per minute)';
+}
+
+Object.assign(dict.zh,{bhBonusLabel:'黑洞增长加成系数',powerLabel:'黑洞威力',growthLabel:'每秒质量指数增长 g',kappaLabel:'黑洞增长拟合系数',fitBhHeading:'③A / 用两组实测拟合黑洞 k',fitBhHelp:'在不同黑洞威力 P 下分别测量 γ = Δlog₁₀(M)/Δt。拟合 log₁₀γ = c_BH·k_BH·Pmax。至少需要两组不同 P；本版本按无额外截距的模型计算。',fitP1:'第一次黑洞威力',fitP2:'第二次黑洞威力',fitG1:'第一次每秒对数质量增长',fitG2:'第二次每秒对数质量增长',fitBhCaution:'此 k 是黑洞增长系数，不是上方的创世目标指数增长系数 k。未实测前保持空白。'});Object.assign(dict.en,{bhBonusLabel:'Black-hole growth bonus coefficient',powerLabel:'Black-hole power',growthLabel:'Log₁₀ mass growth per second g',kappaLabel:'Black-hole growth fit coefficient',fitBhHeading:'③A / Fit black-hole k from measurements',fitBhHelp:'Measure γ = Δlog₁₀(M)/Δt at two different powers P. Fit log₁₀γ = c_BH·k_BH·Pmax. At least two distinct P values are needed; the model uses no extra intercept.',fitP1:'First black-hole power',fitP2:'Second black-hole power',fitG1:'First log-mass growth / second',fitG2:'Second log-mass growth / second',fitBhCaution:'This k is the black-hole growth coefficient, not the Genesis threshold k above. Inputs remain blank until measured.'});
+const inputHints={zh:{'massEffect':'[虚无] → [暗黑研究] → [溢出之光]：查看黑洞质量对能量贡献的指数。当前假设 1.25 × 2 = 2.5，请根据实际常数修改。','k': '获取位置：多元 → 当前宇宙，查看相邻两级的创世目标能量；取两次目标的 10 的指数之比（Lv20 后）。', 'k_bonus': '多元 → 当前宇宙：右侧「创世阶数 · 当前能量 × 倍率 = 目标能量」中的倍率，例如 0.5。', 'qTree': '起源之树 → 继承；默认 0.75。', 'qMulti': '多元 → 常数与组合；继承加成默认 0.04。', 'power': '「虚无（Void）→ 吸积盘（Accretion Disk）」中的黑洞威力 Pmax。', 'growth': '获取位置：[虚无] → [每秒质量增长]。输入每秒乘法倍率 v 的 log₁₀，例如 8.29e14 输入 14.918554。', 'accel': '额外时间或质量增长加速倍率。默认 1。', 'kappa': '此项不是游戏菜单直接显示的数值。获取方法：在下方「观测数据 · 拟合黑洞 k」输入不同 Pmax 下的实测增长数据并拟合。', 'rs': '打开「星图」，读取下方火花数量指数 ÷「能量/秒」总指数。', 'bhExp': '「星图」下方「能量倍率」里的黑洞质量指数。', 'totalExp': '打开「星图」，读取下方「能量/秒」显示的总指数值。', 'calStart': '获取位置：多元 → 当前宇宙，记录开始计时的创世等级。', 'calEnd': '获取位置：多元 → 当前宇宙，记录结束计时的创世等级。', 'calMinutes': '此项不是游戏固定常数：自行计时从起始创世等级到结束等级的实际分钟数。'},en:{'massEffect':'[Void] → [Dark Research] → [Overflowing Light]: black-hole mass contribution exponent. Default assumes 1.25 × 2 = 2.5; verify your actual bonuses.', 'k': 'Where: Multiverse → Current Universe. Compare the base-10 exponents of the Genesis targets at two consecutive levels after Lv20.', 'k_bonus': 'Multiverse → Current Universe: the multiplier beside “Genesis Tier · Current Energy × Multiplier = Target Energy” (e.g. 0.5).', 'qTree': 'Origin Tree → Inheritance; default 0.75.', 'qMulti': 'Multiverse → Constants & Combinations; inheritance bonus default 0.04.', 'power': 'Void (虚无) → Accretion Disk (吸积盘): maximum black-hole power Pmax.', 'growth': 'Find [Void] → [Mass Growth per Second]. Enter log₁₀ of the multiplier v: 8.29e14 becomes 14.918554.', 'accel': 'Additional growth/time acceleration multiplier. Default 1.', 'kappa': 'Not shown directly in-game. Use the Observations / Fit black-hole k section below with measurements at different Pmax values.', 'rs': 'Open “Star Map”: Spark count exponent divided by the total exponent under “Energy/sec”.', 'bhExp': 'Star Map → Energy Multiplier below: black-hole mass exponent.', 'totalExp': 'Open “Star Map” and read the total exponent under “Energy/sec” at the bottom.', 'calStart': 'Where: Multiverse → Current Universe. Record the Genesis level when timing begins.', 'calEnd': 'Where: Multiverse → Current Universe. Record the Genesis level when timing ends.', 'calMinutes': 'Measured manually: elapsed real minutes between the starting and ending Genesis levels.'}};
+const fieldMeta={zh:{rs:['r_spark','火花对能量增长的贡献比例','「星图」下方火花数量指数 ÷「能量/秒」总指数；静态占比仅作为增长斜率近似。'],totalExp:['E_total','总能量指数','「星图」下方「能量/秒」的总指数值。'],minTime:['t_min','自动创世检测间隔','仅当单次创世理论耗时小于检测间隔时，按固定间隔检测；同一次检测可连续完成多个已达标创世。默认 1 分钟。'],layers:['m','有效价格层数','用于沉重引力情景估算的层数。'],freezeStart:['n_start','大冰冻起始创世等级','开始累计奖励和耗时的等级。'],freezeMax:['n_max','大冰冻最高比较等级','计算终点的最大等级。'],rewardBase:['A₆₄','Lv64 起源奖励','Lv64 时的基础奖励。'],rewardStep:['ΔA','后续每级奖励','起始等级之后，每一级固定获得的潜热奖励。'],resetOverhead:['t_reset','每轮冰冻额外耗时','不计入创世过程的重置时间，单位秒。'],fitP1:['P₁','第一次黑洞威力','第一组测量时的黑洞威力 P。'],fitP2:['P₂','第二次黑洞威力','第二组测量时的黑洞威力 P，必须与 P₁ 不同。'],fitG1:['γ₁','第一次每秒对数质量增长','两时刻 log10 黑洞质量指数差除以秒数；如 1e14。'],fitG2:['γ₂','第二次每秒对数质量增长','另一黑洞威力下测得的 γ；如 8.29e14。']},en:{rs:['r_spark','Spark contribution ratio','Star Map: Spark count exponent / total exponent under Energy/sec. Snapshot ratio approximates slope share.'],totalExp:['E_total','Total energy exponent','Star Map: total exponent shown under Energy/sec.'],minTime:['t_min','Auto-Genesis polling interval','When a Genesis needs less than the polling interval, check at fixed intervals; one check may finish multiple eligible levels. Default: 1 minute.'],layers:['m','Effective tiers','Number of pricing tiers in the Heavy Gravity scenario.'],freezeStart:['n_start','Big Freeze start level','First Genesis level in the cumulative run.'],freezeMax:['n_max','Maximum comparison level','Highest candidate endpoint.'],rewardBase:['A₆₄','Reward at Lv64','Base reward at Genesis level 64.'],rewardStep:['ΔA','Reward increase per level','Fixed reward at each level after the starting level.'],resetOverhead:['t_reset','Reset overhead','Additional seconds per freeze cycle.'],fitP1:['P₁','First black-hole power','Black-hole power P at the first measurement.'],fitP2:['P₂','Second black-hole power','Power P at the second measurement; must differ from P₁.'],fitG1:['γ₁','First log-mass growth / second','Difference of log10 mass exponents divided by elapsed seconds.'],fitG2:['γ₂','Second log-mass growth / second','Growth rate measured at the second power, e.g. 8.29e14.']}};
+function enhanceFields(){document.querySelectorAll('input[id]').forEach(input=>{const label=input.parentElement.querySelector('label');if(!label)return;const meta=fieldMeta[lang][input.id];if(meta){let title=label.querySelector('[data-field-name]');if(!title){title=document.createElement('span');title.dataset.fieldName=input.id;label.prepend(title);}title.textContent=meta[0]+' · '+meta[1];}if(!label.querySelector('.hint')){const hint=document.createElement('span');hint.className='hint param-hint';hint.tabIndex=0;hint.textContent=' ?';hint.dataset.tipKey=input.id;label.append(hint);}});}
+function updateBhFit(){
+ const pairs=[...document.querySelectorAll('.obs-row')].map(row=>({p:arithmetic(row.querySelector('.obs-p').value),v:arithmetic(row.querySelector('.obs-v').value)})).filter(o=>Number.isFinite(o.p)&&o.v>0);
+ const n=pairs.length, sx=pairs.reduce((a,o)=>a+o.p,0), sy=pairs.reduce((a,o)=>a+Math.log10(o.v),0), mx=sx/n,my=sy/n;
+ const den=pairs.reduce((a,o)=>a+(o.p-mx)**2,0);
+ const originDen=pairs.reduce((a,o)=>a+o.p*o.p,0); const k=n>=2&&den>0&&originDen>0?pairs.reduce((a,o)=>a+o.p*Math.log10(o.v),0)/originDen/val("bhBonus"):NaN;
+ const b=0;
+ window.bhFit={k,b};
+ $('fitBhResult').textContent=Number.isFinite(k)?'k_BH = '+format(k,9)+'':'—';
+ $('fitBhDetail').textContent=Number.isFinite(k)?(lang==='zh'?`已拟合 ${n} 组观测`:`Fitted ${n} observations`):(lang==='zh'?'至少输入两组不同 Pmax 的有效观测。':'Enter at least two valid observations with different Pmax.');
+}
+function updateParameterHints(){enhanceFields();document.querySelectorAll('[data-tip-key]').forEach(el=>{el.dataset.tooltip=inputHints[lang][el.dataset.tipKey]||fieldMeta[lang][el.dataset.tipKey]?.[2]||'';el.removeAttribute('title');el.setAttribute('aria-label',el.dataset.tooltip)});}
+
+function updateTooltips(){
+ updateParameterHints();
+ const tips={sparkHelp:dict[lang].sparkHint,bhHelp:dict[lang].bhHint};
+ document.querySelectorAll('.hint').forEach(el=>{
+  const t=tips[el.id]||el.dataset.tooltip||el.getAttribute('title');
+  if(t){el.dataset.tooltip=t;el.removeAttribute('title');el.tabIndex=0;el.setAttribute('aria-label',t);}
+ });
+}
+const newTips={zh:{qCombined:'「起源之树 → 继承」与「多元 → 常数与组合」两处的继承加成相加；默认 0.79。',growth:'输入 g = log₁₀(v)，例如 8.29×10¹⁴ 对应 14.918554；如果只输入 14，则按 10¹⁴ 计算。',kappa:'由至少两组不同 Pmax 与每秒增长速度拟合；初始参考 67/750。',k_bonus:'「多元 → 当前宇宙」右侧「创世阶数 · 当前能量 × 倍率 = 目标能量」的倍率。',bhBonus:'在「超新星 → U元素」与「虚无 → 暗黑研究」查看影响黑洞增长的加成；默认系数 2.5。请根据实际游戏读数调整。'},en:{qCombined:'Add the inheritance bonuses from “Origin Tree → Inheritance” and “Multiverse → Constants & Combinations”. Default: 0.79.',growth:'Enter g = log₁₀(v). For 8.29e14, g ≈ 14.918554. Entering 14 means 1e14.',kappa:'Fit from at least two measurements at different Pmax values; initial reference 67/750.',k_bonus:'Find the multiplier under “Multiverse → Current Universe”, next to “Genesis Tier · Current Energy × Multiplier = Target Energy”.',bhBonus:'Check the black-hole growth bonuses under “Supernova → U Elements” and “Void → Dark Research”. Default coefficient: 2.5; adjust to match your game.'}};
+Object.assign(inputHints.zh,newTips.zh);Object.assign(inputHints.en,newTips.en);
+Object.assign(inputHints.zh,{power:'获取位置：虚无（Void）→ 吸积盘（Accretion Disk），读取黑洞威力 Pmax。',rs:'获取位置：星图 → 火花产出和总能量/秒，分别读取指数后计算占比。',bhExp:'获取位置：星图 → 能量倍率 → 黑洞质量，读取对应的能量指数。',totalExp:'获取位置：星图 → 能量/秒，读取总指数。'});
+Object.assign(inputHints.en,{power:'Where: Void → Accretion Disk. Read the black-hole power Pmax.',rs:'Where: Star Map → Spark production and total Energy/sec. Read their exponents to calculate the ratio.',bhExp:'Where: Star Map → Energy Multiplier → Black-hole Mass. Read the energy exponent.',totalExp:'Where: Star Map → Energy/sec. Read the total exponent.'});
+Object.assign(dict.zh,{bhBonusLabel:'黑洞增长加成系数',powerLabel:'黑洞威力',growthLabel:'每秒质量指数增长 g',kappaLabel:'黑洞增长拟合系数',qCombinedLabel:'黑洞质量继承指数',interceptLabel:'增长拟合截距',addObservation:'+ 添加观测',applyBhFit:'应用拟合结果',fitBhHeading:'观测数据 · 拟合黑洞 k',fitBhHelp:'至少两组不同 Pmax 与对应每秒增长速度；增加观测后采用无截距最小二乘拟合。'});
+Object.assign(dict.en,{bhBonusLabel:'Black-hole growth bonus coefficient',powerLabel:'Black-hole power',growthLabel:'Log₁₀ mass growth per second g',kappaLabel:'Black-hole growth fit coefficient',qCombinedLabel:'Black-hole inheritance exponent',interceptLabel:'Growth fit intercept',addObservation:'+ Add observation',applyBhFit:'Apply fitted values',fitBhHeading:'Observations · Fit black-hole k',fitBhHelp:'Use at least two distinct Pmax measurements and their per-second growth; additional observations use least-squares fitting through the origin.'});
+// v44: canonical bilingual help text. Keep menu paths in [Menu] notation.
+const auditedMenuHints={
+ zh:{
+  k:'[多元] → [当前宇宙]：读取相邻两级创世目标的十进制指数，计算指数之比（Lv20 之后）。',
+  k_bonus:'[多元] → [当前宇宙]：读取右侧「当前能量 × 倍率 = 目标能量」的倍率。',
+  qTree:'[起源之树] → [继承]：读取黑洞质量继承指数。',
+  qMulti:'[多元] → [常数与组合]：读取黑洞质量继承加成。',
+  qCombined:'[起源之树] → [继承] 与 [多元] → [常数与组合]：两项继承指数加成相加。',
+  power:'[虚无] → [吸积盘] → [黑洞威力]：读取 Pmax。',
+  growth:'[虚无] → [每秒质量增长]：读取黑洞质量每秒增长值；此处输入当前模型所需的每秒增长读数，注意与拟合公式使用的量一致。',
+  bhBonus:'[超新星] → [U元素]、[虚无] → [暗黑研究]：读取影响黑洞增长的加成；2.5 为模型默认值。',
+  kappa:'模型拟合参数，不是游戏直接显示的常数。在下方「观测数据 · 拟合黑洞 k」中输入不同黑洞威力下的观测值。',
+  rs:'[星图] → [火花数量] 与 [能量/秒]：读取十进制指数并计算火花贡献比例。',
+  bhExp:'[星图] → [能量倍率] → [黑洞质量]：读取黑洞质量贡献的十进制指数。',
+  totalExp:'[星图] → [能量/秒]：读取总能量的十进制指数。',
+  calStart:'[多元] → [当前宇宙]：记录开始计时的创世等级。',
+  calEnd:'[多元] → [当前宇宙]：记录结束计时的创世等级。',
+  calMinutes:'手动计时从起始创世等级到结束创世等级的现实时间，单位为分钟。',
+  fitP1:'[虚无] → [吸积盘] → [黑洞威力]：第一组观测的 Pmax。',
+  fitP2:'[虚无] → [吸积盘] → [黑洞威力]：第二组观测的 Pmax，必须不同于第一组。',
+  fitG1:'[虚无] → [每秒质量增长]：第一组观测的每秒增长读数。',
+  fitG2:'[虚无] → [每秒质量增长]：第二组观测的每秒增长读数。'
+ },
+ en:{
+  k:'[Multiverse] → [Current Universe]: compare the base-10 exponents of consecutive Genesis targets after Lv20.',
+  k_bonus:'[Multiverse] → [Current Universe]: read the multiplier beside “Current Energy × Multiplier = Target Energy”.',
+  qTree:'[Origin Tree] → [Inheritance]: read the black-hole mass inheritance exponent.',
+  qMulti:'[Multiverse] → [Constants & Combinations]: read the black-hole inheritance bonus.',
+  qCombined:'[Origin Tree] → [Inheritance] and [Multiverse] → [Constants & Combinations]: add both inheritance bonuses.',
+  power:'[Void] → [Accretion Disk] → [Black-hole Power]: read Pmax.',
+  growth:'[Void] → [Mass Growth per Second]: read the black-hole mass growth value; use the quantity required by the current model and its fitting equation.',
+  bhBonus:'[Supernova] → [U Elements] and [Void] → [Dark Research]: read the black-hole growth bonuses. The model defaults to 2.5.',
+  kappa:'A fitted model parameter, not a directly displayed game constant. Use the Observations / Fit black-hole k section below.',
+  rs:'[Star Map] → [Spark Count] and [Energy/sec]: read their base-10 exponents to calculate the Spark contribution ratio.',
+  bhExp:'[Star Map] → [Energy Multiplier] → [Black-hole Mass]: read the base-10 exponent of the black-hole contribution.',
+  totalExp:'[Star Map] → [Energy/sec]: read the base-10 exponent of total energy.',
+  calStart:'[Multiverse] → [Current Universe]: record the Genesis level when timing starts.',
+  calEnd:'[Multiverse] → [Current Universe]: record the Genesis level when timing ends.',
+  calMinutes:'Manually measure the real elapsed minutes between the starting and ending Genesis levels.',
+  fitP1:'[Void] → [Accretion Disk] → [Black-hole Power]: Pmax for the first observation.',
+  fitP2:'[Void] → [Accretion Disk] → [Black-hole Power]: Pmax for the second observation; it must differ from the first.',
+  fitG1:'[Void] → [Mass Growth per Second]: growth reading for the first observation.',
+  fitG2:'[Void] → [Mass Growth per Second]: growth reading for the second observation.'
+ }
+};
+Object.assign(inputHints.zh,{bhFitEnd:'[多元] → [当前宇宙]：Lv0 开始计时后到达的目标等级。',bhFitMinutes:'从 Lv0 到目标等级的完整实测分钟数。',priorGenesis:'大冰冻前无 Debuff 最高创世等级，默认 69；按该等级终点能量反推等效黑洞质量，继承一次进入 Lv0。'});Object.assign(inputHints.zh,{freezePriorGenesis:'大冰冻前最高无 Debuff 创世等级，默认 69；该等级终点质量按 q 继承进入 Lv0。'});Object.assign(inputHints.en,{freezePriorGenesis:'Highest no-Debuff Genesis level before Big Freeze (default 69). The final mass at this level is inherited into Lv0 using q.'});
+Object.assign(inputHints.en,{bhFitEnd:'[Multiverse] → [Current Universe]: target level reached after starting from Lv0.',bhFitMinutes:'Measured total minutes from Lv0 to the target level.',priorGenesis:'Highest no-Debuff Genesis level before Big Freeze (default 69); its final energy is converted to equivalent mass, then inherited into Lv0.'});
+Object.assign(inputHints.zh,auditedMenuHints.zh);
+Object.assign(inputHints.en,auditedMenuHints.en);
+Object.assign(dict.zh,{growthHelp:auditedMenuHints.zh.growth,powerLabel:'黑洞威力',growthLabel:'每秒质量指数增长 g'});
+Object.assign(dict.en,{growthHelp:auditedMenuHints.en.growth,powerLabel:'Black-hole power',growthLabel:'Log₁₀ mass growth per second g'});
+Object.assign(dict.zh,{orderExplain:'读取目标、继承、黑洞增长和能量贡献，再用质量增长模型估算耗时。',step4:'⑤ 大冰冻耗时模型输入',massEffectLabel:'黑洞质量能量贡献指数',minGenesis:'自动创世检测间隔（分钟）',timeModelNote:'若单次创世理论耗时小于 1 分钟，则按 1 分钟检测一次；同一检测时刻可以连续完成所有已满足 E_final 的等级。Lv21 起的能量达标时间由黑洞增长模型估算。',freezeAssumptions:'效率 = 从起始等级累计的潜热 ÷ Lv0 到终点的总耗时。Lv0–20 为单独假设，Lv21 起按质量增长模型。'});
+Object.assign(dict.zh,{bhTimeFitLabel:'从 Lv0 到目标等级的总耗时反推 r_blackhole',bhFitEndLabel:'目标创世等级',bhFitMinutesLabel:'Lv0 至目标等级总耗时（分钟）',priorGenesisLabel:'大冰冻前最高创世等级'});
+Object.assign(dict.zh,{freezePriorGenesis:'大冰冻前最高创世等级',freezePriorHint:'用于计算进入 Lv0 时继承的初始黑洞质量；与上方耗时反推参数独立。'});Object.assign(dict.en,{freezePriorGenesis:'Highest Genesis level before Big Freeze',freezePriorHint:'Sets the inherited black-hole mass entering Lv0; independent of the time-fit setting.'});
+Object.assign(dict.en,{bhTimeFitLabel:'Infer r_blackhole from total time since Lv0',bhFitEndLabel:'Target Genesis level',bhFitMinutesLabel:'Total elapsed minutes, Lv0 to target',priorGenesisLabel:'Highest Genesis level before Big Freeze'});
+Object.assign(dict.en,{orderExplain:'Read threshold, inheritance, black-hole growth and energy shares; estimate time from the mass-growth model.',step4:'⑤ Big Freeze time-model inputs',massEffectLabel:'Black-hole mass energy exponent',minGenesis:'Auto-Genesis polling interval (minutes)',timeModelNote:'If a Genesis needs less than one minute, poll once per minute; one polling event may complete multiple eligible Genesis levels. Lv21+ energy-target times use the black-hole growth model.',freezeAssumptions:'Efficiency = rewards from the selected start level / elapsed time from Lv0 to endpoint. Lv0–20 uses a separate assumption; Lv21+ uses mass growth.'});
+Object.assign(dict.zh,{bhBonusLabel:'黑洞增长速度',growthLabel:'每秒质量增长倍率 v',timeFlowLabel:'时间流速因子'});
+Object.assign(dict.en,{bhBonusLabel:'Black-hole growth speed',growthLabel:'Mass multiplier per game second v',timeFlowLabel:'Time-flow factor'});
+Object.assign(inputHints.zh,{bhBonus:'[超新星] → [U元素]；[暗黑研究II] → [引力之道]。这里读取黑洞增长速度相关加成。',growth:'[虚无] → [每秒质量增长]：输入完整倍率，例如 8.29e14。计算内部使用 log₁₀(v)，支持科学计数法，不需要直接存储巨大质量。',timeFlow:'时间流速进入理论增长速度公式 v(P)=10^(τ·c_BH·k_BH·P)。面板显示的 v 已包含当前时间流速，因此耗时反推直接使用 log₁₀(v)，不会再次乘 τ。'});
+Object.assign(inputHints.en,{bhBonus:'[Supernova] → [U Elements]; [Dark Research II] → [Way of Gravity]. Read the black-hole growth speed bonuses.',growth:'[Void] → [Mass Growth per Second]: enter the full multiplier, e.g. 8.29e14. Internally uses log₁₀(v), avoiding giant mass values.',timeFlow:'Time flow belongs inside theoretical v(P)=10^(τ·c_BH·k_BH·P). The panel v already includes time flow; the elapsed-time fit uses log₁₀(v) directly, without applying τ twice.'});
+function translate(){document.documentElement.lang=lang==='zh'?'zh-CN':'en';document.querySelectorAll('[data-i]').forEach(el=>{const key=el.dataset.i;if(dict[lang][key]!==undefined)el.innerHTML=dict[lang][key];});$('language').textContent=lang==='zh'?'English':'中文';refreshObservations();$('obsDisclaimer').textContent=lang==='zh'?'第二组为演示假设数据，并非玩家实测；请替换后再使用拟合结果。':'The second row is hypothetical demo data, NOT a real measurement. Replace it before trusting the fit.';updateTooltips();updateBhFit();bhUpdate();computeDebuffs();computeFreeze();}
+function derivedUpdate(){
+ $('qDisplay').textContent='q = '+format(val('qCombined'),5);
+ const p=val('power'),k=val('kappa'),observed=scientificLog10($('growth').value);
+ $('growthDisplay').textContent='P_max = '+format(p,6)+' · κ_BH = '+format(k,8);
+ $('targetParams').textContent='k = '+format(val('k'),8)+' · k_bonus = '+format(val('k_bonus'),8);
+ $('growthPreview').textContent=(lang==='zh'?'每现实秒质量指数增长（含时间流速）：':'Log₁₀ mass growth / real sec (time flow included): ')+ (Number.isFinite(observed)?observed.toFixed(6):'—');
+}
+function recalc(){updateBhFit();derivedUpdate();bhUpdate();computeDebuffs();computeFreeze();}
+if(!safeStorage.getItem('og-qCombined') && safeStorage.getItem('og-qTree'))safeStorage.setItem('og-qCombined',String((Number(safeStorage.getItem('og-qTree'))||0)+(Number(safeStorage.getItem('og-qMulti'))||0)));
+if(safeStorage.getItem('og-bonus')&&!safeStorage.getItem('og-k_bonus'))safeStorage.setItem('og-k_bonus',safeStorage.getItem('og-bonus'));
+if(safeStorage.getItem('og-growth-v58-migrated')!=='1'){
+ const old=safeStorage.getItem('og-growth');
+ if(old!==null){const numeric=Number(old);if(Number.isFinite(numeric)&&numeric>0&&numeric<100)safeStorage.setItem('og-growth',String(Math.pow(10,numeric)));}
+ safeStorage.setItem('og-growth-v58-migrated','1');
+}
+document.querySelectorAll('input:not([type=checkbox])').forEach(el=>{const key='og-'+el.id;if(safeStorage.getItem(key)!==null)el.value=safeStorage.getItem(key);el.addEventListener('input',()=>{safeStorage.setItem(key,el.value);recalc();});el.addEventListener('blur',()=>{const v=arithmetic(el.value);if(Number.isFinite(v)){el.value=String(Number(v.toPrecision(12)));safeStorage.setItem(key,el.value);recalc();}});});
+
+$('bhTime').addEventListener('click',()=>{bhMode='time';safeStorage.setItem('og-bhMode',bhMode);recalc();});$('bhDirect').addEventListener('click',()=>{bhMode='direct';safeStorage.setItem('og-bhMode',bhMode);recalc();});
+$('language').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';safeStorage.setItem('og-lang',lang);translate();});
+function scientificLog10(raw){
+ const expr=String(raw).trim();const evaluated=arithmetic(expr);if(Number.isFinite(evaluated)&&evaluated>0)return Math.log10(evaluated);const m=expr.match(/^([+]?(?:\d+(?:\.\d*)?|\.\d+))(?:[eE]([+-]?\d+))?$/);
+ if(!m)return NaN;
+ const coefficient=Number(m[1]);if(!(coefficient>0))return NaN;
+ const exponent=Number(m[2]||0);if(!Number.isFinite(exponent))return NaN;
+ return Math.log10(coefficient)+exponent;
+}
+
+function setTab(tab){$('debuffPanel').classList.toggle('hidden',tab!=='debuff');$('freezePanel').classList.toggle('hidden',tab!=='freeze');$('tabDebuffs').classList.toggle('active',tab==='debuff');$('tabFreeze').classList.toggle('active',tab==='freeze');if(tab==='freeze')requestAnimationFrame(()=>computeFreeze());}
+$('tabDebuffs').addEventListener('click',()=>setTab('debuff'));$('tabFreeze').addEventListener('click',()=>setTab('freeze'));
+function refreshObservations(){
+ document.querySelectorAll('.obs-row').forEach((row,i)=>{
+  const labels=row.querySelectorAll('label');
+  labels[0].innerHTML=`P<sub>max,${i+1}</sub> · <span class="obs-name">${lang==='zh'?'黑洞威力':'Black-hole power'}</span> <span class="hint" tabindex="0">?</span>`;
+  labels[1].innerHTML=`v<sub>${i+1}</sub> · <span class="obs-name">${lang==='zh'?'每秒黑洞质量增长':'Mass growth per second'}</span> <span class="hint" tabindex="0">?</span>`;
+  const hints=row.querySelectorAll('.hint');
+  hints[0].dataset.tooltip=lang==='zh'?auditedMenuHints.zh.fitP1:auditedMenuHints.en.fitP1;
+  hints[1].dataset.tooltip=lang==='zh'?auditedMenuHints.zh.fitG1:auditedMenuHints.en.fitG1;
+  row.querySelector('.remove-obs').textContent=lang==='zh'?'删除观测':'Remove observation';
+  row.querySelector('.remove-obs').disabled=document.querySelectorAll('.obs-row').length<=2;
+ });
+}
+function saveObservations(){
+ const rows=[...document.querySelectorAll('.obs-row')].map(r=>[r.querySelector('.obs-p').value,r.querySelector('.obs-v').value]);
+ safeStorage.setItem('og-observations-v12',JSON.stringify(rows));
+}
+function addObservation(p='',v=''){
+ const row=document.createElement('div');row.className='fields obs-row';
+ row.innerHTML=`<div class="field"><label></label><input class="obs-p" type="text" inputmode="decimal"></div><div class="field"><label></label><input class="obs-v" type="text" inputmode="decimal"></div><div class="field obs-action"><button type="button" class="remove-obs"></button></div>`;
+ row.querySelector('.obs-p').value=p;row.querySelector('.obs-v').value=v;
+ row.querySelector('.remove-obs').addEventListener('click',()=>{if(document.querySelectorAll('.obs-row').length<=2)return;row.remove();refreshObservations();saveObservations();recalc()});
+ row.querySelectorAll('input').forEach(input=>{
+  input.addEventListener('input',()=>{saveObservations();recalc()});
+  input.addEventListener('blur',()=>{const x=arithmetic(input.value);if(Number.isFinite(x)){input.value=String(Number(x.toPrecision(12)));saveObservations();recalc()}});
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();input.blur()}});
+ });
+ $('observationList').append(row);refreshObservations();updateBhFit();
+}
+$('addObservation').addEventListener('click',()=>{addObservation();saveObservations()});
+$('applyBhFit').addEventListener('click',()=>{const {k,b}=window.bhFit||{};if(Number.isFinite(k)&&Number.isFinite(b)){for(const [id,v] of [['kappa',k]]){$(id).value=String(Number(v.toPrecision(12)));safeStorage.setItem('og-'+id,$(id).value)}recalc()}});
+let storedObs=null;
+try{storedObs=JSON.parse(safeStorage.getItem('og-observations-v12'))}catch(e){}
+const defaultObs=[['66.8','8.29e14'],['67.8','1.386e15']]; // second row is illustrative, not measured
+(storedObs&&Array.isArray(storedObs)&&storedObs.length>=2?storedObs:defaultObs).slice(0,30).forEach(pair=>addObservation(String(pair[0]??''),String(pair[1]??'')));
+document.querySelectorAll('input:not([type=checkbox])').forEach(input=>input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();input.blur();const v=arithmetic(input.value);if(Number.isFinite(v)){input.value=String(Number(v.toPrecision(12)));if(input.id)safeStorage.setItem('og-'+input.id,input.value);recalc()}}}));
+
+// V14: tabular Debuff models, selectable levels, custom combinations.
+const dbBase=[1.05,.97,.85,.95,.95,2,.85,1.05];
+const dbPairMembers=[[0,2],[2,6],[6,7],[7,0],[3,5],[1,5],[4,1],[3,4]];
+const dbPairExtra=[.02,1.10,.02,.97,.97,1.10,.97,1];
+const dbSingleFormula=[
+ String.raw`R_{\mathrm{沉重引力}}=\frac{\frac{k}{1-r_{spark}(1-x_{\mathrm{沉重引力}}^{-8})}-q}{k-q}`,
+ String.raw`R_{\mathrm{微光宇宙}}=\frac{\frac{k}{x_{\mathrm{微光宇宙}}}-q}{k-q}`,
+ String.raw`R_{\mathrm{迟缓时间}}=\frac{1}{x_{\mathrm{迟缓时间}}}`,
+ String.raw`R_{\mathrm{残破星图}}=\frac{k-qx_{\mathrm{残破星图}}}{k-q}`,
+ String.raw`R_{\mathrm{元素不足}}=\frac{\frac{k}{x_{\mathrm{元素不足}}}-q}{k-q}`,
+ String.raw`R_{\mathrm{短夜}}=\frac{P_{max}}{P_{max}-x_{\mathrm{短夜}}}`,
+ String.raw`R_{\mathrm{冷寂连珠}}=\frac{1}{x_{\mathrm{冷寂连珠}}}`,
+ String.raw`R_{\mathrm{真空衰变}}=\frac{kx_{\mathrm{真空衰变}}-q}{k-q}`];
+const dbPairFormula=[];
+const dbQuadFormula=[];
+const dbAbbr=['HG','DU','ST','BSM','ES','SN','CC','VD'];
+// Model uses effective energy factors from the existing single-debuff equations.
+// Model B: all final-energy components scale together under ES and DU; HG acts first on orbital pricing only.
+function dbComboModel(levels){
+ const k=val('k'),q=val('qCombined'),p=val('power'),rs=val('rs'),d=k-q;
+ const on=i=>levels[i]>0, x=i=>on(i)?dbX(i,levels[i]):(i===5?0:1);
+ const heavy=on(0)?rs*(1-Math.pow(x(0),-8)):0;
+ const a=x(1)*x(4)*(1-heavy);
+ const target=x(7), start=x(3), speed=x(2)*x(6)*(p-x(5))/p;
+ if(!(a>0&&speed>0&&d>0&&p>0&&q>=0&&k>0&&rs>=0&&rs<=1))return NaN;
+ // F_n=k F_(n-1), b=log10(M), b_start=q*b_previous_end.
+ // Normal baseline: b_previous_end = C*F_(n-1), with C=r_BH/e.
+ // Same combo: previous terminal b = C*F_(n-1)*target/a;
+ // broken-map start effect x(3) applies after inheritance.
+ const distance=dbSameInheritance?target*(k-q*start)/a:(k*target/a-q*start);
+ return distance>0?distance/d/speed:0;
+}
+function dbComboFormula(levels){
+ const on=i=>levels[i]>0;
+ const X=i=>String.raw`x_{\mathrm{${names.zh[i]}}}`;
+ const R=i=>String.raw`R_{\mathrm{${names.zh[i]}}}`;
+ const chosen=levels.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
+ if(!chosen.length)return String.raw`R=1`;
+ // Directly reuse a single-debuff ratio for pure growth-rate/time effects.
+ const time=chosen.filter(i=>[2,5,6].includes(i));
+ const structural=chosen.filter(i=>![2,5,6].includes(i));
+ const timeFactor=time.map(i=>R(i)).join(String.raw`\cdot `);
+ if(!structural.length)return String.raw`R_{\mathrm{combo}}=${timeFactor}`;
+ const aParts=[];
+ if(on(0))aParts.push(String.raw`(1-r_{spark}(1-${X(0)}^{-8}))`);
+ if(on(4))aParts.unshift(X(4));
+ if(on(1))aParts.unshift(X(1));
+ const a=aParts.join(String.raw`\cdot `)||'1';
+ const v=on(7)?X(7):'',s=on(3)?X(3):'';
+ let numerator;
+ if(dbSameInheritance){numerator=String.raw`\frac{${v?`${v}`:''}(k-q${s})}{${a}}`;}
+ else{numerator=String.raw`\frac{k${v}}{${a}}-q${s}`;}
+ let core=String.raw`\frac{${numerator}}{k-q}`;
+ // A single mechanism can be represented by the established single-debuff R.
+ if(structural.length===1)core=R(structural[0]);
+ return String.raw`R_{\mathrm{combo}}=${core}${timeFactor?String.raw`\cdot ${timeFactor}`:''}`;
+}
+let dbSameInheritance=false;let dbPage=0;let dbLevels=Array(8).fill(4);let dbCustomLevels=Array(8).fill(0);
+const dbLevelRule=(i,zh,lv=dbLevels[i])=>{const x=dbX(i,lv),f=n=>Number(n).toFixed(2),pct=n=>`${Math.round(n*100)}%`;
+ const z=[`轨道价格增长率 +${pct(x-1)}`,`能量产出 ^${f(x)}`,`时间流速 ×${f(x)}`,`黑洞初始质量 ^${f(x)}`,`黑洞质量效果 ^${f(x)}`,`黑洞威力 −${x}`,`每秒质量增长倍率 v ^${f(x)}`,`创世条件 +${pct(x-1)}`];
+ const e=[`Orbit price growth rate +${pct(x-1)}`,`Energy production ^${f(x)}`,`Time flow ×${f(x)}`,`Initial black-hole mass ^${f(x)}`,`Black-hole mass effect ^${f(x)}`,`Black-hole power −${x}`,`Mass growth factor v ^${f(x)}`,`Genesis threshold +${pct(x-1)}`];
+ return (zh?z:e)[i];};
+const dbConstantNames={zh:[['G','引力常数 G','创世条件 ×0.98；所有轨道产出 ×3.16e22'],['h','普朗克常数 h','创世条件 ×0.98；能量产出 ×1.00e45'],['c','光速 c','创世条件 ×0.98；公转速度 ×5.20'],['k','玻尔兹曼常数 k','创世条件 ×0.98；星尘获取量 ×1.00e15'],['α','精细结构常数 α','创世条件 ×0.98；新星核获取量 ×1.00e9'],['Λ','宇宙学常数 Λ','创世条件 ×0.98；暗物质获取量 ×31.62'],['H₀','哈勃常数 H₀','创世条件 ×0.98；行星连珠倍率 ×1.00e3'],['e','元电荷 e','创世条件 ×0.98；起源获取量 ×2.83']],en:[['G','Gravitational constant G','Genesis threshold ×0.98; all orbit output ×3.16e22'],['h','Planck constant h','Genesis threshold ×0.98; energy output ×1.00e45'],['c','Speed of light c','Genesis threshold ×0.98; orbital speed ×5.20'],['k','Boltzmann constant k','Genesis threshold ×0.98; stardust ×1.00e15'],['α','Fine-structure constant α','Genesis threshold ×0.98; nova cores ×1.00e9'],['Λ','Cosmological constant Λ','Genesis threshold ×0.98; dark matter ×31.62'],['H₀','Hubble constant H₀','Genesis threshold ×0.98; planetary conjunction ×1.00e3'],['e','Elementary charge e','Genesis threshold ×0.98; origin gain ×2.83']]};
+const dbPairConstantNames={zh:[['mₚ','普朗克质量 mₚ','黑洞质量继承 +2%'],['t₀','宇宙年龄 t₀','时间流速 ×1.1'],['ε₀','真空电容率 ε₀','黑洞质量继承 +2%'],['ℏ','约化普朗克常数 ℏ','创世条件 ×0.97'],['T','霍金温度 T','创世条件 ×0.97'],['S','黑洞熵 S','黑洞质量增长速度 ×1.1'],['R∞','里德伯常数 R∞','创世条件 ×0.97'],['Nₐ','阿伏伽德罗常数 Nₐ','遗物最高等级 +1']],en:[['mₚ','Planck mass mₚ','Black-hole mass inheritance +2%'],['t₀','Age of universe t₀','Time flow ×1.1'],['ε₀','Vacuum permittivity ε₀','Black-hole mass inheritance +2%'],['ℏ','Reduced Planck constant ℏ','Genesis threshold ×0.97'],['T','Hawking temperature T','Genesis threshold ×0.97'],['S','Black-hole entropy S','Black-hole mass growth ×1.1'],['R∞','Rydberg constant R∞','Genesis threshold ×0.97'],['Nₐ','Avogadro constant Nₐ','Maximum relic level +1']]};
+function dbReward(item,color){const safeName=item[1].replaceAll(item[0],`<span class="db-constant-symbol">${item[0]}</span>`);return `<div class="db-reward" style="--constant-color:${color||'#7be8ff'}"><span class="db-reward-icon">${item[0]}</span><div><strong>${safeName}</strong><small>${item[2]}</small></div></div>`}
+function dbXDefinition(i,zh){
+ const current=dbX(i,dbLevels[i]);
+ return `<div class="db-x-definition">x = ${Number(current.toFixed(5))}</div>`;
+}
+function dbPairLevels(i,zh){return `<div class="db-pair-levels">${dbPairMembers[i].map(j=>`<div class="db-pair-level"><div>${dbBadge(j)}</div><div class="db-per-level">${dbLevelRule(j,zh)}</div><div class="db-level-controls"><span>x = <b>${dbX(j,dbLevels[j]).toFixed(6)}</b></span><label>${zh?'等级':'Level'} <select data-db-level="${j}">${[1,2,3,4].map(l=>`<option value="${l}" ${dbLevels[j]===l?'selected':''}>${l}</option>`).join('')}</select></label></div></div>`).join('')}</div>`}
+const dbLevelCell=(i,zh)=>`<div class="db-level-cell"><div class="db-per-level">${dbLevelRule(i,zh)}</div><label>${zh?'等级':'Level'} <select data-db-level="${i}">${[1,2,3,4].map(l=>`<option value="${l}" ${dbLevels[i]===l?'selected':''}>${l}</option>`).join('')}</select></label><div class="db-current-x">x = <strong>${dbX(i,dbLevels[i]).toFixed(6)}</strong></div></div>`;
+const dbSelect=(selected, options)=>`<select class="db-level">${options.map(([v,t])=>`<option value="${v}" ${String(v)===String(selected)?'selected':''}>${t}</option>`).join('')}</select>`;
+function dbX(i,lv){const L=Math.max(1,Math.min(4,Number(lv)||4));const x=i===0?1.05:dbBase[i];switch(i){case 0:case 7:return 1+(x-1)*L;case 1:case 2:case 4:case 6:return Math.pow(x,L);case 3:return 1-(1-x)*L;case 5:return x*L;default:return NaN;}}
+function dbSingleFormulaMode(i){
+ if(!dbSameInheritance)return dbSingleFormula[i];
+ const x=String.raw`x_{\mathrm{${names.zh[i]}}}`;
+ const R=String.raw`R_{\mathrm{${names.zh[i]}}}`;
+ switch(i){
+ case 0:return String.raw`${R}=\frac{1}{1-r_{spark}(1-${x}^{-8})}`;
+ case 4:return String.raw`${R}=\frac{1}{${x}}`;
+ case 1:case 2:case 6:return String.raw`${R}=\frac{1}{${x}}`;
+ case 3:return dbSingleFormula[i];
+ case 5:return dbSingleFormula[i];
+ case 7:return String.raw`${R}=${x}`;
+ }
+}
+// All single, pair, quad and custom results use the same mass-state model.
+// q acts on log10(M), never directly on log10(E). The k-q normalization
+// follows only after mapping the previous target to terminal BH mass.
+function dbSingles(){
+ return dbBase.map((_,i)=>dbComboModel(Array.from({length:8},(_,j)=>i===j?dbLevels[j]:0)));
+}
+function dbPairs(s){return dbPairMembers.map(m=>dbComboModel(Array.from({length:8},(_,i)=>m.includes(i)?dbLevels[i]:0)));}
+function dbNumber(n){return Number.isFinite(n)&&n>0?'×'+n.toFixed(3):'—'}
+function dbMath(formula){
+ // MathML: same native equation layout as section ⑤, including true fractions.
+ let pos=0;
+ const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ function atom(){
+  if(pos>=formula.length)return '<mrow></mrow>';
+  let c=formula[pos++];
+  if(c==='{'){const inner=sequence('}');if(formula[pos]==='}')pos++;return '<mrow>'+inner+'</mrow>'}
+  if(c==='\\'){
+   let cmd='';while(/[A-Za-z]/.test(formula[pos]||''))cmd+=formula[pos++];
+   if(cmd==='frac'){const numerator=atom(),denominator=atom();return '<mfrac>'+numerator+denominator+'</mfrac>'}
+   if(cmd==='approx')return '<mo>≈</mo>';
+   if(cmd==='prod')return '<mo>∏</mo>';
+   if(cmd==='times')return '<mo>×</mo>';
+   if(cmd==='cdot')return '<mo>·</mo>';
+   if(cmd==='left'||cmd==='right')return '';
+   if(cmd==='text'||cmd==='mathrm')return '<mtext>'+esc(textGroup())+'</mtext>';
+   if(cmd===' ')return '<mspace width=".25em"/>';
+   return '<mi>'+esc(cmd)+'</mi>';
+  }
+  if(/[0-9.]/.test(c)){let n=c;while(/[0-9.]/.test(formula[pos]||'')&&pos<formula.length)n+=formula[pos++];return '<mn>'+esc(n)+'</mn>'}
+  if(/[A-Za-z]/.test(c))return '<mi>'+esc(c)+'</mi>';
+  if(c===' ')return '<mspace width=".16em"/>';
+  return '<mo>'+esc(c)+'</mo>';
+ }
+ function textGroup(){if(formula[pos]!=='{')return formula[pos++]||'';pos++;let t='';while(pos<formula.length&&formula[pos]!=='}')t+=formula[pos++];pos++;return t}
+ function sequence(stop){let result='';while(pos<formula.length&&formula[pos]!==stop){
+   if(formula[pos]==='_'||formula[pos]==='^'){const typ=formula[pos++],script=atom();
+     // Attach scripts to the preceding atom, not to the entire expression.
+     const idx=result.lastIndexOf('<!--atom-->');
+     if(idx>=0){const base=result.slice(idx+11);result=result.slice(0,idx)+'<!--atom--><'+(typ==='_'?'msub':'msup')+'>'+base+script+'</'+(typ==='_'?'msub':'msup')+'>';}
+     else result+='<mo>'+esc(typ)+'</mo>'+script;
+   }else result+='<!--atom-->'+atom();
+  }return result.replaceAll('<!--atom-->','');}
+ return '<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow>'+sequence()+'</mrow></math>';
+}
+function dbLocalizedFormula(formula){
+ if(lang==='zh')return formula;
+ const english=['HG','DU','ST','BSM','ES','SN','CC','VD'];
+ const chinese=['沉重引力','微光宇宙','迟缓时间','残破星图','元素不足','短夜','冷寂连珠','真空衰变'];
+ for(let i=0;i<chinese.length;i++)formula=formula.replaceAll(chinese[i],english[i]);
+ return formula;
+}
+function dbRenderMath(){} // Formulas are rendered synchronously using HTML.
+const dbColors=['#F2A11B','#B9A0DD','#E9D955','#D3E4ED','#64D9A1','#FF8AB1','#79E0DD','#E78ACB'];
+const dbPairColors=['#eebd38','#b1dc99','#b0b5d4','#ec9673','#a0c7f0','#92a5e8','#8ebcbf','#9cdec7'];
+const dbGlyphs=['◉','◈','◷','✧','⬡','☾','❄','◎'];
+function dbBadge(i,level){const c=dbColors[i];return `<span class="db-badge" style="--db-accent:${c}"><span class="db-glyph">${dbGlyphs[i]}</span><span class="db-badge-name">${names[lang][i]}${level===undefined?'':` <small>Lv${level}</small>`}</span></span>`}
+function dbLevelPicker(i,allowZero=false){const levels=allowZero?[0,1,2,3,4]:[1,2,3,4];const lv=allowZero?dbCustomLevels[i]:dbLevels[i];const attr=allowZero?'data-db-custom-level':'data-db-level';const disabled=allowZero&&lv===0&&dbCustomLevels.filter(x=>x>0).length>=4;return `<select class="db-title-level" ${attr}="${i}" aria-label="${names[lang][i]} level">${levels.map(l=>`<option value="${l}" ${lv===l?'selected':''} ${disabled&&l>0?'disabled':''}>${l}</option>`).join('')}</select>`} 
+function dbNamedPicker(i){return `<span class="db-inline-name" style="--db-accent:${dbColors[i]}"><span class="db-glyph">${dbGlyphs[i]}</span><strong>${names[lang][i]}</strong><span class="db-lv-word">Lv</span>${dbLevelPicker(i)}</span>`}
+function dbComboTitle(i){const members=i<8?dbPairMembers[i]:i===8?[0,2,6,7]:[1,3,4,5];const colors=members.map(j=>dbColors[j]);return `<div class="db-combo-title" style="--db-a:${i<8?dbPairColors[i]:colors[0]};--db-b:${i<8?dbPairColors[i]:colors[1]};"><strong>${names[lang][8+i]}</strong><div class="db-combo-badges">${members.map(j=>dbNamedPicker(j)).join('')}</div></div>`}
+function renderDebuffsV14(){const area=$('dbContent');if(!area)return;$('layersLabel').textContent=lang==='zh'?'8 · 生产链层数（固定）':'8 · Generator chain layers (fixed)';const zh=lang==='zh',s=dbSingles(),pairs=dbPairs(s),four=[[0,2,6,7],[1,3,4,5]].map(m=>dbComboModel(Array.from({length:8},(_,i)=>m.includes(i)?dbLevels[i]:0)));
+ $('dbSameInheritance').checked=dbSameInheritance;$('dbSameInheritanceText').textContent=zh?'上一轮使用相同 Debuff 组合（影响继承的黑洞质量）':'Previous genesis used the same Debuff combination (changes inherited black-hole mass)';const n=names[lang];document.querySelectorAll('.deb-tabs button').forEach((b,i)=>{b.classList.toggle('active',dbPage===i);b.textContent=(zh?['① 单项','② 双组合','③ 四组合','④ 自由组合']:['① Singles','② Pairs','③ Four','④ Custom'])[i]});
+ let rows='';const th=dbPage===0?(zh?['名称 / 等级','当前效果','常数奖励','理论公式','模型倍率']:['Name / Level','Current effect','Constant reward','Theoretical equation','Model ratio']):dbPage===1?(zh?['组合名称 / 等级','组合常数','理论公式','模型倍率']:['Combination / Level','Pair constant','Theoretical equation','Model ratio']):(zh?['方案 / 等级','理论公式','模型倍率']:['Plan / Level','Theoretical equation','Model ratio']);
+ if(dbPage===0){rows=s.map((v,i)=>`<tr style="--db-row:${dbColors[i]}"><td>${dbNamedPicker(i)}</td><td>${dbLevelRule(i,zh)}${dbXDefinition(i,zh)}</td><td>${dbLevels[i]>=3?dbReward(dbConstantNames[lang][i],dbColors[i]):(zh?'Lv3 解锁':'Unlocks at Lv3')}</td><td>${dbMath(dbLocalizedFormula(dbSingleFormulaMode(i)))}${i===0?`<small class="db-model-note">${zh?"仅供近似估算，结果不可靠（指数 8 未验证）":"Approximation only; unreliable (exponent 8 unverified)."}</small>`:""}</td><td><strong>${dbNumber(v)}</strong></td></tr>`).join('')}
+ if(dbPage===1){rows=pairs.map((v,i)=>`<tr style="--db-row:${dbColors[dbPairMembers[i][0]]}"><td>${dbComboTitle(i)}</td><td>${dbPairMembers[i].every(j=>dbLevels[j]>=3)?dbReward(dbPairConstantNames[lang][i],dbPairColors[i]):(zh?'成员均达到 Lv3 解锁':'All members must reach Lv3')}</td><td>${dbMath(dbLocalizedFormula(dbComboFormula(Array.from({length:8},(_,j)=>dbPairMembers[i].includes(j)?dbLevels[j]:0))))}</td><td><strong>${dbNumber(v)}</strong></td></tr>`).join('')}
+
+ if(dbPage===2){rows=[0,1].map(i=>`<tr style="--db-row:${dbColors[i===0?0:1]}"><td>${dbComboTitle(8+i)}</td><td>${dbMath(dbLocalizedFormula(dbComboFormula(Array.from({length:8},(_,j)=>(i===0?[0,2,6,7]:[1,3,4,5]).includes(j)?dbLevels[j]:0))))}<div class="db-quad-caveat">${zh?'组合耦合近似；不包含组合常数奖励':'Coupled approximation; pair constant rewards excluded'}</div></td><td><strong>${dbNumber(four[i])}</strong></td></tr>`).join('')}
+
+ if(dbPage===3){const chosen=dbCustomLevels.map((l,i)=>l>0?i:-1).filter(i=>i>=0);
+ const combo=Array.from({length:8},(_,i)=>`<div class="db-custom-item" style="--db-row:${dbColors[i]}"><div class="db-custom-name">${dbGlyphs[i]} <strong>${names[lang][i]}</strong> <span class="db-lv-word">Lv</span>${dbLevelPicker(i,true)}</div></div>`).join('');
+ const matched=[];for(let j=0;j<8;j++)if(dbPairMembers[j].every(i=>chosen.includes(i)))matched.push(j);
+ const activeText=chosen.map(i=>names[lang][i]+' Lv'+dbCustomLevels[i]).join(' + ')||(zh?'无':'None');
+ const matchText=matched.map(j=>names[lang][8+j]).join('、')||(zh?'无':'None');
+ area.innerHTML=`<div class="db-custom-grid">${combo}</div><div class="db-custom-summary"><strong>${zh?'当前组合':'Selected combination'}：</strong>${activeText}<div><strong>${zh?'可形成双组合':'Matching pairs'}：</strong>${matchText}</div><div><strong>${zh?'当前公式':'Current formula'}：</strong>${chosen.length?dbMath(dbLocalizedFormula(dbComboFormula(dbCustomLevels))):(zh?'未选择 Debuff':'No Debuffs selected')}</div><div><strong>${zh?'模型倍率':'Model ratio'}：</strong><span class="db-custom-model-ratio">${chosen.length?dbNumber(dbComboModel(dbCustomLevels)):'×1.000'}</span></div></div>`;
+
+ }else{area.innerHTML=`<div class="db-legend">${zh?'参数说明：':'Parameters: '}<strong>x</strong> ${zh?'表示当前所选等级的实际效果值（不是每级基础值）。':'is the effect at the selected level (not the per-level base).'} <strong>R</strong> = ${zh?'开启 Debuff 耗时 ÷ 正常耗时':'Debuff time / normal time'}；<strong>k</strong> = ${val('k').toPrecision(5)}；<strong>q</strong> = ${val('qCombined').toPrecision(5)}；<strong>P<sub>max</sub></strong> = ${val('power').toPrecision(5)}；<strong>r<sub>spark</sub></strong> = ${val('rs').toPrecision(5)}。<div class="db-model-note">${zh?'推导约定：q 只作用于黑洞质量 M；k 作用于创世目标能量指数 F。先由固定黑洞贡献比例把 F 换算成所需质量指数，再计算继承差值。首次开启与上一轮相同组合分别计算；8 层轨道价格近似未经实测验证。':'Assumptions: q applies to black-hole mass M, while k applies to the target energy exponent F. Convert F into the required mass exponent using a fixed black-hole share, then subtract inherited mass. First use and repeated identical combinations differ; the 8-layer orbit-price approximation is unverified.'}</div></div><div class="table-scroll"><table class="db-table db-table-page-${dbPage}"><thead><tr>${th.map(t=>`<th>${t}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;}
+ $('dbFootnote').textContent=zh?'等级效果按逐级规则计算：沉重/真空每级 +5%，微光 ^0.97，迟缓/冷寂 ×0.85，残破每级 −5%，元素 ^0.95，短夜每级 −2。耗时倍率及八层沉重模型仍为近似；组合常数奖励不自动计入。':'Level effects: Heavy/Vacuum +5% per level; Dim ^0.97; Slow/Cold ×0.85; Broken −5% per level; Element ^0.95; Short Night −2 power per level. Time ratios and the eight-tier Heavy model remain approximate; pair constant rewards are excluded.';
+ area.querySelectorAll('[data-db-level]').forEach(el=>el.addEventListener('change',()=>{dbLevels[+el.dataset.dbLevel]=+el.value;renderDebuffsV14()}));
+ area.querySelectorAll('[data-db-custom-level]').forEach(el=>el.addEventListener('change',()=>{const i=+el.dataset.dbCustomLevel,l=+el.value;if(l>0&&dbCustomLevels[i]===0&&dbCustomLevels.filter(x=>x>0).length>=4){renderDebuffsV14();return;}dbCustomLevels[i]=l;renderDebuffsV14()}));
+ dbRenderMath();}
+$('dbSameInheritance').addEventListener('change',e=>{dbSameInheritance=e.target.checked;renderDebuffsV14()});
+for(let i=0;i<4;i++)$('dbTab'+i).addEventListener('click',()=>{dbPage=i;renderDebuffsV14()});
+
+
+function drawFreezeChart(points){
+ const canvas=$('freezeChart');if(!canvas)return;
+ const ctx=canvas.getContext('2d');if(!ctx)return;
+ const rect=canvas.getBoundingClientRect();
+ if(rect.width<1||rect.height<1)return;
+ const W=rect.width,H=rect.height,pad=Math.min(65,Math.max(42,W*0.13));
+ const dpr=Math.max(1,window.devicePixelRatio||1);
+ const pw=Math.round(W*dpr),ph=Math.round(H*dpr);
+ if(canvas.width!==pw||canvas.height!==ph){canvas.width=pw;canvas.height=ph;}
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ ctx.clearRect(0,0,W,H);
+ const valid=points.filter(p=>Number.isFinite(p.eff));
+ ctx.font='17px sans-serif';ctx.textBaseline='middle';
+ if(!valid.length){ctx.fillStyle='#b4d8e9';ctx.textAlign='center';ctx.fillText(lang==='zh'?'请检查耗时模型输入':'Check time-model inputs',W/2,H/2);return;}
+ const lo=points[0].n,hi=points[points.length-1].n;
+ const values=valid.map(p=>p.eff),minV=Math.min(0,...values),maxV=Math.max(...values);
+ const upper=maxV>minV?maxV*1.08:Math.max(1,maxV+1);
+ const xx=n=>pad+(n-lo)/Math.max(1,hi-lo)*(W-2*pad);
+ const yy=v=>H-pad-(v-minV)/Math.max(1e-12,upper-minV)*(H-2*pad);
+ ctx.textAlign='right';
+ for(let i=0;i<=4;i++){
+  const v=minV+(upper-minV)*i/4,y=yy(v);
+  ctx.beginPath();ctx.strokeStyle='#244a62';ctx.lineWidth=1;ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();
+  ctx.fillStyle='#b4d8e9';ctx.fillText(v.toFixed(2),pad-9,y);
+ }
+ ctx.beginPath();ctx.strokeStyle='#6ce1e6';ctx.lineWidth=3;
+ valid.forEach((p,i)=>{const x=xx(p.n),y=yy(p.eff);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke();
+ ctx.fillStyle='#b4d8e9';ctx.textAlign='left';ctx.fillText('Lv '+lo,pad,H-22);
+ ctx.textAlign='right';ctx.fillText('Lv '+hi,W-pad,H-22);
+}
+
+window.addEventListener('resize',()=>{if(!$('freezePanel').classList.contains('hidden'))computeFreeze();});
+translate();recalc();
+</script></body></html>
+
+<style>
+/* v27: original poster constant palette and accessible dark native level menus */
+.db-reward-icon {color:var(--constant-color)!important;text-shadow:0 0 6px var(--constant-color),0 0 14px var(--constant-color),0 0 26px var(--constant-color)!important;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;font-family:Georgia,'Times New Roman',serif!important;font-size:44px!important;}
+.db-reward strong {color:var(--constant-color)!important;text-shadow:0 0 10px color-mix(in srgb,var(--constant-color) 35%,transparent)}
+.db-title-level {color-scheme:dark!important;background-color:#0a2338!important;color:#eff8ff!important;cursor:pointer!important;}
+.db-title-level:hover,.db-title-level:focus-visible {background-color:#15354b!important;color:#fff!important;border-color:#9bcbe2!important;}
+.db-title-level option,.db-title-level option:hover,.db-title-level option:checked,.db-title-level option:focus {background-color:#0a2338!important;color:#eff8ff!important;}
+</style>
