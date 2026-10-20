@@ -267,6 +267,177 @@ html{scroll-behavior:smooth;scroll-padding-top:95px}
  border-right:1px solid #36536a!important;
 }
 </style>
+
+<style id="v105-combo-gradient">
+/* Horizontal alpha falloff (as single Debuff), vertical member-color interpolation. */
+#dbContent .db-table-page-1 tbody td:not(.db-col-hidden),#dbContent .db-table-page-2 tbody td:not(.db-col-hidden){
+ background-image:linear-gradient(to right,transparent 0%,#0d1a2a 62%),linear-gradient(to bottom,var(--db-combo-tint-stops))!important;
+ background-color:#0d1a2a!important;
+ background-repeat:no-repeat!important;
+ background-size:var(--db-row-width,100%) 100%!important;
+ background-position:calc(-1 * var(--db-cell-offset,0px)) 0!important;
+}
+#dbContent .db-table-page-1 tbody td:first-child,#dbContent .db-table-page-2 tbody td:first-child{position:sticky;left:0}
+#dbContent .db-table-page-1 tbody td:first-child::before,#dbContent .db-table-page-2 tbody td:first-child::before{
+ content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+ background:linear-gradient(to bottom,var(--db-combo-color-stops));pointer-events:none;
+}
+#dbContent .db-table-page-1 .db-combo-title,#dbContent .db-table-page-2 .db-combo-title,
+#dbContent .db-table-page-1 .db-reward,#dbContent .db-table-page-2 .db-reward{
+ background:linear-gradient(to bottom,var(--db-combo-tint-stops))!important;
+ border-color:color-mix(in srgb,var(--db-combo-first) 40%,#29465a)!important;
+}
+#dbContent .db-table-page-1 .db-combo-title>strong,#dbContent .db-table-page-2 .db-combo-title>strong,
+#dbContent .db-table-page-1 .db-reward strong,#dbContent .db-table-page-2 .db-reward strong,
+#dbContent .db-table-page-1 .db-reward-icon,#dbContent .db-table-page-2 .db-reward-icon{
+ background:linear-gradient(to bottom,var(--db-combo-color-stops))!important;
+ -webkit-background-clip:text!important;background-clip:text!important;
+ -webkit-text-fill-color:transparent!important;text-shadow:none!important;
+}
+</style>
+
+<style id="v107-combo-reward-fixes">
+/* Same neutral constant cards and title typography as singles: only row wash and row marker use member colors. */
+#dbContent .db-table-page-1 .db-combo-title,#dbContent .db-table-page-2 .db-combo-title{background:#102337!important;border-color:#31526b!important}
+#dbContent .db-table-page-1 .db-combo-title>strong,#dbContent .db-table-page-2 .db-combo-title>strong{background:none!important;-webkit-text-fill-color:currentColor!important;color:#e9f3ff!important;text-shadow:none!important}
+#dbContent .db-table-page-1 .db-reward,#dbContent .db-table-page-2 .db-reward{background:linear-gradient(115deg,#1a3345,#0c1d2d)!important;border-color:#456178!important}
+#dbContent .db-table-page-1 .db-reward strong,#dbContent .db-table-page-2 .db-reward strong,
+#dbContent .db-table-page-1 .db-reward-icon,#dbContent .db-table-page-2 .db-reward-icon{
+ background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;
+ -webkit-text-fill-color:var(--constant-color)!important;color:var(--constant-color)!important;
+ text-shadow:0 0 6px var(--constant-color),0 0 14px var(--constant-color)!important;
+}
+/* H₀ is narrower than R∞ at 44px Georgia. A fixed 56px grid track clips R∞ ink. */
+#dbContent .db-reward{grid-template-columns:max-content minmax(0,1fr)!important}
+#dbContent .db-reward-icon{width:max-content!important;min-width:56px!important;max-width:none!important;
+ padding-inline:6px!important;box-sizing:border-box!important;white-space:nowrap!important;overflow:visible!important;
+ flex-shrink:0!important}
+/* Keep all original single-debuff colors. */
+</style>
+
+<style id="v108-combo-title-treatment">
+/* Pair/quad title cards follow the single Debuff's horizontal fade, while
+   their member hues blend vertically. Preserve ordinary non-glowing text. */
+#dbContent .db-table-page-1 .db-combo-title,
+#dbContent .db-table-page-2 .db-combo-title{
+ position:relative;isolation:isolate;
+ background:linear-gradient(to right,transparent 0%,#102337 95%),linear-gradient(to bottom,var(--db-combo-tint-stops))!important;
+ border:1px solid transparent!important;
+ background-origin:padding-box!important;
+ background-clip:padding-box!important;
+}
+#dbContent .db-table-page-1 .db-combo-title::before,
+#dbContent .db-table-page-2 .db-combo-title::before{
+ content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+ background:linear-gradient(to bottom,var(--db-combo-color-stops));
+ -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ -webkit-mask-composite:xor;mask-composite:exclude;
+ pointer-events:none;z-index:-1;
+}
+#dbContent .db-table-page-1 .db-combo-title>strong,
+#dbContent .db-table-page-2 .db-combo-title>strong{
+ color:#e9f3ff!important;-webkit-text-fill-color:#e9f3ff!important;
+ background:none!important;text-shadow:none!important;filter:none!important;
+}
+/* Constant labels use their single-Debuff palette without any luminous halo. */
+#dbContent .db-table-page-1 .db-reward strong,
+#dbContent .db-table-page-2 .db-reward strong{
+ color:var(--constant-color)!important;-webkit-text-fill-color:var(--constant-color)!important;
+ text-shadow:none!important;filter:none!important;
+}
+/* Constant icon itself keeps the original single-Debuff icon treatment. */
+#dbContent .db-table-page-1 .db-reward-icon,
+#dbContent .db-table-page-2 .db-reward-icon{
+ text-shadow:0 0 6px var(--constant-color),0 0 14px var(--constant-color),0 0 26px var(--constant-color)!important;
+}
+</style>
+
+<style id="v109-scrollbar-and-soft-combo-frame">
+/* Match the two synchronized scrollbar surfaces in Chromium/Safari and Firefox. */
+#dbContent .db-scroll-top,
+#dbContent .db-scroll-shell > .table-scroll{
+  scrollbar-color:#3a5367 #101e2c!important;
+  scrollbar-width:thin!important;
+  color-scheme:dark;
+}
+#dbContent .db-scroll-top::-webkit-scrollbar,
+#dbContent .db-scroll-shell > .table-scroll::-webkit-scrollbar{height:10px!important}
+#dbContent .db-scroll-top::-webkit-scrollbar-track,
+#dbContent .db-scroll-shell > .table-scroll::-webkit-scrollbar-track{
+  background:#101e2c!important;border-radius:9px!important;
+}
+#dbContent .db-scroll-top::-webkit-scrollbar-thumb,
+#dbContent .db-scroll-shell > .table-scroll::-webkit-scrollbar-thumb{
+  background:#3a5367!important;border:2px solid #101e2c!important;border-radius:9px!important;
+}
+#dbContent .db-scroll-top::-webkit-scrollbar-thumb:hover,
+#dbContent .db-scroll-shell > .table-scroll::-webkit-scrollbar-thumb:hover{background:#516a7e!important}
+/* Original combo frame was 100% saturated member color.  Use the same
+   subtle border strength as the single Debuff's tinted surface. */
+#dbContent .db-table-page-1 .db-combo-title::before,
+#dbContent .db-table-page-2 .db-combo-title::before{
+ background:linear-gradient(to bottom,var(--db-combo-soft-border-stops))!important;
+}
+</style>
+
+<style id="v110-single-combo-leading-rule">
+/* Single Debuff retains its native colored border. Pair/quad use only
+   the vertical gradient pseudo-element, not the old blue fallback border. */
+#dbContent .db-table-page-1 tbody td:first-child,
+#dbContent .db-table-page-2 tbody td:first-child{
+  border-left:0!important;
+}
+#dbContent .db-table-page-1 tbody td:first-child::before,
+#dbContent .db-table-page-2 tbody td:first-child::before{
+  left:0;width:4px;
+}
+</style>
+
+<style id="v111-combo-constant-colors">
+/* Pair/quad member colors run vertically; preserve the neutral card design. */
+#dbContent .db-table-page-1 .db-reward,
+#dbContent .db-table-page-2 .db-reward{
+ background:linear-gradient(90deg,transparent 0%,#0c1d2d 96%),linear-gradient(180deg,var(--db-combo-tint-stops))!important;
+ border-color:#456178!important;
+}
+/* A gradient-clipped glyph must not use solid text-fill or text-shadow.
+   Drop-shadow follows the actual multi-color glyph instead. */
+#dbContent .db-table-page-1 .db-reward-icon,
+#dbContent .db-table-page-2 .db-reward-icon{
+ color:transparent!important;
+ background:linear-gradient(180deg,var(--db-combo-color-stops))!important;
+ -webkit-background-clip:text!important;background-clip:text!important;
+ -webkit-text-fill-color:transparent!important;
+ text-shadow:none!important;
+ filter:drop-shadow(0 0 5px color-mix(in srgb,var(--db-combo-first) 45%,transparent))
+        drop-shadow(0 0 12px color-mix(in srgb,var(--db-combo-last) 38%,transparent))!important;
+}
+/* Constant name takes the same vertical color order, without fluorescence. */
+#dbContent .db-table-page-1 .db-reward strong,
+#dbContent .db-table-page-2 .db-reward strong{
+ color:transparent!important;
+ background:linear-gradient(180deg,var(--db-combo-color-stops))!important;
+ -webkit-background-clip:text!important;background-clip:text!important;
+ -webkit-text-fill-color:transparent!important;
+ text-shadow:none!important;filter:none!important;
+}
+/* Combination heading text intentionally stays normal, non-glowing. */
+#dbContent .db-table-page-1 .db-combo-title>strong,
+#dbContent .db-table-page-2 .db-combo-title>strong{
+ background:none!important;color:#e9f3ff!important;
+ -webkit-text-fill-color:#e9f3ff!important;text-shadow:none!important;
+}
+</style>
+
+<style id="v112-neutral-constant-card">
+/* Keep constant cards exactly neutral, as in the single-Debuff design.
+   Only constant glyph/name can carry the member-color gradient. */
+#dbContent .db-table-page-1 .db-reward,
+#dbContent .db-table-page-2 .db-reward {
+  background:linear-gradient(115deg,#1a3345,#0c1d2d)!important;
+  border:1px solid #456178!important;
+}
+</style>
 </head><body><main class="wrap"><header class="top" role="banner"><div class="logo">◉ ORBITAL GENESIS <span style="color:#7e9cba">/ CALCULATOR</span></div><nav class="section-rail" aria-label="Section navigation"><button type="button" class="rail-link active" data-target="parametersAnchor" aria-label="Parameters"><span class="rail-number">01</span></button><button type="button" class="rail-link" data-target="calculatorsAnchor" aria-label="Calculators"><span class="rail-number">02</span></button></nav><button aria-label="Switch language" id="language">ENGLISH</button></header><section class="hero"><div class="eyebrow" data-i="eyebrow">交互式理论模型 · PATH OF GRAVITY</div><h1 data-i="title">Orbital Genesis<br/>创世计算器</h1><p data-i="intro">计算 Debuff 对创世时间的影响，计算黑洞增长与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。</p><span class="pill">v0.22 beta</span></section>
 <div class="section-title" id="parametersAnchor"><h2 data-i="general">01 / 基础参数与公式</h2></div>
 <div class="grid"><div class="card col8"><h3 data-i="equations">计算顺序 · 核心方程</h3>
@@ -712,7 +883,15 @@ const dbGlyphs=['◉','◈','◷','✧','⬡','☾','❄','◎'];
 function dbBadge(i,level){const c=dbColors[i];return `<span class="db-badge" style="--db-accent:${c}"><span class="db-glyph">${dbGlyphs[i]}</span><span class="db-badge-name">${names[lang][i]}${level===undefined?'':` <small>Lv${level}</small>`}</span></span>`}
 function dbLevelPicker(i,allowZero=false){const levels=allowZero?[0,1,2,3,4]:[1,2,3,4];const lv=allowZero?dbCustomLevels[i]:dbLevels[i];const attr=allowZero?'data-db-custom-level':'data-db-level';const disabled=allowZero&&lv===0&&dbCustomLevels.filter(x=>x>0).length>=4;return `<select class="db-title-level" ${attr}="${i}" aria-label="${names[lang][i]} level">${levels.map(l=>`<option value="${l}" ${lv===l?'selected':''} ${disabled&&l>0?'disabled':''}>${l}</option>`).join('')}</select>`} 
 function dbNamedPicker(i){return `<span class="db-inline-name" style="--db-accent:${dbColors[i]}"><span class="db-glyph">${dbGlyphs[i]}</span><strong>${names[lang][i]}</strong><span class="db-lv-word">Lv</span>${dbLevelPicker(i)}</span>`}
-function dbComboTitle(i){const members=i<8?dbPairMembers[i]:i===8?[0,2,6,7]:[1,3,4,5];const colors=members.map(j=>dbColors[j]);return `<div class="db-combo-title" style="--db-a:${i<8?dbPairColors[i]:colors[0]};--db-b:${i<8?dbPairColors[i]:colors[1]};"><strong>${names[lang][8+i]}</strong><div class="db-combo-badges">${members.map(j=>dbNamedPicker(j)).join('')}</div></div>`}
+function dbComboGradientStyle(members){
+ const colors=members.map(i=>dbColors[i]);
+ const pct=i=>(100*i/(colors.length-1)).toFixed(3)+'%';
+ const colorStops=colors.map((c,i)=>`${c} ${pct(i)}`).join(',');
+ const tintStops=colors.map((c,i)=>`color-mix(in srgb,${c} 16%,#0d1a2a) ${pct(i)}`).join(',');
+ const softBorderStops=colors.map((c,i)=>`color-mix(in srgb,${c} 22%,#152b3e) ${(100*i/(colors.length-1)).toFixed(3)}%`).join(',');
+ return `--db-combo-color-stops:${colorStops};--db-combo-tint-stops:${tintStops};--db-combo-soft-border-stops:${softBorderStops};--db-combo-first:${colors[0]};--db-combo-last:${colors[colors.length-1]};`;
+}
+function dbComboTitle(i){const members=i<8?dbPairMembers[i]:i===8?[0,2,6,7]:[1,3,4,5];const colors=members.map(j=>dbColors[j]);return `<div class="db-combo-title" style="--db-a:${colors[0]};--db-b:${colors[colors.length-1]};"><strong>${names[lang][8+i]}</strong><div class="db-combo-badges">${members.map(j=>dbNamedPicker(j)).join('')}</div></div>`}
 
 
 const dbColumnVisibilityKey='og-dbColumnVisibility';
@@ -773,9 +952,9 @@ function renderDebuffsV14(){const area=$('dbContent');if(!area)return;$('layersL
  $('dbSameInheritance').checked=dbSameInheritance;$('dbSameInheritanceText').textContent=zh?'上一轮使用相同 Debuff 组合（影响继承的黑洞质量）':'Previous genesis used the same Debuff combination (changes inherited black-hole mass)';const n=names[lang];document.querySelectorAll('.deb-tabs button').forEach((b,i)=>{b.classList.toggle('active',dbPage===i);b.textContent=(zh?['① 单项','② 双组合','③ 四组合','④ 自由组合']:['① Singles','② Pairs','③ Four','④ Custom'])[i]});
  let rows='';const th=dbPage===0?(zh?['名称 / 等级','当前效果','常数奖励','理论公式','模型倍率']:['Name / Level','Current effect','Constant reward','Theoretical equation','Model ratio']):dbPage===1?(zh?['组合名称 / 等级','组合常数','理论公式','模型倍率']:['Combination / Level','Pair constant','Theoretical equation','Model ratio']):(zh?['方案 / 等级','理论公式','模型倍率']:['Plan / Level','Theoretical equation','Model ratio']);
  if(dbPage===0){rows=s.map((v,i)=>`<tr style="--db-row:${dbColors[i]}"><td>${dbNamedPicker(i)}</td><td>${dbLevelRule(i,zh)}${dbXDefinition(i,zh)}</td><td>${dbLevels[i]>=3?dbReward(dbConstantNames[lang][i],dbColors[i]):(zh?'Lv3 解锁':'Unlocks at Lv3')}</td><td>${dbMath(dbLocalizedFormula(dbSingleFormulaMode(i)))}${i===0?`<small class="db-model-note">${zh?"仅供近似估算，结果不可靠（指数 8 未验证）":"Approximation only; unreliable (exponent 8 unverified)."}</small>`:""}</td><td><strong>${dbNumber(v)}</strong></td></tr>`).join('')}
- if(dbPage===1){rows=pairs.map((v,i)=>`<tr style="--db-row:${dbColors[dbPairMembers[i][0]]}"><td>${dbComboTitle(i)}</td><td>${dbPairMembers[i].every(j=>dbLevels[j]>=3)?dbReward(dbPairConstantNames[lang][i],dbPairColors[i]):(zh?'成员均达到 Lv3 解锁':'All members must reach Lv3')}</td><td>${dbMath(dbLocalizedFormula(dbComboFormula(Array.from({length:8},(_,j)=>dbPairMembers[i].includes(j)?dbLevels[j]:0))))}</td><td><strong>${dbNumber(v)}</strong></td></tr>`).join('')}
+ if(dbPage===1){rows=pairs.map((v,i)=>`<tr style="${dbComboGradientStyle(dbPairMembers[i])}"><td>${dbComboTitle(i)}</td><td>${dbPairMembers[i].every(j=>dbLevels[j]>=3)?dbReward(dbPairConstantNames[lang][i],dbPairColors[i]):(zh?'成员均达到 Lv3 解锁':'All members must reach Lv3')}</td><td>${dbMath(dbLocalizedFormula(dbComboFormula(Array.from({length:8},(_,j)=>dbPairMembers[i].includes(j)?dbLevels[j]:0))))}</td><td><strong>${dbNumber(v)}</strong></td></tr>`).join('')}
 
- if(dbPage===2){rows=[0,1].map(i=>`<tr style="--db-row:${dbColors[i===0?0:1]}"><td>${dbComboTitle(8+i)}</td><td>${dbMath(dbLocalizedFormula(dbComboFormula(Array.from({length:8},(_,j)=>(i===0?[0,2,6,7]:[1,3,4,5]).includes(j)?dbLevels[j]:0))))}<div class="db-quad-caveat">${zh?'组合耦合近似；不包含组合常数奖励':'Coupled approximation; pair constant rewards excluded'}</div></td><td><strong>${dbNumber(four[i])}</strong></td></tr>`).join('')}
+ if(dbPage===2){rows=[0,1].map(i=>`<tr style="${dbComboGradientStyle(i===0?[0,2,6,7]:[1,3,4,5])}"><td>${dbComboTitle(8+i)}</td><td>${dbMath(dbLocalizedFormula(dbComboFormula(Array.from({length:8},(_,j)=>(i===0?[0,2,6,7]:[1,3,4,5]).includes(j)?dbLevels[j]:0))))}<div class="db-quad-caveat">${zh?'组合耦合近似；不包含组合常数奖励':'Coupled approximation; pair constant rewards excluded'}</div></td><td><strong>${dbNumber(four[i])}</strong></td></tr>`).join('')}
 
  if(dbPage===3){const chosen=dbCustomLevels.map((l,i)=>l>0?i:-1).filter(i=>i>=0);
  const combo=Array.from({length:8},(_,i)=>`<div class="db-custom-item" style="--db-row:${dbColors[i]}"><div class="db-custom-name">${dbGlyphs[i]} <strong>${names[lang][i]}</strong> <span class="db-lv-word">Lv</span>${dbLevelPicker(i,true)}</div></div>`).join('');
