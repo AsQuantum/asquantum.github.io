@@ -628,7 +628,7 @@ const calibrationHints={
   timeCalIntervalLabel:'Fixed polling: settle at most 10 Genesis levels per polling window. Eligible levels can be settled consecutively, up to 10; additional levels wait until the next poll while black-hole mass continues growing. '
  }
 };
-function updateParameterHints(){enhanceFields();document.querySelectorAll('[data-tip-key]').forEach(el=>{el.dataset.tooltip=(calibrationHints[lang]||{})[el.dataset.tipKey]||inputHints[lang][el.dataset.tipKey]||fieldMeta[lang][el.dataset.tipKey]?.[2]||'';el.removeAttribute('title');el.setAttribute('aria-label',el.dataset.tooltip)});}
+function updateParameterHints(){enhanceFields();document.querySelectorAll('[data-tip-key]').forEach(el=>{el.dataset.tooltip=((calibrationHints[lang]||{})[el.dataset.tipKey]||inputHints[lang][el.dataset.tipKey]||fieldMeta[lang][el.dataset.tipKey]?.[2]||'').replace(/\$\{?maxPoll\}?/gi,String(Math.max(1,Math.trunc(Number($('instantMax')?.value)||10))));el.removeAttribute('title');el.setAttribute('aria-label',el.dataset.tooltip)});}
 
 function updateTooltips(){
  updateParameterHints();
@@ -642,6 +642,7 @@ const newTips={zh:{qCombined:'「起源之树 → 继承」与「多元 → 常�
 Object.assign(inputHints.zh,newTips.zh);Object.assign(inputHints.en,newTips.en);
 Object.assign(inputHints.zh,{power:'获取位置：虚无（Void）→ 吸积盘（Accretion Disk），读取黑洞威力 Pmax。',rs:'获取位置：星图 → 火花产出和总能量/秒，分别读取指数后计算占比。',});
 Object.assign(inputHints.en,{power:'Where: Void → Accretion Disk. Read the black-hole power Pmax.',rs:'Where: Star Map → Spark production and total Energy/sec. Read their exponents to calculate the ratio.',});
+Object.assign(dict.zh,{qCombinedLabel:'黑洞质量继承指数'});
 Object.assign(dict.en,{bhBonusLabel:'Black-hole growth bonus coefficient',powerLabel:'Black-hole power',growthLabel:'Log₁₀ mass growth per second g',kappaLabel:'Black-hole growth fit coefficient',qCombinedLabel:'Black-hole inheritance exponent',interceptLabel:'Growth fit intercept',addObservation:'+ Add observation',applyBhFit:'Apply fitted values',fitBhHeading:'Observations · Fit K_obs',fitBhHelp:'Fit K_obs = Δlog₁₀(v)/ΔP from at least two distinct powers. The model assumes zero intercept.'});
 // v44: canonical bilingual help text. Keep menu paths in [Menu] notation.
 const auditedMenuHints={
@@ -1031,12 +1032,15 @@ translate();recalc();
  const popup=document.createElement('div');popup.className='global-tooltip';popup.setAttribute('role','tooltip');popup.hidden=true;document.body.appendChild(popup);let anchor=null;
  function position(){if(!anchor||popup.hidden)return;const r=anchor.getBoundingClientRect();const w=popup.offsetWidth,h=popup.offsetHeight;const left=Math.min(Math.max(12,r.left+r.width/2-w/2),innerWidth-w-12);let top=r.top-h-10;if(top<12)top=Math.min(innerHeight-h-12,r.bottom+10);popup.style.left=left+'px';popup.style.top=Math.max(12,top)+'px';}
  function show(el){const message=el.dataset.tooltip||el.getAttribute('title')||el.getAttribute('aria-label');if(!message)return;anchor=el;popup.textContent=message;popup.hidden=false;position();}
- function hide(){popup.hidden=true;anchor=null;}
+ function hide(){popup.hidden=true;anchor=null;if(document.activeElement?.classList?.contains('hint'))document.activeElement.blur();}
  document.addEventListener('pointerover',e=>{const el=e.target.closest?.('.hint');if(el)show(el);});
  document.addEventListener('pointerout',e=>{if(anchor&&(e.target===anchor||anchor.contains(e.target))&&!anchor.contains(e.relatedTarget))hide();});
  document.addEventListener('focusin',e=>{const el=e.target.closest?.('.hint');if(el)show(el);});
  document.addEventListener('focusout',e=>{if(anchor&&(e.target===anchor||anchor.contains(e.target)))hide();});
- document.addEventListener('scroll',()=>{if(anchor)position();},true);
+ document.addEventListener('scroll',()=>{if(anchor)hide();},true);
+ document.addEventListener('touchmove',()=>{if(anchor)hide();},{passive:true});
+ document.addEventListener('pointerdown',e=>{if(anchor&&!e.target.closest?.('.hint'))hide();});
+ document.addEventListener('click',e=>{const el=e.target.closest?.('.hint');if(!el)return;if(anchor===el&&!popup.hidden)hide();else show(el);});
  window.addEventListener('resize',()=>{if(anchor)position();});
  $('language').addEventListener('click',()=>{syncRailLabels();if(anchor)show(anchor);});
  syncRailLabels();
