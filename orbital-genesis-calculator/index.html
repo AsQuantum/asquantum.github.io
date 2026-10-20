@@ -516,6 +516,108 @@ html{scroll-behavior:smooth;scroll-padding-top:95px}
 #dbContent .db-mobile-field .katex-display::-webkit-scrollbar-thumb:hover,
 #dbContent .db-mobile-field .math-display::-webkit-scrollbar-thumb:hover {background:#516a7e!important}
 </style>
+<style id="v118-mobile-pair-constant-gradient-and-clear">
+/* Mobile pair cards retain the exact member-color order of desktop pair rows. */
+@media(max-width:640px){
+ #dbContent .db-mobile-card .db-reward-icon{
+  color:transparent!important;
+  background:linear-gradient(180deg,var(--db-combo-color-stops))!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  text-shadow:none!important;
+  filter:drop-shadow(0 0 5px color-mix(in srgb,var(--db-combo-first) 45%,transparent)) drop-shadow(0 0 12px color-mix(in srgb,var(--db-combo-last) 38%,transparent))!important;
+ }
+ #dbContent .db-mobile-card .db-reward strong{
+  color:transparent!important;
+  background:linear-gradient(180deg,var(--db-combo-color-stops))!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  text-shadow:none!important;filter:none!important;
+ }
+ /* The member-color treatment is for pair rewards only, not single rewards. */
+ #dbContent .db-mobile-card:not([data-db-pair]) .db-reward-icon,
+ #dbContent .db-mobile-card:not([data-db-pair]) .db-reward strong{background:none!important;-webkit-text-fill-color:initial!important;color:var(--constant-color)!important;filter:none!important}
+}
+#dbContent .db-custom-clear-row{display:flex;justify-content:flex-end;margin-top:12px}
+#dbContent .db-custom-clear{background:#182b3e;color:#c9dbea;border:1px solid #486077;border-radius:8px;padding:9px 13px;font:inherit;font-size:13px;cursor:pointer}
+#dbContent .db-custom-clear:hover{background:#243d53;border-color:#69859d}
+#dbContent .db-custom-clear:focus-visible{outline:2px solid #78b8e0;outline-offset:2px}
+</style>
+
+<style id="v119-mobile-combination-title-parity">
+/* Match desktop pair/quad combination title treatment, not the neutral outer card. */
+@media (max-width:640px){
+ #dbContent .db-mobile-card[data-db-pair] .db-combo-title{
+  position:relative!important;isolation:isolate!important;
+  background:linear-gradient(to right,transparent 0%,#102337 95%),linear-gradient(to bottom,var(--db-combo-tint-stops))!important;
+  border:1px solid transparent!important;
+  background-origin:padding-box!important;background-clip:padding-box!important;
+ }
+ #dbContent .db-mobile-card[data-db-pair] .db-combo-title::before{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+  background:linear-gradient(to bottom,var(--db-combo-soft-border-stops))!important;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;z-index:-1;
+ }
+ #dbContent .db-mobile-card[data-db-pair] .db-combo-title>strong{
+  background:none!important;color:#e9f3ff!important;-webkit-text-fill-color:#e9f3ff!important;
+  text-shadow:none!important;filter:none!important;
+ }
+}
+</style>
+
+<style id="v120-mobile-combination-parity-and-selects">
+/* Pair and quad cards share the exact same title treatment. */
+@media(max-width:640px){
+ #dbContent .db-mobile-card[data-db-quad] .db-combo-title{
+  position:relative!important;isolation:isolate!important;
+  background:linear-gradient(to right,transparent 0%,#102337 95%),linear-gradient(to bottom,var(--db-combo-tint-stops))!important;
+  border:1px solid transparent!important;background-origin:padding-box!important;background-clip:padding-box!important;
+ }
+ #dbContent .db-mobile-card[data-db-quad] .db-combo-title::before{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+  background:linear-gradient(to bottom,var(--db-combo-soft-border-stops))!important;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:-1;
+ }
+ #dbContent .db-mobile-card[data-db-quad] .db-combo-title>strong{
+  background:none!important;color:#e9f3ff!important;-webkit-text-fill-color:#e9f3ff!important;text-shadow:none!important;filter:none!important;
+ }
+}
+/* Native option hover is painted by the OS/browser on some platforms.
+   Set the requested dark palette where the engine allows CSS styling. */
+#dbContent select.db-title-level{color-scheme:dark!important;accent-color:#3a5367!important}
+#dbContent select.db-title-level option{background:#0a2338!important;color:#eff8ff!important}
+#dbContent select.db-title-level option:hover,
+#dbContent select.db-title-level option:focus,
+#dbContent select.db-title-level option:checked{background:#29465e!important;color:#fff!important}
+</style>
+<style id="v121-combo-frame-and-custom-level-menu">
+/* Combo frame uses a reduced color blend (45%) to visually balance the single-buff frame while preserving vertical member gradients. */
+#dbContent .db-combo-title::before{background:linear-gradient(to bottom,var(--db-combo-soft-border-stops))!important}
+/* Native <option> hover is OS-painted; use HTML menu items for controllable colors. */
+#dbContent .db-level-native-hidden{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important;clip-path:inset(50%)!important}
+#dbContent .db-level-menu-wrap{display:inline-flex;position:relative;vertical-align:middle;min-width:0}
+#dbContent .db-level-menu-trigger{min-width:55px;min-height:34px;padding:3px 8px;border:1px solid #6d9db9;border-radius:5px;background:#0a2338;color:#eff8ff;font-size:16px;cursor:pointer;display:inline-flex;gap:6px;align-items:center;justify-content:space-between;font-family:inherit}
+#dbContent .db-level-menu-trigger:hover,#dbContent .db-level-menu-trigger:focus-visible{background:#15354b;border-color:#9bcbe2;color:#fff}
+#dbContent .db-level-menu-popup{position:absolute;z-index:9999;top:calc(100% + 3px);left:0;min-width:100%;padding:3px;background:#0a2338;border:1px solid #527b9b;border-radius:7px;box-shadow:0 9px 22px #0009;display:flex;flex-direction:column;gap:2px}
+#dbContent .db-level-menu-popup[hidden]{display:none!important}
+#dbContent .db-level-menu-item{display:block;width:100%;min-width:50px;text-align:left;padding:7px 10px;border:0;border-radius:4px;background:#0a2338!important;color:#eff8ff!important;font:inherit;font-size:16px;cursor:pointer}
+#dbContent .db-level-menu-item:hover,#dbContent .db-level-menu-item:focus-visible{background:#29465e!important;color:#fff!important;outline:none}
+#dbContent .db-level-menu-item[aria-selected="true"]{background:#1a3c52!important;color:#a8f3df!important}
+#dbContent .db-level-menu-item:disabled{opacity:.4;cursor:not-allowed}
+</style>
+<style id="v123-combo-frame-alpha">
+/* Keep original member hues; soften only the 1px gradient frame, not the card background or text. */
+#dbContent .db-table-page-1 .db-combo-title::before,
+#dbContent .db-table-page-2 .db-combo-title::before,
+#dbContent .db-mobile-card[data-db-pair] .db-combo-title::before,
+#dbContent .db-mobile-card[data-db-quad] .db-combo-title::before{
+ background:linear-gradient(to bottom,var(--db-combo-color-stops))!important;
+ opacity:.55!important;
+}
+</style>
 </head><body><main class="wrap"><header class="top" role="banner"><div class="logo">◉ ORBITAL GENESIS <span style="color:#7e9cba">/ CALCULATOR</span></div><nav class="section-rail" aria-label="Section navigation"><button type="button" class="rail-link active" data-target="parametersAnchor" aria-label="Parameters"><span class="rail-number">01</span></button><button type="button" class="rail-link" data-target="calculatorsAnchor" aria-label="Calculators"><span class="rail-number">02</span></button></nav><button aria-label="Switch language" id="language">ENGLISH</button></header><section class="hero"><div class="eyebrow" data-i="eyebrow">交互式理论模型 · PATH OF GRAVITY</div><h1 data-i="title">Orbital Genesis<br/>创世计算器</h1><p data-i="intro">计算 Debuff 对创世时间的影响，计算黑洞增长与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。</p><span class="pill">v0.22 beta</span></section>
 <div class="section-title" id="parametersAnchor"><h2 data-i="general">01 / 基础参数与公式</h2></div>
 <div class="grid"><div class="card col8"><h3 data-i="equations">计算顺序 · 核心方程</h3>
@@ -967,7 +1069,7 @@ function dbComboGradientStyle(members){
  const pct=i=>(100*i/(colors.length-1)).toFixed(3)+'%';
  const colorStops=colors.map((c,i)=>`${c} ${pct(i)}`).join(',');
  const tintStops=colors.map((c,i)=>`color-mix(in srgb,${c} 16%,#0d1a2a) ${pct(i)}`).join(',');
- const softBorderStops=colors.map((c,i)=>`color-mix(in srgb,${c} 22%,#152b3e) ${(100*i/(colors.length-1)).toFixed(3)}%`).join(',');
+ const softBorderStops=colors.map((c,i)=>`color-mix(in srgb,${c} 45%,#182b3d) ${(100*i/(colors.length-1)).toFixed(3)}%`).join(',');
  return `--db-combo-color-stops:${colorStops};--db-combo-tint-stops:${tintStops};--db-combo-soft-border-stops:${softBorderStops};--db-combo-first:${colors[0]};--db-combo-last:${colors[colors.length-1]};`;
 }
 function dbComboTitle(i){const members=i<8?dbPairMembers[i]:i===8?[0,2,6,7]:[1,3,4,5];const colors=members.map(j=>dbColors[j]);return `<div class="db-combo-title" style="--db-a:${colors[0]};--db-b:${colors[colors.length-1]};"><strong>${names[lang][8+i]}</strong><div class="db-combo-badges">${members.map(j=>dbNamedPicker(j)).join('')}</div></div>`}
@@ -994,6 +1096,10 @@ function buildDebuffMobileCards(area,headers){
  const cards=document.createElement('div');cards.className='db-mobile-cards';
  Array.from(table.tBodies[0]?.rows||[]).forEach(row=>{
   const card=document.createElement('article');card.className='db-mobile-card';
+  // Preserve the combination's member-color CSS variables when cloning the table row.
+  card.style.cssText=row.style.cssText;
+  if(row.closest('.db-table-page-1'))card.dataset.dbPair='true';
+  if(row.closest('.db-table-page-2'))card.dataset.dbQuad='true';
   Array.from(row.cells).forEach((cell,i)=>{
    const field=document.createElement('section');field.className='db-mobile-field';field.dataset.dbColumn=String(i);
    const label=document.createElement('div');label.className='db-mobile-label';label.textContent=headers[i]||'';
@@ -1069,7 +1175,7 @@ function renderDebuffsV14(){const area=$('dbContent');if(!area)return;$('layersL
  const matched=[];for(let j=0;j<8;j++)if(dbPairMembers[j].every(i=>chosen.includes(i)))matched.push(j);
  const activeText=chosen.map(i=>names[lang][i]+' Lv'+dbCustomLevels[i]).join(' + ')||(zh?'无':'None');
  const matchText=matched.map(j=>names[lang][8+j]).join('、')||(zh?'无':'None');
- area.innerHTML=`<div class="db-custom-grid">${combo}</div><div class="db-custom-summary"><strong>${zh?'当前组合':'Selected combination'}：</strong>${activeText}<div><strong>${zh?'可形成双组合':'Matching pairs'}：</strong>${matchText}</div><div><strong>${zh?'当前公式':'Current formula'}：</strong><span class="db-custom-formula-scroll"><span class="db-custom-formula-content">${chosen.length?dbMath(dbLocalizedFormula(dbComboFormula(dbCustomLevels))):(zh?'未选择 Debuff':'No Debuffs selected')}</span></span></div><div><strong>${zh?'模型倍率':'Model ratio'}：</strong><span class="db-custom-model-ratio">${chosen.length?dbNumber(dbComboModel(dbCustomLevels)):'×1.000'}</span></div></div>`;
+ area.innerHTML=`<div class="db-custom-grid">${combo}</div><div class="db-custom-summary"><strong>${zh?'当前组合':'Selected combination'}：</strong>${activeText}<div><strong>${zh?'可形成双组合':'Matching pairs'}：</strong>${matchText}</div><div><strong>${zh?'当前公式':'Current formula'}：</strong><span class="db-custom-formula-scroll"><span class="db-custom-formula-content">${chosen.length?dbMath(dbLocalizedFormula(dbComboFormula(dbCustomLevels))):(zh?'未选择 Debuff':'No Debuffs selected')}</span></span></div><div><strong>${zh?'模型倍率':'Model ratio'}：</strong><span class="db-custom-model-ratio">${chosen.length?dbNumber(dbComboModel(dbCustomLevels)):'×1.000'}</span></div><div class="db-custom-clear-row"><button type="button" class="db-custom-clear" id="dbCustomClear">${zh?'清空上述选择（全部设为 Lv0）':'Clear selections (set all to Lv0)'}</button></div></div>`;
 
  }else{area.innerHTML=`<div class="db-legend">${zh?'参数说明：':'Parameters: '}<strong>x</strong> ${zh?'表示当前所选等级的实际效果值（不是每级基础值）。':'is the effect at the selected level (not the per-level base).'} <strong>R</strong> = ${zh?'开启 Debuff 耗时 ÷ 正常耗时':'Debuff time / normal time'}；<strong>k</strong> = ${val('k').toPrecision(5)}；<strong>q</strong> = ${val('qCombined').toPrecision(5)}；<strong>P<sub>max</sub></strong> = ${val('power').toPrecision(5)}；<strong>r<sub>spark</sub></strong> = ${val('rs').toPrecision(5)}。<div class="db-model-note">${zh?'推导约定：q 只作用于黑洞质量 M；k 作用于创世目标能量指数 F。先由固定黑洞贡献比例把 F 换算成所需质量指数，再计算继承差值。首次开启与上一轮相同组合分别计算；8 层轨道价格近似未经实测验证。':'Assumptions: q applies to black-hole mass M, while k applies to the target energy exponent F. Convert F into the required mass exponent using a fixed black-hole share, then subtract inherited mass. First use and repeated identical combinations differ; the 8-layer orbit-price approximation is unverified.'}</div></div><div class="db-scroll-shell"><div class="db-scroll-top" aria-label="${zh?'表格顶部横向滚动条':'Top horizontal table scrollbar'}"><div class="db-scroll-top-track"></div></div><div class="table-scroll"><table class="db-table db-table-page-${dbPage}"><thead><tr>${th.map(t=>`<th>${t}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div></div>`;}
  $('dbFootnote').textContent=zh?'等级效果按逐级规则计算：沉重/真空每级 +5%，微光 ^0.97，迟缓/冷寂 ×0.85，残破每级 −5%，元素 ^0.95，短夜每级 −2。耗时倍率及八层沉重模型仍为近似；组合常数奖励不自动计入。':'Level effects: Heavy/Vacuum +5% per level; Dim ^0.97; Slow/Cold ×0.85; Broken −5% per level; Element ^0.95; Short Night −2 power per level. Time ratios and the eight-tier Heavy model remain approximate; pair constant rewards are excluded.';
@@ -1077,6 +1183,7 @@ function renderDebuffsV14(){const area=$('dbContent');if(!area)return;$('layersL
  setupDebuffScroll(area);
  if(dbPage!==3)setupDebuffColumns(area,th);
  area.querySelectorAll('[data-db-level]').forEach(el=>el.addEventListener('change',()=>{dbLevels[+el.dataset.dbLevel]=+el.value;safeStorage.setItem('og-dbLevels',JSON.stringify(dbLevels));renderDebuffsV14()}));
+ area.querySelector('#dbCustomClear')?.addEventListener('click',()=>{dbCustomLevels=Array(8).fill(0);safeStorage.setItem('og-dbCustomLevels',JSON.stringify(dbCustomLevels));renderDebuffsV14()});
  area.querySelectorAll('[data-db-custom-level]').forEach(el=>el.addEventListener('change',()=>{const i=+el.dataset.dbCustomLevel,l=+el.value;if(l>0&&dbCustomLevels[i]===0&&dbCustomLevels.filter(x=>x>0).length>=4){renderDebuffsV14();return;}dbCustomLevels[i]=l;safeStorage.setItem('og-dbCustomLevels',JSON.stringify(dbCustomLevels));renderDebuffsV14()}));
  dbRenderMath();}
 $('dbSameInheritance').addEventListener('change',e=>{dbSameInheritance=e.target.checked;safeStorage.setItem('og-dbSameInheritance',String(dbSameInheritance));renderDebuffsV14()});
@@ -1152,6 +1259,29 @@ translate();recalc();
  window.addEventListener('resize',()=>{if(anchor)position();});
  $('language').addEventListener('click',()=>{syncRailLabels();if(anchor)show(anchor);});
  syncRailLabels();
+})();
+
+/* v121: custom level option popup, because native option hover colors are OS-controlled. */
+(function(){
+ const root=document.getElementById('dbContent');if(!root)return;
+ function closeAll(except){root.querySelectorAll('.db-level-menu-popup').forEach(p=>{if(p!==except)p.hidden=true});root.querySelectorAll('.db-level-menu-trigger').forEach(b=>{if(!except||b.nextElementSibling!==except)b.setAttribute('aria-expanded','false')})}
+ function enhance(){
+  root.querySelectorAll('select.db-title-level:not([data-v121-enhanced])').forEach(sel=>{
+   sel.dataset.v121Enhanced='1';
+   const wrap=document.createElement('span');wrap.className='db-level-menu-wrap';
+   const btn=document.createElement('button');btn.type='button';btn.className='db-level-menu-trigger';btn.setAttribute('aria-haspopup','listbox');btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-label',sel.getAttribute('aria-label')||'Level');
+   const menu=document.createElement('span');menu.className='db-level-menu-popup';menu.hidden=true;menu.setAttribute('role','listbox');
+   function fill(){btn.textContent=sel.value+' ▾';menu.replaceChildren();Array.from(sel.options).forEach(opt=>{const item=document.createElement('button');item.type='button';item.className='db-level-menu-item';item.textContent=opt.textContent;item.disabled=opt.disabled;item.setAttribute('role','option');item.setAttribute('aria-selected',String(opt.value===sel.value));item.addEventListener('click',()=>{if(item.disabled)return;sel.value=opt.value;closeAll();sel.dispatchEvent(new Event('change',{bubbles:true}));});menu.append(item)})}
+   fill();sel.parentNode.insertBefore(wrap,sel);wrap.append(sel,btn,menu);sel.classList.add('db-level-native-hidden');
+   btn.addEventListener('click',()=>{const opening=menu.hidden;closeAll();if(opening){fill();menu.hidden=false;btn.setAttribute('aria-expanded','true')}});
+   btn.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='Enter'||e.key===' '){e.preventDefault();if(menu.hidden)btn.click();const first=menu.querySelector('button:not(:disabled)');if(first)first.focus()}});
+   menu.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();btn.focus()}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const items=[...menu.querySelectorAll('button:not(:disabled)')];const i=items.indexOf(document.activeElement);items[(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length]?.focus()}});
+  });
+ }
+ root.addEventListener('click',e=>{if(!e.target.closest('.db-level-menu-wrap'))closeAll()});
+ document.addEventListener('click',e=>{if(!e.target.closest('#dbContent .db-level-menu-wrap'))closeAll()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+ const observer=new MutationObserver(()=>enhance());observer.observe(root,{childList:true,subtree:true});enhance();
 })();
 </script></body></html>
 
