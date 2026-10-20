@@ -658,7 +658,19 @@ body > .db-level-menu-portal .db-level-menu-item:disabled{opacity:.4;cursor:not-
 .eqstep .eqrow:has(>.eq-formula-item:nth-child(3))>.eq-formula-item::-webkit-scrollbar-thumb{background:#3a5367;border-radius:9px}
 .eqstep .eqrow:has(>.eq-formula-item:nth-child(3))>.eq-formula-item::-webkit-scrollbar-thumb:hover{background:#516a7e}
 </style>
-<style id="v132-clear-location">#dbContent .db-custom-clear-row{display:flex;justify-content:flex-end;margin:0 0 14px;padding:0 4px}#dbContent .db-custom-clear-row .db-custom-clear{max-width:100%}</style></head><body><main class="wrap"><header class="top" role="banner"><div class="logo">◉ ORBITAL GENESIS <span style="color:#7e9cba">/ CALCULATOR</span></div><nav class="section-rail" aria-label="Section navigation"><button type="button" class="rail-link active" data-target="parametersAnchor" aria-label="Parameters"><span class="rail-number">01</span></button><button type="button" class="rail-link" data-target="calculatorsAnchor" aria-label="Calculators"><span class="rail-number">02</span></button></nav><button aria-label="Switch language" id="language">ENGLISH</button></header><section class="hero"><div class="eyebrow" data-i="eyebrow">交互式理论模型 · PATH OF GRAVITY</div><h1 data-i="title">Orbital Genesis<br/>创世计算器</h1><p data-i="intro">计算 Debuff 对创世时间的影响，计算黑洞增长与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。</p><span class="pill">v0.22 beta</span></section>
+<style id="v132-clear-location">#dbContent .db-custom-clear-row{display:flex;justify-content:flex-end;margin:0 0 14px;padding:0 4px}#dbContent .db-custom-clear-row .db-custom-clear{max-width:100%}</style>
+<style id="v133-mode-dropdown">
+#autoGenesisSection .og-mode-menu-wrap{display:block;position:relative;width:100%}
+#autoGenesisSection select.og-mode-native-hidden{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;clip-path:inset(50%)!important}
+#autoGenesisSection .og-mode-menu-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:46px;text-align:left;background:#0b1424;border:1px solid #33455d;border-radius:10px;color:#fff;padding:10px 11px;font:inherit;cursor:pointer}
+#autoGenesisSection .og-mode-menu-trigger:hover,#autoGenesisSection .og-mode-menu-trigger:focus-visible{background:#15354b;border-color:#80b3ff;outline:none}
+body>.og-mode-menu-popup{position:fixed;z-index:2147482001;display:flex;flex-direction:column;gap:2px;padding:4px;background:#0a2338;border:1px solid #527b9b;border-radius:9px;box-shadow:0 9px 22px #0009}
+body>.og-mode-menu-popup[hidden]{display:none!important}
+body>.og-mode-menu-popup .og-mode-menu-item{display:block;width:100%;text-align:left;padding:9px 12px;border:0;border-radius:5px;background:#0a2338!important;color:#eff8ff!important;font:inherit;cursor:pointer}
+body>.og-mode-menu-popup .og-mode-menu-item:hover,body>.og-mode-menu-popup .og-mode-menu-item:focus-visible{background:#29465e!important;color:#fff!important;outline:none}
+body>.og-mode-menu-popup .og-mode-menu-item[aria-selected="true"]{color:#a8f3df!important}
+</style>
+</head><body><main class="wrap"><header class="top" role="banner"><div class="logo">◉ ORBITAL GENESIS <span style="color:#7e9cba">/ CALCULATOR</span></div><nav class="section-rail" aria-label="Section navigation"><button type="button" class="rail-link active" data-target="parametersAnchor" aria-label="Parameters"><span class="rail-number">01</span></button><button type="button" class="rail-link" data-target="calculatorsAnchor" aria-label="Calculators"><span class="rail-number">02</span></button></nav><button aria-label="Switch language" id="language">ENGLISH</button></header><section class="hero"><div class="eyebrow" data-i="eyebrow">交互式理论模型 · PATH OF GRAVITY</div><h1 data-i="title">Orbital Genesis<br/>创世计算器</h1><p data-i="intro">计算 Debuff 对创世时间的影响，计算黑洞增长与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。</p><span class="pill">v0.22 beta</span></section>
 <div class="section-title" id="parametersAnchor"><h2 data-i="general">01 / 基础参数与公式</h2></div>
 <div class="grid"><div class="card col8"><h3 data-i="equations">计算顺序 · 核心方程</h3>
 <p class="sub" data-i="orderExplain">先读取游戏常量，再根据 Big Freeze 实测耗时直接求解经验增长系数 K_obs。</p>
@@ -759,6 +771,7 @@ function applyTimeCalibration(){
  $('instantMaxField').style.display=optimal?'none':'';
  $('instantMaxLabel').firstChild.textContent=zh?'每个检测窗口最多创世次数 ':'Maximum Genesis per polling window ';
  $('optimalFields').style.display=optimal?'':'none';
+ $('timeCalIntervalLabel').querySelector('.cal-label-text').textContent=zh?'自动创世检测间隔（分钟）':'Auto-Genesis polling interval (minutes)';
  $('autoGenesisHeading').textContent=zh?'自动创世类型':'Auto-Genesis mode';
  $('autoGenesisTypeLabel').firstChild.textContent=zh?'自动创世类型 ':'Auto-Genesis mode ';
  $('autoGenesisType').options[0].textContent=zh?'最优 · Optimal':'Optimal';
@@ -1350,6 +1363,30 @@ translate();recalc();
  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
  window.addEventListener('scroll',closeAll,true);window.addEventListener('resize',closeAll);
  const observer=new MutationObserver(enhance);observer.observe(root,{childList:true,subtree:true});enhance();
+})();
+
+/* v133: Auto-Genesis mode uses a styled popup rather than OS-painted native options. */
+(function(){
+ const sel=document.getElementById('autoGenesisType');if(!sel)return;
+ const wrap=document.createElement('span');wrap.className='og-mode-menu-wrap';
+ const btn=document.createElement('button');btn.type='button';btn.className='og-mode-menu-trigger';btn.setAttribute('aria-haspopup','listbox');btn.setAttribute('aria-expanded','false');
+ const menu=document.createElement('div');menu.className='og-mode-menu-popup';menu.hidden=true;menu.setAttribute('role','listbox');
+ sel.parentNode.insertBefore(wrap,sel);wrap.append(sel,btn);document.body.append(menu);
+ sel.classList.add('og-mode-native-hidden');
+ function close(){menu.hidden=true;btn.setAttribute('aria-expanded','false')}
+ function sync(){const opt=sel.selectedOptions[0];btn.textContent=(opt?.textContent||sel.value)+' ▾';btn.setAttribute('aria-label',document.getElementById('autoGenesisTypeLabel')?.textContent?.trim()||'Auto-Genesis mode')}
+ function fill(){menu.replaceChildren();for(const opt of sel.options){const item=document.createElement('button');item.type='button';item.className='og-mode-menu-item';item.textContent=opt.textContent;item.setAttribute('role','option');item.setAttribute('aria-selected',String(opt.value===sel.value));item.addEventListener('click',()=>{sel.value=opt.value;close();sel.dispatchEvent(new Event('change',{bubbles:true}));sync()});menu.append(item)}}
+ function position(){const r=btn.getBoundingClientRect();const width=Math.max(r.width,145);menu.style.minWidth=width+'px';const h=menu.offsetHeight;menu.style.top=(window.innerHeight-r.bottom>=h+6?r.bottom+3:Math.max(4,r.top-h-3))+'px';menu.style.left=Math.max(4,Math.min(r.left,window.innerWidth-width-4))+'px'}
+ btn.addEventListener('click',()=>{if(!menu.hidden){close();return}fill();menu.hidden=false;btn.setAttribute('aria-expanded','true');position()});
+ btn.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='Enter'||e.key===' '){e.preventDefault();if(menu.hidden)btn.click();menu.querySelector('button')?.focus()}});
+ menu.addEventListener('keydown',e=>{if(e.key==='Escape'){close();btn.focus()}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const items=[...menu.querySelectorAll('button')];const i=items.indexOf(document.activeElement);items[(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length]?.focus()}});
+ document.addEventListener('pointerdown',e=>{if(!menu.hidden&&!menu.contains(e.target)&&!btn.contains(e.target))close()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+ window.addEventListener('scroll',close,true);window.addEventListener('resize',close);
+ sel.addEventListener('change',sync);
+ document.getElementById('language')?.addEventListener('click',()=>{queueMicrotask(sync);close()});
+ new MutationObserver(sync).observe(sel,{childList:true,subtree:true,characterData:true});
+ sync();
 })();
 </script></body></html>
 
