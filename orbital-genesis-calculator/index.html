@@ -618,7 +618,15 @@ html{scroll-behavior:smooth;scroll-padding-top:95px}
  opacity:.55!important;
 }
 </style>
-</head><body><main class="wrap"><header class="top" role="banner"><div class="logo">◉ ORBITAL GENESIS <span style="color:#7e9cba">/ CALCULATOR</span></div><nav class="section-rail" aria-label="Section navigation"><button type="button" class="rail-link active" data-target="parametersAnchor" aria-label="Parameters"><span class="rail-number">01</span></button><button type="button" class="rail-link" data-target="calculatorsAnchor" aria-label="Calculators"><span class="rail-number">02</span></button></nav><button aria-label="Switch language" id="language">ENGLISH</button></header><section class="hero"><div class="eyebrow" data-i="eyebrow">交互式理论模型 · PATH OF GRAVITY</div><h1 data-i="title">Orbital Genesis<br/>创世计算器</h1><p data-i="intro">计算 Debuff 对创世时间的影响，计算黑洞增长与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。</p><span class="pill">v0.22 beta</span></section>
+<style id="v124-level-portal">
+/* Portaled menus are outside #dbContent and outside the horizontally clipped table. */
+body > .db-level-menu-portal{position:fixed!important;z-index:2147482000!important;display:flex;flex-direction:column;gap:2px;width:max-content;padding:3px;background:#0a2338;border:1px solid #527b9b;border-radius:7px;box-shadow:0 9px 22px #0009}
+body > .db-level-menu-portal[hidden]{display:none!important}
+body > .db-level-menu-portal .db-level-menu-item{display:block;width:100%;min-width:50px;text-align:left;padding:7px 10px;border:0;border-radius:4px;background:#0a2338!important;color:#eff8ff!important;font:inherit;font-size:16px;cursor:pointer}
+body > .db-level-menu-portal .db-level-menu-item:hover,body > .db-level-menu-portal .db-level-menu-item:focus-visible{background:#29465e!important;color:#fff!important;outline:none}
+body > .db-level-menu-portal .db-level-menu-item[aria-selected="true"]{background:#1a3c52!important;color:#a8f3df!important}
+body > .db-level-menu-portal .db-level-menu-item:disabled{opacity:.4;cursor:not-allowed}
+</style></head><body><main class="wrap"><header class="top" role="banner"><div class="logo">◉ ORBITAL GENESIS <span style="color:#7e9cba">/ CALCULATOR</span></div><nav class="section-rail" aria-label="Section navigation"><button type="button" class="rail-link active" data-target="parametersAnchor" aria-label="Parameters"><span class="rail-number">01</span></button><button type="button" class="rail-link" data-target="calculatorsAnchor" aria-label="Calculators"><span class="rail-number">02</span></button></nav><button aria-label="Switch language" id="language">ENGLISH</button></header><section class="hero"><div class="eyebrow" data-i="eyebrow">交互式理论模型 · PATH OF GRAVITY</div><h1 data-i="title">Orbital Genesis<br/>创世计算器</h1><p data-i="intro">计算 Debuff 对创世时间的影响，计算黑洞增长与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。</p><span class="pill">v0.22 beta</span></section>
 <div class="section-title" id="parametersAnchor"><h2 data-i="general">01 / 基础参数与公式</h2></div>
 <div class="grid"><div class="card col8"><h3 data-i="equations">计算顺序 · 核心方程</h3>
 <p class="sub" data-i="orderExplain">先读取游戏常量，再根据 Big Freeze 实测耗时直接求解经验增长系数 K_obs。</p>
@@ -1261,27 +1269,38 @@ translate();recalc();
  syncRailLabels();
 })();
 
-/* v121: custom level option popup, because native option hover colors are OS-controlled. */
+/* v124: portal level menus to document.body so table overflow cannot clip them. */
 (function(){
  const root=document.getElementById('dbContent');if(!root)return;
- function closeAll(except){root.querySelectorAll('.db-level-menu-popup').forEach(p=>{if(p!==except)p.hidden=true});root.querySelectorAll('.db-level-menu-trigger').forEach(b=>{if(!except||b.nextElementSibling!==except)b.setAttribute('aria-expanded','false')})}
+ const menus=new Set();let active=null;
+ function closeAll(){for(const entry of menus){entry.menu.hidden=true;entry.btn.setAttribute('aria-expanded','false')}active=null}
+ function place(entry){
+  const {btn,menu}=entry;const r=btn.getBoundingClientRect();
+  const width=Math.max(r.width,72);menu.style.minWidth=width+'px';
+  const h=menu.offsetHeight;const below=window.innerHeight-r.bottom;
+  const top=below>=h+5||r.top< h+5?r.bottom+3:r.top-h-3;
+  menu.style.top=Math.max(4,top)+'px';
+  menu.style.left=Math.max(4,Math.min(r.left,window.innerWidth-width-4))+'px';
+ }
  function enhance(){
+  for(const entry of [...menus]){if(!entry.btn.isConnected){entry.menu.remove();menus.delete(entry);if(active===entry)active=null}}
   root.querySelectorAll('select.db-title-level:not([data-v121-enhanced])').forEach(sel=>{
    sel.dataset.v121Enhanced='1';
    const wrap=document.createElement('span');wrap.className='db-level-menu-wrap';
    const btn=document.createElement('button');btn.type='button';btn.className='db-level-menu-trigger';btn.setAttribute('aria-haspopup','listbox');btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-label',sel.getAttribute('aria-label')||'Level');
-   const menu=document.createElement('span');menu.className='db-level-menu-popup';menu.hidden=true;menu.setAttribute('role','listbox');
-   function fill(){btn.textContent=sel.value+' ▾';menu.replaceChildren();Array.from(sel.options).forEach(opt=>{const item=document.createElement('button');item.type='button';item.className='db-level-menu-item';item.textContent=opt.textContent;item.disabled=opt.disabled;item.setAttribute('role','option');item.setAttribute('aria-selected',String(opt.value===sel.value));item.addEventListener('click',()=>{if(item.disabled)return;sel.value=opt.value;closeAll();sel.dispatchEvent(new Event('change',{bubbles:true}));});menu.append(item)})}
-   fill();sel.parentNode.insertBefore(wrap,sel);wrap.append(sel,btn,menu);sel.classList.add('db-level-native-hidden');
-   btn.addEventListener('click',()=>{const opening=menu.hidden;closeAll();if(opening){fill();menu.hidden=false;btn.setAttribute('aria-expanded','true')}});
-   btn.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='Enter'||e.key===' '){e.preventDefault();if(menu.hidden)btn.click();const first=menu.querySelector('button:not(:disabled)');if(first)first.focus()}});
+   const menu=document.createElement('span');menu.className='db-level-menu-popup db-level-menu-portal';menu.hidden=true;menu.setAttribute('role','listbox');
+   const entry={btn,menu};menus.add(entry);
+   function fill(){btn.textContent=sel.value+' ▾';menu.replaceChildren();for(const opt of sel.options){const item=document.createElement('button');item.type='button';item.className='db-level-menu-item';item.textContent=opt.textContent;item.disabled=opt.disabled;item.setAttribute('role','option');item.setAttribute('aria-selected',String(opt.value===sel.value));item.addEventListener('click',()=>{if(item.disabled)return;sel.value=opt.value;closeAll();sel.dispatchEvent(new Event('change',{bubbles:true}))});menu.append(item)}}
+   fill();sel.parentNode.insertBefore(wrap,sel);wrap.append(sel,btn);document.body.append(menu);sel.classList.add('db-level-native-hidden');
+   btn.addEventListener('click',()=>{const opening=menu.hidden;closeAll();if(opening){fill();menu.hidden=false;active=entry;btn.setAttribute('aria-expanded','true');place(entry)}});
+   btn.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='Enter'||e.key===' '){e.preventDefault();if(menu.hidden)btn.click();menu.querySelector('button:not(:disabled)')?.focus()}});
    menu.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();btn.focus()}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const items=[...menu.querySelectorAll('button:not(:disabled)')];const i=items.indexOf(document.activeElement);items[(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length]?.focus()}});
   });
  }
- root.addEventListener('click',e=>{if(!e.target.closest('.db-level-menu-wrap'))closeAll()});
- document.addEventListener('click',e=>{if(!e.target.closest('#dbContent .db-level-menu-wrap'))closeAll()});
+ document.addEventListener('pointerdown',e=>{if(active&&!active.menu.contains(e.target)&&!active.btn.contains(e.target))closeAll()});
  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
- const observer=new MutationObserver(()=>enhance());observer.observe(root,{childList:true,subtree:true});enhance();
+ window.addEventListener('scroll',closeAll,true);window.addEventListener('resize',closeAll);
+ const observer=new MutationObserver(enhance);observer.observe(root,{childList:true,subtree:true});enhance();
 })();
 </script></body></html>
 
