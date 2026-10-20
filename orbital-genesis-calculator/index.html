@@ -467,6 +467,55 @@ html{scroll-behavior:smooth;scroll-padding-top:95px}
  #dbContent .db-columns-toggle{max-width:100%}
 }
 </style>
+
+<style id="v116-mobile-natural-formula-scroll">
+@media (max-width:640px){
+ /* Keep cards and formula scrollports independent of intrinsic MathML width. */
+ #dbContent .db-mobile-card,#dbContent .db-mobile-field,#dbContent .db-mobile-value{min-width:0!important;max-width:100%!important}
+ #dbContent .db-mobile-formula-scroll,
+ #dbContent .db-custom-formula-scroll{display:block!important;box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x pan-y}
+ #dbContent .db-mobile-formula-content,
+ #dbContent .db-custom-formula-content{display:table!important;width:max-content!important;min-width:0!important;max-width:none!important;white-space:nowrap!important}
+ #dbContent .db-mobile-formula-content math,
+ #dbContent .db-custom-formula-content math{display:inline-block!important;width:max-content!important;max-width:none!important;min-width:max-content!important;font-size:1.16rem!important;white-space:nowrap!important}
+ #dbContent .db-mobile-formula-content math *,
+ #dbContent .db-custom-formula-content math *{white-space:nowrap!important}
+ #dbContent .db-custom-summary,#dbContent .db-custom-summary>div{min-width:0;max-width:100%;overflow-wrap:anywhere}
+ #dbContent .db-custom-formula-scroll{margin-top:7px}
+}
+</style>
+<style id="v117-formula-scrollbar-colors">
+/* Use the same muted blue-gray scrollbar palette as the Columns table. */
+#dbContent .db-mobile-formula-scroll,
+#dbContent .db-custom-formula-scroll,
+#dbContent .db-mobile-field .db-math,
+#dbContent .db-mobile-field .katex-display,
+#dbContent .db-mobile-field .math-display {
+ scrollbar-width:thin!important;
+ scrollbar-color:#3a5367 #101e2c!important;
+ color-scheme:dark;
+}
+#dbContent .db-mobile-formula-scroll::-webkit-scrollbar,
+#dbContent .db-custom-formula-scroll::-webkit-scrollbar,
+#dbContent .db-mobile-field .db-math::-webkit-scrollbar,
+#dbContent .db-mobile-field .katex-display::-webkit-scrollbar,
+#dbContent .db-mobile-field .math-display::-webkit-scrollbar {height:10px!important}
+#dbContent .db-mobile-formula-scroll::-webkit-scrollbar-track,
+#dbContent .db-custom-formula-scroll::-webkit-scrollbar-track,
+#dbContent .db-mobile-field .db-math::-webkit-scrollbar-track,
+#dbContent .db-mobile-field .katex-display::-webkit-scrollbar-track,
+#dbContent .db-mobile-field .math-display::-webkit-scrollbar-track {background:#101e2c!important;border-radius:9px!important}
+#dbContent .db-mobile-formula-scroll::-webkit-scrollbar-thumb,
+#dbContent .db-custom-formula-scroll::-webkit-scrollbar-thumb,
+#dbContent .db-mobile-field .db-math::-webkit-scrollbar-thumb,
+#dbContent .db-mobile-field .katex-display::-webkit-scrollbar-thumb,
+#dbContent .db-mobile-field .math-display::-webkit-scrollbar-thumb {background:#3a5367!important;border:2px solid #101e2c!important;border-radius:9px!important}
+#dbContent .db-mobile-formula-scroll::-webkit-scrollbar-thumb:hover,
+#dbContent .db-custom-formula-scroll::-webkit-scrollbar-thumb:hover,
+#dbContent .db-mobile-field .db-math::-webkit-scrollbar-thumb:hover,
+#dbContent .db-mobile-field .katex-display::-webkit-scrollbar-thumb:hover,
+#dbContent .db-mobile-field .math-display::-webkit-scrollbar-thumb:hover {background:#516a7e!important}
+</style>
 </head><body><main class="wrap"><header class="top" role="banner"><div class="logo">◉ ORBITAL GENESIS <span style="color:#7e9cba">/ CALCULATOR</span></div><nav class="section-rail" aria-label="Section navigation"><button type="button" class="rail-link active" data-target="parametersAnchor" aria-label="Parameters"><span class="rail-number">01</span></button><button type="button" class="rail-link" data-target="calculatorsAnchor" aria-label="Calculators"><span class="rail-number">02</span></button></nav><button aria-label="Switch language" id="language">ENGLISH</button></header><section class="hero"><div class="eyebrow" data-i="eyebrow">交互式理论模型 · PATH OF GRAVITY</div><h1 data-i="title">Orbital Genesis<br/>创世计算器</h1><p data-i="intro">计算 Debuff 对创世时间的影响，计算黑洞增长与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。</p><span class="pill">v0.22 beta</span></section>
 <div class="section-title" id="parametersAnchor"><h2 data-i="general">01 / 基础参数与公式</h2></div>
 <div class="grid"><div class="card col8"><h3 data-i="equations">计算顺序 · 核心方程</h3>
@@ -951,6 +1000,13 @@ function buildDebuffMobileCards(area,headers){
    const value=document.createElement('div');value.className='db-mobile-value';
    // Clone original content; preserve reward, name and combination styling.
    Array.from(cell.childNodes).forEach(node=>value.appendChild(node.cloneNode(true)));
+   // The formula is measured at its natural MathML width inside a scroll viewport.
+   if(cell.querySelector('math')){
+    const viewport=document.createElement('div');viewport.className='db-mobile-formula-scroll';
+    const content=document.createElement('div');content.className='db-mobile-formula-content';
+    while(value.firstChild)content.appendChild(value.firstChild);
+    viewport.appendChild(content);value.appendChild(viewport);
+   }
    field.append(label,value);card.append(field);
   });cards.append(card);
  });
@@ -1013,7 +1069,7 @@ function renderDebuffsV14(){const area=$('dbContent');if(!area)return;$('layersL
  const matched=[];for(let j=0;j<8;j++)if(dbPairMembers[j].every(i=>chosen.includes(i)))matched.push(j);
  const activeText=chosen.map(i=>names[lang][i]+' Lv'+dbCustomLevels[i]).join(' + ')||(zh?'无':'None');
  const matchText=matched.map(j=>names[lang][8+j]).join('、')||(zh?'无':'None');
- area.innerHTML=`<div class="db-custom-grid">${combo}</div><div class="db-custom-summary"><strong>${zh?'当前组合':'Selected combination'}：</strong>${activeText}<div><strong>${zh?'可形成双组合':'Matching pairs'}：</strong>${matchText}</div><div><strong>${zh?'当前公式':'Current formula'}：</strong>${chosen.length?dbMath(dbLocalizedFormula(dbComboFormula(dbCustomLevels))):(zh?'未选择 Debuff':'No Debuffs selected')}</div><div><strong>${zh?'模型倍率':'Model ratio'}：</strong><span class="db-custom-model-ratio">${chosen.length?dbNumber(dbComboModel(dbCustomLevels)):'×1.000'}</span></div></div>`;
+ area.innerHTML=`<div class="db-custom-grid">${combo}</div><div class="db-custom-summary"><strong>${zh?'当前组合':'Selected combination'}：</strong>${activeText}<div><strong>${zh?'可形成双组合':'Matching pairs'}：</strong>${matchText}</div><div><strong>${zh?'当前公式':'Current formula'}：</strong><span class="db-custom-formula-scroll"><span class="db-custom-formula-content">${chosen.length?dbMath(dbLocalizedFormula(dbComboFormula(dbCustomLevels))):(zh?'未选择 Debuff':'No Debuffs selected')}</span></span></div><div><strong>${zh?'模型倍率':'Model ratio'}：</strong><span class="db-custom-model-ratio">${chosen.length?dbNumber(dbComboModel(dbCustomLevels)):'×1.000'}</span></div></div>`;
 
  }else{area.innerHTML=`<div class="db-legend">${zh?'参数说明：':'Parameters: '}<strong>x</strong> ${zh?'表示当前所选等级的实际效果值（不是每级基础值）。':'is the effect at the selected level (not the per-level base).'} <strong>R</strong> = ${zh?'开启 Debuff 耗时 ÷ 正常耗时':'Debuff time / normal time'}；<strong>k</strong> = ${val('k').toPrecision(5)}；<strong>q</strong> = ${val('qCombined').toPrecision(5)}；<strong>P<sub>max</sub></strong> = ${val('power').toPrecision(5)}；<strong>r<sub>spark</sub></strong> = ${val('rs').toPrecision(5)}。<div class="db-model-note">${zh?'推导约定：q 只作用于黑洞质量 M；k 作用于创世目标能量指数 F。先由固定黑洞贡献比例把 F 换算成所需质量指数，再计算继承差值。首次开启与上一轮相同组合分别计算；8 层轨道价格近似未经实测验证。':'Assumptions: q applies to black-hole mass M, while k applies to the target energy exponent F. Convert F into the required mass exponent using a fixed black-hole share, then subtract inherited mass. First use and repeated identical combinations differ; the 8-layer orbit-price approximation is unverified.'}</div></div><div class="db-scroll-shell"><div class="db-scroll-top" aria-label="${zh?'表格顶部横向滚动条':'Top horizontal table scrollbar'}"><div class="db-scroll-top-track"></div></div><div class="table-scroll"><table class="db-table db-table-page-${dbPage}"><thead><tr>${th.map(t=>`<th>${t}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div></div>`;}
  $('dbFootnote').textContent=zh?'等级效果按逐级规则计算：沉重/真空每级 +5%，微光 ^0.97，迟缓/冷寂 ×0.85，残破每级 −5%，元素 ^0.95，短夜每级 −2。耗时倍率及八层沉重模型仍为近似；组合常数奖励不自动计入。':'Level effects: Heavy/Vacuum +5% per level; Dim ^0.97; Slow/Cold ×0.85; Broken −5% per level; Element ^0.95; Short Night −2 power per level. Time ratios and the eight-tier Heavy model remain approximate; pair constant rewards are excluded.';
