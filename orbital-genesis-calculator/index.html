@@ -438,6 +438,35 @@ html{scroll-behavior:smooth;scroll-padding-top:95px}
   border:1px solid #456178!important;
 }
 </style>
+
+<style id="v114-mobile-debuff-cards">
+/* Mobile cards only: desktop table and its original gradients are unchanged. */
+.db-mobile-cards{display:none}
+@media(max-width:640px){
+ #dbContent{min-width:0;max-width:100%}
+ #dbContent .db-scroll-shell{display:none!important}
+ #dbContent .db-mobile-cards{display:grid;grid-template-columns:minmax(0,1fr);gap:13px;min-width:0;width:100%}
+ #dbContent .db-mobile-card{box-sizing:border-box;min-width:0;max-width:100%;width:100%;padding:13px;border-radius:12px;border:1px solid #35485b;background:#101e2d;overflow:hidden}
+ #dbContent .db-mobile-field{min-width:0;max-width:100%;padding:11px 0;border-bottom:1px solid #293c4d}
+ #dbContent .db-mobile-field[hidden]{display:none!important}
+ #dbContent .db-mobile-field:last-child{border-bottom:0;padding-bottom:0}
+ #dbContent .db-mobile-field:first-child{padding-top:0}
+ #dbContent .db-mobile-label{font-size:12px;color:#9aafc4;margin-bottom:8px;font-weight:600}
+ #dbContent .db-mobile-value{min-width:0;max-width:100%;overflow-wrap:anywhere}
+ #dbContent .db-mobile-field:first-child .db-mobile-value{overflow:visible}
+ #dbContent .db-mobile-field .db-math,#dbContent .db-mobile-field .katex-display,#dbContent .db-mobile-field .math-display{max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+ #dbContent .db-mobile-field .db-math{display:block!important;box-sizing:border-box;width:100%!important;white-space:nowrap!important;overflow-wrap:normal!important}
+ #dbContent .db-mobile-field .db-math math{display:inline-block!important;max-width:none!important;white-space:nowrap!important;font-size:1rem!important}
+ #dbContent .db-mobile-field .db-math math *{white-space:nowrap!important}
+ #dbContent .db-mobile-field .db-math>*{width:max-content;max-width:none}
+ #dbContent .db-mobile-field .db-combo-title{max-width:100%;box-sizing:border-box}
+ #dbContent .db-mobile-field .db-combo-badges{flex-wrap:wrap;min-width:0}
+ #dbContent .db-mobile-field .db-inline-name{max-width:100%}
+ /* Restore desktop model-ratio mint styling in mobile cards. */
+ #dbContent .db-mobile-card .db-mobile-field:last-child .db-mobile-value>strong{font-size:25px!important;color:#86e7ce!important;font-weight:700;font-variant-numeric:tabular-nums}
+ #dbContent .db-columns-toggle{max-width:100%}
+}
+</style>
 </head><body><main class="wrap"><header class="top" role="banner"><div class="logo">◉ ORBITAL GENESIS <span style="color:#7e9cba">/ CALCULATOR</span></div><nav class="section-rail" aria-label="Section navigation"><button type="button" class="rail-link active" data-target="parametersAnchor" aria-label="Parameters"><span class="rail-number">01</span></button><button type="button" class="rail-link" data-target="calculatorsAnchor" aria-label="Calculators"><span class="rail-number">02</span></button></nav><button aria-label="Switch language" id="language">ENGLISH</button></header><section class="hero"><div class="eyebrow" data-i="eyebrow">交互式理论模型 · PATH OF GRAVITY</div><h1 data-i="title">Orbital Genesis<br/>创世计算器</h1><p data-i="intro">计算 Debuff 对创世时间的影响，计算黑洞增长与火花贡献，并比较大冰冻期间的最优创世终点。所有预测均注明模型假设。</p><span class="pill">v0.22 beta</span></section>
 <div class="section-title" id="parametersAnchor"><h2 data-i="general">01 / 基础参数与公式</h2></div>
 <div class="grid"><div class="card col8"><h3 data-i="equations">计算顺序 · 核心方程</h3>
@@ -911,6 +940,23 @@ function refreshDebuffRowGradients(table){
   }
  }
 }
+function buildDebuffMobileCards(area,headers){
+ const table=area.querySelector('.db-scroll-shell table');if(!table)return;
+ const cards=document.createElement('div');cards.className='db-mobile-cards';
+ Array.from(table.tBodies[0]?.rows||[]).forEach(row=>{
+  const card=document.createElement('article');card.className='db-mobile-card';
+  Array.from(row.cells).forEach((cell,i)=>{
+   const field=document.createElement('section');field.className='db-mobile-field';field.dataset.dbColumn=String(i);
+   const label=document.createElement('div');label.className='db-mobile-label';label.textContent=headers[i]||'';
+   const value=document.createElement('div');value.className='db-mobile-value';
+   // Clone original content; preserve reward, name and combination styling.
+   Array.from(cell.childNodes).forEach(node=>value.appendChild(node.cloneNode(true)));
+   field.append(label,value);card.append(field);
+  });cards.append(card);
+ });
+ area.querySelector('.db-scroll-shell').after(cards);
+ return cards;
+}
 function setupDebuffColumns(area,headers){
  const shell=area.querySelector('.db-scroll-shell');if(!shell)return;
  const bar=document.createElement('div');bar.className='db-columns-bar';
@@ -919,8 +965,13 @@ function setupDebuffColumns(area,headers){
  const panel=document.createElement('div');panel.className='db-columns-panel';panel.hidden=true;
  const visible=dbColumnVisibility[dbPage]||[];
  const table=shell.querySelector('table');
+ const cards=area.querySelector('.db-mobile-cards');
+ const media=window.matchMedia('(max-width:640px)');
+ function updateLabel(){toggle.textContent=media.matches?(lang==='zh'?'▤ 内容管理':'▤ Contents'):(lang==='zh'?'▤ 列管理':'▤ Columns')}
+ updateLabel();media.addEventListener?.('change',updateLabel);
  function apply(){
   Array.from(table.rows).forEach(row=>Array.from(row.cells).forEach((cell,i)=>cell.classList.toggle('db-col-hidden',i>0&&visible[i]===false)));
+  cards?.querySelectorAll('[data-db-column]').forEach(field=>{field.hidden=(+field.dataset.dbColumn)>0&&visible[+field.dataset.dbColumn]===false;});
   const viewport=shell.querySelector('.table-scroll'),top=shell.querySelector('.db-scroll-top'),track=shell.querySelector('.db-scroll-top-track');
   track.style.width=table.scrollWidth+'px';top.scrollLeft=viewport.scrollLeft;refreshDebuffRowGradients(table);
   viewport.dispatchEvent(new Event('scroll'));
@@ -966,6 +1017,7 @@ function renderDebuffsV14(){const area=$('dbContent');if(!area)return;$('layersL
 
  }else{area.innerHTML=`<div class="db-legend">${zh?'参数说明：':'Parameters: '}<strong>x</strong> ${zh?'表示当前所选等级的实际效果值（不是每级基础值）。':'is the effect at the selected level (not the per-level base).'} <strong>R</strong> = ${zh?'开启 Debuff 耗时 ÷ 正常耗时':'Debuff time / normal time'}；<strong>k</strong> = ${val('k').toPrecision(5)}；<strong>q</strong> = ${val('qCombined').toPrecision(5)}；<strong>P<sub>max</sub></strong> = ${val('power').toPrecision(5)}；<strong>r<sub>spark</sub></strong> = ${val('rs').toPrecision(5)}。<div class="db-model-note">${zh?'推导约定：q 只作用于黑洞质量 M；k 作用于创世目标能量指数 F。先由固定黑洞贡献比例把 F 换算成所需质量指数，再计算继承差值。首次开启与上一轮相同组合分别计算；8 层轨道价格近似未经实测验证。':'Assumptions: q applies to black-hole mass M, while k applies to the target energy exponent F. Convert F into the required mass exponent using a fixed black-hole share, then subtract inherited mass. First use and repeated identical combinations differ; the 8-layer orbit-price approximation is unverified.'}</div></div><div class="db-scroll-shell"><div class="db-scroll-top" aria-label="${zh?'表格顶部横向滚动条':'Top horizontal table scrollbar'}"><div class="db-scroll-top-track"></div></div><div class="table-scroll"><table class="db-table db-table-page-${dbPage}"><thead><tr>${th.map(t=>`<th>${t}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div></div>`;}
  $('dbFootnote').textContent=zh?'等级效果按逐级规则计算：沉重/真空每级 +5%，微光 ^0.97，迟缓/冷寂 ×0.85，残破每级 −5%，元素 ^0.95，短夜每级 −2。耗时倍率及八层沉重模型仍为近似；组合常数奖励不自动计入。':'Level effects: Heavy/Vacuum +5% per level; Dim ^0.97; Slow/Cold ×0.85; Broken −5% per level; Element ^0.95; Short Night −2 power per level. Time ratios and the eight-tier Heavy model remain approximate; pair constant rewards are excluded.';
+ if(dbPage!==3)buildDebuffMobileCards(area,th);
  setupDebuffScroll(area);
  if(dbPage!==3)setupDebuffColumns(area,th);
  area.querySelectorAll('[data-db-level]').forEach(el=>el.addEventListener('change',()=>{dbLevels[+el.dataset.dbLevel]=+el.value;safeStorage.setItem('og-dbLevels',JSON.stringify(dbLevels));renderDebuffsV14()}));
