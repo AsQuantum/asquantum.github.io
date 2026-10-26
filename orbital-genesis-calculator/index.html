@@ -778,11 +778,14 @@ function simulateFreezeElapsed(reachedLevel,priorReachedLevel,g,intervalMinutes,
  if(!(q>=0&&q<=1&&e>0&&g>0&&priorReachedLevel>=0))return NaN;
  // All inputs are reached/current levels. Reaching N means Genesis N-1 just completed.
  // The previous freeze's terminal creation index is priorReachedLevel-1.
- let massExp=q*F(priorReachedLevel-1)/e,elapsed=0;
+ // Apply inheritance once on entry to each reached level, including the transition into Lv0.
+ // This matches freezeComboElapsed() when all Debuffs are disabled.
+ let massExp=F(priorReachedLevel-1)/e,elapsed=0;
  for(let level=0;level<reachedLevel;level++){
+  massExp*=q;
   const required=F(level)/e;
   const dt=Math.max(0,(required-massExp)/g);
-  elapsed+=dt;massExp=(massExp+g*dt)*q;
+  elapsed+=dt;massExp+=g*dt;
  }
  return elapsed;
 }
