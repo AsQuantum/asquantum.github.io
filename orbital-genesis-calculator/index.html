@@ -932,10 +932,13 @@ function computeFreeze(){
   const latentHeatMultiplier=val('freezeRewardMultiplier');
   reward+=single*latentHeatMultiplier; // User-controlled latent-heat reward multiplier; independent of Debuff levels and time/mass calculations.
   if(calibrated)total=seconds(n);
-  const eff=calibrated&&total>0?3600*reward/total:NaN;chartPoints.push({n,reward:Math.floor(reward),eff:Number.isFinite(eff)?Math.floor(eff):NaN});
+  const rawEff=calibrated&&total>0?3600*reward/total:NaN;
+  const eff=Number.isFinite(rawEff)?Math.floor(rawEff):NaN;
+  chartPoints.push({n,reward:Math.floor(reward),eff});
+  // Optimize using the displayed integer value. Strict > keeps the first level when floored efficiencies tie.
   if(Number.isFinite(eff)&&(!best||eff>best.eff))best={n,reward:Math.floor(reward),total,eff};
   const tr=document.createElement('tr');if(best&&best.n===n)tr.style.background='#1c3a4a';
-  for(const t of [`Lv ${n}`,String(Math.floor(reward)),calibrated?format(total/60,2)+' min':'—',Number.isFinite(eff)?String(Math.floor(eff)):'—']){const td=document.createElement('td');td.textContent=t;tr.append(td)}body.append(tr);
+  for(const t of [`Lv ${n}`,String(Math.floor(reward)),calibrated?format(total/60,2)+' min':'—',Number.isFinite(eff)?String(eff):'—']){const td=document.createElement('td');td.textContent=t;tr.append(td)}body.append(tr);
  }
  requestAnimationFrame(()=>{drawFreezeChart(chartPoints);syncFreezeScrollSize();});
  $('bestLevel').textContent=best?`Lv ${best.n}`:(lang==='zh'?'等待质量效果指数':'Awaiting mass-effect exponent');
@@ -1383,19 +1386,22 @@ function drawFreezeChart(points){
  if(!valid.length){ctx.fillStyle='#b4d8e9';ctx.textAlign='center';ctx.fillText(lang==='zh'?'请检查耗时模型输入':'Check time-model inputs',W/2,H/2);return;}
  const lo=points[0].n,hi=points[points.length-1].n;
  const values=valid.map(p=>p.eff),minV=Math.min(0,...values),maxV=Math.max(...values);
- const upper=maxV>minV?maxV*1.08:Math.max(1,maxV+1);
- const xx=n=>pad+(n-lo)/Math.max(1,hi-lo)*(W-2*pad);
+ const upper=maxV>minV?Math.max(1,Math.ceil(maxV*1.08)):Math.max(1,maxV+1);
+ ctx.font='13px sans-serif';
+ const labelWidth=ctx.measureText(String(Math.floor(upper))).width;
+ const leftPad=Math.max(pad,labelWidth+20),rightPad=Math.min(28,Math.max(16,W*0.05));
+ const xx=n=>leftPad+(n-lo)/Math.max(1,hi-lo)*(W-leftPad-rightPad);
  const yy=v=>H-pad-(v-minV)/Math.max(1e-12,upper-minV)*(H-2*pad);
  ctx.textAlign='right';
  for(let i=0;i<=4;i++){
-  const v=minV+(upper-minV)*i/4,y=yy(v);
-  ctx.beginPath();ctx.strokeStyle='#244a62';ctx.lineWidth=1;ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();
-  ctx.fillStyle='#b4d8e9';ctx.fillText(v.toFixed(2),pad-9,y);
+  const v=Math.floor(minV+(upper-minV)*i/4),y=yy(v);
+  ctx.beginPath();ctx.strokeStyle='#244a62';ctx.lineWidth=1;ctx.moveTo(leftPad,y);ctx.lineTo(W-rightPad,y);ctx.stroke();
+  ctx.fillStyle='#b4d8e9';ctx.fillText(String(v),leftPad-8,y);
  }
  ctx.beginPath();ctx.strokeStyle='#6ce1e6';ctx.lineWidth=3;
  valid.forEach((p,i)=>{const x=xx(p.n),y=yy(p.eff);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke();
- ctx.fillStyle='#b4d8e9';ctx.textAlign='left';ctx.fillText('Lv '+lo,pad,H-22);
- ctx.textAlign='right';ctx.fillText('Lv '+hi,W-pad,H-22);
+ ctx.fillStyle='#b4d8e9';ctx.textAlign='left';ctx.fillText('Lv '+lo,leftPad,H-22);
+ ctx.textAlign='right';ctx.fillText('Lv '+hi,W-rightPad,H-22);
 }
 
 
