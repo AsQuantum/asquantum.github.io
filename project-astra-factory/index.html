@@ -3,26 +3,27 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Factory Lab V17 · 曲速线圈单链验收</title>
+<title>Factory Lab V21 · 仓库收支与模拟加速</title>
 <style>
 :root{--bg:#0b111c;--panel:#141e2b;--panel2:#192637;--edge:#2a3b50;--text:#eaf1f8;--muted:#91a5ba;--green:#4ee09b;--blue:#59abff;--orange:#ffae65;--danger:#ff7480;--gold:#ffce72}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 system-ui,"Microsoft Yahei",sans-serif;height:100vh;overflow:hidden}button,select,input{font:inherit}button,select{color:var(--text);background:#1c2a3b;border:1px solid #334961;border-radius:8px;padding:7px 10px}button{cursor:pointer}button:hover{background:#293e55}button:disabled{opacity:.45;cursor:not-allowed}button.primary,.active{background:#186347!important;border-color:#319a74!important;color:#fff!important}input[type=text],input[type=number],input[type=search]{background:#0c1521;color:var(--text);border:1px solid #344659;border-radius:7px;padding:7px;width:100%;outline:0}input[type=file]{display:none}.app{height:100vh;display:grid;grid-template-rows:auto 1fr auto}.top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 14px;border-bottom:1px solid var(--edge);background:#121d2b;min-height:57px}.brand{font-weight:800;letter-spacing:.2px;font-size:17px;color:#d7f7ec;margin-right:7px;white-space:nowrap}.brand span{color:var(--green)}.top .grow{flex:1}.top small{color:var(--muted)}.main{display:grid;grid-template-columns:245px minmax(300px,1fr) 292px;min-height:0}.side{overflow-y:auto;background:var(--panel);scrollbar-color:#3a536d transparent}.left{border-right:1px solid var(--edge)}.right{border-left:1px solid var(--edge)}.side h3{font-size:12px;text-transform:uppercase;letter-spacing:1.3px;color:#9cb1c8;margin:18px 15px 8px}.block{padding:0 12px 13px}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted)}.toolrow{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.palette{display:grid;grid-template-columns:1fr;gap:5px}.palette button{text-align:left;display:flex;justify-content:space-between;align-items:center;padding:7px 8px;background:#1b2939}.palette button span:first-child{font-weight:600}.palette button small{font-size:11px;color:#9db3c6}.palette button:hover{border-color:#65b595}.divider{height:1px;background:var(--edge);margin:13px 0}.canvaswrap{min-height:0;position:relative;background:#0a1220;overflow:hidden}#map{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}.floating{position:absolute;left:15px;top:12px;background:#132236ed;border:1px solid #31485c;border-radius:9px;padding:8px 11px;font-size:12px;max-width:410px;pointer-events:none;line-height:1.7}.floating b{color:#a8ffcf}.minimap{position:absolute;right:14px;bottom:15px;background:#152335eb;border:1px solid #41546b;border-radius:8px;padding:8px;pointer-events:none}.legend{position:absolute;left:15px;bottom:15px;background:#132236e8;border-radius:9px;border:1px solid #304354;padding:7px 10px;font-size:11px;pointer-events:none}.dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}.item{background:#1d2b3d;border:1px solid #2d4159;border-radius:9px;padding:9px 10px;margin:7px 0}.item strong{color:#d9ecf7}.kv{display:flex;justify-content:space-between;gap:8px;margin:5px 0}.kv span:first-child{color:var(--muted)}.kv span:last-child{font-variant-numeric:tabular-nums}.full{width:100%}.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.warn{color:#ffca85}.good{color:#77ebb3}.bad{color:#ff9d9c}.status{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:7px 14px;background:#111c2a;border-top:1px solid var(--edge);color:#b7cbde;min-height:38px;font-size:12px}.status b{color:#e8f8ee}.range{accent-color:#41d39a;width:100%}.portspec{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:6px 0}.portspec select{max-width:140px}.table-mini{width:100%;border-collapse:collapse;font-size:12px}.table-mini td{padding:4px 3px;border-bottom:1px solid #304056}.table-mini td:last-child{text-align:right;color:#b5e4cb}.pill{display:inline-block;padding:2px 7px;border:1px solid #365a54;border-radius:15px;color:#96eec7;font-size:11px}.boxnotice{padding:9px;background:#203044;border-radius:7px;border-left:3px solid #71b5fc;font-size:12px}.help{padding:7px 0;line-height:1.8}.smallbtn{padding:4px 8px;font-size:12px}.logs{max-height:170px;overflow-y:auto;font-size:11px;color:#b9c9dc}.logs div{padding:4px 1px;border-bottom:1px dotted #364357}.top select{max-width:230px}.counter{background:#20394b;padding:5px 9px;border-radius:7px;white-space:nowrap}.badge-alert{padding:3px 6px;border-radius:6px;color:#ffcf9a;background:#503421}.shortcut{display:inline-block;padding:1px 5px;background:#304456;border-radius:3px;font-size:11px}@media(max-width:1100px){.main{grid-template-columns:205px minmax(250px,1fr) 248px}}@media(max-width:820px){.main{grid-template-columns:160px minmax(190px,1fr)}.right{display:none}.left{font-size:12px}.top{gap:5px;padding:6px}.brand{font-size:14px}.minimap{display:none}}@media(max-width:560px){.main{grid-template-columns:1fr}.left{display:none}.top .grow{display:none}.top button{padding:4px 7px}}
+.speed-label{font-size:12px;color:#a1b7cc}.right .item{margin-top:5px}.ledger-table{width:100%;border-collapse:collapse;font-size:11px;font-variant-numeric:tabular-nums}.ledger-table th,.ledger-table td{padding:5px 3px;border-bottom:1px solid #304458;text-align:right;white-space:nowrap}.ledger-table th:first-child,.ledger-table td:first-child{text-align:left}.ledger-table th{color:#b2cadd;font-weight:600;background:#1a2a3e}.ledger-table .ledger-name{color:#e1ecf6;max-width:86px;overflow:hidden;text-overflow:ellipsis}.ledger-table .positive{color:#7ce8b3}.ledger-table .negative{color:#ff9d9c}.ledger-panel{margin:6px 0 12px;padding:8px;background:#1b2b3d;border-radius:8px;border:1px solid #31465c}.ledger-head{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:6px}.ledger-head strong{font-size:12px}.ledger-chip{border:1px solid #3b5b67;color:#95d7bb;font-size:10px;padding:2px 6px;border-radius:12px}.ledger-meta{font-size:10px;color:#91aabd;line-height:1.5;margin:6px 0}.ledger-mini{display:grid;grid-template-columns:1fr 1fr;gap:6px}.ledger-mini div{background:#152334;padding:7px;border-radius:6px}.ledger-mini b{display:block;font-size:16px;color:#d8f4e9;font-variant-numeric:tabular-nums}.ledger-mini span{font-size:10px;color:#9db4c9}
+.route-packet-list{max-height:320px;overflow-y:auto;border-top:1px solid #33485d;margin-top:4px}.route-packet{display:grid;grid-template-columns:12px 1fr auto;gap:4px 5px;align-items:center;padding:7px 2px;border-bottom:1px solid #304153;font-variant-numeric:tabular-nums}.route-packet-pos{font-size:11px;color:#a6bdd2;white-space:nowrap}.route-packet-coord{grid-column:2/4}
 </style>
 </head>
 <body>
 <div class="app">
-<header class="top"><div class="brand">⬡ <span>Factory</span> Lab V16</div>
- <select id="preset"><option value="empty" selected>空白72×72地图</option><option value="sample">V32参考布局（局部接线）</option></select>
- <button id="resetPreset" title="加载所选方案，替换当前工作区">载入方案</button>
+<header class="top"><div class="brand">⬡ <span>Factory</span> Lab V21</div>
+ <select id="preset" title="选择已验证的求解器布局；不会自动覆盖你上次保存的工作区"><option value="" selected>▤ 求解器方案…</option><option value="warp">✓ 曲速线圈单链 · 49条线路（已验收）</option><option value="empty">＋ 新建空白工厂</option></select>
  <span class="counter" id="topStats">加载中…</span><div class="grow"></div>
  <button id="undo" title="Ctrl+Z">↶ 撤销</button><button id="redo" title="Ctrl+Y">↷ 重做</button>
  <button id="saveJson">导出布局 JSON</button><button id="loadJson">导入布局 JSON</button><input id="file" type="file" accept=".json,application/json"/>
- <button id="run" class="primary">▶ 运行 / 计算理论收支</button><button id="resetSim">重置模拟</button><button id="acceptance" title="原有13项净入库和齿轮线圈满速验收">✓ 验收13项</button><button id="warpCheck" title="从空库存开始模拟；只要求曲速线圈在两个时段都实际入库" style="border-color:#d2a95c">◎ 验证曲速线圈单链</button>
+ <button id="run" class="primary">▶ 运行模拟</button><label class="speed-label" for="simSpeed">速度</label><select id="simSpeed" title="模拟加速倍率（游戏时间 / 真实时间）"><option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option><option value="20">20×</option></select><button id="stepMinute" title="立即计算后续60秒的逐件模拟；会产生真实物流事件">⏩ +1分钟</button><button id="resetSim">重置模拟</button><button id="acceptance" title="原有13项净入库和齿轮线圈满速验收">✓ 验收13项</button><button id="warpCheck" title="从空库存开始模拟；只要求曲速线圈在两个时段都实际入库" style="border-color:#d2a95c">◎ 验证曲速线圈单链</button>
 </header>
 <div id="importFeedback" role="alert" aria-live="polite" style="display:none;position:absolute;z-index:30;top:64px;left:50%;transform:translateX(-50%);width:min(840px,calc(100vw - 24px));background:#4a2934;border:1px solid #ff9aa5;color:#ffe8e8;padding:12px 14px;border-radius:9px;box-shadow:0 10px 26px #0007"><span id="importFeedbackText"></span><button id="importFeedbackClose" style="float:right;margin-left:12px;padding:2px 7px" aria-label="关闭">✕</button></div>
 <main class="main">
 <aside class="side left">
  <h3>编辑工具</h3><div class="block"><div class="toolrow"><button data-tool="select" class="active">☝ 选择 / 拖动</button><button data-tool="belt">〰 连接传送带</button><button data-tool="pan">✥ 拖动画布</button><button data-tool="erase">⌫ 删除线路</button></div>
- <div class="help tiny"><span class="shortcut">Q</span> 逆时针旋转　<span class="shortcut">E</span> 顺时针旋转<br/><span class="shortcut">Backspace</span> 删除选中的机器 / 撤销接线转折点<br/><span class="shortcut">Esc</span> 取消接线/放置 · <span class="shortcut">滚轮</span> 缩放<br/><span class="shortcut">空格+拖动</span> 平移 · 放置工具会保持选择，可连续放置<br/>连线：点橙色出口 → 点击空地确定拐点 → 点蓝色入口完成。右键取消。</div>
+ <div class="help tiny"><span class="shortcut">Q</span> 逆时针旋转　<span class="shortcut">E</span> 顺时针旋转<br/><span class="shortcut">Backspace</span> 删除选中的机器 / 撤销接线转折点<br/><span class="shortcut">Esc</span> 取消接线/放置 · <span class="shortcut">滚轮</span> 缩放<br/><span class="shortcut">空格+拖动</span> 平移 · 放置工具会保持选择，可连续放置<br/>连线：点橙色出口 → 点击空地确定拐点 → 点蓝色入口完成。右键取消。<br/>运行时：点绿色传送带 → 查看这条线的实时物品清单。</div>
  <div id="beltControls" class="actions" style="display:none;margin:8px 0"><button id="undoBend" class="smallbtn">↶ 撤销上一段</button><button id="cancelBelt" class="smallbtn">✕ 取消本次接线</button></div>
  <div class="actions"><button id="fit" class="smallbtn">适应地图</button><button id="clearRoutes" class="smallbtn">清除所有线路</button></div></div>
  <h3>放置机器</h3><div class="block"><input id="search" type="search" placeholder="搜索机器 / 材料"/>
@@ -38,12 +39,13 @@
  </div><div id="palette" class="palette" style="margin-top:7px"></div></div>
 
  <h3>地图规则</h3><div class="block"><div class="kv"><span>可建造区域</span><b>72×72 − 中央14×14</b></div>
- <div class="tiny" style="margin-bottom:8px">导入文件必须是包含 <code>machines</code> 与 <code>routes</code> 的布局 JSON；产能蓝图、流量审计 JSON 不能当作地图导入。</div><div class="boxnotice">橙/蓝接口在机器内部；绿线只走机器外的格。普通传送带一对一，2米/秒、停靠间距1.1米；每格只有4种有向直线和8种有向直角。交叉格仅能容纳互相垂直的两条直线，每格最多一个十字，不能转弯、合流或交换物品；穿过后可拐弯。分/汇流必须使用3×3设备。</div></div>
+ <div class="tiny" style="margin-bottom:8px">导入文件必须是包含 <code>machines</code> 与 <code>routes</code> 的布局 JSON；产能蓝图、流量审计 JSON 不能当作地图导入。</div><div class="boxnotice">橙/蓝接口在机器内部；绿线只走机器外的格。普通传送带一对一，2米/秒、堵塞时1米停靠间距；起终点位于接口格的外侧边中点；每格只有4种有向直线和8种有向直角。交叉格仅能容纳互相垂直的两条直线，每格最多一个十字，不能转弯、合流或交换物品；穿过后可拐弯。分/汇流必须使用3×3设备。</div></div>
 </aside>
 <section class="canvaswrap"><canvas id="map"></canvas><div class="floating" id="hint">点击机器查看信息；选择 <b>连接传送带</b> 亲手完成剩余线路。</div><div class="legend"><span class="dot" style="background:#ffab61"></span>输出口　<span class="dot" style="background:#59acff"></span>输入口　<span class="dot" style="background:#48dc99"></span>传送带　<span class="dot" style="background:#f2d86b"></span>已选择</div></section>
-<aside class="side right"><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">单击机器，查看配方、旋转及接口材料。选择连接工具后，从橙色输出口点到蓝色输入口。</div></div><h3>线路检查 · 按接口边方向验证</h3><div class="block" id="audit"></div><h3>实际验收（不是理论上限）</h3><div class="block" id="acceptanceReport"><div class="boxnotice">点击顶部「运行验收15分钟」后，先预热300秒，再统计900秒的实际入库、取出、制造数量。未通过前不认定布局已求解。</div></div><h3>曲速线圈单链验收</h3><div class="block" id="warpReport"><div class="boxnotice">只要求曲速线圈真正持续入库，中间产物不强制入库，也不要求齿轮与线圈满速。点击顶部「验证曲速线圈单链」开始从空库存测试。</div></div><h3>仓库理论收支 / 运行模拟</h3><div class="block" id="warehouse"></div><h3>操作记录</h3><div class="block logs" id="logs"></div></aside>
+<aside class="side right"><h3>仓库材料 · 每分钟收支</h3><div class="block" id="warehouse"></div><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方与接口；运行时点击绿色传送带查看运输中的物品。</div></div><h3>线路检查</h3><div class="block" id="audit"></div><h3>实际验收</h3><div class="block" id="acceptanceReport"><div class="boxnotice">13种材料的持续净入库验收：预热300秒，再测900秒。只有完整生产目标才需要执行本项。</div></div><h3>曲速线圈单链验收</h3><div class="block" id="warpReport"><div class="boxnotice">仅验证曲速线圈从空库存持续入库，不要求中间材料单独入仓。</div></div><h3>操作记录</h3><div class="block logs" id="logs"></div></aside>
 </main><footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
 </div>
+<script id="solverWarpLayout" type="application/json">{"name":"曲速线圈直接生产链·49条几何线路·待HTML逐件验收","version":19,"machines":[{"type":"共鸣","mode":"标准","item":"共鸣水晶","face":"S","w":9,"h":11,"id":"p16","x":20,"y":25,"filters":{"0":"遐想物质","1":"相位粒子","2":"能量电池","3":"合金板"}},{"type":"量装","mode":"曲速线圈","item":"曲速线圈","face":"W","w":11,"h":9,"id":"p20","x":10,"y":39,"filters":{"0":"电动机","1":"量子处理器","2":"引力透镜"}},{"type":"量装","mode":"等离子电池","item":"等离子电池","face":"W","w":11,"h":9,"id":"p18","x":31,"y":18,"filters":{"1":"燃料罐","2":"相位粒子","0":"能量电池"}},{"type":"组装","mode":"古代芯片","item":"古代芯片","face":"W","w":11,"h":7,"id":"p13","x":10,"y":63,"filters":{"2":"能量电池","0":"硅晶圆","1":"导线线圈"}},{"type":"量装","mode":"引力透镜","item":"引力透镜","face":"S","w":9,"h":11,"id":"p19","x":9,"y":24,"filters":{"0":"框架模块","1":"共鸣水晶","2":"等离子电池"}},{"type":"量装","mode":"量子处理器","item":"量子处理器","face":"N","w":9,"h":11,"id":"p17","x":25,"y":46,"filters":{"0":"古代芯片","2":"硅晶圆","1":"导线线圈"}},{"type":"组装","mode":"电动机","item":"电动机","face":"W","w":11,"h":7,"id":"p15","x":12,"y":11,"filters":{"2":"合金板","0":"齿轮组","1":"导线线圈"}},{"type":"组装","mode":"框架模块","item":"框架模块","face":"W","w":11,"h":7,"id":"p14","x":26,"y":9,"filters":{"0":"钛合金锭","1":"合金板","2":"齿轮组"}},{"id":"s12a","type":"分流","mode":"","item":"导线线圈","face":"W","w":3,"h":3,"x":25,"y":40},{"id":"s07a","type":"分流","mode":"","item":"能量电池","face":"S","w":3,"h":3,"x":36,"y":48},{"type":"冶炼","mode":"合金板","item":"合金板","face":"N","w":7,"h":9,"id":"p10","x":45,"y":21,"filters":{"0":"小行星矿石","1":"废金属"}},{"id":"s10a","type":"分流","mode":"","item":"合金板","face":"E","w":3,"h":3,"x":45,"y":47},{"type":"组装","mode":"导线线圈","item":"导线线圈","face":"W","w":11,"h":7,"id":"p12","x":26,"y":59,"filters":{"1":"能量电池","0":"合金板"}},{"id":"s04a","type":"分流","mode":"","item":"小行星矿石","face":"W","w":3,"h":3,"x":49,"y":33},{"type":"冶炼","mode":"硅晶圆","item":"硅晶圆","face":"W","w":9,"h":7,"id":"p09","x":39,"y":54,"filters":{"1":"星尘粒子","0":"小行星矿石"}},{"id":"s02a","type":"分流","mode":"","item":"星尘粒子","face":"W","w":3,"h":3,"x":50,"y":44},{"id":"s05a","type":"分流","mode":"","item":"废金属","face":"N","w":3,"h":3,"x":44,"y":39},{"id":"s08a","type":"分流","mode":"","item":"钛合金锭","face":"S","w":3,"h":3,"x":48,"y":12},{"id":"s10b","type":"分流","mode":"","item":"合金板","face":"W","w":3,"h":3,"x":24,"y":20},{"type":"组装","mode":"齿轮组","item":"齿轮组","face":"S","w":7,"h":11,"id":"p11","x":54,"y":7,"filters":{"0":"钛合金锭"}},{"type":"燃料","mode":"标准","item":"燃料罐","face":"N","w":7,"h":9,"id":"p06","x":55,"y":21,"filters":{"0":"星尘粒子"}},{"type":"废料","mode":"标准","item":"废金属","face":"N","w":7,"h":9,"id":"p05","x":51,"y":50,"filters":{"0":"太空垃圾"}},{"type":"冶炼","mode":"钛合金锭","item":"钛合金锭","face":"S","w":7,"h":9,"id":"p08","x":63,"y":2,"filters":{"0":"小行星矿石"}},{"type":"电池","mode":"标准","item":"能量电池","face":"W","w":9,"h":7,"id":"p07","x":40,"y":65,"filters":{"0":"废金属"}},{"id":"s03a","type":"分流","mode":"","item":"相位粒子","face":"W","w":3,"h":3,"x":39,"y":13},{"id":"s07b","type":"分流","mode":"","item":"能量电池","face":"W","w":3,"h":3,"x":44,"y":6},{"id":"s11a","type":"分流","mode":"","item":"齿轮组","face":"E","w":3,"h":3,"x":39,"y":5},{"id":"s09a","type":"分流","mode":"","item":"硅晶圆","face":"W","w":3,"h":3,"x":19,"y":50},{"type":"垃圾","mode":"LV3","item":"太空垃圾","face":"N","w":5,"h":5,"id":"p00","x":54,"y":62},{"id":"depot","type":"仓入","mode":"","item":"曲速线圈","face":"W","w":5,"h":5,"x":14,"y":55},{"type":"垃圾","mode":"LV4","item":"遐想物质","face":"W","w":5,"h":5,"id":"p01","x":32,"y":0},{"type":"粒子","mode":"LV3","item":"星尘粒子","face":"N","w":5,"h":5,"id":"p02","x":56,"y":43},{"type":"采矿","mode":"LV3","item":"小行星矿石","face":"W","w":5,"h":5,"id":"p04","x":63,"y":32},{"type":"粒子","mode":"LV4","item":"相位粒子","face":"N","w":5,"h":5,"id":"p03","x":21,"y":1},{"id":"d0","type":"发电","x":0,"y":0,"face":"E"},{"id":"d1","type":"发电","x":0,"y":5,"face":"E"},{"id":"d2","type":"发电","x":0,"y":10,"face":"E"},{"id":"d3","type":"发电","x":0,"y":15,"face":"E"},{"id":"d4","type":"发电","x":0,"y":20,"face":"E"},{"id":"d5","type":"发电","x":0,"y":25,"face":"E"},{"id":"d6","type":"发电","x":0,"y":30,"face":"E"},{"id":"d7","type":"发电","x":0,"y":35,"face":"E"},{"id":"d8","type":"发电","x":0,"y":40,"face":"E"},{"id":"d9","type":"发电","x":0,"y":45,"face":"E"},{"id":"d10","type":"发电","x":0,"y":50,"face":"E"},{"id":"d11","type":"发电","x":0,"y":55,"face":"E"},{"id":"d12","type":"发电","x":0,"y":60,"face":"E"},{"id":"d13","type":"发电","x":0,"y":65,"face":"E"},{"id":"d14","type":"电脑","x":5,"y":0,"face":"E"},{"id":"d15","type":"电脑","x":5,"y":3,"face":"E"},{"id":"d16","type":"电脑","x":5,"y":6,"face":"E"},{"id":"d17","type":"电脑","x":5,"y":9,"face":"E"},{"id":"d18","type":"电脑","x":5,"y":12,"face":"E"},{"id":"d19","type":"电脑","x":5,"y":15,"face":"E"},{"id":"d20","type":"电脑","x":5,"y":18,"face":"E"},{"id":"d21","type":"电脑","x":5,"y":21,"face":"E"},{"id":"d22","type":"电脑","x":5,"y":24,"face":"E"},{"id":"d23","type":"电脑","x":5,"y":27,"face":"E"},{"id":"d24","type":"电脑","x":5,"y":30,"face":"E"},{"id":"d25","type":"电脑","x":5,"y":33,"face":"E"},{"id":"d26","type":"电脑","x":5,"y":36,"face":"E"},{"id":"d27","type":"电脑","x":5,"y":39,"face":"E"},{"id":"d28","type":"电脑","x":5,"y":42,"face":"E"},{"id":"d29","type":"电脑","x":5,"y":45,"face":"E"},{"id":"d30","type":"电脑","x":5,"y":48,"face":"E"},{"id":"d31","type":"电脑","x":5,"y":51,"face":"E"},{"id":"d32","type":"电脑","x":5,"y":54,"face":"E"},{"id":"d33","type":"电脑","x":5,"y":57,"face":"E"},{"id":"d34","type":"电脑","x":5,"y":60,"face":"E"},{"id":"d35","type":"电脑","x":5,"y":63,"face":"E"},{"id":"d36","type":"电脑","x":5,"y":66,"face":"E"},{"id":"d37","type":"电脑","x":5,"y":69,"face":"E"}],"routes":[{"id":"w1000","from":{"id":"p00","port":0},"to":{"id":"p05","port":0},"path":[[56,61],[56,60],[56,59],[55,59],[54,59]]},{"id":"w1001","from":{"id":"p01","port":0},"to":{"id":"p16","port":0},"path":[[31,2],[30,2],[29,2],[28,2],[27,2],[26,2],[26,3],[26,4],[26,5],[26,6],[25,6],[24,6],[23,6],[22,6],[21,6],[20,6],[19,6],[18,6],[17,6],[16,6],[15,6],[14,6],[13,6],[12,6],[11,6],[10,6],[9,6],[9,7],[9,8],[9,9],[9,10],[9,11],[9,12],[9,13],[9,14],[9,15],[9,16],[9,17],[9,18],[10,18],[11,18],[12,18],[13,18],[14,18],[15,18],[16,18],[17,18],[18,18],[19,18],[20,18],[20,19],[20,20],[20,21],[20,22],[20,23],[20,24],[21,24],[22,24]]},{"id":"w1002","from":{"id":"p13","port":0},"to":{"id":"p17","port":0},"path":[[9,66],[9,65],[9,64],[9,63],[9,62],[9,61],[9,60],[10,60],[11,60],[12,60],[13,60],[14,60],[15,60],[16,60],[17,60],[18,60],[19,60],[20,60],[21,60],[22,60],[23,60],[24,60],[25,60],[25,59],[25,58],[26,58],[27,58],[28,58],[28,57]]},{"id":"w1003","from":{"id":"p06","port":0},"to":{"id":"p18","port":1},"path":[[58,20],[58,19],[57,19],[56,19],[55,19],[54,19],[53,19],[52,19],[51,19],[50,19],[49,19],[48,19],[47,19],[46,19],[45,19],[44,19],[44,20],[44,21],[44,22],[43,22],[42,22]]},{"id":"w1004","from":{"id":"p14","port":0},"to":{"id":"p19","port":0},"path":[[25,12],[24,12],[23,12],[23,11],[23,10],[22,10],[21,10],[20,10],[19,10],[18,10],[17,10],[16,10],[15,10],[14,10],[13,10],[12,10],[11,10],[10,10],[10,11],[10,12],[10,13],[10,14],[10,15],[10,16],[10,17],[10,18],[10,19],[10,20],[10,21],[10,22],[10,23],[11,23],[12,23]]},{"id":"w1005","from":{"id":"p16","port":0},"to":{"id":"p19","port":1},"path":[[24,36],[24,37],[24,38],[23,38],[22,38],[21,38],[20,38],[19,38],[18,38],[17,38],[16,38],[15,38],[14,38],[13,38],[12,38],[11,38],[10,38],[9,38],[8,38],[8,37],[8,36],[8,35],[8,34],[8,33],[8,32],[8,31],[8,30],[8,29],[8,28],[8,27],[8,26],[8,25],[8,24],[8,23],[8,22],[9,22],[10,22],[11,22],[12,22],[13,22],[13,23]]},{"id":"w1006","from":{"id":"p18","port":0},"to":{"id":"p19","port":2},"path":[[30,22],[30,21],[30,20],[30,19],[30,18],[29,18],[28,18],[27,18],[26,18],[25,18],[25,17],[25,16],[25,15],[25,14],[25,13],[25,12],[25,11],[25,10],[25,9],[24,9],[23,9],[22,9],[21,9],[20,9],[19,9],[18,9],[17,9],[16,9],[15,9],[14,9],[13,9],[12,9],[11,9],[10,9],[9,9],[8,9],[8,10],[8,11],[8,12],[8,13],[8,14],[8,15],[8,16],[8,17],[8,18],[8,19],[8,20],[9,20],[10,20],[11,20],[12,20],[13,20],[14,20],[14,21],[14,22],[14,23]]},{"id":"w1007","from":{"id":"p15","port":0},"to":{"id":"p20","port":0},"path":[[11,14],[11,15],[11,16],[11,17],[11,18],[11,19],[11,20],[11,21],[12,21],[13,21],[14,21],[15,21],[16,21],[17,21],[18,21],[19,21],[19,22],[19,23],[19,24],[19,25],[19,26],[19,27],[19,28],[19,29],[19,30],[19,31],[19,32],[19,33],[19,34],[19,35],[19,36],[19,37],[20,37],[21,37],[21,38],[21,39],[21,40],[21,41],[21,42]]},{"id":"w1008","from":{"id":"p17","port":0},"to":{"id":"p20","port":1},"path":[[29,45],[29,44],[29,43],[28,43],[27,43],[26,43],[25,43],[24,43],[23,43],[22,43],[21,43]]},{"id":"w1009","from":{"id":"p19","port":0},"to":{"id":"p20","port":2},"path":[[13,35],[13,36],[13,37],[12,37],[11,37],[10,37],[9,37],[9,38],[9,39],[9,40],[9,41],[9,42],[8,42],[8,43],[8,44],[8,45],[8,46],[8,47],[8,48],[9,48],[10,48],[11,48],[12,48],[13,48],[14,48],[15,48],[16,48],[17,48],[18,48],[19,48],[20,48],[21,48],[21,47],[21,46],[21,45],[21,44]]},{"id":"w1010","from":{"id":"p02","port":0},"to":{"id":"s02a","port":0},"path":[[58,42],[57,42],[56,42],[55,42],[55,43],[55,44],[55,45],[54,45],[53,45]]},{"id":"w1011","from":{"id":"s02a","port":1},"to":{"id":"p06","port":0},"path":[[51,43],[51,42],[51,41],[51,40],[51,39],[51,38],[51,37],[51,36],[52,36],[53,36],[54,36],[55,36],[56,36],[57,36],[58,36],[58,35],[58,34],[58,33],[58,32],[58,31],[58,30]]},{"id":"w1012","from":{"id":"s02a","port":0},"to":{"id":"p09","port":1},"path":[[49,45],[49,46],[49,47],[49,48],[49,49],[49,50],[49,51],[49,52],[49,53],[49,54],[49,55],[49,56],[49,57],[48,57]]},{"id":"w1013","from":{"id":"p03","port":0},"to":{"id":"s03a","port":0},"path":[[23,0],[24,0],[25,0],[26,0],[27,0],[28,0],[29,0],[30,0],[31,0],[31,1],[31,2],[31,3],[31,4],[31,5],[31,6],[31,7],[31,8],[32,8],[33,8],[34,8],[35,8],[36,8],[37,8],[37,9],[38,9],[39,9],[40,9],[41,9],[42,9],[43,9],[43,10],[43,11],[43,12],[43,13],[43,14],[42,14]]},{"id":"w1014","from":{"id":"s03a","port":0},"to":{"id":"p16","port":1},"path":[[38,14],[37,14],[37,15],[37,16],[37,17],[36,17],[35,17],[34,17],[33,17],[32,17],[31,17],[30,17],[29,17],[28,17],[28,18],[28,19],[28,20],[28,21],[28,22],[28,23],[27,23],[26,23],[25,23],[24,23],[23,23],[23,24]]},{"id":"w1015","from":{"id":"s03a","port":2},"to":{"id":"p18","port":2},"path":[[40,16],[40,17],[41,17],[42,17],[42,18],[42,19],[42,20],[42,21],[42,22],[42,23]]},{"id":"w1016","from":{"id":"p04","port":0},"to":{"id":"s04a","port":0},"path":[[62,34],[61,34],[60,34],[59,34],[58,34],[57,34],[56,34],[55,34],[54,34],[53,34],[52,34]]},{"id":"w1017","from":{"id":"s04a","port":1},"to":{"id":"p08","port":0},"path":[[50,32],[50,31],[50,30],[51,30],[52,30],[53,30],[54,30],[55,30],[56,30],[57,30],[58,30],[59,30],[60,30],[61,30],[62,30],[62,29],[62,28],[62,27],[62,26],[62,25],[62,24],[62,23],[62,22],[62,21],[62,20],[62,19],[62,18],[62,17],[62,16],[62,15],[62,14],[62,13],[62,12],[62,11],[62,10],[62,9],[62,8],[62,7],[62,6],[62,5],[62,4],[62,3],[62,2],[62,1],[63,1],[64,1],[65,1]]},{"id":"w1018","from":{"id":"s04a","port":2},"to":{"id":"p09","port":0},"path":[[50,36],[50,37],[50,38],[50,39],[49,39],[48,39],[48,40],[48,41],[48,42],[48,43],[48,44],[48,45],[47,45],[46,45],[45,45],[44,45],[43,45],[43,46],[43,47],[43,48],[43,49],[43,50],[43,51],[43,52],[43,53],[44,53],[45,53],[46,53],[47,53],[48,53],[48,54],[48,55],[48,56]]},{"id":"w1019","from":{"id":"s04a","port":0},"to":{"id":"p10","port":0},"path":[[48,34],[48,33],[48,32],[48,31],[48,30]]},{"id":"w1020","from":{"id":"p05","port":0},"to":{"id":"s05a","port":0},"path":[[54,49],[54,48],[54,47],[54,46],[54,45],[54,44],[54,43],[54,42],[53,42],[52,42],[51,42],[50,42],[49,42],[48,42],[47,42],[46,42],[45,42]]},{"id":"w1021","from":{"id":"s05a","port":0},"to":{"id":"p07","port":0},"path":[[47,40],[48,40],[49,40],[50,40],[51,40],[52,40],[53,40],[54,40],[55,40],[56,40],[57,40],[58,40],[59,40],[60,40],[61,40],[62,40],[62,41],[62,42],[62,43],[62,44],[62,45],[62,46],[62,47],[62,48],[62,49],[62,50],[62,51],[62,52],[62,53],[62,54],[62,55],[62,56],[62,57],[62,58],[62,59],[62,60],[62,61],[62,62],[62,63],[62,64],[62,65],[62,66],[62,67],[62,68],[61,68],[60,68],[59,68],[58,68],[57,68],[56,68],[55,68],[54,68],[53,68],[52,68],[51,68],[50,68],[49,68]]},{"id":"w1022","from":{"id":"s05a","port":1},"to":{"id":"p10","port":1},"path":[[43,40],[43,39],[43,38],[43,37],[43,36],[43,35],[43,34],[43,33],[43,32],[43,31],[44,31],[45,31],[46,31],[47,31],[48,31],[49,31],[49,30]]},{"id":"w1023","from":{"id":"p07","port":0},"to":{"id":"s07a","port":0},"path":[[39,68],[38,68],[38,67],[38,66],[38,65],[38,64],[38,63],[38,62],[38,61],[38,60],[38,59],[38,58],[38,57],[38,56],[38,55],[38,54],[38,53],[38,52],[38,51],[39,51],[39,50],[39,49],[39,48],[39,47],[38,47],[37,47]]},{"id":"w1024","from":{"id":"s07a","port":1},"to":{"id":"p12","port":1},"path":[[35,49],[34,49],[34,50],[34,51],[34,52],[35,52],[36,52],[37,52],[38,52],[39,52],[40,52],[41,52],[42,52],[42,51],[43,51],[44,51],[45,51],[46,51],[47,51],[48,51],[49,51],[50,51],[50,52],[50,53],[50,54],[50,55],[50,56],[50,57],[50,58],[50,59],[50,60],[50,61],[50,62],[49,62],[48,62],[47,62],[46,62],[45,62],[44,62],[43,62],[42,62],[41,62],[40,62],[39,62],[38,62],[37,62]]},{"id":"w1025","from":{"id":"s07a","port":2},"to":{"id":"p13","port":2},"path":[[37,51],[37,52],[37,53],[37,54],[37,55],[36,55],[35,55],[35,56],[35,57],[35,58],[36,58],[37,58],[37,59],[37,60],[37,61],[37,62],[37,63],[37,64],[37,65],[37,66],[37,67],[37,68],[36,68],[35,68],[34,68],[33,68],[32,68],[31,68],[30,68],[29,68],[28,68],[27,68],[26,68],[25,68],[24,68],[23,68],[22,68],[21,68],[21,67]]},{"id":"w1026","from":{"id":"s07a","port":0},"to":{"id":"s07b","port":0},"path":[[39,49],[40,49],[41,49],[42,49],[43,49],[44,49],[44,50],[44,51],[44,52],[45,52],[46,52],[47,52],[48,52],[48,51],[48,50],[48,49],[48,48],[48,47],[49,47],[50,47],[51,47],[52,47],[53,47],[53,46],[53,45],[53,44],[53,43],[53,42],[53,41],[53,40],[53,39],[53,38],[53,37],[53,36],[53,35],[53,34],[53,33],[53,32],[53,31],[53,30],[53,29],[53,28],[53,27],[53,26],[53,25],[53,24],[53,23],[53,22],[53,21],[53,20],[53,19],[53,18],[53,17],[53,16],[53,15],[52,15],[51,15],[50,15],[49,15],[48,15],[47,15],[47,14],[47,13],[47,12],[47,11],[47,10],[47,9],[47,8],[47,7]]},{"id":"w1027","from":{"id":"s07b","port":0},"to":{"id":"p16","port":2},"path":[[43,7],[42,7],[42,8],[42,9],[42,10],[42,11],[42,12],[42,13],[42,14],[42,15],[42,16],[41,16],[40,16],[39,16],[38,16],[37,16],[36,16],[35,16],[34,16],[33,16],[32,16],[31,16],[30,16],[29,16],[28,16],[27,16],[27,17],[27,18],[27,19],[27,20],[27,21],[27,22],[27,23],[27,24],[26,24],[25,24],[24,24]]},{"id":"w1028","from":{"id":"s07b","port":2},"to":{"id":"p18","port":0},"path":[[45,9],[45,10],[45,11],[45,12],[45,13],[45,14],[45,15],[45,16],[45,17],[45,18],[44,18],[43,18],[43,19],[43,20],[43,21],[42,21]]},{"id":"w1029","from":{"id":"p08","port":0},"to":{"id":"s08a","port":0},"path":[[66,11],[65,11],[64,11],[63,11],[62,11],[61,11],[61,10],[61,9],[61,8],[61,7],[61,6],[60,6],[59,6],[58,6],[57,6],[56,6],[55,6],[54,6],[53,6],[52,6],[51,6],[50,6],[49,6],[49,7],[49,8],[49,9],[49,10],[49,11]]},{"id":"w1030","from":{"id":"s08a","port":0},"to":{"id":"p11","port":0},"path":[[51,13],[52,13],[53,13],[53,12],[53,11],[53,10],[53,9],[53,8],[53,7],[53,6],[53,5],[54,5],[55,5],[56,5],[56,6]]},{"id":"w1031","from":{"id":"s08a","port":1},"to":{"id":"p14","port":0},"path":[[47,13],[46,13],[45,13],[44,13],[44,12],[44,11],[43,11],[42,11],[41,11],[40,11],[39,11],[38,11],[37,11]]},{"id":"w1032","from":{"id":"p09","port":0},"to":{"id":"s09a","port":0},"path":[[38,57],[37,57],[36,57],[36,56],[36,55],[36,54],[36,53],[37,53],[38,53],[39,53],[40,53],[40,52],[40,51],[40,50],[40,49],[40,48],[40,47],[40,46],[40,45],[39,45],[38,45],[37,45],[36,45],[35,45],[34,45],[33,45],[32,45],[31,45],[30,45],[29,45],[28,45],[27,45],[26,45],[25,45],[24,45],[24,46],[24,47],[24,48],[24,49],[24,50],[24,51],[23,51],[22,51]]},{"id":"w1033","from":{"id":"s09a","port":0},"to":{"id":"p13","port":0},"path":[[18,51],[18,52],[18,53],[18,54],[19,54],[20,54],[21,54],[21,55],[21,56],[21,57],[21,58],[21,59],[21,60],[21,61],[21,62],[21,63],[21,64],[21,65]]},{"id":"w1034","from":{"id":"s09a","port":2},"to":{"id":"p17","port":2},"path":[[20,53],[20,54],[20,55],[20,56],[20,57],[21,57],[22,57],[23,57],[24,57],[25,57],[26,57],[27,57],[28,57],[29,57],[30,57]]},{"id":"w1035","from":{"id":"p10","port":0},"to":{"id":"s10a","port":0},"path":[[48,20],[49,20],[50,20],[51,20],[52,20],[53,20],[54,20],[54,21],[54,22],[54,23],[54,24],[54,25],[54,26],[54,27],[54,28],[54,29],[54,30],[54,31],[54,32],[54,33],[54,34],[54,35],[54,36],[54,37],[54,38],[54,39],[54,40],[54,41],[53,41],[52,41],[51,41],[50,41],[49,41],[49,42],[49,43],[49,44],[48,44],[47,44],[46,44],[45,44],[44,44],[44,45],[44,46],[44,47],[44,48]]},{"id":"w1036","from":{"id":"s10a","port":2},"to":{"id":"p12","port":0},"path":[[46,50],[47,50],[48,50],[49,50],[50,50],[50,49],[51,49],[52,49],[53,49],[54,49],[55,49],[56,49],[57,49],[58,49],[58,50],[58,51],[58,52],[58,53],[58,54],[58,55],[58,56],[58,57],[58,58],[58,59],[58,60],[58,61],[57,61],[56,61],[55,61],[54,61],[53,61],[52,61],[51,61],[50,61],[49,61],[48,61],[47,61],[46,61],[45,61],[44,61],[43,61],[42,61],[41,61],[40,61],[39,61],[38,61],[37,61]]},{"id":"w1037","from":{"id":"s10a","port":0},"to":{"id":"p14","port":1},"path":[[48,48],[49,48],[50,48],[51,48],[52,48],[53,48],[54,48],[55,48],[56,48],[57,48],[58,48],[59,48],[60,48],[61,48],[61,47],[61,46],[61,45],[61,44],[61,43],[61,42],[61,41],[61,40],[61,39],[61,38],[61,37],[61,36],[61,35],[61,34],[61,33],[61,32],[61,31],[60,31],[59,31],[58,31],[57,31],[56,31],[55,31],[54,31],[53,31],[52,31],[52,30],[52,29],[52,28],[52,27],[52,26],[52,25],[52,24],[52,23],[52,22],[52,21],[52,20],[52,19],[52,18],[52,17],[52,16],[51,16],[50,16],[49,16],[48,16],[47,16],[46,16],[46,15],[46,14],[46,13],[46,12],[45,12],[44,12],[43,12],[42,12],[41,12],[40,12],[39,12],[38,12],[37,12]]},{"id":"w1038","from":{"id":"s10a","port":1},"to":{"id":"s10b","port":0},"path":[[46,46],[47,46],[47,45],[47,44],[47,43],[47,42],[47,41],[47,40],[47,39],[47,38],[47,37],[47,36],[47,35],[47,34],[47,33],[47,32],[47,31],[47,30],[46,30],[45,30],[44,30],[43,30],[43,29],[43,28],[43,27],[42,27],[41,27],[40,27],[39,27],[38,27],[37,27],[36,27],[35,27],[34,27],[33,27],[32,27],[31,27],[30,27],[29,27],[29,26],[29,25],[29,24],[29,23],[29,22],[29,21],[28,21],[27,21]]},{"id":"w1039","from":{"id":"s10b","port":1},"to":{"id":"p15","port":2},"path":[[25,19],[24,19],[24,18],[24,17],[24,16],[24,15],[23,15]]},{"id":"w1040","from":{"id":"s10b","port":2},"to":{"id":"p16","port":3},"path":[[25,23],[25,24]]},{"id":"w1041","from":{"id":"p11","port":0},"to":{"id":"s11a","port":0},"path":[[57,18],[56,18],[55,18],[54,18],[53,18],[52,18],[51,18],[51,17],[51,16],[51,15],[51,14],[51,13],[51,12],[51,11],[51,10],[51,9],[51,8],[51,7],[51,6],[51,5],[51,4],[50,4],[49,4],[48,4],[47,4],[46,4],[45,4],[44,4],[43,4],[42,4],[41,4],[40,4],[39,4],[38,4],[38,5],[38,6]]},{"id":"w1042","from":{"id":"s11a","port":1},"to":{"id":"p14","port":2},"path":[[40,4],[40,3],[41,3],[42,3],[43,3],[43,4],[43,5],[43,6],[43,7],[43,8],[42,8],[41,8],[41,9],[41,10],[40,10],[39,10],[38,10],[37,10],[37,11],[37,12],[37,13]]},{"id":"w1043","from":{"id":"s11a","port":2},"to":{"id":"p15","port":0},"path":[[40,8],[39,8],[38,8],[38,7],[37,7],[36,7],[35,7],[34,7],[33,7],[32,7],[31,7],[30,7],[29,7],[28,7],[27,7],[26,7],[25,7],[24,7],[24,8],[24,9],[24,10],[24,11],[24,12],[24,13],[23,13]]},{"id":"w1044","from":{"id":"p12","port":0},"to":{"id":"s12a","port":0},"path":[[25,62],[24,62],[24,61],[24,60],[24,59],[24,58],[24,57],[24,56],[24,55],[24,54],[24,53],[24,52],[23,52],[22,52],[22,51],[22,50],[22,49],[22,48],[22,47],[22,46],[22,45],[22,44],[22,43],[22,42],[22,41],[22,40],[22,39],[23,39],[24,39],[25,39],[26,39],[27,39],[28,39],[28,40],[28,41]]},{"id":"w1045","from":{"id":"s12a","port":0},"to":{"id":"p13","port":1},"path":[[24,41],[23,41],[23,42],[23,43],[23,44],[23,45],[23,46],[23,47],[23,48],[23,49],[23,50],[23,51],[23,52],[23,53],[23,54],[23,55],[23,56],[23,57],[23,58],[23,59],[22,59],[22,60],[22,61],[22,62],[22,63],[22,64],[22,65],[22,66],[21,66]]},{"id":"w1046","from":{"id":"s12a","port":1},"to":{"id":"p15","port":1},"path":[[26,39],[26,38],[26,37],[26,36],[25,36],[24,36],[23,36],[22,36],[21,36],[20,36],[19,36],[18,36],[18,35],[18,34],[18,33],[18,32],[18,31],[18,30],[18,29],[18,28],[18,27],[18,26],[18,25],[18,24],[18,23],[18,22],[18,21],[18,20],[18,19],[19,19],[20,19],[21,19],[22,19],[23,19],[23,18],[23,17],[23,16],[23,15],[23,14]]},{"id":"w1047","from":{"id":"s12a","port":2},"to":{"id":"p17","port":1},"path":[[26,43],[26,44],[27,44],[28,44],[29,44],[30,44],[31,44],[32,44],[33,44],[34,44],[35,44],[35,45],[35,46],[35,47],[35,48],[35,49],[35,50],[35,51],[35,52],[35,53],[35,54],[34,54],[34,55],[34,56],[34,57],[34,58],[33,58],[32,58],[31,58],[30,58],[29,58],[29,57]]},{"id":"w1048","from":{"id":"p20","port":0},"to":{"id":"depot","port":1},"path":[[9,43],[9,44],[9,45],[9,46],[9,47],[9,48],[9,49],[9,50],[9,51],[9,52],[9,53],[10,53],[11,53],[12,53],[13,53],[14,53],[15,53],[16,53],[17,53],[18,53],[19,53],[19,54],[19,55],[19,56],[19,57]]}],"map":{"width":72,"height":72,"centerReserved":{"x":29,"y":29,"width":14,"height":14}}}</script>
 <script>
 
 'use strict';
@@ -145,7 +147,10 @@ function getPorts(m){const d=def(m),f=m.face||'E',[w,h]=dims(m),x=m.x,y=m.y;cons
  function sideLength(side){return side==='E'||side==='W'?h:w}
  if(m.type==='汇流') {['E','W','N','S'].filter(q=>q!==f).forEach((s,i)=>ports.push(one(s,Math.floor(sideLength(s)/2),'in',i)));ports.push(one(f,Math.floor(sideLength(f)/2),'out',0));}
  else if(m.type==='分流'){ports.push(one(back,Math.floor(sideLength(back)/2),'in',0));['E','W','N','S'].filter(q=>q!==back).forEach((s,i)=>ports.push(one(s,Math.floor(sideLength(s)/2),'out',i)));}
- else{const len=sideLength(back);let offsets=ni===2?[Math.floor(len/2)-1,Math.floor(len/2)]:Array.from({length:ni},(_,i)=>Math.max(0,Math.floor((len-ni)/2))+i);offsets.forEach((off,i)=>ports.push(one(back,off,'in',i)));if(no)ports.push(one(f,Math.floor(sideLength(f)/2),'out',0));}return ports;}
+ else{const len=sideLength(back);let offsets=ni===2?[Math.floor(len/2)-1,Math.floor(len/2)]:Array.from({length:ni},(_,i)=>Math.max(0,Math.floor((len-ni)/2))+i);// 冶炼炉、共鸣谐振器的输入口阵列从输入侧看偏右半格：
+ // 朝 E/N 时沿地图坐标正方向偏一格；朝 W/S 时，原偏小索引一侧已是局部右侧。
+ if((m.type==='冶炼'||m.type==='共鸣')&&(f==='E'||f==='N'))offsets=offsets.map(off=>off+1);
+ offsets.forEach((off,i)=>ports.push(one(back,off,'in',i)));if(no)ports.push(one(f,Math.floor(sideLength(f)/2),'out',0));}return ports;}
 // 每个输入口只可接一种配方材料，原料可自由换口；只有玩家手动配置才限制端口。
 function suggestFilter(m,i){return '';}
 function inPort(m,i){return getPorts(m).find(p=>p.kind==='in'&&p.index===i)}function outPort(m,i){return getPorts(m).find(p=>p.kind==='out'&&p.index===i)}
@@ -447,12 +452,14 @@ function auditRefresh(){
  const required=state.machines.filter(m=>getRecipe(m)&&Object.keys(getRecipe(m).inputs||{}).length>0).length;
  const stockPaths=REQUIRED_STOCK.map(mat=>({mat,path:hasProducerWarehousePath(mat)}));
  const ratePrecheck=fullRatePrecheck();
- $('audit').innerHTML=`<div class="item"><strong>13种材料：硬性净入库目标（当前仅检查可达性）</strong>
- <div class="tiny">这里只检查是否存在产出机→仓库入口的有效物料路径；有路径不等于有净利润。</div>
- ${stockPaths.map(v=>`<div class="kv"><span>${esc(v.mat)}</span><b class="${v.path?'warn':'bad'}">${v.path?'有路径·待验盈余':'无入库路径'}</b></div>`).join('')}
- <div class="tiny" style="margin-top:8px">目标：齿轮40/分、线圈60/分；其他11种产物含曲速线圈需净入库 >0/秒。下方仅检查本机入口容量上界，不计算上游矿石、仓库物料守恒及分流器实际行为。即使显示40/40，也不代表达标。</div>
- ${ratePrecheck.map(v=>`<div class="kv"><span>${esc(v.mode)}</span><b class="${v.pass?'warn':'bad'}">${v.upper.toFixed(2)} / ${v.needed.toFixed(2)} 件/分${v.pass?'（入口通过，供料待验）':'（入口不足）'}</b></div>`).join('')}
- </div>
+ $('audit').innerHTML=`<div class="item"><strong>线路概览</strong>
+ <div class="tiny">几何与入口材料是否接通；并不代表产能或净入库达标。</div>
+ <details><summary class="tiny">展开13种材料入库路径预检（${stockPaths.filter(v=>v.path).length}/13）</summary>
+ ${stockPaths.map(v=>`<div class="kv"><span>${esc(v.mat)}</span><b class="${v.path?'warn':'bad'}">${v.path?'有路径':'无路径'}</b></div>`).join('')}
+ <div class="tiny">纯曲速线圈单链只要求最终产物入库，其他材料不必单独入库。</div></details>
+ <details><summary class="tiny">展开齿轮/线圈输入口上限</summary>
+ ${ratePrecheck.map(v=>`<div class="kv"><span>${esc(v.mode)}</span><b class="${v.pass?'warn':'bad'}">${v.upper.toFixed(2)} / ${v.needed.toFixed(2)} 件/分</b></div>`).join('')}
+ <div class="tiny">这是仅计算端口数量的上界，不代表实际产率。</div></details></div>
  <div class="kv"><span>已绘制的线路</span><b>${state.routes.length}</b></div>
  <div class="kv"><span>有原料需求的机器</span><b>${complete}/${required} 台已连齐原料种类</b></div>
  <div class="kv"><span>尚未接入的材料</span><b class="${unconnected.length?'bad':'good'}">${unconnected.length} 项</b></div>
@@ -469,8 +476,27 @@ function auditRefresh(){
  ${invalid.length?`<details open><summary class="bad tiny">错误线路 (${invalid.length})</summary><div class="bad tiny">${invalid.map(esc).join('<br>')}</div></details>`:''}
  <p class="tiny">红色标记＝缺配方原料；橙色标记＝尚无产出线路。几何合法不表示工厂可以运行，更不代表吞吐已达标。</p>`;
 }
-function inspectorRefresh(){const root=$('inspector');if(selection?.routeId){let r=state.routes.find(r=>r.id===selection.routeId);if(!r){selection=null;return inspectorRefresh()}root.innerHTML=`<div class="item"><strong>传送带 #${esc(r.id)}</strong><div class="tiny">${esc(routeTitle(r))}</div><div class="kv"><span>长度</span><b>${r.path.length}格</b></div>${r.label?`<div class="tiny">参考线路：${esc(r.label)}</div>`:''}</div><button class="full" data-delete-route="${esc(r.id)}">删除这条线路</button>`;return;}
- let m=machineById(selection?.machineId);if(!m){root.innerHTML=`<div class="boxnotice">点击机器查看属性。按 Q / E 旋转选中机器，Backspace 删除；连线仍须使用橙色输出口到蓝色输入口。</div>`;return;}
+function inspectorRefresh(){const root=$('inspector');if(selection?.routeId){
+ let r=state.routes.find(r=>r.id===selection.routeId);if(!r){selection=null;return inspectorRefresh()}
+ const packets=sim?.routes?.[r.id]||[],length=routeLength(r);
+ const crossHere=selection?.crossAt?cellRoutes(...selection.crossAt).filter(q=>q.id!==r.id):[];
+ const items=packets.map((p,i)=>{
+   const xy=packetCoords(r,p),cell=xy?`格 (${Math.max(0,Math.min(71,Math.floor(xy[0])))}, ${Math.max(0,Math.min(71,Math.floor(xy[1])))})`:'位置未知';
+   const remaining=Math.max(0,length-p.distance);
+   return `<div class="route-packet"><span style="color:${materialColor(p.item)}">●</span><span>${i+1}. ${esc(p.item)}</span><span class="route-packet-pos">${remaining.toFixed(1)}m 剩余</span><div class="tiny route-packet-coord">${cell} · 距起点 ${p.distance.toFixed(1)}m</div></div>`;
+ }).join('');
+ root.innerHTML=`<div class="item"><strong>传送带 #${esc(r.id)}</strong><div class="tiny">${esc(routeTitle(r))}</div>
+ <div class="kv"><span>长度</span><b>${length}米</b></div>
+ <div class="kv"><span>模拟时间</span><b>${simTime.toFixed(1)}秒</b></div>
+ <div class="kv"><span>线上物品</span><b>${packets.length}件</b></div>
+ ${r.label?`<div class="tiny">参考线路：${esc(r.label)}</div>`:''}</div>
+ <div class="item"><strong>当前运输物品（靠近终点优先）</strong>
+ <div class="tiny" style="margin:3px 0 8px">实时读取该条线路中的逐件运输队列，含堵塞停留物品；快进后也会更新。</div>
+ <div class="route-packet-list">${items||'<div class="tiny" style="padding:8px 0">当前线路没有物品。运行模拟后即可查看。</div>'}</div></div>
+ ${crossHere.length?`<div class="tiny">这里是十字交叉；另有一条独立传送带：</div>${crossHere.map(q=>`<button class="full smallbtn" data-select-route="${esc(q.id)}" style="margin:4px 0">切换查看 #${esc(q.id)} · ${esc(routeTitle(q))}</button>`).join('')}`:''}
+ <button class="full" data-delete-route="${esc(r.id)}">删除这条线路</button>`;
+ return;}
+ let m=machineById(selection?.machineId);if(!m){root.innerHTML=`<div class="boxnotice">点击机器查看属性，点击绿色传送带查看该线路的物品清单。按 Q / E 旋转机器，Backspace 删除；连线仍须使用橙色输出口到蓝色输入口。</div>`;return;}
  let d=def(m),[w,h]=dims(m),rec=getRecipe(m),ports=getPorts(m),modes=d.recipes?Object.keys(d.recipes):null;
  root.innerHTML=`<div class="item"><strong style="color:${d.color}">${esc(d.name)}</strong><div style="margin-top:4px">${rec?`${Object.entries(rec.inputs).map(([k,v])=>`<span style="color:#60b5ff">${esc(k)} ×${v}</span>`).join('　')}<div style="color:#ffb16b">${esc(rec.output)} ×${rec.qty}</div><small>${esc(timeLabel(m))}</small>`:m.type==='仓出'?'取出：'+esc(m.item):''}</div><div class="tiny">${esc(m.tag||'')} · ${w}×${h} · (${m.x}, ${m.y})</div><div class="kv"><span>朝向（输出方向）</span><b>${({E:'右',W:'左',N:'上',S:'下'})[m.face]}</b></div></div><div class="actions"><button data-rotate="-1">↶ 逆时针90°</button><button data-rotate="1">↷ 顺时针90°</button></div>
  ${modes?.length>1?`<div style="margin:12px 0">产物 / 配方 <select class="full" id="modeSelect">${modes.map(q=>`<option value="${esc(q)}" ${m.mode===q?'selected':''}>${esc(recipeOptionLabel(m.type,q))}</option>`).join('')}</select></div>`:''}
@@ -607,7 +633,7 @@ function draw(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRect(0,0,pix.
  }
  for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle='#9affd0';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
  // traveling items
- if(sim){for(let r of state.routes)for(let packet of sim.routes[r.id]||[]){let xy=packetCoords(r,packet);if(!xy)continue;ctx.fillStyle=materialColor(packet.item);ctx.beginPath();ctx.arc(xy[0]+.5,xy[1]+.5,.25,0,2*Math.PI);ctx.fill();}}
+ if(sim){for(let r of state.routes)for(let packet of sim.routes[r.id]||[]){let xy=packetCoords(r,packet);if(!xy)continue;ctx.fillStyle=materialColor(packet.item);ctx.beginPath();ctx.arc(xy[0],xy[1],.25,0,2*Math.PI);ctx.fill();}}
  for(let m of state.machines){let[w,h]=dims(m),c=makeColor(m);ctx.fillStyle=hexAlpha(c,.18);ctx.fillRect(m.x+.08,m.y+.08,w-.16,h-.16);ctx.lineWidth=selection?.machineId===m.id ? .29 : .14;ctx.strokeStyle=selection?.machineId===m.id?'#f5dc77':c;ctx.strokeRect(m.x+.08,m.y+.08,w-.16,h-.16);
  const ports=getPorts(m);for(let p of ports){ctx.fillStyle=p.kind==='in'?'#5baaff':'#ffae61';ctx.fillRect(p.x+.08,p.y+.08,.84,.84);ctx.strokeStyle='#132434';ctx.lineWidth=.08;ctx.strokeRect(p.x+.08,p.y+.08,.84,.84);if(draft&&draft.from.id===m.id&&draft.from.port===p.index&&p.kind==='out'){ctx.strokeStyle='#ffee88';ctx.lineWidth=.17;ctx.strokeRect(p.x-.06,p.y-.06,1.12,1.12);}}
  if(z>=6.5)paintMachineText(m,w,h);
@@ -662,7 +688,16 @@ function onPointerDown(e){if(e.button===2){if(draft){draft=null;updateHint();dra
   draft.history.push(draft.path.map(p=>p.slice()));draft.path=candidate;updateDraftPreview();updateHint();draw();notify('当前路段已固定；继续选择下一个拐点或蓝色输入口');
  }else notify('请选择蓝色输入口或空白格作为转折点');return;}
  const hit=portAt(c.x,c.y);let m=cellMachine(c.x,c.y);if(m){selection={machineId:m.id};drag={kind:'machine',id:m.id,startX:pt.x,startY:pt.y,ox:m.x,oy:m.y,moved:false};inspectorRefresh();draw();return;}
- const rt=cellRoutes(c.x,c.y).at(-1);selection=rt?{routeId:rt.id}:null;inspectorRefresh();draw();}
+ const hitRoutes=cellRoutes(c.x,c.y);
+ let rt=hitRoutes.at(-1);
+ if(hitRoutes.length===2){
+   // On a cross: clicking farther to the left/right selects the horizontal strand;
+   // clicking farther up/down selects the vertical strand. A switch button is also shown.
+   const localX=pt.x-camera.x-(c.x+.5)*camera.z,localY=pt.y-camera.y-(c.y+.5)*camera.z;
+   const wanted=Math.abs(localX)>Math.abs(localY)?'H':'V';
+   rt=hitRoutes.find(q=>{let i=q.path.findIndex(p=>p[0]===c.x&&p[1]===c.y);return orientation(q,i)===wanted;})||rt;
+ }
+ selection=rt?{routeId:rt.id,crossAt:hitRoutes.length===2?[c.x,c.y]:null}:null;inspectorRefresh();draw();}
 function onPointerMove(e){const p=eventCoords(e),oldCell=hoverCell;hoverCell=screenToCell(p.x,p.y);if(draft&&(!oldCell||oldCell.x!==hoverCell.x||oldCell.y!==hoverCell.y))updateDraftPreview();const here=cellRoutes(hoverCell.x,hoverCell.y);
  const stateAt=here.map(r=>{let i=r.path.findIndex(([x,y])=>x===hoverCell.x&&y===hoverCell.y);let t=routeTile(r,i);return t?(t.type==='straight'?'直线':'转角')+' '+t.key:'无效状态';});
  $('cursorText').textContent=`格子 (${hoverCell.x},${hoverCell.y})${inMap(hoverCell.x,hoverCell.y)?'':' · 地图外'}${stateAt.length?' · '+(stateAt.length===2?'十字交叉 / ':'')+stateAt.join(' × '):''}`;
@@ -747,25 +782,77 @@ function warehouseTheory(){
  }
  return {inflow,outflow,warnings};
 }
+// 以事件计数记录真实逐件入库/出库，而不是以物料路径推断实际收入。
+function recordWarehouseMovement(direction,item){
+ if(!sim)return;
+ const bucketIndex=Math.max(0,Math.floor((simTime-1e-7)/60));
+ const bucket=sim.minuteBuckets[bucketIndex]||(sim.minuteBuckets[bucketIndex]={inbound:{},outbound:{}});
+ bucket[direction][item]=(bucket[direction][item]||0)+1;
+}
+function ledgerNumber(v,decimals=2){return Number(v||0).toFixed(decimals);}
+function ledgerNetCell(net){return `<td class="${net>1e-8?'positive':net<-1e-8?'negative':''}">${net>1e-8?'+':''}${ledgerNumber(net)}</td>`;}
 function warehouseRefresh(){
- const budget=theoreticalBudget,keys=budget?[...new Set([...Object.keys(budget.inflow),...Object.keys(budget.outflow)])].sort():[];
- const rows=keys.map(k=>{let a=(budget.inflow[k]||0)*60,b=(budget.outflow[k]||0)*60,n=a-b;return `<tr><td>${esc(k)}</td><td style="text-align:right">${a.toFixed(2)}</td><td style="text-align:right">${b.toFixed(2)}</td><td style="text-align:right;color:${n>=0?'#83e3b4':'#ff9e9e'}">${n>0?'+':''}${n.toFixed(2)}</td></tr>`;}).join('');
- const actual=Object.entries(ware).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]);
- $('warehouse').innerHTML=`<div class="item"><strong>仓库收支估算（未经全链路验证；件/分钟）</strong><div class="tiny">只计算有效入库/取出线路，按配方、每口1件/s和已连接上游估计稳态上限；非动画计数。</div>${budget?`<table class="table-mini"><thead><tr><td>材料</td><td>收入</td><td>消耗</td><td>净</td></tr></thead><tbody>${rows||'<tr><td colspan="4">仓库尚无有效进出线路</td></tr>'}</tbody></table>`:'<div class="tiny">点击“运行 / 计算理论收支”显示</div>'}</div><div class="kv"><span>动画模拟时间</span><b>${simTime.toFixed(1)} 秒</b></div><div class="kv"><span>动画实际累计入库</span><b>${Object.values(sim?.inbound||{}).reduce((a,b)=>a+b,0)} 件</b></div>${actual.length?`<table class="table-mini">${actual.slice(0,12).map(([mat,num])=>`<tr><td>${esc(mat)}</td><td>${num}</td></tr>`).join('')}</table>`:''}<p class="tiny">这些数字不是经过全局物料守恒的可行解；即使净值为正也不证明达标。尚未精确模拟分流器堵塞后跳过出口、机器等待与输送时间；不能视为游戏实测产量。已连接但上游供料不全的材料可能显示0。</p>`;
+ // 把理论值单独显示：它只是静态的乐观估计，不能代替每分钟真实出入库。
+ if(theoreticalBudget===null)theoreticalBudget=warehouseTheory();
+ const budget=theoreticalBudget||{inflow:{},outflow:{}};
+ const materialSet=new Set([...Object.keys(budget.inflow||{}),...Object.keys(budget.outflow||{}),...Object.keys(ware||{}),
+  ...Object.keys(sim?.inbound||{}),...Object.keys(sim?.outbound||{}),
+  ...state.machines.filter(m=>m.type==='仓出').map(m=>m.item).filter(Boolean)]);
+ const known=[...MATERIALS,...REQUIRED_STOCK];
+ const materials=[...materialSet].filter(Boolean).sort((a,b)=>{const ia=known.indexOf(a),ib=known.indexOf(b);return (ia<0?999:ia)-(ib<0?999:ib)||a.localeCompare(b,'zh-CN');});
+ const tRows=materials.map(mat=>{
+  const inc=(budget.inflow[mat]||0)*60,out=(budget.outflow[mat]||0)*60;
+  return `<tr><td class="ledger-name" title="${esc(mat)}">${esc(mat)}</td><td>${ledgerNumber(inc)}</td><td>${ledgerNumber(out)}</td>${ledgerNetCell(inc-out)}</tr>`;
+ }).join('');
+ const elapsedMinutes=Math.floor((simTime+1e-7)/60);
+ const finished=elapsedMinutes>0?sim?.minuteBuckets?.[elapsedMinutes-1]:null;
+ const showBucket=finished||{inbound:{},outbound:{}};
+ const aRows=materials.map(mat=>{const inc=showBucket.inbound[mat]||0,out=showBucket.outbound[mat]||0;
+  return `<tr><td class="ledger-name" title="${esc(mat)}">${esc(mat)}</td><td>${inc}</td><td>${out}</td>${ledgerNetCell(inc-out)}<td>${ware[mat]||0}</td></tr>`;
+ }).join('');
+ const totalsIn=Object.values(sim?.inbound||{}).reduce((a,b)=>a+b,0),totalsOut=Object.values(sim?.outbound||{}).reduce((a,b)=>a+b,0);
+ const recentBuckets=(sim?.minuteBuckets||[]).slice(Math.max(0,elapsedMinutes-12),elapsedMinutes);
+ const history=recentBuckets.map((bk,i)=>{const minute=elapsedMinutes-recentBuckets.length+i+1;
+  const iCount=Object.values(bk?.inbound||{}).reduce((a,b)=>a+b,0),oCount=Object.values(bk?.outbound||{}).reduce((a,b)=>a+b,0);
+  return `<tr><td>第${minute}分钟</td><td>${iCount}</td><td>${oCount}</td>${ledgerNetCell(iCount-oCount)}</tr>`;
+ }).join('');
+ $('warehouse').innerHTML=`<div class="ledger-mini"><div><span>模拟时间</span><b>${(simTime/60).toFixed(1)}分</b></div><div><span>仓库累计进 / 出</span><b>${totalsIn} / ${totalsOut}</b></div></div>
+ <div class="ledger-panel"><div class="ledger-head"><strong>理论收支</strong><span class="ledger-chip">件/分钟 · 估计</span></div>
+ <table class="ledger-table"><thead><tr><th>材料</th><th>收入</th><th>支出</th><th>净值</th></tr></thead><tbody>${tRows||'<tr><td colspan="4">暂无有效仓库物流</td></tr>'}</tbody></table>
+ <div class="ledger-meta">按有效连接和配方计算的乐观估值；未保证共享物料、分流背压与仓库库存平衡，不代表实际产量。</div></div>
+ <div class="ledger-panel"><div class="ledger-head"><strong>实际收支</strong><span class="ledger-chip">${elapsedMinutes>0?'第 '+elapsedMinutes+' 分钟':'等待首个完整分钟'}</span></div>
+ ${elapsedMinutes===0?`<div class="ledger-meta">已模拟 ${simTime.toFixed(1)}秒；运行满60秒后显示第一份准确的每分钟记录。可用顶部「+1分钟」快速计算。</div>`:''}
+ <table class="ledger-table"><thead><tr><th>材料</th><th>入库</th><th>出库</th><th>净值</th><th>库存</th></tr></thead><tbody>${aRows||'<tr><td colspan="5">仓库暂无材料</td></tr>'}</tbody></table>
+ <div class="ledger-meta">入库、出库为最近一个完整模拟分钟内逐件记录；库存为当前剩余件数，净值＝入库－出库。未满60秒时不做速率外推。</div>
+ ${history?`<details><summary class="tiny">最近${recentBuckets.length}分钟记录</summary><table class="ledger-table"><thead><tr><th>分钟</th><th>收入</th><th>支出</th><th>净值</th></tr></thead><tbody>${history}</tbody></table></details>`:''}</div>`;
 }
 // Simplified discrete-item experiment, intentionally distinct from a full game-accurate solver.
 let sim=null;
-// 格子按1米；物品速度2米/秒、同一线路相邻物品中心至少相隔1.1米。
-const BELT_SPEED=2,ITEM_SPACING=1.1,PORT_INTERVAL=1;
-function routeLength(r){return (r.path?.length||0)+1;}
-function packetCoords(r,p){const first=machineById(r.from.id),last=machineById(r.to.id);
- const op=first&&outPort(first,r.from.port),ip=last&&inPort(last,r.to.port);
+// 每个传送带格沿入边中点 -> 中心 -> 出边中点走过1米；直角格两段各0.5米。
+// 线路起点是第一格与机器出口格的共享边中点；终点是最后一格与机器入口格的共享边中点。
+// 物品运动速度2米/秒；堵塞时以1米间距停在格子边中点，满线后背压到生产机器的输出缓存。
+const BELT_SPEED=2,ITEM_SPACING=1,PORT_INTERVAL=1;
+function routeLength(r){return (r.path?.length||0);}
+// Return world coordinates directly (not tile indices), so render does not add an extra 0.5 tile.
+function packetCoords(r,p){
+ const path=r.path||[],n=path.length;
+ if(!n)return null;
+ const source=machineById(r.from.id),target=machineById(r.to.id);
+ const op=source&&outPort(source,r.from.port),ip=target&&inPort(target,r.to.port);
  if(!op||!ip)return null;
- const coords=[[op.x,op.y],...r.path,[ip.x,ip.y]];
- const t=Math.max(0,Math.min(coords.length-1.00001,p.distance));const i=Math.floor(t),f=t-i;
- return [coords[i][0]*(1-f)+coords[i+1][0]*f,coords[i][1]*(1-f)+coords[i+1][1]*f];
+ const first=path[0],last=path[n-1],d=Math.max(0,Math.min(n,p.distance));
+ // Adjacent physical port CENTER is used only to determine the outer tile's entry/exit direction.
+ const sx=first[0]-op.x,sy=first[1]-op.y;
+ const tx=ip.x-last[0],ty=ip.y-last[1];
+ if(Math.abs(sx)+Math.abs(sy)!==1||Math.abs(tx)+Math.abs(ty)!==1)return null;
+ if(d<=.5)return [first[0]+.5+sx*(d-.5),first[1]+.5+sy*(d-.5)];
+ if(d>=n-.5)return [last[0]+.5+tx*(d-n+.5),last[1]+.5+ty*(d-n+.5)];
+ // Between adjacent tile centers the displacement is exactly 1m; corners turn at tile center.
+ const u=d-.5,i=Math.floor(u),f=u-i;
+ const a=path[i],b=path[i+1];
+ return [a[0]+.5+(b[0]-a[0])*f,a[1]+.5+(b[1]-a[1])*f];
 }
-function resetSimulation(){running=false;let btn=$('run');if(btn){btn.textContent='▶ 运行 / 计算理论收支';btn.classList.add('primary');}simTime=0;ware={};sim={byMachine:{},routes:{},inbound:{},outbound:{},crafts:{}};
+function resetSimulation(){running=false;let btn=$('run');if(btn){btn.textContent='▶ 运行模拟';btn.classList.add('primary');}simTime=0;ware={};sim={byMachine:{},routes:{},inbound:{},outbound:{},crafts:{},minuteBuckets:[]};
  for(let m of state.machines)sim.byMachine[m.id]={inputs:{},portInputs:{},queue:[],busy:0,tick:0,lastSend:{},lastReceive:{},roundRobin:0};
  for(let r of state.routes)sim.routes[r.id]=[];
  warehouseRefresh();draw();}
@@ -784,7 +871,7 @@ function inputCap(m,item,port){let rec=getRecipe(m);
  return 0;
 }
 function acceptItem(m,port,item){let s=sim.byMachine[m.id];if(m.type==='仓入'){
-   ware[item]=(ware[item]||0)+1;sim.inbound[item]=(sim.inbound[item]||0)+1;return true;
+   ware[item]=(ware[item]||0)+1;sim.inbound[item]=(sim.inbound[item]||0)+1;recordWarehouseMovement('inbound',item);return true;
  }
  if(!s)return false;
  if(!acceptsMaterial(m,item,port))return false;
@@ -802,7 +889,7 @@ function removeBuffered(m,s,item){if(!(s.inputs[item]>0))return false;s.inputs[i
 }
 function simulate(dt){simTime+=dt;
  // 队列 index=0 永远是最前面的物品；先移动前车，再移动后车。
- // 接收方停止收货时，最前面的包裹停住，其余包裹按1.1米间隔排队。
+ // 接收方停止收货时，最前面的包裹停在机器入口边中点，其余包裹以1米间隔停在连续格边中点。
  for(const r of state.routes){const pk=sim.routes[r.id]||[],target=machineById(r.to.id);const end=routeLength(r);
   for(let i=0;i<pk.length;i++){
    const ahead=i===0?end:pk[i-1].distance-ITEM_SPACING;
@@ -814,7 +901,7 @@ function simulate(dt){simTime+=dt;
  }
  for(const m of state.machines){const s=sim.byMachine[m.id];if(!s)continue;const rec=getRecipe(m);
   if(m.type==='仓出'){
-   const item=m.item;if(item&&ware[item]>0&&sendItem(m,s,0,item)){ware[item]--;sim.outbound[item]=(sim.outbound[item]||0)+1;}continue;
+   const item=m.item;if(item&&ware[item]>0&&sendItem(m,s,0,item)){ware[item]--;sim.outbound[item]=(sim.outbound[item]||0)+1;recordWarehouseMovement('outbound',item);}continue;
   }
   if(m.type==='分流'){
    const outs=getPorts(m).filter(p=>p.kind==='out'),items=Object.keys(s.inputs).filter(q=>s.inputs[q]>0);
@@ -845,7 +932,23 @@ function simulate(dt){simTime+=dt;
   }
  }
 }
-function stepLoop(t){let elapsed=Math.min(.12,Math.max(0,(t-animationLast)/1000));animationLast=t;if(running){let part=0.05;while(elapsed>.0001){let d=Math.min(part,elapsed);simulate(d);elapsed-=d;}simPaintTimer+=.05;if(simPaintTimer>.3){simPaintTimer=0;warehouseRefresh();inspectorRefresh();}}draw();requestAnimationFrame(stepLoop);}
+let simulationSpeed=1;
+function stepLoop(t){
+ const elapsedReal=Math.min(.12,Math.max(0,(t-animationLast)/1000));animationLast=t;
+ if(running){let elapsed=elapsedReal*simulationSpeed,part=0.05;
+  while(elapsed>.0001){let d=Math.min(part,elapsed);simulate(d);elapsed-=d;}
+  simPaintTimer+=elapsedReal;
+  if(simPaintTimer>=.3){simPaintTimer=0;warehouseRefresh();inspectorRefresh();}
+ }
+ draw();requestAnimationFrame(stepLoop);
+}
+function advanceSimulationMinute(){
+ const previous=running;running=false;
+ for(let i=0;i<1200;i++)simulate(.05);
+ running=previous;warehouseRefresh();inspectorRefresh();draw();
+ notify('已按逐件规则快进60秒，仓库每分钟记录已更新');
+}
+
 $('map').addEventListener('pointerdown',onPointerDown);$('map').addEventListener('pointermove',onPointerMove);$('map').addEventListener('pointerup',onPointerUp);$('map').addEventListener('pointercancel',onPointerUp);$('map').addEventListener('contextmenu',e=>e.preventDefault());
 $('map').addEventListener('wheel',e=>{e.preventDefault();const p=eventCoords(e),factor=Math.exp(-e.deltaY*.0012),nz=Math.max(3,Math.min(48,camera.z*factor));camera.x=p.x-(p.x-camera.x)*nz/camera.z;camera.y=p.y-(p.y-camera.y)*nz/camera.z;camera.z=nz;draw();},{passive:false});
 document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));$('search').oninput=buildPalette;
@@ -853,9 +956,21 @@ $('palette').onclick=e=>{let b=e.target.closest('[data-stamp]');if(!b)return;set
 $('stampLeft').onclick=()=>rotateStamp(-1);$('stampRight').onclick=()=>rotateStamp(1);$('stampCancel').onclick=()=>setTool('select');
 $('stampMode').onchange=e=>{stampMode=e.target.value;saveStampPreference();updateStampControls();updateHint();draw();};
 $('stampItem').onchange=e=>{stampItem=e.target.value;saveStampPreference();updateStampControls();updateHint();draw();};$('undoBend').onclick=undoDraftBend;$('cancelBelt').onclick=cancelDraft;
-$('inspector').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.rotate)rotateSelected(Number(b.dataset.rotate));else if(b.dataset.deleteRoute)deleteRoute(b.dataset.deleteRoute);else if(b.id==='deleteM')removeMachine(selection?.machineId);else if(b.id==='duplicate'){let orig=machineById(selection?.machineId);if(!orig)return;let m=copy(orig);m.id='m'+(++idSeed);let pos=findFree(m,orig.x+2,orig.y+2);if(!pos)return notify('附近没有空地可复制机器','bad');Object.assign(m,pos);snapshot();state.machines.push(m);selection={machineId:m.id};afterChange('复制 '+label(m));}};
+$('inspector').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.rotate)rotateSelected(Number(b.dataset.rotate));else if(b.dataset.selectRoute){selection={routeId:b.dataset.selectRoute,crossAt:selection?.crossAt||null};inspectorRefresh();draw();}else if(b.dataset.deleteRoute)deleteRoute(b.dataset.deleteRoute);else if(b.id==='deleteM')removeMachine(selection?.machineId);else if(b.id==='duplicate'){let orig=machineById(selection?.machineId);if(!orig)return;let m=copy(orig);m.id='m'+(++idSeed);let pos=findFree(m,orig.x+2,orig.y+2);if(!pos)return notify('附近没有空地可复制机器','bad');Object.assign(m,pos);snapshot();state.machines.push(m);selection={machineId:m.id};afterChange('复制 '+label(m));}};
 $('inspector').onchange=e=>{let m=machineById(selection?.machineId);if(!m)return; if(e.target.id==='modeSelect'){snapshot();m.mode=e.target.value;m.filters={};let rcount=state.routes.length;state.routes=state.routes.filter(r=>r.from.id!==m.id&&r.to.id!==m.id);afterChange(`配方已更改，删除${rcount-state.routes.length}条旧连接`);}else if(e.target.id==='itemSelect'){snapshot();m.item=e.target.value;afterChange('仓库取出口改为 '+m.item);}else if(e.target.dataset.filter!==undefined){snapshot();(m.filters??={})[Number(e.target.dataset.filter)]=e.target.value;afterChange('已更新输入口材料');}else if(e.target.dataset.outFilter!==undefined){snapshot();(m.outFilters??={})[Number(e.target.dataset.outFilter)]=e.target.value;afterChange('已更新分流器出口材料限制');}};
-$('preset').onchange=()=>{};$('resetPreset').onclick=()=>{if(state.machines.length&&!confirm('载入方案将替换当前布局。请先导出 JSON 备份。继续吗？'))return;loadState($('preset').value==='empty'?createEmpty():SAMPLE);autoFit();};
+$('preset').onchange=()=>{
+ const choice=$('preset').value;
+ // Return the menu to its placeholder regardless of success, so the same layout can be reloaded.
+ $('preset').value='';
+ if(!choice)return;
+ if(state.machines.length&&!confirm('切换求解器方案将替换当前地图。建议先导出布局 JSON 备份，确定继续吗？'))return;
+ try{
+   const plan=choice==='warp'?JSON.parse($('solverWarpLayout').textContent):createEmpty();
+   loadState(plan);autoFit();
+   $('importFeedback').style.display='none';
+   notify(choice==='warp'?'已载入求解器验证的曲速线圈布局（仅单链验收）':'已新建空白工厂','good');
+ }catch(err){importFeedback('无法加载内置方案：'+err.message,true);}
+};
 $('fit').onclick=autoFit;$('clearRoutes').onclick=()=>{if(!state.routes.length)return;if(!confirm('确定清除所有传送带连接？'))return;snapshot();state.routes=[];afterChange('全部线路已清除');};
 $('undo').onclick=undo;$('redo').onclick=redo;
 $('saveJson').onclick=()=>download('factory_lab_layout.json',JSON.stringify({...state,version:11,map:{width:72,height:72,centerReserved:{x:29,y:29,width:14,height:14}},description:'Factory Lab · 72x72 center 14x14 reserved'},null,2),'application/json');
@@ -941,7 +1056,10 @@ function runWarpChainAcceptance(){
 }
 $('warpCheck').onclick=()=>runWarpChainAcceptance();
 
-$('run').onclick=()=>{theoreticalBudget=warehouseTheory();warehouseRefresh();running=!running;$('run').textContent=running?'❚❚ 暂停模拟':'▶ 继续模拟 / 更新理论收支';$('run').classList.toggle('primary',!running);notify(running?'已计算理论仓库收支，同时启动示意动画':'模拟已暂停');};$('resetSim').onclick=()=>{resetSimulation();notify('模拟库存与生产队列已重置');};
+$('run').onclick=()=>{warehouseRefresh();running=!running;if(running)setTool('select');$('run').textContent=running?'❚❚ 暂停模拟':'▶ 继续模拟';$('run').classList.toggle('primary',!running);notify(running?'模拟已开始：仓库每60秒保存一份真实收支记录':'模拟已暂停');};
+$('simSpeed').onchange=e=>{simulationSpeed=Number(e.target.value)||1;notify(`模拟速度已设为 ${simulationSpeed}×`);};
+$('stepMinute').onclick=advanceSimulationMinute;
+$('resetSim').onclick=()=>{resetSimulation();notify('已清空模拟库存、生产队列和分钟统计记录');};
 document.addEventListener('keydown',e=>{
  const target=e.target;
  if(target?.closest?.('input,select,textarea,[contenteditable]'))return;
