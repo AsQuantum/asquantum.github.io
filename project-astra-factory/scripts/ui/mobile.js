@@ -5,18 +5,33 @@ const mobileLayoutMedia=window.matchMedia('(max-width: 900px)');
 let mobileActiveView='map';
 
 function mobileEditorActive(){return mobileLayoutMedia.matches;}
+let mobileMapToastTimer=null;
+function mobileSetMapStatus(message){
+ const status=$('mobileMapState');
+ if(!status||status.textContent===message)return;
+ status.textContent=message;
+ if(mobileMapToastTimer!==null)clearTimeout(mobileMapToastTimer);
+ mobileMapToastTimer=null;
+ status.classList.toggle('is-visible',Boolean(message));
+ if(message)mobileMapToastTimer=setTimeout(()=>{
+  status.classList.remove('is-visible');
+  mobileMapToastTimer=null;
+ },3000);
+}
 function mobileUpdatePlacement(){
- const bar=$('mobileStampBar'),status=$('mobileMapState');
- if(!bar||!status)return;
+ const bar=$('mobileStampBar');
+ if(!bar)return;
  bar.hidden=!stampType;
+ let message;
  if(stampType){
   const name=def({type:stampType})?.name||stampType;
   $('mobileStampName').textContent=name;
-  status.textContent='放置：'+name+' · 点击地图格子';
- }else if(tool==='belt')status.textContent='接线：点橙色输出口 → 蓝色输入口';
- else if(tool==='pan')status.textContent='平移：单指拖动 · 双指缩放／平移';
- else if(groupTransform)status.textContent='移动预览：点击地图确认';
- else status.textContent='双指缩放、平移地图';
+  message='放置：'+name+' · 点击地图格子';
+ }else if(tool==='belt')message='接线：点橙色输出口 → 蓝色输入口';
+ else if(tool==='pan')message='平移：单指拖动 · 双指缩放／平移';
+ else if(groupTransform)message='移动预览：点击地图确认';
+ else message='双指缩放、平移地图';
+ mobileSetMapStatus(message);
 }
 function mobileOpenView(view){
  if(!mobileEditorActive())return;

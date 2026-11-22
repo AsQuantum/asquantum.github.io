@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="styles/stock-chart.css"/>
 <link rel="stylesheet" href="styles/mobile.css"/>
 <link rel="stylesheet" href="styles/window-motion.css"/>
+<link rel="stylesheet" href="styles/ast1-dialog.css"/>
 </head>
 <body>
 <div class="app">
@@ -64,11 +65,23 @@
   <button id="resetSim" class="sim-reset" title="清空模拟库存、队列与分钟统计；不删除机器">↻ 重置</button>
  </div>
 </header>
-<div id="ast1Panel" style="display:none;position:absolute;z-index:80;top:58px;left:50%;transform:translateX(-50%);width:min(940px,calc(100vw - 30px));background:#172437;border:2px solid #5f8daa;border-radius:12px;box-shadow:0 14px 36px #000c;padding:16px;color:#e8f1ff">
- <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b id="ast1PanelTitle" style="font-size:16px">游戏 AST1 蓝图</b><span id="ast1PanelHint" style="font-size:11px;color:#adc5d5"></span><button id="ast1Close" style="margin-left:auto">✕ 关闭</button></div>
- <textarea id="ast1Text" spellcheck="false" style="width:100%;height:178px;resize:vertical;background:#08121c;color:#def8e4;border:1px solid #436176;border-radius:8px;padding:12px;font:12px/1.6 ui-monospace,Consolas,monospace" placeholder="AST1:..."></textarea>
- <div style="display:flex;gap:8px;align-items:center;margin-top:9px;flex-wrap:wrap"><button id="ast1Apply" class="primary">导入为新方案</button><button id="ast1Copy">复制全部蓝图代码</button><small id="ast1PanelStatus" style="color:#afc8df"></small></div>
- <div class="tiny" style="margin-top:8px">AST1 的机器升级等级、配方、仓库出库物品、分流器过滤器会尽量完整保留（空过滤等于「任意」）；游戏设备 #16 暂按 5×5「空间锚点」保留（根据样例推断）。建议先在游戏里测试导出代码，再覆盖正式蓝图。</div>
+<div id="ast1Panel" class="ast1-dialog" role="dialog" aria-modal="true" aria-labelledby="ast1PanelTitle" aria-describedby="ast1PanelHint" style="display:none">
+ <div class="ast1-dialog-head">
+  <div class="ast1-dialog-heading">
+   <span class="ast1-dialog-eyebrow">BLUEPRINT · AST1</span>
+   <b id="ast1PanelTitle">游戏 AST1 蓝图</b>
+   <p id="ast1PanelHint">复制游戏蓝图或导入已有代码</p>
+  </div>
+  <button id="ast1Close" class="ast1-dialog-close" type="button" aria-label="关闭蓝图窗口" title="关闭">✕</button>
+ </div>
+ <label class="ast1-dialog-label" for="ast1Text">蓝图代码</label>
+ <textarea id="ast1Text" spellcheck="false" autocapitalize="off" autocorrect="off" autocomplete="off" placeholder="AST1:..." aria-label="AST1 蓝图代码"></textarea>
+ <div class="ast1-dialog-actions">
+  <button id="ast1Apply" class="primary" type="button">导入为新方案</button>
+  <button id="ast1Copy" class="ast1-dialog-copy" type="button">复制全部蓝图代码</button>
+  <small id="ast1PanelStatus" class="ast1-dialog-status" role="status" aria-live="polite"></small>
+ </div>
+ <p class="ast1-dialog-note">AST1 的机器升级等级、配方、仓库出库物品、分流器过滤器会尽量完整保留（空过滤等于「任意」）；游戏设备 #16 暂按 5×5「空间锚点」保留（根据样例推断）。建议先在游戏里测试导出代码，再覆盖正式蓝图。</p>
 </div>
 <div id="importFeedback" role="alert" aria-live="polite" style="display:none;position:absolute;z-index:30;top:64px;left:50%;transform:translateX(-50%);width:min(840px,calc(100vw - 24px));background:#4a2934;border:1px solid #ff9aa5;color:#ffe8e8;padding:12px 14px;border-radius:9px;box-shadow:0 10px 26px #0007"><span id="importFeedbackText"></span><button id="importFeedbackClose" style="float:right;margin-left:12px;padding:2px 7px" aria-label="关闭">✕</button></div>
 <main class="main">
