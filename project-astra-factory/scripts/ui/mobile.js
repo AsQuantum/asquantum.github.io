@@ -14,9 +14,9 @@ function mobileUpdatePlacement(){
   $('mobileStampName').textContent=name;
   status.textContent='放置：'+name+' · 点击地图格子';
  }else if(tool==='belt')status.textContent='接线：点橙色输出口 → 蓝色输入口';
- else if(tool==='pan')status.textContent='平移：拖动地图 · ＋／− 缩放';
+ else if(tool==='pan')status.textContent='平移：单指拖动 · 双指缩放／平移';
  else if(groupTransform)status.textContent='移动预览：点击地图确认';
- else status.textContent='';
+ else status.textContent='双指缩放、平移地图';
 }
 function mobileOpenView(view){
  if(!mobileEditorActive())return;
