@@ -119,22 +119,30 @@ async function poll(fn){for(let i=0;i<120;i++){try{const v=await fn();if(v)retur
   assert(!library.stampBarHidden&&library.editingVisible!=='none');
   assert(library.machineScroll>100,'machine library can scroll within panel');
   assert.equal(library.viewAfterPlace,'map');
-  // Test an actual touch on the mobile map, not just clicking the palette.
+  // Placement is a two-stage mobile edit: drag the ghost without committing,
+  // release, then a separate tap confirms at the persisted ghost position.
   const touchPoint=await evalJS(`(()=>{
-   // Test on a controlled empty layout to avoid blocked cells in the initial preset.
    state={name:'mobile touch regression',machines:[],routes:[]};resetSimulation();autoFit();
-   const m=getStampMachine(7,15);
-   if(!canPlace(m))throw Error('Touch test placement area is blocked');
+   mobileStampPreviewType=null;mobilePrepareStampPreview();
+   hoverCell={x:7,y:15};
+   if(!canPlace(getStampMachine(hoverCell.x,hoverCell.y)))throw Error('Touch test placement cell is blocked');
    const r=canvas.getBoundingClientRect();
-   return {x:r.left+camera.x+7.5*camera.z,y:r.top+camera.y+15.5*camera.z,
-    countBefore:state.machines.length};
+   return {x:r.left+Math.min(95,r.width*.25),y:r.top+Math.min(195,r.height*.42),
+    countBefore:state.machines.length,preview:{...hoverCell}};
   })()`);
   await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:touchPoint.x,y:touchPoint.y,id:21}]});
+  await send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:touchPoint.x+23,y:touchPoint.y+16,id:21}]});
   await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-  const placed=await evalJS("({count:state.machines.length,selected:selection?.machineId,tool,stampType})");
-  console.log('MOBILE TOUCH PLACEMENT',JSON.stringify({touchPoint,placed}));
-  assert.equal(placed.count,touchPoint.countBefore+1,'single-finger tap places one machine');
-  assert(placed.selected,'placed machine selected');
+  const afterDrag=await evalJS('({count:state.machines.length,preview:{...hoverCell}})');
+  assert.equal(afterDrag.count,touchPoint.countBefore,'lifting finger after ghost drag must not place');
+  assert(afterDrag.preview.x>touchPoint.preview.x,'ghost must move after single-finger drag');
+  await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:touchPoint.x,y:touchPoint.y,id:22}]});
+  await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  const placed=await evalJS("({count:state.machines.length,selected:selection?.machineId,tool,stampType,machine:state.machines.at(-1)&&{x:state.machines.at(-1).x,y:state.machines.at(-1).y}})");
+  console.log('MOBILE TOUCH PREVIEW DRAG THEN TAP',JSON.stringify({touchPoint,afterDrag,placed}));
+  assert.equal(placed.count,touchPoint.countBefore+1,'later tap confirms one machine');
+  assert.deepEqual(placed.machine,afterDrag.preview,'tap places at the persisted ghost location');
+  assert(placed.selected&&placed.stampType==='垃圾','machine selected and continuous stamping preserved');
 
   const pane=await evalJS(`(()=>{
    document.querySelector('.mobile-nav [data-mobile-view="inspector"]').click();

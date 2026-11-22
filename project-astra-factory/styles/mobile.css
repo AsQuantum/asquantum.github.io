@@ -194,3 +194,19 @@
  .mobile-nav button{min-height:43px;gap:1px}
  .mobile-map-tools{top:5px}
 }
+
+/* Phone users see touch instructions, not keyboard hotkeys. */
+.mobile-help-title,.mobile-help-content{display:none}
+@media(max-width:900px){
+ .desktop-help-title,.desktop-help-content{display:none!important}
+ .mobile-help-title,.mobile-help-content{display:block}
+ .main[data-mobile-view="tools"] .group-buttons button>small,
+ .main[data-mobile-view="machines"] #stampLeft small,
+ .main[data-mobile-view="machines"] #stampRight small,
+ .top #editMenu>.edit-menu-command kbd{display:none}
+ .mobile-help-content .editor-shortcut-row{align-items:flex-start;gap:10px}
+ .mobile-help-content .shortcut-keys{min-width:82px;max-width:115px}
+ .mobile-help-content kbd{font-size:10.5px;white-space:nowrap}
+ .mobile-help-content .shortcut-desc{min-width:0;flex:1;line-height:1.55}
+ .mobile-help-content p{margin:6px 0 0;font-size:11px;line-height:1.65;color:#a5bfd1}
+}

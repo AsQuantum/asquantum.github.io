@@ -3,6 +3,20 @@
 // not duplicated: desktop remains the three-column layout.
 const mobileLayoutMedia=window.matchMedia('(max-width: 900px)');
 let mobileActiveView='map';
+let mobileStampPreviewType=null;
+// Center a pending machine's footprint on the visible canvas, not the whole
+// 72×72 map. This is a preview only; it never creates a machine or a snapshot.
+function mobilePrepareStampPreview(){
+ if(!mobileEditorActive())return;
+ if(!stampType){mobileStampPreviewType=null;return;}
+ if(mobileStampPreviewType===stampType&&hoverCell)return;
+ const [w,h]=dims(getStampMachine(0,0));
+ const x=Math.floor((pix.w*.5-camera.x)/camera.z-w/2);
+ const y=Math.floor((pix.h*.5-camera.y)/camera.z-h/2);
+ hoverCell={x:Math.max(0,Math.min(72-w,x)),y:Math.max(0,Math.min(72-h,y))};
+ mobileStampPreviewType=stampType;
+ draw();
+}
 
 function mobileEditorActive(){return mobileLayoutMedia.matches;}
 let mobileMapToastTimer=null;
@@ -26,7 +40,7 @@ function mobileUpdatePlacement(){
  if(stampType){
   const name=def({type:stampType})?.name||stampType;
   $('mobileStampName').textContent=name;
-  message='放置：'+name+' · 点击地图格子';
+  message='放置：'+name+' · 拖动虚影定位，松手后再次点按放置';
  }else if(tool==='belt')message='接线：点橙色输出口 → 蓝色输入口';
  else if(tool==='pan')message='平移：单指拖动 · 双指缩放／平移';
  else if(groupTransform)message='移动预览：点击地图确认';
@@ -37,6 +51,9 @@ function mobileOpenView(view){
  if(!mobileEditorActive())return;
  if(!['map','tools','machines','inspector','warehouse'].includes(view))return;
  mobileActiveView=view;
+ // Returning from the machine library starts a fresh, centered placement
+ // preview even when the user picked the same machine type again.
+ if(view==='machines')mobileStampPreviewType=null;
  const main=document.querySelector('.main');
  main.dataset.mobileView=view;
  for(const button of document.querySelectorAll('.mobile-nav [data-mobile-view]')){
@@ -53,6 +70,7 @@ function mobileOpenView(view){
    if(bounds.width>0&&bounds.height>0){
     if(Math.abs(bounds.width-pix.w)>1||Math.abs(bounds.height-pix.h)>1)resize();
     else draw();
+    mobilePrepareStampPreview();
    }
   });
  }

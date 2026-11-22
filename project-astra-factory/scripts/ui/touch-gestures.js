@@ -62,6 +62,15 @@
   onPointerDown({pointerId:e.pointerId,button:0,clientX:s.clientX,clientY:s.clientY,
    pointerType:'touch',preventDefault(){},stopPropagation(){}});
  }
+ function confirmStampPreview(s,e){
+  // The second tap CONFIRMS the persisted ghost (not where the finger landed).
+  // Reuse onPointerDown for exactly the same collision/port/undo validation as
+  // desktop; no duplicated placement rules, no commit on pointer release.
+  const cell=hoverCell||screenToCell(s.x,s.y);
+  const r=map.getBoundingClientRect();
+  replayDown({...s,clientX:r.left+camera.x+(cell.x+.5)*camera.z,
+   clientY:r.top+camera.y+(cell.y+.5)*camera.z},e);
+ }
  map.addEventListener('pointerdown',e=>{
   if(!isMobileTouch(e))return;
   preventEditor(e);
@@ -72,7 +81,8 @@
   usedMulti=false;pinch=null;
   single={pointerId:e.pointerId,startX:p.x,startY:p.y,x:p.x,y:p.y,
    clientX:e.clientX,clientY:e.clientY,cameraX:camera.x,cameraY:camera.y,
-   forwarded:false,continuation:false,moved:false,hadGroupTransform:!!groupTransform};
+   forwarded:false,continuation:false,moved:false,hadGroupTransform:!!groupTransform,
+   previewStart:stampType&&hoverCell?{...hoverCell}:null};
  },{capture:true,passive:false});
  map.addEventListener('pointermove',e=>{
   if(!touches.has(e.pointerId))return;
@@ -88,6 +98,22 @@
   if(single.continuation||tool==='pan'){
    if(single.moved){camera.x=single.cameraX+p.x-single.startX;
     camera.y=single.cameraY+p.y-single.startY;queuePaint();}
+   return;
+  }
+  // A selected stamp is an editing preview, not a Pan gesture. Drag it by
+  // touch displacement relative to its ORIGINAL position so it cannot jump
+  // under the finger. Release only fixes the preview; a later tap commits.
+  if(stampType){
+   if(single.moved){
+    const start=single.previewStart||hoverCell||screenToCell(single.startX,single.startY);
+    const [w,h]=dims(getStampMachine(0,0));
+    const x=clamp(start.x+Math.round((p.x-single.startX)/camera.z),0,72-w);
+    const y=clamp(start.y+Math.round((p.y-single.startY)/camera.z),0,72-h);
+    if(!hoverCell||hoverCell.x!==x||hoverCell.y!==y){
+     hoverCell={x,y};
+     queuePaint();
+    }
+   }
    return;
   }
   // Preserve long one-finger selection/marquee drags. Editing starts only
@@ -117,7 +143,8 @@
     if(cancelled){drag=null;marquee=null;draw();}
     else onPointerUp(e);
    }else if(!cancelled&&!wasSingle.moved){
-    replayDown(wasSingle,e);
+    if(stampType)confirmStampPreview(wasSingle,e);
+    else replayDown(wasSingle,e);
     onPointerUp(e);
    }
    single=null;

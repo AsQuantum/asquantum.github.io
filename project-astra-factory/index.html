@@ -111,8 +111,8 @@
  <details class="group-guide"><summary>框选规则</summary><small>移动时只带走完整选中的线路。未完全框入的传送带保持原位。</small></details></div>
  <div id="beltControls" class="actions" style="display:none;margin:8px 0"><button id="undoBend" class="smallbtn">↶ 撤销上一段</button><button id="cancelBelt" class="smallbtn">✕ 取消本次接线</button></div>
   <details class="editor-help-disclosure">
-   <summary>快捷键与操作说明</summary>
-   <div class="editor-help-content">
+   <summary><span class="desktop-help-title">快捷键与操作说明</span><span class="mobile-help-title">触摸快捷操作与使用说明</span></summary>
+   <div class="editor-help-content desktop-help-content">
     <div class="editor-help-section">
      <b>编辑与历史</b>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd><span class="key-plus">+</span><kbd>Z</kbd></span><span class="shortcut-desc">撤销上一步</span></div>
@@ -145,6 +145,30 @@
      <b>连线与模拟</b>
      <p>从橙色出口开始，点击空格添加转折点，最后点蓝色入口完成接线。放置工具可连续放置相同机器。</p>
      <p>点击机器查看输入／输出缓存，点击传送带查看运输中的逐件物品。每个输入口合计最多处理 1 件／秒。</p>
+    </div>
+   </div>
+   <div class="editor-help-content mobile-help-content">
+    <div class="editor-help-section">
+     <b>地图手势</b>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>双指张合</kbd></span><span class="shortcut-desc">以双指中心缩放地图</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>双指移动</kbd></span><span class="shortcut-desc">平移地图，放大时也可同步移动</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>单指拖动</kbd></span><span class="shortcut-desc">在「平移」工具中移动地图</span></div>
+     <p>地图顶部可以切换「选择／接线／平移」，用 ＋／− 缩放或「适应」恢复视野。</p>
+    </div>
+    <div class="editor-help-section">
+     <b>放置机器（连续放置）</b>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>机器 → 地图</kbd></span><span class="shortcut-desc">选机器并配置配方、朝向，再点「返回地图放置」</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>中央虚影</kbd></span><span class="shortcut-desc">进入地图时出现待放置机器，红色代表位置无效</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>单指拖动</kbd></span><span class="shortcut-desc">移动虚影；松手后仅停留在当前位置</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>再次点按</kbd></span><span class="shortcut-desc">确认放置；仍保留同种机器，继续拖动即可放下一台</span></div>
+     <p>双指缩放、平移不会意外放置。要退出放置模式，进入「工具」选择其他工具。</p>
+    </div>
+    <div class="editor-help-section">
+     <b>选择与连线</b>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>点按机器</kbd></span><span class="shortcut-desc">选中并在「属性」查看详情</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>接线工具</kbd></span><span class="shortcut-desc">依次点橙色出口、空格转折点、蓝色输入口</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>框选／移动</kbd></span><span class="shortcut-desc">在「工具」中框选、旋转、复制与确认移动</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>撤销／重做</kbd></span><span class="shortcut-desc">顶部「编辑」菜单直接点按</span></div>
     </div>
    </div>
   </details>
