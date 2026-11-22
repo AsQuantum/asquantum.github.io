@@ -125,7 +125,7 @@ function factorySteadyTwoPhase(ineq,n,c){
  return {ok:true,x,objective:tab[m][n+1],pivots};
 }
 
-function warehouseTheory(){
+function warehouseTheory(targetItem=null){
  const byId=new Map(state.machines.map(m=>[m.id,m]));
  const validRoutes=state.routes.filter(r=>byId.has(r.from.id)&&byId.has(r.to.id)&&!checkPath(r.path,r.from,r.to,r.id));
  const routesIn=new Map(),routesOut=new Map();
@@ -282,10 +282,10 @@ const materials=new Set([...routeVar.keys()].map(k=>labels[routeVar.get(k)].item
   }
   // One unit of an excess two-way branch flow represents half of the
   // absolute branch-rate gap. Both terms are now measured in items/second.
-  const FAIRNESS_TRANSFER_COST=0.5;
+  const FAIRNESS_TRANSFER_COST=targetItem?0:0.5;
 
   const objective=new Float64Array(n);
- for(const [id,rec] of machineRecords)objective[cycleVar.get(id)]=rec.qty;
+ for(const [id,rec] of machineRecords)objective[cycleVar.get(id)]=(!targetItem||rec.output===targetItem)?rec.qty:0;
   for(const j of fairnessDevs)objective[j]=-FAIRNESS_TRANSFER_COST;
  // Warehouse net surplus is secondary to genuinely producing items.
  // A tiny weight favors reusing excess supply rather than wasting it upstream.
@@ -302,7 +302,29 @@ const materials=new Set([...routeVar.keys()].map(k=>labels[routeVar.get(k)].item
   // down compared with Stage 1; unused warehouse resources must be used
   // wherever they can increase ANY useful manufacturing throughput.
   // This is an algebraic LP, never a simulation or time-average.
+  // Numerical results are never trusted without checking every original
+  // recipe, warehouse, route and interface capacity inequality.
+  // In highly degenerate networks a floating-point tableau may return
+  // a mathematically impossible "optimal" result after many pivots.
+  function verifyPrimal(solution,constraints){
+   if(!solution.ok)return {ok:false,error:solution.error||'LP solver failed'};
+   if(!solution.x||solution.x.length!==n)return {ok:false,error:'LP variables missing'};
+   for(let j=0;j<n;j++)if(!Number.isFinite(solution.x[j])||solution.x[j]<-1e-6)
+    return {ok:false,error:'LP invalid variable #'+j};
+   for(let i=0;i<constraints.length;i++){
+    const r=constraints[i];let lhs=0;
+    for(const [j,a] of r.a)lhs+=a*solution.x[j];
+    if(!Number.isFinite(lhs)||lhs>r.b+1e-5*Math.max(1,Math.abs(r.b)))
+     return {ok:false,error:'LP constraint #'+i+' violated (lhs='+lhs+', rhs='+r.b+')'};
+   }
+   return {ok:true};
+  }
   let result=factorySteadySimplex(rows,n,objective);
+  const stage1Check=verifyPrimal(result,rows);
+  if(!stage1Check.ok)
+   return {inflow:{},outflow:{},machineCycles:{},routeFlows:{},warnings:[stage1Check.error],
+    error:'稳态 LP 数值求解不可信：'+stage1Check.error,
+    diagnostics:{variables:n,constraints:rows.length,pivots:result.pivots||0,numericallyInvalid:true}};
   let paretoAdditionalProductsPerMinute=0,paretoRefinementStatus='skipped';
   if(result.ok && cycleVar.size){
    const baseline=result,refineRows=rows.slice(),tol=1e-8;
@@ -311,7 +333,7 @@ const materials=new Set([...routeVar.keys()].map(k=>labels[routeVar.get(k)].item
    const workObjective=new Float64Array(n);
    for(const [id,rec] of machineRecords)workObjective[cycleVar.get(id)]=rec.qty;
    const better=factorySteadyTwoPhase(refineRows,n,workObjective);
-   if(better.ok && [...cycleVar.values()].every(j=>better.x[j]+2e-6>=baseline.x[j])){
+   if(verifyPrimal(better,refineRows).ok && [...cycleVar.values()].every(j=>better.x[j]+2e-6>=baseline.x[j])){
     for(const [id,rec] of machineRecords){
      const j=cycleVar.get(id);
      paretoAdditionalProductsPerMinute+=60*Math.max(0,(better.x[j]-baseline.x[j])*rec.qty);
@@ -404,51 +426,53 @@ function steadyFlowPortLabel(m,p){
 }
 function machineSteadyPanel(m){
  const theory=theoreticalBudget;
- if(!theory||theory.error)return `<div class="item"><strong>\u7a33\u6001\u7406\u8bba \u00b7 \u7eaf\u6570\u5b57</strong><div class="tiny">${esc(theory?.error||'\u5c1a\u672a\u8ba1\u7b97')}</div></div>`;
- const ports=getPorts(m),junction=m.type==='\u5206\u6d41'||m.type==='\u6c47\u6d41';
+ if(!theory||theory.error)
+  return `<div class="item machine-theory" id="inspectorTheory"><div class="machine-analysis-title"><strong>稳态理论</strong></div><div class="tiny">${esc(theory?.error||'尚未计算')}</div></div>`;
+ const ports=getPorts(m),junction=m.type==='分流'||m.type==='汇流';
  const details=ports.map(p=>steadyPortFlowDetails(m,p,theory));
  const rate=v=>(Math.max(0,v)*60).toFixed(2);
-   const recipe=getRecipe(m);
-  const duty=recipe?Math.max(0,Math.min(1,theory.machineDuty?.[m.id]??(theory.machineCycles?.[m.id]||0)*recipe.seconds)):null;
-  const dutyInfo=recipe?`<div class="kv" style="margin-top:6px"><strong>理论运行占空比</strong><b>${(duty*100).toFixed(2)}%</b></div>
-   <div class="kv"><span>等效停机比例（缺料/堵塞）</span><b>${((1-duty)*100).toFixed(2)}%</b></div>`:'';
-const dirs=[['in','\u8f93\u5165','#65b3fc'],['out','\u8f93\u51fa','#ffb477']];
- let content='';
- for(const [kind,heading,color] of dirs){
-  const subset=details.filter(d=>d.port.kind===kind);
-  const amounts={},known=new Set();
-  for(const d of subset){
-   for(const [item,n] of Object.entries(d.flows))amounts[item]=(amounts[item]||0)+n;
-   for(const item of d.materials)known.add(item);
+ const recipe=getRecipe(m);
+ const duty=recipe?Math.max(0,Math.min(1,theory.machineDuty?.[m.id]??(theory.machineCycles?.[m.id]||0)*recipe.seconds)):null;
+ const dutyInfo=recipe?`<div class="machine-duty-grid">
+  <div><span>理论运行占空比</span><b>${(duty*100).toFixed(2)}%</b></div>
+  <div><span>等效停机比例</span><b>${((1-duty)*100).toFixed(2)}%</b></div>
+ </div>`:'';
+ const kinds=[['in','输入','in'],['out','输出','out']];
+ let tiles='',breakdown='';
+ for(const [kind,heading,cls] of kinds){
+  const subset=details.filter(d=>d.port.kind===kind),amounts={},known=new Set();
+  for(const item of subset){
+   for(const [name,n] of Object.entries(item.flows))amounts[name]=(amounts[name]||0)+n;
+   for(const material of item.materials)known.add(material);
   }
-  const sum=rate(steadyFlowTotal(amounts));
-  content+=`<div class="divider"></div><div class="kv"><strong style="color:${color}">${heading}${junction?'\u63a5\u53e3':'\u603b\u8ba1'}</strong><b style="white-space:nowrap">${sum} \u4ef6/\u5206</b></div>`;
-  if(!subset.length){
-   content+=`<div class="tiny">\u65e0${heading}\u63a5\u53e3</div>`;
-   continue;
+  const total=rate(steadyFlowTotal(amounts));
+  tiles+=`<div class="machine-flow-tile ${cls}"><span class="tile-label"><i class="tile-dot"></i>${heading}总量</span>
+   <b class="tile-value">${total}<small> 件/分</small></b></div>`;
+  let rows='';
+  if(!subset.length)rows='<div class="tiny">没有'+heading+'接口</div>';
+  else if(!junction){
+   rows=steadyFlowMaterialRows(amounts,known);
+   if(subset.length>1)rows+=`<div class="tiny">${subset.length} 个接口合计</div>`;
+  }else{
+   for(const d of subset){
+    const p=d.port,stateText=d.valid?'已连接':d.route?'线路无效':'未连接';
+    const filter=p.kind==='out'&&m.type==='分流'&&p.filter&&p.filter!=='任意'
+     ?' · 过滤 '+esc(p.filter):'';
+    rows+=`<div class="machine-port-detail-row ${cls==='out'?'is-out':'is-in'}">
+     <div class="kv"><b>${esc(steadyFlowPortLabel(m,p))}</b><b>${rate(steadyFlowTotal(d.flows))} 件/分</b></div>
+     <div class="port-muted">${stateText}${filter}</div>
+     ${steadyFlowMaterialRows(d.flows,d.materials)}
+    </div>`;
+   }
   }
-  if(!junction){
-   content+=steadyFlowMaterialRows(amounts,known);
-   if(subset.length>1)content+=`<div class="tiny">${subset.length} \u4e2a${heading}\u63a5\u53e3\u5408\u8ba1</div>`;
-   continue;
-  }
-  for(const d of subset){
-   const p=d.port,portName=steadyFlowPortLabel(m,p);
-   const stateText=d.valid?'\u5df2\u8fde\u7ebf':d.route?'\u7ebf\u8def\u65e0\u6548':'\u672a\u63a5\u7ebf';
-   const rateText=rate(steadyFlowTotal(d.flows));
-   const selectedFilter=p.kind==='out'&&m.type==='\u5206\u6d41'&&p.filter&&p.filter!=='\u4efb\u610f'
-    ?'\u8fc7\u6ee4: '+esc(p.filter):'';
-   content+=`<div style="border-left:2px solid ${color};padding:3px 0 5px 9px;margin:8px 0 6px">
-    <div class="kv" style="align-items:center;margin:2px 0"><b style="color:${color}">${esc(portName)}</b><b style="white-space:nowrap">${rateText} \u4ef6/\u5206</b></div>
-    <div class="tiny">${stateText}${selectedFilter?' \u00b7 '+selectedFilter:''}</div>
-    ${steadyFlowMaterialRows(d.flows,d.materials)}
-   </div>`;
-  }
+  breakdown+=`<section class="machine-port-details-section"><div class="machine-port-details-heading">${heading}接口 · ${subset.length} 个</div>${rows}</section>`;
  }
- return `<div class="item"><strong>\u7a33\u6001\u7406\u8bba \u00b7 \u7eaf\u6570\u5b57</strong>
-  <div class="tiny">\u901f\u7387\u5355\u4f4d\uff1a\u4ef6/\u5206\uff1b\u53ea\u7edf\u8ba1\u6709\u6548\u7ebf\u8def\u7684\u7406\u8bba\u7269\u6599\u6d41</div>
-     ${dutyInfo}
-${content}
-  <div class="tiny" style="margin-top:8px">\u6b64\u5904\u663e\u793a\u5f53\u524d\u7ebf\u6027\u89c4\u5212\u89e3\u7684\u6d41\u901f\uff0c\u4e0d\u662f\u673a\u5668\u7684\u4e0a\u9650\u4ea7\u80fd\uff1b\u81ea\u52a8\u5206\u6d41\u5668\u7684\u52a8\u6001\u5835\u585e\u5206\u6d41\u4e0e\u9010\u4ef6\u6a21\u62df\u4ecd\u53ef\u80fd\u4e0d\u540c\u3002</div>
+ return `<div class="item machine-theory" id="inspectorTheory">
+  <div class="machine-analysis-title"><strong>稳态理论</strong><span class="analysis-unit">件/分钟</span></div>
+  <div class="machine-flow-summary">${tiles}</div>
+  ${dutyInfo}
+  <details class="machine-port-details"><summary>接口流量明细 · ${ports.length} 个接口</summary>
+   <div class="machine-port-details-body">${breakdown}</div>
+  </details>
  </div>`;
 }

@@ -6,6 +6,7 @@
 <title>Factory Lab · Project:Astra</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="styles/main.css"/>
+<link rel="stylesheet" href="styles/sidebar-polish.css"/>
 </head>
 <body>
 <div class="app">
@@ -78,7 +79,18 @@
   <button data-tool="erase" class="editor-erase" title="点击线路即可删除"><span>⌫</span> 删除线路</button>
   <div class="editor-tool-label editor-tool-actions-label">视图与线路</div>
   <div class="editor-canvas-actions"><button id="fit" class="smallbtn">⌗ 适应地图</button><button id="clearRoutes" class="smallbtn editor-danger">清除所有线路</button></div>
- <div id="groupControls" class="group-controls" style="display:none;margin:9px 0"><b id="groupSelectionInfo"></b><div class="group-buttons"><button id="groupMove">G 移动</button><button id="groupCopy">Ctrl+C 复制</button><button id="groupDuplicate">Ctrl+D 复制并放置</button><button id="groupPaste">Ctrl+V 粘贴</button><button id="groupLeft">Q ↶</button><button id="groupRight">E ↷</button><button id="groupDelete">Delete 删除</button><button id="groupCancel">Esc 取消放置</button></div><small>框选必须完整包含传送带路径；仅选中的机器间的线路可随组变换。</small></div>
+ <div id="groupControls" class="group-controls" style="display:none;margin:9px 0"><div class="group-controls-heading"><span class="group-mark">▧</span><b id="groupSelectionInfo"></b></div>
+ <div class="group-buttons">
+  <button id="groupMove" title="移动选中机器（G）">移动<small>G</small></button>
+  <button id="groupCopy" title="复制选中机器（Ctrl+C）">复制<small>Ctrl+C</small></button>
+  <button id="groupPaste" title="粘贴机器（Ctrl+V）">粘贴<small>Ctrl+V</small></button>
+  <button id="groupDuplicate" title="复制并进入放置预览（Ctrl+D）">复制放置<small>Ctrl+D</small></button>
+  <button id="groupLeft" title="逆时针旋转选中机器（Q）">左转<small>Q</small></button>
+  <button id="groupRight" title="顺时针旋转选中机器（E）">右转<small>E</small></button>
+  <button id="groupDelete" title="删除选中机器或线路" class="group-danger">删除<small>Del</small></button>
+  <button id="groupCancel" title="取消放置预览">取消<small>Esc</small></button>
+ </div>
+ <details class="group-guide"><summary>框选规则</summary><small>移动时只带走完整选中的线路。未完全框入的传送带保持原位。</small></details></div>
  <div id="beltControls" class="actions" style="display:none;margin:8px 0"><button id="undoBend" class="smallbtn">↶ 撤销上一段</button><button id="cancelBelt" class="smallbtn">✕ 取消本次接线</button></div>
   <details class="editor-help-disclosure">
    <summary>快捷键与操作说明</summary>
@@ -119,24 +131,39 @@
    </div>
   </details>
  </div>
- <h3>放置机器</h3><div class="block"><input id="search" type="search" placeholder="搜索机器 / 材料"/>
- <div id="stampControls" style="display:none;margin-top:10px;padding:9px;border:1px solid #476c66;border-radius:8px;background:#1e3540">
-  <div class="kv"><span>当前机器</span><b id="stampName">—</b></div>
-  <div class="kv"><span>放置前方向</span><b id="stampFacing">右 →</b></div>
-  <div class="actions"><button id="stampLeft">↶ Q 逆时针</button><button id="stampRight">↷ E 顺时针</button></div>
-   <div id="stampModeRow" style="margin-top:8px"><label for="stampMode">选择产物 / 配方</label><select id="stampMode" class="full"></select></div>
-  <div id="stampItemRow" style="margin-top:8px"><label for="stampItem">仓库取出物品</label><select id="stampItem" class="full"></select></div>
-  <div id="stampRecipeText" class="tiny" style="margin-top:8px;line-height:1.65"></div>
-  <div class="tiny" style="margin-top:7px">选择配方（或产物）和方向，然后点击地图放置。<b>放下后保持相同配置</b>，可以继续放置。</div>
-  <button id="stampCancel" class="smallbtn full" style="margin-top:7px">完成 / 取消放置 (Esc)</button>
- </div><div id="palette" class="palette" style="margin-top:7px"></div></div>
-
- <h3>地图规则</h3><div class="block"><div class="kv"><span>可建造区域</span><b>72×72 − 中央14×14</b></div>
-</div>
- <h3>物品颜色图例</h3><div class="block"><div class="material-legend" id="materialLegend" aria-label="物品颜色对应表"></div></div>
+ <h3>机器库</h3><div class="block machine-library">
+  <div class="machine-search"><input id="search" type="search" placeholder="搜索机器、材料或配方" aria-label="搜索机器"/></div>
+  <div id="stampControls" class="machine-config" style="display:none">
+   <div class="machine-config-top"><span id="configContext">放置设置</span><button id="stampCancel" type="button" title="关闭机器设置／结束放置">×</button></div>
+   <div class="machine-config-identity"><strong id="stampName">—</strong><span id="stampFacing">右 →</span></div>
+   <div class="machine-config-rotations">
+    <button id="stampLeft" title="逆时针旋转 90°（Q）">↶ <span>左转</span><small>Q</small></button>
+    <button id="stampRight" title="顺时针旋转 90°（E）">↷ <span>右转</span><small>E</small></button>
+   </div>
+   <label class="machine-config-field" id="stampModeRow"><span>生产配方</span><select id="stampMode" class="full"></select></label>
+   <label class="machine-config-field" id="stampItemRow"><span>仓库取出物品</span><select id="stampItem" class="full"></select></label>
+   <div id="stampRecipeText" class="machine-config-recipe"></div>
+   <p id="stampHelp" class="machine-config-hint"></p>
+  </div>
+  <div class="machine-library-scroll">
+   <div id="palette" class="palette machine-palette"></div>
+  </div>
+ </div>
+ <details class="library-reference">
+  <summary>地图规则与物品图例</summary>
+  <div class="library-reference-body">
+   <div class="kv"><span>可建造区域</span><b>72×72 − 中央14×14</b></div>
+   <div class="library-reference-heading">物品颜色图例</div>
+   <div class="material-legend" id="materialLegend" aria-label="物品颜色对应表"></div>
+  </div>
+ </details>
 </aside>
 <section class="canvaswrap"><canvas id="map"></canvas><div class="legend"><span class="dot" style="background:#ffab61"></span>输出口　<span class="dot" style="background:#59acff"></span>输入口　<span class="dot" style="background:#48dc99"></span>传送带　<span class="dot" style="background:#f2d86b"></span>已选择</div></section>
-<aside class="side right"><details id="warehousePanel" class="warehouse-panel"><summary>仓库材料 · 每分钟收支</summary><div class="block" id="warehouse"></div></details><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><h3>线路检查</h3><div class="block" id="audit"></div><h3>操作记录</h3><div class="block logs" id="logs"></div></aside>
+<aside class="side right"><details id="warehousePanel" class="warehouse-panel"><summary>仓库材料 · 每分钟收支</summary><div class="block" id="warehouse"></div></details><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><details class="right-extra-panel" id="auditPanel">
+ <summary>线路检查</summary><div class="block" id="audit"></div>
+ </details><details class="right-extra-panel" id="logsPanel">
+ <summary>操作记录</summary><div class="block logs" id="logs"></div>
+ </details></aside>
 </main><footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
 </div>
 <script src="scripts/data/warp-preset.js"></script>

@@ -99,63 +99,49 @@ function hasProducerWarehousePath(mat){
  }
  return false;
 }
-function actualInPortUpper(m,mat){
- // Each physically connected input is independently limited to one item/s.
- // A junction's downstream material may still be absent: this is only an upper bound.
- return getPorts(m).filter(p=>p.kind==='in' && state.routes.some(r=>r.to.id===m.id&&r.to.port===p.index&&
-  inletMaterials(m,p.index).has(mat)&&acceptsMaterial(m,mat,p.index))).length;
-}
-function fullRatePrecheck(){
- const goals=[['组装','齿轮组',40],['组装','导线线圈',60]];
- return goals.map(([typ,mode,needed])=>{
-  const machines=state.machines.filter(m=>m.type===typ&&m.mode===mode);let best=0;
-  for(const m of machines){const rec=getRecipe(m);let cycle=1/rec.seconds;
-   const needs=Object.entries(rec.inputs);
-   const physical=getPorts(m).filter(p=>p.kind==='in'&&routeFor(m.id,'in',p.index)&&
-     !checkPath(routeFor(m.id,'in',p.index).path,routeFor(m.id,'in',p.index).from,routeFor(m.id,'in',p.index).to,routeFor(m.id,'in',p.index).id));
-   // Every nonempty subset of required ingredients shares the physical ports able to carry it.
-   for(let mask=1;mask<(1<<needs.length);mask++){
-    const group=needs.filter((_,i)=>mask&(1<<i));
-    const demand=group.reduce((sum,[,qty])=>sum+qty,0);
-    const portCount=physical.filter(p=>group.some(([mat])=>inletMaterials(m,p.index).has(mat)&&acceptsMaterial(m,mat,p.index))).length;
-    cycle=Math.min(cycle,portCount/demand);
-   }
-   best+=Math.min(cycle*rec.qty,1)*60;
-  }
-  return {typ,mode,needed,upper:best,pass:best+1e-7>=needed};
- });
-}
 function auditRefresh(){
- const {unconnected,invalid,unservedOutputs,blocked}=warnings(),mixed=mixedInputWarnings(),legalMixed=validMixedInlets();
- let crossings=0;for(const entries of occupiedRouteMap().values())if(entries.length===2)crossings++;
- const nondecor=state.machines.filter(m=>!['发电','电脑','空间锚点'].includes(m.type));
+ const {unconnected,invalid,unservedOutputs,blocked}=warnings();
+ const mixed=mixedInputWarnings(),legalMixed=validMixedInlets();
+ let crossings=0;
+ for(const entries of occupiedRouteMap().values())if(entries.length===2)crossings++;
  const complete=state.machines.filter(m=>getRecipe(m)&&Object.keys(getRecipe(m).inputs||{}).length>0&&missingMaterials(m).length===0).length;
  const required=state.machines.filter(m=>getRecipe(m)&&Object.keys(getRecipe(m).inputs||{}).length>0).length;
- const stockPaths=REQUIRED_STOCK.map(mat=>({mat,path:hasProducerWarehousePath(mat)}));
- const ratePrecheck=fullRatePrecheck();
- $('audit').innerHTML=`<div class="item"><strong>线路概览</strong>
- <div class="tiny">几何与入口材料是否接通；并不代表产能或净入库达标。</div>
- <details><summary class="tiny">展开13种材料入库路径预检（${stockPaths.filter(v=>v.path).length}/13）</summary>
- ${stockPaths.map(v=>`<div class="kv"><span>${esc(v.mat)}</span><b class="${v.path?'warn':'bad'}">${v.path?'有路径':'无路径'}</b></div>`).join('')}
- <div class="tiny">纯曲速线圈单链只要求最终产物入库，其他材料不必单独入库。</div></details>
- <details><summary class="tiny">展开齿轮/线圈输入口上限</summary>
- ${ratePrecheck.map(v=>`<div class="kv"><span>${esc(v.mode)}</span><b class="${v.pass?'warn':'bad'}">${v.upper.toFixed(2)} / ${v.needed.toFixed(2)} 件/分</b></div>`).join('')}
- <div class="tiny">同一入口接入多种原料时共享1件/秒，这里是乐观上界而非实际产率。</div></details></div>
- <div class="kv"><span>已绘制的线路</span><b>${state.routes.length}</b></div>
- <div class="kv"><span>有原料需求的机器</span><b>${complete}/${required} 台已连齐原料种类</b></div>
- <div class="kv"><span>尚未接入的材料</span><b class="${unconnected.length?'bad':'good'}">${unconnected.length} 项</b></div>
- <div class="kv"><span>生产机器没有出线</span><b class="${unservedOutputs.length?'warn':'good'}">${unservedOutputs.length} 台</b></div>
- <div class="kv"><span>占用传送带格</span><b>${getBeltCount()}</b></div>
- <div class="kv"><span>合法十字形</span><b>${crossings}</b></div>
- <div class="kv"><span>线路几何错误</span><b class="${invalid.length?'bad':'good'}">${invalid.length}</b></div>
- <div class="kv"><span>被邻居封死的接口</span><b class="${blocked.length?'bad':'good'}">${blocked.length}</b></div>
- <div class="kv"><span>合法混料入口</span><b class="good">${legalMixed.length}</b></div>
- <div class="kv"><span>不兼容输入材料</span><b class="${mixed.length?'bad':'good'}">${mixed.length}</b></div>
- ${legalMixed.length?`<details><summary class="tiny">混合原料输入口 (${legalMixed.length})</summary><div class="tiny">${legalMixed.map(esc).join('<br>')}</div></details>`:''}
- ${mixed.length?`<details open><summary class="bad tiny">材料不兼容 (${mixed.length})</summary><div class="bad tiny">${mixed.map(esc).join('<br>')}</div></details>`:''}
- ${blocked.length?`<details open><summary class="bad tiny">接口被挡住 (${blocked.length})</summary><div class="bad tiny" style="max-height:125px;overflow:auto">${blocked.map(esc).join('<br>')}</div></details>`:''}
- ${unconnected.length?`<details open><summary class="tiny">尚未连到机器的原料 (${unconnected.length})</summary><div class="tiny" style="max-height:170px;overflow:auto">${unconnected.map(esc).join('<br>')}</div></details>`:''}
- ${unservedOutputs.length?`<details><summary class="tiny">未连接任何下游的产出机器 (${unservedOutputs.length})</summary><div class="tiny" style="max-height:110px;overflow:auto">${unservedOutputs.map(esc).join('<br>')}</div></details>`:''}
- ${invalid.length?`<details open><summary class="bad tiny">错误线路 (${invalid.length})</summary><div class="bad tiny">${invalid.map(esc).join('<br>')}</div></details>`:''}
- <p class="tiny">红色标记＝缺配方原料；橙色标记＝尚无产出线路。几何合法不表示工厂可以运行，更不代表吞吐已达标。</p>`;
+ // Inspect ALL required stock types on every layout change, not just one
+ // representative. This is structural reachability, not a throughput claim.
+ // MATERIALS is the complete game item registry, not the historic 13-item subset.
+ const auditItems=[...new Set(MATERIALS)];
+ const stockPaths=auditItems.map(mat=>({mat,path:hasProducerWarehousePath(mat)}));
+ const foundPaths=stockPaths.filter(v=>v.path).length;
+ const summaryRows=[
+  ['已绘制的线路',state.routes.length],
+  ['有原料需求的机器',complete+' / '+required+' 台已连齐'],
+  ['尚未接入的材料',unconnected.length+' 项',unconnected.length?'bad':'good'],
+  ['生产机器没有出线',unservedOutputs.length+' 台',unservedOutputs.length?'warn':'good'],
+  ['占用传送带格',getBeltCount()],
+  ['合法十字形',crossings],
+  ['线路几何错误',invalid.length,invalid.length?'bad':'good'],
+  ['被邻居封死的接口',blocked.length,blocked.length?'bad':'good'],
+  ['合法混料入口',legalMixed.length,'good'],
+  ['不兼容输入材料',mixed.length,mixed.length?'bad':'good']
+ ];
+ const rows=summaryRows.map(([title,value,status])=>
+  `<div class="audit-row"><span class="audit-label">${esc(title)}</span><span class="audit-value ${status||''}">${esc(value)}</span></div>`).join('');
+ const materialRows=stockPaths.map(({mat,path})=>
+  `<div class="audit-row audit-material-row"><span class="audit-label">${esc(mat)}</span><span class="audit-value ${path?'good':'bad'}">${path?'有入库路径':'无入库路径'}</span></div>`).join('');
+ const diagnostic=(title,items,state='')=>items.length?
+  `<details class="audit-diagnostic" ${state?'open':''}><summary class="${state}">${esc(title)} · ${items.length} 项</summary><div class="audit-diagnostic-body">${items.map(item=>`<div>${esc(item)}</div>`).join('')}</div></details>`:'';
+ $('audit').innerHTML=`<section class="audit-card">
+  <div class="audit-card-title">线路概览</div>
+  <div class="audit-stat-list">${rows}</div>
+  <div class="audit-section-heading"><span>物品入库路径预检</span><span class="audit-section-meta">已检查 ${stockPaths.length}/${auditItems.length} · 有路径 ${foundPaths}/${stockPaths.length}</span></div>
+  <div class="audit-material-list">${materialRows}</div>
+  <div class="audit-hint">按照完整物品目录逐项检查生产机 → 有效传送带 → 仓库入口的可达性；未找到路径不代表无法作为原料使用，也不代表产能不足。</div>
+  ${diagnostic('混合原料输入口',legalMixed)}
+  ${diagnostic('材料不兼容',mixed,'bad')}
+  ${diagnostic('接口被挡住',blocked,'bad')}
+  ${diagnostic('尚未连到机器的原料',unconnected,'warn')}
+  ${diagnostic('未连接下游的产出机器',unservedOutputs)}
+  ${diagnostic('错误线路',invalid,'bad')}
+  <div class="audit-hint audit-footer-hint">红色表示缺失或错误，橙色表示未连接产出。几何与路径合法，不等于工厂能持续生产。</div>
+ </section>`;
 }

@@ -216,12 +216,13 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    state.routes=[];resetSimulation();selection={machineId:'m_copy_test'};inspectorRefresh();
    const inspector=document.getElementById('inspector');
    const theory=[...inspector.querySelectorAll('.item')].find(n=>n.textContent.includes('稳态理论'));
-   const deleteButton=inspector.querySelector('#deleteM');
+   const properties=inspector.querySelector('.machine-properties');
    const live=inspector.querySelector('#inspectorLive');
-   if(!deleteButton||!theory||!live||
-      !(deleteButton.compareDocumentPosition(theory)&Node.DOCUMENT_POSITION_FOLLOWING)||
+   if(!properties||!theory||!live||
+      inspector.querySelector('#deleteM,#duplicate,.machine-actions')||
+      !(properties.compareDocumentPosition(theory)&Node.DOCUMENT_POSITION_FOLLOWING)||
       !(theory.compareDocumentPosition(live)&Node.DOCUMENT_POSITION_FOLLOWING))
-     return {ok:false,reason:'Delete Machine must precede theory and live inventory'};
+     return {ok:false,reason:'Machine properties must precede theory/live, without redundant right-side edit buttons'};
    const textNode=theory?.querySelector('strong')?.firstChild;
    if(!textNode||textNode.nodeType!==Node.TEXT_NODE)return {ok:false,html:inspector.textContent.slice(0,400)};
    const range=document.createRange();range.selectNodeContents(textNode);

@@ -14,14 +14,22 @@ function recipeOptionLabel(type,key){const r=DEF[type]?.recipes?.[key];return r?
 function setStampType(type){const previous=stampPrefs[type]||{};stampType=type;stampFace=previous.face||'E';const savedMode=previous.mode;stampMode=savedMode!==undefined&&savedMode!==null&&Object.prototype.hasOwnProperty.call(DEF[type].recipes||{},savedMode)?parseRecipeMode(type,savedMode):defaultModeFor(type);stampItem=previous.item||'钛合金锭';updateStampControls();}
 function saveStampPreference(){if(!stampType)return;stampPrefs[stampType]={face:stampFace,mode:stampMode,item:stampItem};try{localStorage.setItem('factory_lab_v3_stamp_prefs',JSON.stringify(stampPrefs));}catch(e){}}
 function getStampMachine(x=0,y=0){const mirrored=state.machines.some(m=>m.ast1Mirrored);return {type:stampType,x,y,face:stampFace,mode:stampMode,item:stampItem,ast1Mirrored:mirrored,ast1GamePorts:mirrored};}
-function updateStampControls(){if(!stampType)return;const d=DEF[stampType],modes=recipeModes(stampType);
+function updateStampControls(){
+ const panel=$('stampControls');
+ if(!stampType){panel.style.display='none';return;}
+ const d=DEF[stampType],modes=recipeModes(stampType),rec=d.recipes?.[stampMode];
+ panel.style.display='block';
+ $('configContext').textContent='放置设置';
  $('stampName').textContent=d.name;
- $('stampModeRow').style.display=modes.length>1?'block':'none';
- $('stampItemRow').style.display=stampType==='仓出'?'block':'none';
- $('stampMode').innerHTML=modes.map(key=>`<option value="${esc(key)}" ${String(stampMode)===key?'selected':''}>${esc(recipeOptionLabel(stampType,key))}</option>`).join('');
+ $('stampFacing').textContent=({E:'右 →',S:'下 ↓',W:'左 ←',N:'上 ↑'})[stampFace]||'—';
+ $('stampModeRow').style.display=modes.length>1?'flex':'none';
+ $('stampItemRow').style.display=stampType==='仓出'?'flex':'none';
+ $('stampMode').innerHTML=modes.map(key=>`<option value="${esc(key)}" ${String(stampMode)===String(key)?'selected':''}>${esc(recipeOptionLabel(stampType,key))}</option>`).join('');
  $('stampItem').innerHTML=MATERIALS.map(mat=>`<option value="${esc(mat)}" ${stampItem===mat?'selected':''}>${esc(mat)}</option>`).join('');
- const r=d.recipes?.[stampMode];
- $('stampRecipeText').innerHTML=r?`${Object.entries(r.inputs).map(([k,v])=>`<span style="color:#60b5ff">${esc(k)} ×${v}</span>`).join('　')}<div style="color:#ffb16b">${esc(r.output)} ×${r.qty}</div><small>${esc(timeLabel({type:stampType,mode:stampMode}))}</small>`:(stampType==='仓出'?`将取出：${esc(stampItem)}`:'无生产配方');
+ $('stampRecipeText').innerHTML=rec?
+  `<div class="machine-config-recipe-head"><span>配方</span><small>${rec.seconds} 秒/次</small></div><div class="machine-config-flow">${Object.entries(rec.inputs).map(([k,n])=>`<span class="machine-config-input">${esc(k)} ×${n}</span>`).join('')||'<span class="machine-config-none">无输入</span>'}<span class="machine-config-arrow">→</span><strong>${esc(rec.output)} ×${rec.qty}</strong></div>`
+  :stampType==='仓出'?`<span>从仓库取出：<strong>${esc(stampItem||'未选择')}</strong></span>`:'';
+ $('stampHelp').textContent='单击地图放置；可继续放置同配置机器。按 Esc 结束。';
 }
 function getRecipe(m){const d=def(m);if(!d?.recipes)return null;const mode=m.mode===undefined||m.mode===null||m.mode===''?Object.keys(d.recipes)[0]:m.mode;return d.recipes[mode]||null;}
 // 左边是配方标称加工秒数，括号显示全网联立稳态求解的动态有效加工周期。
@@ -62,11 +70,19 @@ function machineLabelLines(m){let r=getRecipe(m),result=[{text:def(m).name,color
  else if(m.type==='仓出')result.push({text:(m.item||'未指定')+' ×1',color:'#ffb16b'});
  return result;
 }
+// Keep canvas glyphs proportional at every zoom level. Supplying fillText's
+// maxWidth compressed long Chinese machine names horizontally; measuring first
+// and scaling the FONT avoids that distortion. Split long headings when space permits.
 function paintMachineText(m,w,h,preview=false){const lines=machineLabelLines(m);if(!lines.length)return;
  const heightLimit=Math.max(.48,Math.min(.83,(h-.54)/lines.length));
  const spacing=Math.min(1.04,(h-.5)/lines.length),base=m.y+h/2-(lines.length-1)*spacing/2;
  ctx.textAlign='center';ctx.textBaseline='middle';
- lines.forEach((line,i)=>{let sz=i===0?Math.min(1.04,heightLimit*1.22):heightLimit;ctx.font=(line.bold?'bold ':'')+sz+'px system-ui, "Microsoft YaHei", sans-serif';ctx.fillStyle=line.color;ctx.fillText(line.text,m.x+w/2,base+i*spacing,w-.42);});
+ lines.forEach((line,i)=>{let sz=i===0?Math.min(1.04,heightLimit*1.22):heightLimit;ctx.font=(line.bold?'bold ':'')+sz+'px system-ui, "Microsoft YaHei", sans-serif';ctx.fillStyle=line.color;
+  // Fit with proportional font size; never use fillText(maxWidth), which
+  // horizontally compresses glyphs rather than scaling the typography.
+  const textWidth=ctx.measureText(line.text).width,available=Math.max(.5,w-.42);
+  if(textWidth>available){sz*=available/textWidth;ctx.font=(line.bold?'bold ':'')+sz+'px system-ui, "Microsoft YaHei", sans-serif';}
+  ctx.fillText(line.text,m.x+w/2,base+i*spacing);});
 }
 function label(m){let s=def(m)?.name||m.type; if(m.type==='仓出')s+=' · '+(m.item||'未设置');else if(getRecipe(m))s+=' · '+recipeOptionLabel(m.type,m.mode);return s}
 function dims(m){if(Number.isInteger(m.w)&&Number.isInteger(m.h))return [m.w,m.h];let d=def(m)||{w:5,h:5};return m.face==='N'||m.face==='S'?[d.h,d.w]:[d.w,d.h]}
@@ -75,7 +91,7 @@ function getPorts(m){
   const original={...m,ast1Mirrored:false,face:ast1MirrorFace(m.face),x:AST1_GRID_WIDTH-m.x-dims(m)[0]};
   return getPorts(original).map(p=>({...p,x:AST1_GRID_WIDTH-1-p.x,ex:AST1_GRID_WIDTH-1-p.ex,side:ast1MirrorFace(p.side)}));
  }
- const d=def(m),f=m.face||'E',[w,h]=dims(m),x=m.x,y=m.y;const ni=d.ins,no=d.outs;const one=(side,off,kind,i)=>{let xx=side==='E'?x+w-1:side==='W'?x:x+off;let yy=side==='S'?y+h-1:side==='N'?y:y+off;let [dx,dy]=V[side];return {kind,index:i,x:xx,y:yy,ex:xx+dx,ey:yy+dy,side,filter:kind==='in'?(m.type==='仓入'?(m.inletItem||''):(m.filters?.[i]??suggestFilter(m,i))):(m.outFilters?.[i]??'')};};const ports=[];const back=OPP[f];
+ const d=def(m),f=m.face||'E',[w,h]=dims(m),x=m.x,y=m.y;const ni=d.ins,no=d.outs;const one=(side,off,kind,i)=>{let xx=side==='E'?x+w-1:side==='W'?x:x+off;let yy=side==='S'?y+h-1:side==='N'?y:y+off;let [dx,dy]=V[side];return {kind,index:i,x:xx,y:yy,ex:xx+dx,ey:yy+dy,side,filter:kind==='in'?(m.type==='仓入'?(m.inletItem||''):''):(m.outFilters?.[i]??'')};};const ports=[];const back=OPP[f];
  function sideLength(side){return side==='E'||side==='W'?h:w}
  if(m.type==='汇流') {['E','W','N','S'].filter(q=>q!==f).forEach((s,i)=>ports.push(one(s,Math.floor(sideLength(s)/2),'in',i)));ports.push(one(f,Math.floor(sideLength(f)/2),'out',0));}
  else if(m.type==='分流'){ports.push(one(back,Math.floor(sideLength(back)/2),'in',0));['E','W','N','S'].filter(q=>q!==back).forEach((s,i)=>ports.push(one(s,Math.floor(sideLength(s)/2),'out',i)));}
@@ -87,8 +103,7 @@ function getPorts(m){
  if(m.ast1GamePorts&&m.type==='冶炼'&&f==='N')offsets=offsets.map(off=>off-1);
  if(m.ast1GamePorts&&m.type==='共鸣'&&f==='S')offsets=offsets.map(off=>off+1);
  offsets.forEach((off,i)=>ports.push(one(back,off,'in',i)));if(no)ports.push(one(f,Math.floor(sideLength(f)/2),'out',0));}return ports;}
-// 每个输入口可以混合多种配方原料，共用1件/秒的入口吞吐；手动过滤仍可限制某一种材料。
-function suggestFilter(m,i){return '';}
+// 配方机器的所有输入口均自动接收配方所需材料；输入口手动过滤已停用。
 function inPort(m,i){return getPorts(m).find(p=>p.kind==='in'&&p.index===i)}function outPort(m,i){return getPorts(m).find(p=>p.kind==='out'&&p.index===i)}
 function inMap(x,y){return x>=0&&y>=0&&x<W&&y<H}
 function reserved(x,y){return x>=29&&x<43&&y>=29&&y<43;}
@@ -123,12 +138,11 @@ function findFree(m,hintX=9,hintY=2){let cand=[];for(let y=0;y<72;y++)for(let x=
 function machineById(id){return state.machines.find(m=>m.id===id)}
 function portAt(x,y){const m=cellMachine(x,y);if(!m)return null;const p=getPorts(m).find(p=>p.x===x&&p.y===y);return p?{m,p}:null;}
 function recipeOutput(m){if(m.type==='仓出')return m.item||'';return getRecipe(m)?.output||''}
-function inputFilter(m,idx){return inPort(m,idx)?.filter||''}
-// 不按输入口编号决定原料种类；所有配方所需材料可以分配至任意输入口。
-// 手动设置的端口过滤仍优先生效。汇流、分流、仓入允许接收混合材料。
+// 所有普通生产机器输入口都按配方自动接受混合原料；仓库入库的独立
+// 物品限制仍可配置。分流/汇流接受混合物品，出口过滤不受影响。
 function acceptsMaterial(m,item,idx){
  if(!m||!inPort(m,idx)||!item)return false;
- const filter=inputFilter(m,idx);
+ const filter=m.type==='仓入'?(m.inletItem||''):'';
  if(filter&&filter!=='任意'&&filter!==item)return false;
  const rec=getRecipe(m);
  if(rec)return Object.prototype.hasOwnProperty.call(rec.inputs||{},item);

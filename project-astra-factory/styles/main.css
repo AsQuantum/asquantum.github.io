@@ -140,3 +140,142 @@
 /* Share exactly the same transparent hexagon icon between header and tab. */
 .brand{display:flex;align-items:center;gap:5px}
 .brand-mark{display:block;width:20px;height:20px;flex:none}
+
+
+/* Selected machine: one calm inspector, not a tower of unrelated cards. */
+#inspector .inspector-machine{min-width:0;display:flex;flex-direction:column;gap:0;color:#dceaf4}
+.inspector-machine .machine-summary{min-width:0;padding:13px 13px 11px;background:linear-gradient(150deg,#1c3040 0%,#172637 72%);border:1px solid #345063;border-top:2px solid var(--machine-accent,#53cbaa);border-radius:10px}
+.machine-summary-eyebrow{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#829eaf;font-size:10px;letter-spacing:.5px}
+.machine-summary-eyebrow code{font:600 10.5px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace;padding:3px 7px;border-radius:5px;border:1px solid #365067;background:#152638;color:#b9d0df;letter-spacing:0}
+.machine-summary-name{font-weight:720;font-size:15px;line-height:1.4;margin:6px 0;color:var(--machine-accent,#72e2b4);overflow-wrap:anywhere}
+.machine-summary-location{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:10.5px;color:#9ab1c4}
+.machine-summary-location .machine-tag{color:#d6e6f1}
+.machine-summary-location span+span{position:relative}
+.machine-summary-metrics{display:grid;grid-template-columns:.8fr .85fr 1.35fr;gap:0;margin-top:12px;padding-top:10px;border-top:1px solid #365064}
+.machine-summary-metrics>div{min-width:0;padding:0 6px}
+.machine-summary-metrics>div:first-child{padding-left:0}
+.machine-summary-metrics>div+div{border-left:1px solid #30475c}
+.machine-summary-metrics>div:last-child{padding-right:0}
+.machine-summary-metrics span{display:block;font-size:10px;white-space:nowrap;color:#8fa7bb}
+.machine-summary-metrics strong{display:block;white-space:nowrap;font-size:12.5px;margin-top:2px;color:#e4f5ee;font-variant-numeric:tabular-nums;letter-spacing:-.15px}
+.machine-summary-metrics strong small{font-size:9px;font-weight:400;color:#a7c9c2}
+.machine-ast1-meta{padding-top:10px;margin-top:10px;border-top:1px dashed #395267;font-size:10px;color:#8eaebd}
+.inspector-machine .machine-section-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 9px;font-size:11px;font-weight:700;letter-spacing:.35px;color:#bad4e2}
+.inspector-machine .machine-section-heading small{font-weight:400;font-size:10px;color:#8da4b9;letter-spacing:0}
+.inspector-machine .machine-edit{padding:17px 1px 0}
+.inspector-machine .machine-rotate-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+.machine-rotate-bar>span{font-size:11px;color:#96adc0}
+.inspector-machine .machine-rotate-actions{display:flex;flex-wrap:nowrap;gap:5px}
+.inspector-machine .machine-rotate-actions button{display:flex;align-items:center;justify-content:center;gap:5px;min-height:31px;padding:5px 9px;background:#192c3e;border:1px solid #344b62;border-radius:6px;font-size:11px;color:#cbdfea;white-space:nowrap}
+.inspector-machine .machine-rotate-actions button:hover{background:#254459;border-color:#6ea9a9}
+.inspector-machine .machine-rotate-actions button small{font-size:9px;color:#829bae;border-left:1px solid #3b5365;padding-left:5px}
+.inspector-machine .machine-field{display:flex;flex-direction:column;gap:5px;margin:0 0 13px;min-width:0}
+.inspector-machine .machine-field>span{font-weight:600;font-size:11px;color:#afc6d8}
+.inspector-machine .machine-field select,.inspector-machine .machine-port-bottom select{min-width:0;width:100%;min-height:34px;padding:6px 8px;background:#142538;border:1px solid #36516a;border-radius:7px;color:#e2f1f8;font-size:11.5px;outline:0}
+.inspector-machine .machine-field select:focus,.inspector-machine .machine-port-bottom select:focus{border-color:#65c9ae;box-shadow:0 0 0 2px #51c7a523}
+.inspector-machine .machine-recipe{padding:10px 11px;margin:0 0 13px;background:#142536;border:1px solid #2c4255;border-radius:8px}
+.machine-recipe-heading{display:flex;align-items:center;justify-content:space-between;gap:6px;color:#9db7cb;font-size:10.5px}
+.machine-recipe-heading small{font-size:10px;color:#85a3b6}
+.machine-recipe-flow{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:7px;line-height:1.4;font-size:11px}
+.machine-flow-input{color:#85c8f6}
+.machine-flow-none{color:#7896ac}
+.machine-flow-arrow{color:#839bad;margin:0 3px}
+.machine-flow-output{color:#ffd099;font-weight:650;overflow-wrap:anywhere}
+.inspector-machine .machine-connections{border-top:1px solid #2c4052;padding-top:15px;margin-top:2px}
+.inspector-machine .machine-ports{border-top:1px solid #2b3f50}
+.inspector-machine .machine-port{padding:9px 1px;border-bottom:1px solid #2b3f50;min-width:0}
+.inspector-machine .machine-port-top{display:flex;align-items:center;gap:6px;min-width:0;font-size:11px}
+.machine-port-top b{flex:1;min-width:0;overflow-wrap:anywhere;color:#d6e8f4;font-size:11px;font-weight:600}
+.machine-port-direction{font-weight:400;color:#98aebf}
+.machine-port-bullet{display:block;width:7px;height:7px;border-radius:50%;flex:none;background:#6db9ff}
+.machine-port-bullet.is-output{background:#ffb270}
+.machine-port-rate{font-size:10.5px;font-variant-numeric:tabular-nums;color:#a8c8d8;white-space:nowrap}
+.machine-port-rate small{font-size:9px;color:#829eb0}
+.inspector-machine .machine-port-bottom{display:flex;align-items:center;gap:8px;justify-content:space-between;margin:5px 0 0 13px;min-width:0}
+.machine-port-hint{flex:1;min-width:0;font-size:10px;color:#829fb3;overflow-wrap:anywhere}
+.inspector-machine .machine-port-bottom select{width:auto;min-width:96px;max-width:133px;min-height:28px;padding:3px 7px;font-size:10px}
+.machine-port-filter{font-size:10px;color:#98b7c6;white-space:nowrap}
+.inspector-machine .machine-interface-help{margin-top:8px}
+.inspector-machine .machine-interface-help summary{display:flex;align-items:center;gap:5px;list-style:none;cursor:pointer;color:#91acc0;font-size:10.5px;padding:5px 1px;user-select:none}
+.inspector-machine .machine-interface-help summary::-webkit-details-marker{display:none}
+.inspector-machine .machine-interface-help summary:before{content:'▸';font-size:11px;color:#80cbb1;transition:transform .15s}
+.inspector-machine .machine-interface-help[open] summary:before{transform:rotate(90deg)}
+.inspector-machine .machine-interface-help p{margin:5px 2px 8px;font-size:10.5px;line-height:1.65;color:#94adbf}
+.inspector-machine .machine-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:15px 0 16px;border-bottom:1px solid #2c4255}
+.inspector-machine .machine-actions button{display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:36px;padding:6px 7px;font-size:11px;border-radius:7px;white-space:nowrap}
+.inspector-machine #duplicate{background:#20453d;border:1px solid #376d5c;color:#c1f1dc}
+.inspector-machine #duplicate:hover{background:#2b6352;border-color:#65c3a3}
+.inspector-machine #duplicate small{padding:0 0 0 5px;margin-left:3px;border-left:1px solid #538476;font-size:9px;font-weight:400;color:#98c5b4}
+.inspector-machine #deleteM{background:transparent;border:1px solid #57414e;color:#c69da6}
+.inspector-machine #deleteM:hover{background:#462a35;border-color:#bd6976;color:#ffe1e4}
+.inspector-machine .machine-analysis-heading{font-size:11px;letter-spacing:.35px;font-weight:700;color:#bad4e2;margin:18px 0 4px}
+#inspector .inspector-machine>.item{background:transparent;border:0;border-radius:0;border-bottom:1px solid #2c4053;padding:12px 0 14px;margin:0;min-width:0}
+#inspector .inspector-machine>.item>strong{display:block;margin-bottom:5px;font-size:12px;color:#d8e9f4}
+#inspector .inspector-machine>.item .divider{margin:12px 0 9px;background:#2a4052}
+#inspector .inspector-machine>.item .tiny{font-size:10.5px;color:#8daac0;line-height:1.55}
+#inspector .inspector-machine>.item .kv{margin:6px 0;font-size:11px;gap:5px}
+#inspector .inspector-machine>.item .kv b{font-variant-numeric:tabular-nums;white-space:nowrap}
+#inspector .inspector-machine>.item details>summary{cursor:pointer;color:#99b8c9;font-size:10.5px;margin-top:9px}
+.machine-duty-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0 12px}
+.machine-duty-grid>div{background:#1a2b3d;border:1px solid #2b4257;border-radius:7px;padding:8px;min-width:0}
+.machine-duty-grid span{display:block;font-size:10px;color:#93adc0}
+.machine-duty-grid b{display:block;margin-top:2px;font-size:15px;color:#def0fa;font-variant-numeric:tabular-nums}
+.machine-steady-notes{margin-top:9px}
+.machine-steady-notes>summary{font-size:10px;color:#91acbc}
+.machine-steady-notes p{margin:5px 0 0;color:#8da7bb;font-size:10.5px;line-height:1.6}
+
+
+/* Machine library: compact, searchable palette and contextual placement settings. */
+.machine-library{padding-top:4px}
+.machine-library .machine-search{position:relative}
+.machine-library .machine-search:before{content:'⌕';position:absolute;left:10px;top:50%;transform:translateY(-54%);font-size:18px;color:#789bb1;pointer-events:none}
+.machine-library #search{width:100%;min-height:36px;padding:7px 9px 7px 30px;border:1px solid #365067;border-radius:8px;background:#152638;color:#ebf6ff;font-size:11.5px;outline:0}
+.machine-library #search:focus{border-color:#63c9ae;box-shadow:0 0 0 2px #58bda92b}
+.machine-library #search::placeholder{color:#829bae}
+.machine-library .machine-palette{margin-top:9px}
+.machine-palette-group{margin:0 0 12px}
+.machine-palette-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 1px 7px;font-size:11px;font-weight:650;color:#acc7da;border-bottom:1px solid #293e51;margin-bottom:5px}
+.machine-palette-heading small{color:#708fa7;font-size:10px;font-weight:400}
+.machine-library .machine-palette button[data-stamp]{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-height:36px;padding:6px 9px;margin:3px 0;background:transparent;border:1px solid transparent;border-radius:7px;color:#d5e6f2;text-align:left}
+.machine-library .machine-palette button[data-stamp]:hover{background:#1e3448;border-color:#33556a}
+.machine-library .machine-palette button[data-stamp].active{background:#234d48;border-color:#4eac90;color:#eefff5;box-shadow:inset 2px 0 0 #64d8ab}
+.machine-palette-label{display:flex;align-items:center;gap:8px;min-width:0;font-weight:550;font-size:11.5px}
+.machine-palette-label span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.machine-palette-mark{width:8px;height:8px;flex:none;display:inline-block;border-radius:2px;box-shadow:0 0 0 2px #ffffff0d}
+.machine-library .machine-palette button[data-stamp]>small{font:10px/1 ui-monospace,Consolas,monospace;color:#819eaf;white-space:nowrap}
+.machine-library .machine-palette button[data-stamp].active>small{color:#a2d9c4}
+
+/* Placement only: all attributes for already placed machines live on the right. */
+.machine-library .machine-config{margin-top:11px;margin-bottom:12px;padding:10px 11px;border:1px solid #376c62;border-radius:9px;background:linear-gradient(160deg,#1c3b3b,#142b38)}
+.machine-config-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;color:#8cceb8;font-size:10px;font-weight:650;letter-spacing:.35px}
+.machine-library .machine-config-top #stampCancel{width:24px;height:24px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:5px;background:transparent;color:#a4c4c3;font-size:18px;line-height:1}
+.machine-library .machine-config-top #stampCancel:hover{background:#395d58;color:#f1fff9}
+.machine-config-identity{display:flex;justify-content:space-between;align-items:baseline;gap:7px;margin-bottom:9px}
+.machine-config-identity strong{min-width:0;color:#def8eb;font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.machine-config-identity #stampFacing{color:#97bfc0;font-size:10px;white-space:nowrap}
+.machine-config-rotations{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:11px}
+.machine-library .machine-config-rotations button{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 3px;min-width:0;background:#203c47;border:1px solid #416366;border-radius:6px;color:#d5ede8;font-size:11px}
+.machine-library .machine-config-rotations button:hover{background:#2e5758;border-color:#6ab39c}
+.machine-config-rotations small{font-size:9px;color:#93beb7;border-left:1px solid #4b7773;padding-left:5px}
+.machine-config-field{display:flex;flex-direction:column;gap:5px;margin:0 0 9px;color:#b4d4d6;font-size:10.5px}
+.machine-config-field>span{font-weight:650}
+.machine-library .machine-config-field select{width:100%;min-height:32px;padding:5px 8px;border-radius:6px;border:1px solid #416765;background:#162f3b;color:#e7f6f4;font-size:11.5px}
+.machine-config-recipe{margin-top:7px;padding:9px 10px;background:#142d38;border:1px solid #365c60;border-radius:7px;color:#afcfd2;font-size:10.5px}
+.machine-config-recipe-head{display:flex;align-items:center;justify-content:space-between;color:#a5c4d2}
+.machine-config-recipe-head small{font-size:10px;color:#93b7bf}
+.machine-config-flow{display:flex;flex-wrap:wrap;align-items:center;gap:5px;line-height:1.55;margin-top:5px}
+.machine-config-input{color:#86c6ef}
+.machine-config-none{color:#819fb3}
+.machine-config-arrow{color:#7d9eae;margin:0 2px}
+.machine-config-flow strong{color:#ffcf9c}
+.machine-config-hint{margin:9px 1px 0;color:#8badae;font-size:10px;line-height:1.55}
+
+/* Right-hand machine attributes: recipe, warehouse materials and splitter outlets. */
+#inspector .machine-properties{display:flex;flex-direction:column;gap:10px;margin:14px 0 0;padding:13px 12px 11px;background:#15283a;border:1px solid #34495e;border-radius:9px;min-width:0}
+#inspector .machine-properties .machine-field{display:flex;flex-direction:column;gap:5px;margin:0;min-width:0}
+#inspector .machine-properties .machine-field>span{font-size:10.5px;color:#afc8da;font-weight:650}
+#inspector .machine-properties select{display:block;width:100%;min-width:0;min-height:33px;padding:6px 8px;font-size:11.5px;color:#e4f2f7;background:#102133;border:1px solid #36526a;border-radius:7px}
+#inspector .machine-properties select:focus{border-color:#65cbaa;outline:2px solid #65cbaa24}
+#inspector .machine-properties .machine-filter-options{display:flex;flex-direction:column;gap:10px;min-width:0}
+#inspector .machine-properties .machine-field-caption{font-size:11px;font-weight:650;color:#c2dcec;margin-bottom:1px}
+#inspector .machine-recipe-standalone{display:block;margin:12px 0 0}

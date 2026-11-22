@@ -1,0 +1,687 @@
+/* Sidebar refinements: compact editing tools, visible machine buttons and readable analysis.
+   Kept separately from the original stylesheet to avoid selector churn in the renderer. */
+
+/* The machine list should not scroll off-screen underneath editing controls. */
+.side.left{display:flex;flex-direction:column;overflow:hidden;background:#172434;border-right:1px solid #334a60}
+.side.left>h3{flex:none;margin:11px 12px 5px;font-size:11px;letter-spacing:.5px;color:#b3c8d8}
+.side.left>.editor-tools{flex:none;min-height:0;padding:0 11px 5px}
+.side.left>.machine-library{flex:1 1 auto;min-height:110px;display:flex;flex-direction:column;overflow:hidden;padding:0 10px 9px}
+.machine-library .machine-search{flex:none;padding-bottom:4px}
+.machine-library #search{height:35px;background:#1b3143;border-color:#496176}
+.machine-library-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+ scrollbar-width:thin;scrollbar-color:#55738b transparent;padding:3px 3px 9px 0}
+
+/* One compact four-tool row. The icon and name remain recognizably buttons. */
+.editor-tools .editor-tool-label{font-size:10.5px;color:#b8cfdf;letter-spacing:.1px;margin:4px 1px 6px}
+.editor-tools .editor-tool-label span{display:none}
+.editor-tools .editor-tool-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.editor-tools .editor-tool-grid [data-tool]{min-height:48px;padding:5px 1px;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:1px;background:#23394c;border:1px solid #405b71;border-radius:7px;color:#d5e5ef;text-align:center}
+.editor-tools .editor-tool-grid [data-tool]:hover{background:#2b4860;border-color:#79b9ad}
+.editor-tools .editor-tool-grid [data-tool].active{background:#2b5b4e!important;border:1px solid #6dd3a6!important;box-shadow:inset 0 0 0 1px #80e6b52e}
+.editor-tools .editor-tool-grid .editor-tool-icon{width:auto;height:19px;min-height:0;font-size:16px;line-height:19px;color:#a8cede}
+.editor-tools .editor-tool-grid .editor-tool-name{font-size:10px;font-weight:550;line-height:1.2;color:#e3eef7}
+.editor-tools .editor-tool-grid .editor-tool-name small{display:none}
+.editor-tools .editor-erase{min-height:27px;margin:6px 0 1px;padding:4px 5px;font-size:10.5px;
+ background:#25374a;border-color:#405367;color:#b7c8d7}
+.editor-tools .editor-erase span{font-size:13px}
+.editor-tools .editor-tool-actions-label{margin:8px 1px 5px}
+.editor-tools .editor-canvas-actions{gap:5px}
+.editor-tools .editor-canvas-actions button{min-height:28px;font-size:10px;padding:4px 2px;background:#23384b;border-color:#40596e}
+.editor-tools .editor-canvas-actions .editor-danger{color:#e6b0b4;border-color:#75535c}
+.editor-tools .editor-help-disclosure{margin:7px 0 3px;padding-top:2px}
+.editor-tools .editor-help-disclosure>summary{padding:5px 0;color:#92b1c6;font-size:10.5px}
+
+/* Contextual group actions are subordinate to machine selection, not a huge teal block. */
+.editor-tools #groupControls{margin:8px 0 3px!important;padding:8px;border-radius:8px;
+ background:#1b3041;border:1px solid #466377;box-shadow:none}
+.group-controls-heading{display:flex;align-items:center;gap:6px;min-width:0;margin:0 0 7px}
+.group-controls-heading .group-mark{font-size:13px;color:#8fd3b6}
+#groupSelectionInfo{font-size:10.5px;line-height:1.4;font-weight:650!important;margin:0!important;color:#d1e4e4!important}
+.editor-tools .group-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.editor-tools .group-buttons button{min-width:0;min-height:33px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:0;padding:2px 1px;font-size:10.5px;line-height:1.3;background:#294054;border:1px solid #446179;border-radius:5px;color:#e0eaf3}
+.editor-tools .group-buttons button:hover:not(:disabled){background:#33546b;border-color:#6b9fb5}
+.editor-tools .group-buttons button small{display:block;margin:0;color:#9aafc1;font-size:8px;line-height:1.1}
+.editor-tools .group-buttons button:disabled{opacity:.36;background:#243444}
+.editor-tools .group-buttons #groupDuplicate{background:#2c5149;border-color:#477e6e;color:#e6f9ee}
+.editor-tools .group-buttons #groupDelete{color:#f1c4c5;border-color:#6c4c57}
+.editor-tools .group-buttons #groupDelete:hover{background:#543742}
+.editor-tools .group-guide{margin-top:6px;color:#8fa8ba}
+.editor-tools .group-guide summary{cursor:pointer;list-style:none;font-size:9.5px}
+.editor-tools .group-guide summary:before{content:'▸  ';color:#87b8a6}
+.editor-tools .group-guide[open] summary:before{content:'▾  '}
+.editor-tools .group-guide small{font-size:9.5px;line-height:1.5;color:#8ea5b7}
+
+/* Restored visually distinct clickable machine tiles, not flat text rows. */
+.machine-library .machine-palette{display:flex;flex-direction:column;gap:0;margin:0}
+.machine-palette-group{margin:0 0 12px}
+.machine-palette-heading{font-size:10.5px;padding:7px 3px 5px;margin:0 0 5px;color:#b7d1e2;border-bottom:1px solid #334a5e}
+.machine-palette-heading small{font-size:10px;color:#8aa4ba}
+.machine-library .machine-palette button[data-stamp]{display:flex;align-items:center;min-height:38px;
+ width:100%;margin:0 0 5px;padding:7px 9px;background:#253a4e;border:1px solid #3c566b;border-left:3px solid #57738b;
+ border-radius:7px;color:#e2edf8;box-shadow:0 1px 0 #050f192b}
+.machine-library .machine-palette button[data-stamp]:hover{background:#304b62;border-color:#6f9eab;border-left-color:#81c6ae;transform:translateX(1px)}
+.machine-library .machine-palette button[data-stamp]:focus-visible{outline:2px solid #6ce0b8;outline-offset:1px}
+.machine-library .machine-palette button[data-stamp].active{background:#28584e!important;border-color:#62c7a5!important;border-left-color:#94f2cb!important;color:#f0fff5!important}
+.machine-palette-label{gap:8px}
+.machine-palette-mark{width:10px;height:10px;flex:none;border:1px solid #ffffff38}
+.machine-palette-label span{font-size:11.5px;font-weight:590;color:#e5eff8}
+.machine-library .machine-palette button[data-stamp]>small{font-size:10px;color:#9fb9cb}
+.machine-library .machine-palette button[data-stamp].active>small{color:#d5eadf}
+
+/* Keep legacy map information accessible but out of the machine selection way. */
+.library-reference{margin:12px 2px 5px;border-top:1px solid #3b5164;padding-top:6px}
+.library-reference>summary{padding:6px 0;cursor:pointer;list-style:none;font-size:10.5px;color:#9db9ca}
+.library-reference>summary:before{content:'▸  ';color:#82c9af}
+.library-reference[open]>summary:before{content:'▾  '}
+.library-reference-body{padding:7px 0;color:#a4bbcc;font-size:10.5px}
+.library-reference-body .kv{font-size:10.5px}
+.library-reference-body .kv b{font-size:10px;color:#d2e5ed;white-space:nowrap}
+.library-reference-heading{margin:11px 0 6px;color:#b5cbd9;font-weight:650}
+.library-reference-body .material-legend{grid-template-columns:1fr 1fr;gap:5px}
+
+/* Calm right sidebar: clearer headings, roomier labels, less glowing text. */
+.side.right{background:#172333;border-left:1px solid #344b60;scrollbar-width:thin}
+.right>h3{font-size:11px;letter-spacing:.45px;margin:14px 13px 8px;color:#adc6d8}
+.right>.block{padding:0 12px 13px}
+.right .warehouse-panel>summary,.right .right-extra-panel>summary{font-size:11px;letter-spacing:.45px}
+.right .warehouse-panel>summary{margin:13px 13px 7px;color:#aac4d6}
+.right .right-extra-panel{border-top:1px solid #35475a;margin:10px 12px 0}
+.right .right-extra-panel>summary{list-style:none;cursor:pointer;color:#a9c2d3;padding:12px 1px;display:flex;align-items:center;gap:7px}
+.right .right-extra-panel>summary::-webkit-details-marker{display:none}
+.right .right-extra-panel>summary:before{content:'▸';font-size:12px;color:#7fc7ac}
+.right .right-extra-panel[open]>summary:before{content:'▾'}
+.right .right-extra-panel>.block{padding:0 0 11px}
+#inspector .inspector-machine .machine-summary{background:#1d3041;border-color:#405a70;border-top-width:2px;padding:12px}
+#inspector .machine-summary-name{font-size:14px;color:var(--machine-accent)}
+#inspector .machine-summary-metrics{grid-template-columns: .77fr .82fr 1.4fr}
+#inspector .machine-summary-metrics strong{font-size:11.5px;white-space:normal;overflow-wrap:anywhere}
+#inspector .machine-properties{background:#1a2c3e;border-color:#3b5369;margin-top:11px;gap:9px}
+#inspector .machine-properties .machine-field-caption{font-size:11px}
+#inspector .machine-properties select{min-height:34px;background:#203449;border-color:#4a6177;color:#e2edf7}
+#inspector .machine-actions{padding:13px 0;margin-bottom:0}
+#inspector .machine-actions button{min-height:35px}
+#inspector .machine-analysis-heading{margin:16px 0 2px;font-size:11.5px}
+#inspector .inspector-machine>.item{padding:12px 0 13px;font-size:11px}
+#inspector .inspector-machine>.item .tiny{color:#9bb3c6;line-height:1.55}
+#inspector .inspector-machine>.item .kv{align-items:baseline;gap:6px}
+#inspector .inspector-machine>.item .kv span{min-width:0;overflow-wrap:anywhere}
+#inspector .inspector-machine>.item .kv b{color:#e2eff6;font-size:11px;white-space:nowrap}
+#inspector .machine-theory .machine-flow-summary{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}
+.machine-flow-tile{background:#203446;border:1px solid #36516b;border-radius:7px;padding:10px 9px;min-width:0}
+.machine-flow-tile .tile-label{display:flex;align-items:center;gap:5px;font-size:10px;color:#aac0d1}
+.machine-flow-tile .tile-label .tile-dot{height:6px;width:6px;border-radius:50%;background:#76baff}
+.machine-flow-tile.out .tile-label .tile-dot{background:#e9b275}
+.machine-flow-tile .tile-value{display:block;margin-top:3px;font-size:16px;font-variant-numeric:tabular-nums;font-weight:650;color:#eaf4f8}
+.machine-flow-tile .tile-value small{font-size:9.5px;font-weight:450;color:#91aebf}
+#inspector .machine-theory .machine-duty-grid{gap:6px;margin:8px 0}
+#inspector .machine-duty-grid>div{background:#1e3041;border-color:#364c61;padding:8px}
+#inspector .machine-duty-grid span{font-size:9.5px}
+#inspector .machine-duty-grid b{font-size:13px;font-weight:650}
+.machine-analysis-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 7px}
+.machine-analysis-title strong{font-size:12px;font-weight:650;color:#ccdeec}
+.machine-analysis-title .analysis-unit{font-size:9.5px;color:#8faabd}
+.machine-port-details{border-top:1px solid #344b5e;padding:7px 0 2px;margin-top:8px}
+.machine-port-details summary{display:flex;align-items:center;gap:7px;list-style:none;cursor:pointer;
+ color:#afd0dc;font-size:10.5px;padding:7px 1px}
+.machine-port-details summary:before{content:'▸';font-size:11px;color:#86c4ad}
+.machine-port-details[open] summary:before{content:'▾'}
+.machine-port-details summary::-webkit-details-marker{display:none}
+.machine-port-details-body{margin-top:4px}
+.machine-port-details-section{padding:9px 0;border-top:1px solid #2d4255}
+.machine-port-details-section:first-child{border-top:0}
+.machine-port-details-heading{font-weight:650;color:#bbd2df;font-size:10.5px;margin-bottom:6px}
+.machine-port-detail-row{padding:7px 9px;margin:5px 0;background:#1e3143;border:1px solid #344d63;border-left:2px solid #779eb4;border-radius:6px;font-size:10.5px}
+.machine-port-detail-row.is-out{border-left-color:#d9a873}
+.machine-port-detail-row .kv{margin:1px 0 4px}
+.machine-port-detail-row .port-muted{font-size:9.5px;color:#91aabb}
+.machine-port-detail-row .kv b{color:#e1eaf1!important;font-size:10.5px!important}
+#inspector .machine-live-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#inspector .machine-live-head strong{font-size:11.5px}
+#inspector .machine-live-head small{color:#8eabba;font-size:10px}
+.machine-live-meta{margin-top:5px;font-size:10px;color:#93abbe}
+.machine-live-detail{margin-top:8px;border-top:1px solid #324b60;padding-top:7px}
+.machine-live-detail>summary{display:flex;align-items:center;gap:6px;cursor:pointer;list-style:none;color:#afd1d9;font-size:10.5px;padding:5px 0}
+.machine-live-detail>summary:before{content:'▸';color:#84c5b0}
+.machine-live-detail[open]>summary:before{content:'▾'}
+.machine-live-detail>summary::-webkit-details-marker{display:none}
+#inspector .machine-recipe-standalone{background:#1c2f42;border-color:#3b5267}
+#inspector .machine-ast1-meta{font-size:9.5px;color:#8da5b7}
+@media(max-width:1100px){
+ .editor-tools .editor-tool-grid [data-tool]{min-height:45px}
+ .editor-tools .group-buttons button{font-size:9.5px}
+ .machine-library .machine-palette button[data-stamp]{min-height:36px}
+}
+
+
+/* Real-time data shows useful totals immediately, details only on demand. */
+.machine-live-summary{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.machine-live-summary>div{padding:9px;background:#203446;border:1px solid #36516b;border-radius:7px;min-width:0}
+.machine-live-summary span{display:block;font-size:10px;color:#9db5c8}
+.machine-live-summary b{display:block;font-size:16px;color:#e8f2fa;font-variant-numeric:tabular-nums;margin-top:3px}
+.machine-live-summary b small{font-size:9px;color:#91aebd;font-weight:450}
+.machine-live-subhead{font-size:10.5px;font-weight:650;color:#aecad8;margin:11px 0 5px}
+.machine-live-detail-body .machine-live-subhead:first-child{margin-top:4px}
+.machine-live-ports{margin:7px 0 10px;border-top:1px solid #2f4659}
+.machine-live-ports>.tiny{font-size:10px}
+.machine-live-history{margin-top:10px;border-top:1px solid #32495d;padding-top:6px}
+.machine-live-history summary{font-size:10px;color:#9fbfce;cursor:pointer;padding:4px 0}
+
+
+/* Refined against the prior dark-blue V0.35 Git styling: lower glare and
+   return to the compact two-column editor action buttons. */
+.side.left,.side.right{background:#141f2d}
+.side.left>h3,.right>h3{color:#99b3c7}
+.editor-tools .editor-tool-grid [data-tool]{background:#1e2f40;border-color:#354e64;color:#c7d9e7}
+.editor-tools .editor-tool-grid [data-tool]:hover{background:#274155;border-color:#668f9e}
+.editor-tools .editor-tool-grid [data-tool].active{background:#254a40!important;border-color:#59a78c!important;color:#e1f3e9!important}
+.editor-tools .editor-erase,.editor-tools .editor-canvas-actions button{background:#1b2c3e;border-color:#34495e}
+.editor-tools #groupControls{background:#1b2f3d;border-color:#476a70;padding:8px}
+.editor-tools .group-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}
+.editor-tools .group-buttons button{flex-direction:row;gap:5px;min-height:27px;font-size:10px;padding:3px 4px;background:#203246;border-color:#374e66;color:#cadfeb}
+.editor-tools .group-buttons button:hover:not(:disabled){background:#2b4358}
+.editor-tools .group-buttons button small{font-size:9px;color:#88a5b8;white-space:nowrap}
+.editor-tools .group-buttons #groupDuplicate{background:#204236;border-color:#3c6c57;color:#d6f1df}
+.editor-tools .group-buttons #groupDelete{color:#d9a8af;border-color:#634650}
+.editor-tools #groupSelectionInfo{color:#bfe3d9!important}
+.machine-library #search{background:#17293a;border-color:#39536c}
+.machine-library .machine-palette button[data-stamp]{background:#1d3042;border-color:#344f63;border-left-color:#567789;color:#cfe1ed;min-height:36px}
+.machine-library .machine-palette button[data-stamp]:hover{background:#274358;border-color:#6795a1}
+.machine-palette-label span{color:#d5e6f1}
+.machine-library .machine-palette button[data-stamp].active{background:#214b42!important;border-color:#57a78d!important}
+.machine-library .machine-palette button[data-stamp]>small{color:#839dae}
+.machine-palette-heading{color:#a9c5d6}
+#inspector .inspector-machine .machine-summary{background:#192a39;border-color:#374e62}
+#inspector .machine-properties{background:#162738;border-color:#30495d}
+#inspector .machine-properties select{background:#1b2d41;border-color:#3c5369;color:#d7e7f1}
+#inspector .machine-recipe-standalone{background:#172938;border-color:#344a5f}
+.machine-flow-tile,.machine-live-summary>div{background:#1b2d3e;border-color:#31495f}
+.machine-port-detail-row{background:#192a3b;border-color:#2e4559}
+#inspector .machine-duty-grid>div{background:#1a2b3b;border-color:#30485a}
+#inspector .machine-summary-name{filter:saturate(.85)}
+
+
+/* Readability pass: keep previous dark design, restore the earlier 12–13px sidebar
+   typography rather than squeezing labels into 9–10px captions. */
+.side.left>h3,.side.right>h3{font-size:12.5px;letter-spacing:.16px}
+.editor-tools .editor-tool-label{font-size:12px}
+.editor-tools .editor-tool-grid .editor-tool-name{font-size:11.5px}
+.editor-tools .editor-erase{font-size:11.5px}
+.editor-tools .editor-canvas-actions button{font-size:11.5px;min-height:31px}
+.editor-tools .editor-help-disclosure>summary{font-size:11.5px}
+.editor-tools #groupSelectionInfo{font-size:11.5px}
+.editor-tools .group-buttons button{font-size:11.5px;min-height:31px}
+.editor-tools .group-buttons button small{font-size:10px}
+.editor-tools .group-guide summary,.editor-tools .group-guide small{font-size:10.5px}
+.machine-library #search{font-size:12px}
+.machine-palette-heading{font-size:12px}
+.machine-palette-heading small{font-size:11px}
+.machine-library .machine-palette button[data-stamp]{min-height:38px;border-left-color:var(--palette-machine-color,#567789)}
+.machine-library .machine-palette button[data-stamp]:hover{border-left-color:var(--palette-machine-color,#81c6ae)}
+.machine-palette-label span,
+.machine-library .machine-palette button[data-stamp] .machine-palette-label span{
+ color:var(--palette-machine-color,#d5e6f1);
+ font-size:12.5px;font-weight:660;
+ text-shadow:0 1px 1px #061522;
+}
+.machine-library .machine-palette button[data-stamp].active{border-left-color:var(--palette-machine-color,#94f2cb)!important}
+.machine-library .machine-palette button[data-stamp].active .machine-palette-label span{
+ color:var(--palette-machine-color,#d5e6f1);
+}
+.machine-library .machine-palette button[data-stamp]>small{font-size:11px}
+.machine-library .machine-config-top{font-size:11.5px}
+.machine-library .machine-config-identity strong{font-size:13px}
+.machine-library .machine-config-field,
+.machine-library .machine-config-field select{font-size:12px}
+.machine-library .machine-config-recipe,.machine-library .machine-config-hint{font-size:11.5px}
+.side.right .inspector-machine{font-size:12px}
+#inspector .machine-summary-eyebrow{font-size:11.5px}
+#inspector .machine-summary-name{font-size:16px}
+#inspector .machine-summary-location{font-size:11.5px}
+#inspector .machine-summary-metrics span{font-size:11px}
+#inspector .machine-summary-metrics strong{font-size:12.5px}
+#inspector .machine-summary-metrics strong small{font-size:10px}
+#inspector .machine-analysis-heading{font-size:12.5px}
+#inspector .machine-properties .machine-field-caption{font-size:12px}
+#inspector .machine-properties .machine-field>span{font-size:11.5px}
+#inspector .machine-properties select{font-size:12px;min-height:35px}
+#inspector .machine-recipe-heading{font-size:12px}
+#inspector .machine-recipe-flow{font-size:12px}
+#inspector .machine-recipe-heading small{font-size:11px}
+#inspector .inspector-machine>.item{font-size:12px}
+#inspector .inspector-machine>.item .tiny{font-size:11.5px}
+#inspector .inspector-machine>.item .kv{font-size:12px}
+#inspector .inspector-machine>.item .kv b{font-size:12px}
+#inspector .machine-analysis-title strong{font-size:12.5px}
+#inspector .machine-analysis-title .analysis-unit{font-size:11px}
+#inspector .machine-flow-tile .tile-label{font-size:11.5px}
+#inspector .machine-flow-tile .tile-value{font-size:17px}
+#inspector .machine-flow-tile .tile-value small{font-size:10px}
+#inspector .machine-duty-grid span{font-size:11px}
+#inspector .machine-duty-grid b{font-size:14px}
+#inspector .machine-port-details summary{font-size:12px}
+#inspector .machine-port-details-heading{font-size:11.5px}
+#inspector .machine-port-detail-row{font-size:12px}
+#inspector .machine-port-detail-row .kv b{font-size:11.5px!important}
+#inspector .machine-port-detail-row .port-muted{font-size:11px}
+#inspector .machine-live-head strong{font-size:12.5px}
+#inspector .machine-live-head small{font-size:11px}
+#inspector .machine-live-summary span{font-size:11.5px}
+#inspector .machine-live-summary b{font-size:17px}
+#inspector .machine-live-detail>summary,
+#inspector .machine-live-subhead{font-size:12px}
+#inspector .machine-live-history summary{font-size:11px}
+.right .right-extra-panel>summary{font-size:12px}
+@media(max-width:1100px){
+ .editor-tools .group-buttons button{font-size:11px}
+ .machine-library .machine-palette button[data-stamp] .machine-palette-label span{font-size:12px}
+}
+
+
+/* Flat inspector: a single clearly outlined analysis panel. Left labels and
+   right-aligned numbers replace the stack of metric cards inside metric cards. */
+.side.right{background:#19283a}
+#inspector .inspector-machine{color:#e0eff9}
+#inspector .machine-summary{background:#20364a;border:1px solid #48637d;border-top:2px solid var(--machine-accent,#72cdaa)}
+#inspector .machine-summary-eyebrow{color:#a5bfd2}
+#inspector .machine-summary-eyebrow code{background:transparent;border:0;padding:0;color:#c1d8e8}
+#inspector .machine-summary-location{color:#b4ccdc}
+#inspector .machine-summary-metrics{display:block;margin-top:10px;padding-top:8px;border-top:1px solid #456076}
+#inspector .machine-summary-metrics>div{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+ padding:4px 0;border:0;min-width:0}
+#inspector .machine-summary-metrics span{display:inline;color:#a9c6d7;font-size:12px}
+#inspector .machine-summary-metrics strong{display:inline;margin:0;color:#edf7fc;font-size:12.5px;text-align:right;
+ font-variant-numeric:tabular-nums;white-space:normal}
+#inspector .machine-summary-metrics strong small{color:#aec8d8}
+#inspector .machine-properties{background:#21374b;border-color:#48637d;padding:12px}
+#inspector .machine-properties .machine-field-caption{color:#d3e4ef}
+#inspector .machine-properties .machine-field>span{color:#bad2e0}
+#inspector .machine-properties select{background:#16293c;border-color:#516e84;color:#ebf7ff}
+#inspector .machine-recipe-standalone{background:transparent;border:0;border-top:1px solid #40566a;border-radius:0;
+ margin:12px 1px 0;padding:10px 1px}
+#inspector .machine-recipe-heading{color:#c1d9e7}
+#inspector .machine-flow-input{color:#9bd1fb}
+#inspector .machine-flow-output{color:#ffca94}
+#inspector .machine-analysis-panel{margin-top:12px;padding:11px 13px 13px;background:#203548;
+ border:1px solid #48647d;border-radius:9px}
+#inspector .machine-analysis-panel>.machine-analysis-heading{margin:0;padding:1px 0 8px;
+ border-bottom:1px solid #40596e;font-size:12.5px;color:#d6eaf5}
+#inspector .machine-analysis-panel>.item{background:transparent!important;border:0!important;border-radius:0!important;
+ box-shadow:none!important;padding:9px 0 0!important;margin:0!important;min-width:0}
+#inspector .machine-analysis-panel>.item+.item{border-top:1px solid #40596e!important;margin-top:10px!important;padding-top:12px!important}
+#inspector .machine-analysis-title{margin-bottom:4px}
+#inspector .machine-analysis-title strong,#inspector .machine-live-head strong{font-size:12.5px;color:#e8f5fd}
+#inspector .machine-analysis-title .analysis-unit,#inspector .machine-live-head small{color:#a7c5d6}
+#inspector .machine-flow-summary,#inspector .machine-duty-grid,#inspector .machine-live-summary{
+ display:block;margin:2px 0;gap:0}
+#inspector .machine-flow-summary>.machine-flow-tile,#inspector .machine-duty-grid>div,
+#inspector .machine-live-summary>div{display:flex;justify-content:space-between;align-items:baseline;
+ gap:8px;min-height:32px;padding:7px 1px;margin:0;border:0;border-bottom:1px solid #385268;
+ border-radius:0;background:transparent;box-shadow:none}
+#inspector .machine-flow-summary .tile-label,#inspector .machine-duty-grid span,
+#inspector .machine-live-summary span{display:inline;margin:0;color:#b5cedd;font-size:11.5px;white-space:normal}
+#inspector .machine-flow-summary .tile-label .tile-dot{display:inline-block;margin-right:4px}
+#inspector .machine-flow-summary .tile-value,#inspector .machine-duty-grid b,
+#inspector .machine-live-summary b{display:inline;margin:0;font-size:12.5px;font-weight:680;line-height:1.4;
+ color:#e9f5fd;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#inspector .machine-flow-summary .tile-value small,#inspector .machine-live-summary b small{
+ color:#a4c3d1;font-size:10px;font-weight:400}
+#inspector .machine-flow-summary>.machine-flow-tile.in .tile-value{color:#a8dcfc}
+#inspector .machine-flow-summary>.machine-flow-tile.out .tile-value{color:#ffcd9b}
+#inspector .machine-duty-grid b{color:#e2f4e8}
+#inspector .machine-live-summary b{color:#b7ecdb}
+#inspector .machine-port-details{padding:5px 0 0;margin:7px 0 0;border-top:1px solid #40596e}
+#inspector .machine-port-details>summary,#inspector .machine-live-detail>summary{
+ min-height:32px;padding:8px 1px;color:#c1dee9;font-size:12px}
+#inspector .machine-port-details-section{padding:8px 0;border-top:1px solid #3c5268}
+#inspector .machine-port-details-heading,#inspector .machine-live-subhead{color:#c8dce9;font-size:11.5px}
+#inspector .machine-port-detail-row{padding:7px 1px;margin:0;border:0;border-bottom:1px solid #344c61;
+ border-radius:0;background:transparent}
+#inspector .machine-port-detail-row .kv{margin:3px 0}
+#inspector .machine-port-detail-row .kv b{font-size:11.5px!important}
+#inspector .machine-port-detail-row .port-muted{font-size:10.5px;color:#a3bdce}
+#inspector .machine-live-detail{padding-top:5px;margin-top:8px;border-top:1px solid #40596e}
+#inspector .machine-live-detail .kv{padding:5px 0;border-bottom:1px solid #344b5d;margin:0}
+#inspector .machine-live-detail .kv span:first-child{color:#bfd4df}
+#inspector .machine-live-detail .kv b{color:#e7f3fb}
+#inspector .machine-live-history{margin-top:8px;border-top:1px solid #40576c}
+#inspector .machine-live-history>summary{color:#b7d3e2}
+#inspector .machine-live-ports{border-top:0;margin-top:6px}
+#inspector .machine-live-ports>.tiny{font-size:11px}
+#inspector .machine-analysis-panel .tiny{color:#a9c5d6}
+#inspector .machine-summary-metrics>div:first-child{padding-left:0}
+#inspector .machine-summary-metrics>div:last-child{padding-right:0}
+/* Warehouse cards receive the same one-surface/row-based hierarchy. */
+.side.right .ledger-panel{background:#203548;border:1px solid #45617a;padding:10px;border-radius:8px}
+.side.right .ledger-panel .ledger-head strong{font-size:12.5px;color:#e7f2f8}
+.side.right .ledger-panel .ledger-mini{display:block}
+.side.right .ledger-panel .ledger-mini>div{display:flex;align-items:baseline;justify-content:space-between;
+ gap:8px;background:transparent;border-bottom:1px solid #3b556b;border-radius:0;padding:7px 2px}
+.side.right .ledger-panel .ledger-mini span{font-size:11.5px;color:#bad2de}
+.side.right .ledger-panel .ledger-mini b{font-size:13px;color:#e2f5ed}
+.side.right .ledger-table th{color:#c0d8e5;font-size:11px}
+.side.right .ledger-table td{color:#d9e9f4}
+
+
+/* Override the older two-column theory grid explicitly. Both figures must
+   remain full-width name/value rows even in a 292px sidebar. */
+#inspector .machine-theory .machine-flow-summary{display:flex;flex-direction:column;gap:0;margin:3px 0 7px}
+#inspector .machine-theory .machine-flow-summary>.machine-flow-tile{display:flex;flex:0 0 auto;width:100%;
+ align-items:center;justify-content:space-between;gap:9px;padding:7px 0}
+#inspector .machine-theory .machine-flow-summary .tile-label{flex:1 1 auto;min-width:0}
+#inspector .machine-theory .machine-flow-summary .tile-value{flex:none;text-align:right;white-space:nowrap}
+
+
+/* Restore the exact committed V0.35 deep panel palette. The later bright-blue
+   sidebar overrides had washed out contrast with otherwise vivid machine text. */
+.side.left,.side.right{background:var(--panel);border-color:var(--edge)}
+#inspector .inspector-machine .machine-summary,
+#inspector .machine-summary,
+#inspector .machine-properties,
+#inspector .machine-analysis-panel,
+.side.right .ledger-panel{
+ background:#1d2b3d;
+ border-color:#2d4159;
+}
+#inspector .machine-properties select{background:#1c2a3b;border-color:#334961}
+#inspector .machine-recipe-standalone{background:transparent;border-color:#304458}
+#inspector .machine-analysis-panel>.machine-analysis-heading{border-bottom-color:#304458}
+#inspector .machine-analysis-panel>.item+.item{border-top-color:#304458!important}
+#inspector .machine-flow-summary>.machine-flow-tile,
+#inspector .machine-duty-grid>div,
+#inspector .machine-live-summary>div,
+#inspector .machine-port-details,
+#inspector .machine-live-detail,
+#inspector .machine-port-details-section,
+#inspector .machine-port-detail-row,
+#inspector .machine-live-detail .kv{border-color:#304458}
+.side.right .ledger-panel .ledger-mini>div{border-bottom-color:#304458}
+.machine-library .machine-palette button[data-stamp]{background:#1b2939}
+.machine-library .machine-palette button[data-stamp]:hover{background:#253a50}
+.machine-library #search{background:#0c1521;border-color:#344659}
+.editor-tools .editor-tool-grid [data-tool],
+.editor-tools .editor-erase,
+.editor-tools .editor-canvas-actions button,
+.editor-tools .group-buttons button{background:#1c2a3b}
+
+
+/* Normal-weight NUMBERS in right inspector/warehouse. Headings stay bold. */
+.side.right #inspector .machine-summary-metrics strong,
+.side.right #inspector .machine-summary-eyebrow code,
+.side.right #inspector .machine-flow-summary .tile-value,
+.side.right #inspector .machine-duty-grid b,
+.side.right #inspector .machine-live-summary b,
+.side.right #inspector .machine-port-detail-row .kv b,
+.side.right #inspector .machine-live-detail .kv b,
+.side.right #inspector .kv > b,
+.side.right .ledger-mini b,
+.side.right .ledger-table td{font-weight:400}
+/* Override the later generic table-cell color rule with exact historic net colors. */
+.side.right .ledger-table td.positive{color:#7ce8b3}
+.side.right .ledger-table td.negative{color:#ff9d9c}
+
+
+/* Recipe output labels contain quantities too; keep those numeric strings
+   regular-weight just like the rest of the right-hand values. */
+.side.right #inspector .machine-recipe-flow strong{font-weight:400}
+
+
+/* Ledger headings are labels, not bright bold callouts. Preserve original
+   deep blue palette and the green/red net figures. */
+.side.right #warehouse .ledger-head strong{
+ color:#a9bfd1;
+ font-weight:400;
+ font-size:12px;
+}
+/* One audit card from first line through all diagnostics; left label/right
+   value consistently 12px without the old loose rows below the first card. */
+.side.right #audit .audit-card{
+ background:#1d2b3d;
+ border:1px solid #2d4159;
+ border-radius:9px;
+ padding:10px 11px;
+ min-width:0;
+ color:#d9e9f4;
+ font-size:12px;
+}
+.side.right #audit .audit-card-title{
+ color:#c2d7e4;
+ font-size:12px;
+ font-weight:600;
+ margin-bottom:7px;
+}
+.side.right #audit .audit-stat-list,
+.side.right #audit .audit-material-list{
+ display:flex;
+ flex-direction:column;
+ min-width:0;
+}
+.side.right #audit .audit-row{
+ display:flex;
+ justify-content:space-between;
+ align-items:baseline;
+ gap:10px;
+ min-width:0;
+ padding:6px 0;
+ border-bottom:1px solid #304458;
+ line-height:1.4;
+ font-size:12px;
+}
+.side.right #audit .audit-row:last-child{border-bottom:0}
+.side.right #audit .audit-label{color:#aec5d6;min-width:0;overflow-wrap:anywhere}
+.side.right #audit .audit-value{
+ color:#d9e9f4;
+ font-size:12px;
+ font-weight:400;
+ font-variant-numeric:tabular-nums;
+ text-align:right;
+ flex-shrink:0;
+}
+.side.right #audit .audit-value.good{color:#77ebb3}
+.side.right #audit .audit-value.warn{color:#ffca85}
+.side.right #audit .audit-value.bad{color:#ff9d9c}
+.side.right #audit .audit-section-heading{
+ display:flex;
+ justify-content:space-between;
+ align-items:baseline;
+ flex-wrap:wrap;
+ column-gap:10px;
+ row-gap:3px;
+ border-top:1px solid #3a5167;
+ padding-top:11px;
+ margin:13px 0 5px;
+ font-size:12px;
+ color:#c5d9e7;
+ font-weight:600;
+}
+.side.right #audit .audit-section-meta{
+ color:#92b1c5;
+ font-weight:400;
+ font-size:11px;
+}
+.side.right #audit .audit-material-row{padding:5px 0}
+.side.right #audit .audit-material-row .audit-value{font-size:11.5px}
+.side.right #audit .audit-hint{
+ color:#91adbf;
+ font-size:10.5px;
+ line-height:1.65;
+ margin:8px 0 11px;
+}
+.side.right #audit .audit-footer-hint{
+ border-top:1px solid #304458;
+ padding-top:10px;
+ margin-bottom:0;
+}
+.side.right #audit .audit-diagnostic{
+ border-top:1px solid #304458;
+ padding:4px 0 3px;
+ margin-top:4px;
+}
+.side.right #audit .audit-diagnostic>summary{
+ color:#b5d1df;
+ cursor:pointer;
+ list-style:none;
+ font-size:11.5px;
+ padding:6px 0;
+}
+.side.right #audit .audit-diagnostic>summary::-webkit-details-marker{display:none}
+.side.right #audit .audit-diagnostic>summary:before{content:'▸';color:#85bea9;margin-right:7px}
+.side.right #audit .audit-diagnostic[open]>summary:before{content:'▾'}
+.side.right #audit .audit-diagnostic>summary.bad{color:#ff9d9c}
+.side.right #audit .audit-diagnostic>summary.warn{color:#ffca85}
+.side.right #audit .audit-diagnostic-body{
+ padding:3px 0 7px;
+ color:#adc6d6;
+ font-size:11px;
+ line-height:1.65;
+ overflow-wrap:anywhere;
+ max-height:240px;
+ overflow-y:auto;
+}
+.side.right #audit .audit-diagnostic-body>div{padding:3px 0}
+
+
+/* Right-sidebar typography system. Section headings, subsection headings,
+   labels and numbers each have one role instead of unrelated bright overrides.
+   The only bold numeric exceptions are the two warehouse simulation KPIs. */
+.side.right{
+ --right-heading:#b7cad9;
+ --right-subheading:#a5bdce;
+ --right-meta:#8da9bd;
+}
+.side.right>h3,
+.side.right #inspector .machine-summary-eyebrow,
+.side.right #inspector .machine-analysis-panel>.machine-analysis-heading,
+.side.right #warehouse .ledger-head strong,
+.side.right #audit .audit-card-title{
+ color:var(--right-heading);
+ font-size:12px;
+ font-weight:550;
+ letter-spacing:.1px;
+}
+.side.right #inspector .machine-summary-eyebrow>span{color:inherit;font:inherit}
+.side.right #inspector .machine-analysis-title strong,
+.side.right #inspector .machine-live-head strong,
+.side.right #audit .audit-section-heading{
+ color:var(--right-subheading);
+ font-size:11.5px;
+ font-weight:500;
+ letter-spacing:0;
+}
+.side.right #inspector .machine-analysis-title .analysis-unit,
+.side.right #inspector .machine-live-head small,
+.side.right #inspector .machine-summary-eyebrow code,
+.side.right #audit .audit-section-meta{
+ color:var(--right-meta);
+ font-weight:400;
+}
+.side.right #warehouseLiveSummary.ledger-mini b{
+ font-weight:700;
+ color:#e3f8ee;
+ font-size:16px;
+ font-variant-numeric:tabular-nums;
+}
+
+
+/* Unified right sidebar heading scale:
+   Level 1: four main sections (warehouse, attributes, route audit, history).
+   Level 2: card headings (machine details, production/flow, ledger, audit).
+   Level 3: subpanels (steady theory, live inventory, metric groups).
+   Primary headings must never be dimmer/smaller than their children. */
+.side.right{
+ --right-level1:#d5e5f1;
+ --right-level2:#b6cddd;
+ --right-level3:#a0b9cb;
+}
+.side.right>h3,
+.side.right>details.warehouse-panel>summary,
+.side.right>details.right-extra-panel>summary{
+ color:var(--right-level1);
+ font-size:14px;
+ font-weight:650;
+ letter-spacing:.12px;
+ line-height:1.5;
+}
+.side.right>h3{margin:16px 13px 8px}
+.side.right>details.warehouse-panel>summary{margin:16px 13px 8px}
+.side.right>details.right-extra-panel>summary{padding:12px 1px;color:var(--right-level1)}
+.side.right>details.warehouse-panel>summary::before,
+.side.right>details.right-extra-panel>summary::before{
+ color:#77c8ad;
+ font-size:13px;
+}
+.side.right #inspector .machine-summary-eyebrow,
+.side.right #inspector .machine-analysis-panel>.machine-analysis-heading,
+.side.right #warehouse .ledger-head strong,
+.side.right #audit .audit-card-title{
+ color:var(--right-level2);
+ font-size:12.5px;
+ font-weight:560;
+ letter-spacing:0;
+}
+.side.right #inspector .machine-summary-eyebrow>span{font:inherit;color:inherit}
+.side.right #inspector .machine-analysis-title strong,
+.side.right #inspector .machine-live-head strong,
+.side.right #audit .audit-section-heading{
+ color:var(--right-level3);
+ font-size:11.75px;
+ font-weight:500;
+ letter-spacing:0;
+}
+
+
+/* Symmetric primary section headers across both sidebars. The map-rules
+   disclosure is a sibling of the machine library, not buried in its scroller. */
+.side.left>h3,
+.side.left>.library-reference>summary,
+.side.right>h3,
+.side.right>details.warehouse-panel>summary,
+.side.right>details.right-extra-panel>summary{
+ color:#d5e5f1;
+ font-size:14px;
+ font-weight:650;
+ line-height:1.5;
+ letter-spacing:.12px;
+}
+.side.left>h3{
+ margin:10px 12px 7px;
+ padding:0;
+ flex:none;
+}
+.side.left>h3:not(:first-child){
+ border-top:1px solid #35475a;
+ padding-top:12px;
+ margin-top:8px;
+}
+.side.left>.library-reference{
+ flex:none;
+ min-height:0;
+ margin:0 12px 10px;
+ padding:0;
+ border-top:1px solid #35475a;
+}
+.side.left>.library-reference>summary{
+ display:flex;
+ align-items:center;
+ gap:7px;
+ padding:12px 0 5px;
+ margin:0;
+ list-style:none;
+ user-select:none;
+}
+.side.left>.library-reference>summary::-webkit-details-marker{display:none}
+.side.left>.library-reference>summary::before{
+ content:'▸';
+ margin:0;
+ font-size:13px;
+ color:#77c8ad;
+}
+.side.left>.library-reference[open]>summary::before{content:'▾'}
+.side.left>.library-reference[open]{max-height:45vh;overflow-y:auto}
+.side.left>.library-reference .library-reference-body{padding:6px 0 10px}
+.side.right>h3{
+ border-top:1px solid #35475a;
+ padding-top:12px;
+ margin:9px 12px 8px;
+}

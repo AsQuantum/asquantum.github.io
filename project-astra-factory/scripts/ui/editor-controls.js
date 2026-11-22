@@ -36,11 +36,21 @@ function draftTarget(cell){if(!cell||!inMap(cell.x,cell.y))return null;let hit=p
 function updateDraftPreview(){if(!draft)return;let target=draftTarget(hoverCell);const port=hoverCell&&portAt(hoverCell.x,hoverCell.y)?.p;draft.preview=target?draftSegment(target,port?.kind==='in'?port:null):null;}
 
 function updateHint(){
- $('stampControls').style.display=stampType?'block':'none';
+ updateStampControls();
  $('beltControls').style.display=draft?'grid':'none';
- if(stampType)$('stampFacing').textContent=({E:'右 →',S:'下 ↓',W:'左 ←',N:'上 ↑'})[stampFace];
 }
-function buildPalette(){let terms=$('search').value.trim().toLowerCase();let grouped={};for(let [k,d] of Object.entries(DEF)){if(!`${d.name} ${k} ${Object.keys(d.recipes||{}).join(' ')}`.toLowerCase().includes(terms))continue;(grouped[d.cat]??=[]).push([k,d]);}let p=$('palette');p.innerHTML=Object.entries(grouped).map(([cat,list])=>`<div class="tiny" style="margin:9px 0 3px;font-weight:bold">${esc(cat)}</div>${list.map(([key,d])=>`<button data-stamp="${esc(key)}"><span style="color:${d.color}">▣ ${esc(d.name)}</span><small>${d.w}×${d.h}</small></button>`).join('')}`).join('');}
+function buildPalette(){
+ const terms=$('search').value.trim().toLowerCase(),grouped={};
+ for(const [key,d] of Object.entries(DEF)){
+  const recipeWords=Object.values(d.recipes||{}).flatMap(rec=>[rec.output,...Object.keys(rec.inputs||{})]);
+  if(![d.name,key,...recipeWords].join(' ').toLowerCase().includes(terms))continue;
+  (grouped[d.cat]??=[]).push([key,d]);
+ }
+ $('palette').innerHTML=Object.entries(grouped).map(([category,list])=>
+  `<div class="machine-palette-group"><div class="machine-palette-heading"><span>${esc(category)}</span><small>${list.length} 种</small></div>
+    ${list.map(([key,d])=>`<button type="button" data-stamp="${esc(key)}" style="--palette-machine-color:${d.color}" title="选择 ${esc(d.name)} 放置"><span class="machine-palette-label"><i class="machine-palette-mark" style="background:${d.color}"></i><span>${esc(d.name)}</span></span><small>${d.w}×${d.h}</small></button>`).join('')}
+   </div>`).join('')||'<div class="tiny" style="padding:12px 3px">没有匹配的机器或配方</div>';
+}
 function screenToCell(px,py){return {x:Math.floor((px-camera.x)/camera.z),y:Math.floor((py-camera.y)/camera.z)};}
 function eventCoords(e){const rect=canvas.getBoundingClientRect();return{x:e.clientX-rect.left,y:e.clientY-rect.top};}
 function autoFit(){camera.z=Math.min((pix.w-40)/72,(pix.h-40)/72);camera.x=(pix.w-72*camera.z)/2;camera.y=(pix.h-72*camera.z)/2;draw();}
