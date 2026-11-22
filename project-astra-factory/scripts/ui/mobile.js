@@ -46,7 +46,7 @@ function mobileUpdatePlacement(){
  else if(groupTransform)message=groupTransform.mode==='copy'
   ?'连续复制：拖动虚影，点中机器确认；点外面不会放置'
   :'移动预览：拖动虚影，点中机器确认';
- else message='双指缩放、平移地图';
+ else message='点按选择 · 单指滑动框选 · 双指移动/缩放地图';
  mobileSetMapStatus(message);
 }
 function mobileOpenView(view){

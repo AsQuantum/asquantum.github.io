@@ -146,12 +146,17 @@
    }
    return;
   }
-  // Preserve long one-finger selection/marquee drags. Editing starts only
-  // once movement exceeds tap tolerance, keeping a possible second finger safe.
+  // A mobile SELECT swipe is ALWAYS marquee selection, even when it starts
+  // over a machine. Previously replayDown() on the initial move synthesized a
+  // machine-press, which accidentally entered move mode and lost the rest of
+  // that first swipe (the preview had no groupStart recorded at pointerdown).
+  // A stationary tap still goes through the real machine selection handler.
   if(distance>TAP_TOLERANCE&&!stampType&&!draft&&!groupTransform&&
      (tool==='select'||tool==='marquee')){
    if(!single.forwarded){
-    replayDown(single,e);
+    const from=screenToCell(single.startX,single.startY);
+    marquee={from:{...from},to:{...from}};
+    drag={kind:'marquee'};
     single.forwarded=true;
    }
    onPointerMove(e);
