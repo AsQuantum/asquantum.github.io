@@ -27,6 +27,14 @@ function ast1PortToGame(m,kind,i){
  throw Error(`无法把 ${label(m)} ${kind}口${i} 映射到游戏接口编号`);
 }
 function ast1GetPort(m,kind,index){return getPorts(m).find(p=>p.kind===kind&&p.index===index)}
+// AST1 B6 counts additional little-endian uint16 material IDs.
+// A material ID of 0 means unrestricted/any for inlet and splitter filters.
+function ast1ExtraItems(record){
+ return Array.from({length:record[6]},(_,i)=>{
+  const id=record[7+i*2]|(record[8+i*2]<<8);
+  return {id,item:id===0?'任意':(AST1_ITEMS[id]||'未识别游戏物品 #'+id)};
+ });
+}
 // Belt-route indices [front,left,right], but filter fields [front,right,left].
 // Keep route indexing unchanged; only translate filter entries.
 function ast1FilterPortFromGame(m,filterIndex){
@@ -63,8 +71,8 @@ function ast1Decode(code){
   const face=ast1Rotations(t)[rot],known=AST1_MODE[t];
   if(known&&(modeId>=known.length||known[modeId]===undefined))throw Error(`第${i}台${t}存在未知游戏配方序号 ${modeId}`);
   const mode=known?known[modeId]:(['废料','浇筑','燃料','电池','共鸣'].includes(t)?'标准':'');
-  const m={id:'ast1_'+i,type:t,x,y,face:ast1MirrorFace(face),mode,ast1GamePorts:true,ast1Mirrored:true,
-   ast1Meta:{record,originalType:typeId,originalMode:mode,originalItem:null,originalInletItem:null,originalOutFilters:null,filterOrderVersion:3}};
+  const m={id:'ast1_'+i,type:t,x,y,face:ast1MirrorFace(face),mode,panel:record[4],ast1GamePorts:true,ast1Mirrored:true,
+   ast1Meta:{record,extensionItems:ast1ExtraItems(record),originalType:typeId,originalMode:mode,originalItem:null,originalInletItem:null,originalOutFilters:null,filterOrderVersion:3}};
   if(t==='仓出'){
    if(extend!==1)throw Error(`第${i}台仓库取出口配置结构暂不支持`);
    const itemId=record[7]|record[8]<<8;
@@ -77,6 +85,12 @@ function ast1Decode(code){
     m.inletItem=matid?(AST1_ITEMS[matid]||('未识别游戏物品 #'+matid)):'';
     m.ast1Meta.originalInletItem=m.inletItem;
    }
+  if(t==='电脑'){
+   if(extend!==1)throw Error('第'+i+'台量子计算机扩展数据不是预期的1个物品ID');
+   const item=m.ast1Meta.extensionItems[0].item;
+   m.inletItem=item==='任意'?'':item;
+   m.ast1Meta.originalInletItem=m.inletItem;
+  }
   if(t==='分流'){
    if(extend!==0&&extend!==3)throw Error(`第${i}台分流器过滤参数结构暂不支持`);
    const filters={};for(let port=0;port<(extend===3?3:0);port++){
@@ -124,7 +138,7 @@ function ast1ToBytes(){
   const r=ast1Rotations(m.type).indexOf(ast1GameFacing(m,m.face||'E'));if(r<0)throw Error('机器旋转异常');
   const old=m.ast1Meta?.record;
   const rec=old&&old[0]===type?old.slice():[type,0,0,0,0,0,0];
-  rec[0]=type;rec[1]=m.ast1Mirrored?AST1_GRID_WIDTH-m.x-dims(m)[0]:m.x;rec[2]=m.y;rec[3]=r;
+  rec[0]=type;rec[1]=m.ast1Mirrored?AST1_GRID_WIDTH-m.x-dims(m)[0]:m.x;rec[2]=m.y;rec[3]=r;rec[4]=supportsMachinePanel(m)?machinePanelPosition(m):(old?.[4]??0);
   const modes=AST1_MODE[m.type];if(modes){
    const mode=m.mode===undefined||m.mode===null||m.mode===''?modes[0]:parseRecipeMode(m.type,m.mode),k=modes.indexOf(mode);
    if(k<0)throw Error(`${label(m)} 配方 ${mode} 没有游戏编码`);
@@ -157,8 +171,13 @@ function ast1ToBytes(){
     // 有实际过滤才附加 3×u16；旧游戏蓝图记录没变化则原样保留，保证无损往返。
     rec[6]=filtered?3:0;rec.splice(7,rec.length-7,...(filtered?extra:[]));
    }
-  }else if(!old&&m.type==='电脑'){
-   rec[6]=1;rec.push(0,0);
+  }else if(m.type==='电脑'){
+   // Computer's only selectable inlet material is unrestricted (E1=0).
+   // Preserve imported E1 bytes verbatim; never silently rewrite a different ID.
+   const item=m.inletItem||'';
+   if(!old&&item&&item!=='任意')throw Error('量子计算机只支持任意入口物品');
+   if(old&&item!==(m.ast1Meta?.originalInletItem||''))throw Error('量子计算机入口物品变更不受支持');
+   if(!old){rec[6]=1;rec.push(0,0);}
   }
   if(rec.length!==7+2*rec[6])throw Error(`机器 ${m.id} AST1 扩展字段数量错误`);
   buf.push(...rec);

@@ -26,18 +26,18 @@ function schemePortsEqual(a,b){
 function schemeCanUseAST(src,decoded){
  if(src.machines.length!==decoded.machines.length||src.routes.length!==decoded.routes.length)return false;
  const allowed=new Set(['id','type','x','y','face','mode','item','inletItem',
-  'outFilters','filters','ast1Meta','ast1Mirrored','ast1GamePorts','w','h']);
+  'outFilters','filters','ast1Meta','ast1Mirrored','ast1GamePorts','w','h','panel']);
  for(let i=0;i<src.machines.length;i++){
   const a=src.machines[i],b=decoded.machines[i];
   if(a.type!==b.type||a.x!==b.x||a.y!==b.y||(a.face||'E')!==b.face||
     (a.mode??defaultModeFor(a.type))!==(b.mode??defaultModeFor(b.type))||
-    !schemePortsEqual(a,b))return false;
+    !schemePortsEqual(a,b)||machinePanelPosition(a)!==machinePanelPosition(b))return false;
   if(Object.entries(a).some(([key,val])=>!allowed.has(key)&&val!==undefined&&val!==null&&val!==''))return false;
   if(a.item!==undefined&&a.type==='仓出'&&a.item!==b.item)return false;
   // A non-warehouse item other than the legacy default, custom filter or label cannot be encoded.
   if(a.item!==undefined&&a.type!=='仓出'&&a.item!=='钛合金锭')return false;
-  if(a.inletItem!==undefined&&a.type==='仓入'&&(a.inletItem||'')!==(b.inletItem||''))return false;
-  if(a.inletItem!==undefined&&a.type!=='仓入')return false;
+  if(a.inletItem!==undefined&&['仓入','电脑'].includes(a.type)&&(a.inletItem||'')!==(b.inletItem||''))return false;
+  if(a.inletItem!==undefined&&!['仓入','电脑'].includes(a.type))return false;
   if(a.filters&&Object.values(a.filters).some(Boolean))return false;
   const normalizeFilters=filters=>Object.fromEntries(Object.entries(filters||{})
    .filter(([key,item])=>item&&item!=='任意').sort(([a],[b])=>Number(a)-Number(b)));

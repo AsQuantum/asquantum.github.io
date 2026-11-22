@@ -13,9 +13,21 @@ document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.data
 $('palette').onclick=e=>{let b=e.target.closest('[data-stamp]');if(!b)return;setStampType(b.dataset.stamp);tool='stamp';selection=null;draft=null;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.remove('active'));document.querySelectorAll('#palette button').forEach(b=>b.classList.toggle('active',b.dataset.stamp===stampType));updateHint();draw();};
 $('stampLeft').onclick=()=>rotateStamp(-1);$('stampRight').onclick=()=>rotateStamp(1);$('stampCancel').onclick=()=>setTool('select');
 $('stampMode').onchange=e=>{stampMode=parseRecipeMode(stampType,e.target.value);saveStampPreference();updateStampControls();updateHint();draw();};
-$('stampItem').onchange=e=>{stampItem=e.target.value;saveStampPreference();updateStampControls();updateHint();draw();};$('undoBend').onclick=undoDraftBend;$('cancelBelt').onclick=cancelDraft;
+$('stampItem').onchange=e=>{stampItem=e.target.value;saveStampPreference();updateStampControls();updateHint();draw();};
+$('stampPanel').onchange=e=>{stampPanel=Number(e.target.value);saveStampPreference();updateStampControls();draw();};$('undoBend').onclick=undoDraftBend;$('cancelBelt').onclick=cancelDraft;
 $('inspector').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.rotate)rotateSelected(Number(b.dataset.rotate));else if(b.dataset.selectRoute){selection={routeId:b.dataset.selectRoute,crossAt:selection?.crossAt||null};inspectorRefresh();draw();}else if(b.dataset.deleteRoute)deleteRoute(b.dataset.deleteRoute);};
-$('inspector').onchange=e=>{let m=machineById(selection?.machineId);if(!m)return; if(e.target.id==='modeSelect'){snapshot();m.mode=parseRecipeMode(m.type,e.target.value);let rcount=state.routes.length;state.routes=state.routes.filter(r=>r.from.id!==m.id&&r.to.id!==m.id);afterChange(`配方已更改，删除${rcount-state.routes.length}条旧连接`);}else if(e.target.id==='warehouseInFilterSelect'){snapshot();m.inletItem=e.target.value;afterChange('仓库入口过滤：'+(m.inletItem||'任意'));}else if(e.target.id==='itemSelect'){snapshot();m.item=e.target.value;afterChange('仓库取出口改为 '+m.item);}else if(e.target.dataset.outFilter!==undefined){snapshot();(m.outFilters??={})[Number(e.target.dataset.outFilter)]=e.target.value;afterChange('已更新分流器出口材料限制');}};
+$('inspector').onchange=e=>{let m=machineById(selection?.machineId);if(!m)return; if(e.target.id==='modeSelect'){
+  const mode=parseRecipeMode(m.type,e.target.value);
+  if(!Object.prototype.hasOwnProperty.call(DEF[m.type]?.recipes||{},mode))return;
+  if(String(m.mode)===String(mode))return;
+  snapshot();m.mode=mode;
+  // Recipe selection does not alter machine ports; transport routes stay wired.
+  afterChange('已更改产物为 '+recipeOptionLabel(m.type,mode));
+ }else if(e.target.id==='panelSelect'){
+  const value=Number(e.target.value);
+  if(!supportsMachinePanel(m)||!Number.isInteger(value)||value<0||value>3||machinePanelPosition(m)===value)return;
+  snapshot();m.panel=value;afterChange('面板方向：'+machinePanelDescription(m));
+ }else if(e.target.id==='warehouseInFilterSelect'){snapshot();m.inletItem=e.target.value;afterChange('仓库入口过滤：'+(m.inletItem||'任意'));}else if(e.target.id==='itemSelect'){snapshot();m.item=e.target.value;afterChange('仓库取出口改为 '+m.item);}else if(e.target.dataset.outFilter!==undefined){snapshot();(m.outFilters??={})[Number(e.target.dataset.outFilter)]=e.target.value;afterChange('已更新分流器出口材料限制');}};
 $('fit').onclick=autoFit;$('clearRoutes').onclick=()=>{if(!state.routes.length)return;if(!confirm('确定清除所有传送带连接？'))return;snapshot();state.routes=[];afterChange('全部线路已清除');};
 
 

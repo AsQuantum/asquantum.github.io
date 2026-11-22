@@ -30,6 +30,19 @@ $('inspector').addEventListener('toggle',e=>{
 },true);
 function machineLiveInventory(m){
  const s=sim?.byMachine?.[m.id];if(!s)return '';
+ if(m.type==='电脑'){
+  const entries=Object.entries(s.consumed||{}).filter(([,n])=>n>0);
+  const total=entries.reduce((sum,[,n])=>sum+n,0);
+  const rows=entries.length?entries.map(([item,n])=>`<div class="kv"><span><span style="color:${materialColor(item)}">●</span> ${esc(item)}</span><b>消耗 ${n} 件</b></div>`).join(''):'<div class="tiny">尚未收到物品</div>';
+  return `<div class="item machine-live" id="inspectorLive">
+   <div class="machine-live-head"><strong>Consumer · 实时消耗</strong><small>模拟时间 ${simTime.toFixed(1)} 秒</small></div>
+   <div class="machine-live-summary">
+    <div><span>累计销毁</span><b>${total}<small> 件</small></b></div>
+    <div><span>消耗上限</span><b>1<small> 件/秒</small></b></div>
+   </div>
+   <details class="machine-live-detail"><summary>查看物品消耗明细</summary><div class="machine-live-detail-body">${rows}</div></details>
+  </div>`;
+ }
  const rec=getRecipe(m),inPorts=getPorts(m).filter(p=>p.kind==='in');
  const outCap=rec?rec.qty*20:0;
  const entries=rec?Object.keys(rec.inputs):[...new Set([...Object.keys(s.inputs||{}),...Object.keys(s.received||{})])];
@@ -170,6 +183,11 @@ function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosure
  const maxRate=rec?(rec.qty/rec.seconds*60).toFixed(2):null;
  const inputRecipe=rec?Object.entries(rec.inputs).map(([name,count])=>`<span class="machine-flow-input">${esc(name)} ×${count}</span>`).join(''):'';
  const machineProps=[];
+ if(supportsMachinePanel(m))machineProps.push(`<label class="machine-field"><span>面板方向</span>
+  <select id="panelSelect" class="full" aria-label="面板方向">
+   ${MACHINE_PANEL_LABELS.map((name,i)=>`<option value="${i}" ${machinePanelPosition(m)===i?'selected':''}>${esc(name)}</option>`).join('')}
+  </select></label>`);
+
  if(modes?.length>1)machineProps.push(`<label class="machine-field"><span>产物 / 配方</span>
   <select id="modeSelect" class="full">${modes.map(q=>`<option value="${esc(q)}" ${String(m.mode)===String(q)?'selected':''}>${esc(recipeOptionLabel(m.type,q))}</option>`).join('')}</select>
  </label>`);
@@ -191,19 +209,20 @@ function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosure
    <div class="machine-summary-location">${m.tag?`<span class="machine-tag">${esc(m.tag)}</span>`:''}<span>${w} × ${h} 格</span><span>坐标 (${m.x}, ${m.y})</span></div>
    <div class="machine-summary-metrics">
     <div><span>输出朝向</span><strong>${esc(faceName)}</strong></div>
-    <div><span>生产周期</span><strong>${rec?rec.seconds+' 秒':'—'}</strong></div>
-    <div><span>标称上限</span><strong>${maxRate??'—'}${maxRate!==null?`<small> 件/分</small>`:''}</strong></div>
+    ${supportsMachinePanel(m)?`<div><span>面板方向</span><strong>${esc(machinePanelDescription(m))}</strong></div>`:''}
+    <div><span>${m.type==='电脑'?'消耗周期':'生产周期'}</span><strong>${m.type==='电脑'?'1 秒/件':rec?rec.seconds+' 秒':'—'}</strong></div>
+    <div><span>${m.type==='电脑'?'消耗上限':'标称上限'}</span><strong>${m.type==='电脑'?'1 件/秒':(maxRate??'—')}${m.type!=='电脑'&&maxRate!==null?`<small> 件/分</small>`:''}</strong></div>
    </div>
-   ${m.ast1Meta?.record?`<div class="machine-ast1-meta">AST1 类型 #${Number(m.ast1Meta.record[0])} · 配方 #${Number(m.ast1Meta.record[5])}</div>`:''}
-  </section>
-
-  ${machineProps.length?`<section class="machine-properties">${machineProps.join('')}</section>`:''}
-  ${rec?`<section class="machine-recipe machine-recipe-standalone">
+  ${rec?`<section class="machine-recipe machine-recipe-in-summary">
     <div class="machine-recipe-heading"><span>当前配方</span><small>${rec.seconds} 秒/次</small></div>
     <div class="machine-recipe-flow">${inputRecipe||'<span class="machine-flow-none">无输入</span>'}<span class="machine-flow-arrow">→</span>
      <strong class="machine-flow-output">${esc(rec.output)} ×${rec.qty}</strong>
     </div>
    </section>`:''}
+      ${m.ast1Meta?.record?`<div class="machine-ast1-meta">AST1 类型 #${Number(m.ast1Meta.record[0])} · 配方 #${Number(m.ast1Meta.record[5])}</div>`:''}
+  </section>
+
+  ${machineProps.length?`<section class="machine-properties"><div class="machine-edit-heading">编辑设置</div>${machineProps.join('')}</section>`:''}
   <section class="machine-analysis-panel">
    <div class="machine-analysis-heading">生产与物流分析</div>
    ${machineSteadyPanel(m)}

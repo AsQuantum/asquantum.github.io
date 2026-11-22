@@ -25,8 +25,8 @@ function packetCoords(r,p){
  const a=path[i],b=path[i+1];
  return [a[0]+.5+(b[0]-a[0])*f,a[1]+.5+(b[1]-a[1])*f];
 }
-function resetSimulation(){running=false;let btn=$('run');if(btn){btn.textContent='▶ 运行模拟';btn.classList.add('primary');btn.classList.remove('sim-running');}simTime=0;ware={};sim={byMachine:{},routes:{},inbound:{},outbound:{},crafts:{},minuteBuckets:[]};stockChartReset();
- for(let m of state.machines)sim.byMachine[m.id]={inputs:{},portInputs:{},portItems:{},received:{},sent:{},queue:[],busy:0,tick:0,lastSend:{},lastReceive:{},roundRobin:0};
+function resetSimulation(){running=false;let btn=$('run');if(btn){btn.textContent='▶ 运行模拟';btn.classList.add('primary');btn.classList.remove('sim-running');}simTime=0;ware={};sim={byMachine:{},routes:{},inbound:{},outbound:{},crafts:{},consumed:{},minuteBuckets:[]};stockChartReset();
+ for(let m of state.machines)sim.byMachine[m.id]={inputs:{},portInputs:{},portItems:{},received:{},sent:{},consumed:{},queue:[],busy:0,tick:0,lastSend:{},lastReceive:{},roundRobin:0};
  for(let r of state.routes)sim.routes[r.id]=[];
  warehouseRefresh();draw();simVisualDirty=false;}
 function sendItem(m,s,index,item){const r=routeFor(m.id,'out',index);if(!r)return false;
@@ -51,6 +51,16 @@ function acceptItem(m,port,item){let s=sim.byMachine[m.id];if(m.type==='仓入')
  if(!s)return false;
  if(!acceptsMaterial(m,item,port))return false;
  const last=s.lastReceive[port]??-1e6;if(simTime-last<PORT_INTERVAL-1e-6)return false;
+ // Quantum computer acts as an unrestricted Consumer, permanently disposing
+ // of up to one item per second at its sole input port. No buffering or warehouse credit.
+ if(m.type==='电脑'){
+  s.lastReceive[port]=simTime;
+  s.received[item]=(s.received[item]||0)+1;
+  s.consumed[item]=(s.consumed[item]||0)+1;
+  sim.consumed[item]=(sim.consumed[item]||0)+1;
+  simVisualDirty=true;
+  return true;
+ }
  const cap=inputCap(m,item,port);if(!cap)return false;
  if(m.type==='分流'||m.type==='汇流'){
    const current=(s.portInputs[port]||0);if(current>=cap)return false;

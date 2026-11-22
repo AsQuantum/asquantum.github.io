@@ -219,7 +219,7 @@ function warehouseTheory(targetItem=null){
    if(seen.has(route.id))return false;
    const dest=byId.get(route.to.id);
    if(!dest)return false;
-   if(dest.type==='仓入')return acceptsMaterial(dest,item,route.to.port);
+   if(dest.type==='仓入'||dest.type==='电脑')return acceptsMaterial(dest,item,route.to.port);
    if(dest.type!=='汇流')return false;
    const incoming=machineInputs.get(dest.id)||[];
    // Total worst-case input must fit the merger output (1 item/s).

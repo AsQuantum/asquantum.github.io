@@ -685,3 +685,28 @@
  padding-top:12px;
  margin:9px 12px 8px;
 }
+
+
+/* Editable settings is a separate card; the always-visible recipe lives
+   directly under nominal output capacity in the Machine Details card. */
+#inspector .machine-properties{
+ background:#1d2b3d;border:1px solid #36536b;border-radius:9px;
+ padding:12px 13px;margin-top:12px;gap:10px;
+}
+#inspector .machine-edit-heading{
+ color:#b6cddd;font-size:12.5px;font-weight:560;
+ padding:0 0 9px;border-bottom:1px solid #304458;
+}
+#inspector .inspector-machine .machine-summary .machine-recipe-in-summary{
+ background:transparent;border:0;border-top:1px solid #304458;border-radius:0;
+ margin:10px 0 0;padding:10px 0 0;min-width:0;
+}
+#inspector .machine-summary .machine-recipe-heading{
+ color:#b6cddd;font-size:12px;
+}
+#inspector .machine-summary .machine-recipe-heading small{
+ color:#93afc1;font-size:11px;
+}
+#inspector .machine-summary .machine-recipe-flow{
+ font-size:11.5px;line-height:1.6;overflow-wrap:anywhere;
+}

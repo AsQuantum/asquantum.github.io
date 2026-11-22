@@ -4,15 +4,43 @@ const makeColor=m=>DEF[m.type]?.color||'#8796ac';
 // overlay only moving packages; this avoids redrawing all machines and 1300+ belt tiles
 // up to 60 times per second while simulating.
 let cachedMap=null,cachedMapCtx=null,staticReady=false,frameLastPaint=0;
-// Preview machines need the same physical port positions and direction colors as placed machines.
-// Render above the translucent placement tint so input/output sockets remain readable.
+// Input/output ports are transparent squares: blue for input, orange for output.
+function paintPortSocket(port){
+ ctx.strokeStyle=port.kind==='in'?'#5baaff':'#ffae61';
+ ctx.lineWidth=.13;
+ ctx.strokeRect(port.x+.10,port.y+.10,.8,.8);
+}
+// Preview machines share the identical port appearance with placed machines.
 function paintPreviewPorts(m){
  ctx.save();ctx.globalAlpha=1;
- for(const port of getPorts(m)){
-  ctx.fillStyle=port.kind==='in'?'#5baaff':'#ffae61';
-  ctx.fillRect(port.x+.08,port.y+.08,.84,.84);
-  ctx.strokeStyle='#132434';ctx.lineWidth=.08;
-  ctx.strokeRect(port.x+.08,port.y+.08,.84,.84);
+ for(const port of getPorts(m))paintPortSocket(port);
+ ctx.restore();
+}
+// Compact machine markings, centered on their actual physical edges.
+// Outline triangle: within the machine and pointing at its facing edge,
+// same color as its normal machine border (no second outline).
+// Control panel: pale-blue 2-cell bar directly on the relevant edge,
+// with 1.5x the original .14-cell thickness (.21 cell).
+function paintMachineIndicators(m,w,h){
+ const front=m.face||'E',cx=m.x+w/2,cy=m.y+h/2,d=V[front];
+ const normalExtent=(d[0]?w:h)/2;
+ const tx=-d[1],ty=d[0];
+ ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+ // Keep the pointed half of the original triangle: closed but only half as tall/wide.
+ // The tip stays near the facing edge; its base is halfway toward the old base.
+ ctx.beginPath();
+ ctx.moveTo(cx+d[0]*(normalExtent-.28),cy+d[1]*(normalExtent-.28));
+ ctx.lineTo(cx+d[0]*(normalExtent-.61)+tx*.16,cy+d[1]*(normalExtent-.61)+ty*.16);
+ ctx.lineTo(cx+d[0]*(normalExtent-.61)-tx*.16,cy+d[1]*(normalExtent-.61)-ty*.16);
+ ctx.closePath();
+ ctx.lineWidth=.105;ctx.strokeStyle=makeColor(m);ctx.stroke();
+ if(supportsMachinePanel(m)){
+  const side=machinePanelFacing(m),n=V[side];
+  const edge=(n[0]?w:h)/2-.08;
+  const x=cx+n[0]*edge,y=cy+n[1]*edge;
+  ctx.fillStyle='#9dddff';
+  if(n[0])ctx.fillRect(x-.105,cy-1,.21,2);
+  else ctx.fillRect(cx-1,y-.105,2,.21);
  }
  ctx.restore();
 }
@@ -41,7 +69,9 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  }
  for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle='#9affd0';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
  for(let m of state.machines){let[w,h]=dims(m),c=makeColor(m);ctx.fillStyle=hexAlpha(c,.18);ctx.fillRect(m.x+.08,m.y+.08,w-.16,h-.16);ctx.lineWidth=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id)) ? .29 : .14;ctx.strokeStyle=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id))?'#f5dc77':c;ctx.strokeRect(m.x+.08,m.y+.08,w-.16,h-.16);
- const ports=getPorts(m);for(let p of ports){ctx.fillStyle=p.kind==='in'?'#5baaff':'#ffae61';ctx.fillRect(p.x+.08,p.y+.08,.84,.84);ctx.strokeStyle='#132434';ctx.lineWidth=.08;ctx.strokeRect(p.x+.08,p.y+.08,.84,.84);if(draft&&draft.from.id===m.id&&draft.from.port===p.index&&p.kind==='out'){ctx.strokeStyle='#ffee88';ctx.lineWidth=.17;ctx.strokeRect(p.x-.06,p.y-.06,1.12,1.12);}}
+ const ports=getPorts(m);for(let p of ports){paintPortSocket(p);if(draft&&draft.from.id===m.id&&draft.from.port===p.index&&p.kind==='out'){ctx.strokeStyle='#ffee88';ctx.lineWidth=.17;ctx.strokeRect(p.x-.06,p.y-.06,1.12,1.12);}}
+ // Compositing order: socket squares < facing/panel marks < machine text.
+ if(z>=4.8)paintMachineIndicators(m,w,h);
  if(z>=6.5)paintMachineText(m,w,h);
  // Connectivity warnings are drawn on the machine itself; they are not hidden behind the audit panel.
  const miss=missingMaterials(m),isProduct=!!getRecipe(m)&&!!outPort(m,0),idle=isProduct&&!routeFor(m.id,'out',0);
@@ -51,7 +81,8 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  // Machine port squares already indicate the contacts. Never add a separate green port stub.
  // The belt shape in its first outer cell already starts at the appropriate grid edge.
  if(stampType&&hoverCell){let d=DEF[stampType],m=getStampMachine(hoverCell.x,hoverCell.y),[w,h]=dims(m),ok=canPlace(m);ctx.fillStyle=ok?'#4ce4a34b':'#fe547755';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.2;ctx.strokeRect(m.x,m.y,w,h);
- for(let port of getPorts(m)){ctx.fillStyle=port.kind==='in'?'#5baaff':'#ffae61';ctx.fillRect(port.x+.10,port.y+.10,.8,.8);}
+ paintPreviewPorts(m);
+ if(z>=4.8)paintMachineIndicators(m,w,h);
  if(z>=5)paintMachineText(m,w,h,true);}
  if(draft){let locked=draft.path||[],all=draft.preview||locked;
  let startMachine=machineById(draft.from.id),startPort=startMachine&&outPort(startMachine,draft.from.port);
@@ -74,7 +105,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  if(locked.length){let [x,y]=locked.at(-1);ctx.strokeStyle='#ffde74';ctx.lineWidth=.16;ctx.strokeRect(x+.12,y+.12,.76,.76);}
  }
  if(marquee){const x=Math.min(marquee.from.x,marquee.to.x),y=Math.min(marquee.from.y,marquee.to.y),w=Math.abs(marquee.to.x-marquee.from.x)+1,h=Math.abs(marquee.to.y-marquee.from.y)+1;ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
- if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=b&&inPort(b,r.to.port);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);if(z>=5)paintMachineText(m,w,h,true);}ctx.restore();}
+ if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=b&&inPort(b,r.to.port);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);if(z>=4.8)paintMachineIndicators(m,w,h);if(z>=5)paintMachineText(m,w,h,true);}ctx.restore();}
  ctx.strokeStyle='#637991';ctx.lineWidth=.1;ctx.strokeRect(0,0,72,72);ctx.restore();$('beltText').textContent=`${getBeltCount()}格传送带`;}
 function drawMovingPackets(){
  if(!sim)return;

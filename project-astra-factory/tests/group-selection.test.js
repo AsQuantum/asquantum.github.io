@@ -129,12 +129,13 @@ console.log('release-then-click placement regression test passed');
 
 // Preview sockets must remain visible for every face/orientation.
 const previewScript=fs.readFileSync(root+'/scripts/ui/canvas.js','utf8');
-const previewPortPainter=previewScript.slice(previewScript.indexOf('function paintPreviewPorts('),previewScript.indexOf('function drawStaticScene('));
-assert(previewScript.includes('paintPreviewPorts(m);if(z>=5)paintMachineText'), 'placement preview must actually draw sockets');
+const previewPortPainter=previewScript.slice(previewScript.indexOf('function paintPortSocket('),previewScript.indexOf('function drawStaticScene('));
+assert(previewScript.includes('paintPreviewPorts(m);if(z>=4.8)paintMachineIndicators(m,w,h);if(z>=5)paintMachineText'),
+ 'group placement preview must draw sockets then indicators then text');
 const paintedSockets=[];
 ctx.paintedSockets=paintedSockets;
 vm.runInContext(`
-const ctx={color:null, save(){},restore(){},set fillStyle(v){this.color=v},get fillStyle(){return this.color},fillRect(x,y,w,h){paintedSockets.push({color:this.color,x,y,w,h})},strokeRect(){}};
+const ctx={color:null, save(){},restore(){},set strokeStyle(v){this.color=v},get strokeStyle(){return this.color},fillRect(){throw Error('Port socket background must be transparent')},strokeRect(x,y,w,h){paintedSockets.push({color:this.color,x,y,w,h,width:this.lineWidth})}};
 `,ctx);
 vm.runInContext(previewPortPainter,ctx);
 for(const face of ['E','S','W','N']){
@@ -146,8 +147,11 @@ for(const face of ['E','S','W','N']){
  assert.strictEqual(paintedSockets.length,ports.length);
  for(let i=0;i<ports.length;i++){
   assert.strictEqual(paintedSockets[i].color,ports[i].kind==='in'?'#5baaff':'#ffae61');
-  assert.strictEqual(paintedSockets[i].x,ports[i].x+.08);
-  assert.strictEqual(paintedSockets[i].y,ports[i].y+.08);
+  assert.strictEqual(paintedSockets[i].x,ports[i].x+.10);
+  assert.strictEqual(paintedSockets[i].y,ports[i].y+.10);
+  assert.strictEqual(paintedSockets[i].w,.8);
+  assert.strictEqual(paintedSockets[i].h,.8);
+  assert.strictEqual(paintedSockets[i].width,.13);
  }
 }
 console.log('preview socket rendering tests passed');

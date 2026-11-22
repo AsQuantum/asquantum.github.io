@@ -11,9 +11,25 @@ function parseRecipeMode(type,value){
 function recipeModes(type){const keys=Object.keys(DEF[type]?.recipes||{});if(typeof AST1_MODE==='undefined'||!AST1_MODE[type])return keys;const ordered=AST1_MODE[type].map(String);return [...ordered.filter(k=>keys.includes(k)),...keys.filter(k=>!ordered.includes(k))];}
 function defaultModeFor(type){const key=recipeModes(type)[0];return key===undefined?'':parseRecipeMode(type,key);}
 function recipeOptionLabel(type,key){const r=DEF[type]?.recipes?.[key];return r?.output||key;}
-function setStampType(type){const previous=stampPrefs[type]||{};stampType=type;stampFace=previous.face||'E';const savedMode=previous.mode;stampMode=savedMode!==undefined&&savedMode!==null&&Object.prototype.hasOwnProperty.call(DEF[type].recipes||{},savedMode)?parseRecipeMode(type,savedMode):defaultModeFor(type);stampItem=previous.item||'钛合金锭';updateStampControls();}
-function saveStampPreference(){if(!stampType)return;stampPrefs[stampType]={face:stampFace,mode:stampMode,item:stampItem};try{localStorage.setItem('factory_lab_v3_stamp_prefs',JSON.stringify(stampPrefs));}catch(e){}}
-function getStampMachine(x=0,y=0){const mirrored=state.machines.some(m=>m.ast1Mirrored);return {type:stampType,x,y,face:stampFace,mode:stampMode,item:stampItem,ast1Mirrored:mirrored,ast1GamePorts:mirrored};}
+// AST1 record Byte 4: panel side relative to machine facing.
+// 0 left (default), 1 front, 2 right, 3 back.
+const MACHINE_PANEL_LABELS=['左侧','正面','右侧','背面'];
+function supportsMachinePanel(m){return !!m&&!['仓入','仓出','分流','汇流'].includes(m.type);}
+function machinePanelPosition(m){
+ if(!supportsMachinePanel(m))return 0;
+ const value=m.panel??m.ast1Meta?.record?.[4]??0;
+ return Number.isInteger(value)&&value>=0&&value<=3?value:0;
+}
+function machinePanelFacing(m){
+ const order=['E','S','W','N'],front=order.indexOf(m.face||'E');
+ return order[(front+[3,0,1,2][machinePanelPosition(m)]+4)%4];
+}
+function machinePanelDescription(m){
+ return MACHINE_PANEL_LABELS[machinePanelPosition(m)];
+}
+function setStampType(type){const previous=stampPrefs[type]||{};stampType=type;stampFace=previous.face||'E';const savedMode=previous.mode;stampMode=savedMode!==undefined&&savedMode!==null&&Object.prototype.hasOwnProperty.call(DEF[type].recipes||{},savedMode)?parseRecipeMode(type,savedMode):defaultModeFor(type);stampItem=previous.item||'钛合金锭';stampPanel=Number.isInteger(previous.panel)&&previous.panel>=0&&previous.panel<=3?previous.panel:0;updateStampControls();}
+function saveStampPreference(){if(!stampType)return;stampPrefs[stampType]={face:stampFace,mode:stampMode,item:stampItem,panel:stampPanel};try{localStorage.setItem('factory_lab_v3_stamp_prefs',JSON.stringify(stampPrefs));}catch(e){}}
+function getStampMachine(x=0,y=0){const mirrored=state.machines.some(m=>m.ast1Mirrored);return {type:stampType,x,y,face:stampFace,mode:stampMode,item:stampItem,panel:supportsMachinePanel({type:stampType})?stampPanel:0,ast1Mirrored:mirrored,ast1GamePorts:mirrored};}
 function updateStampControls(){
  const panel=$('stampControls');
  if(!stampType){panel.style.display='none';return;}
@@ -23,9 +39,12 @@ function updateStampControls(){
  $('stampName').textContent=d.name;
  $('stampFacing').textContent=({E:'右 →',S:'下 ↓',W:'左 ←',N:'上 ↑'})[stampFace]||'—';
  $('stampModeRow').style.display=modes.length>1?'flex':'none';
+ $('stampPanelRow').style.display=supportsMachinePanel({type:stampType})?'flex':'none';
+ $('stampPanel').value=String(stampPanel);
  $('stampItemRow').style.display=stampType==='仓出'?'flex':'none';
  $('stampMode').innerHTML=modes.map(key=>`<option value="${esc(key)}" ${String(stampMode)===String(key)?'selected':''}>${esc(recipeOptionLabel(stampType,key))}</option>`).join('');
  $('stampItem').innerHTML=MATERIALS.map(mat=>`<option value="${esc(mat)}" ${stampItem===mat?'selected':''}>${esc(mat)}</option>`).join('');
+ $('stampRecipeText').style.display=rec||stampType==='仓出'?'block':'none';
  $('stampRecipeText').innerHTML=rec?
   `<div class="machine-config-recipe-head"><span>配方</span><small>${rec.seconds} 秒/次</small></div><div class="machine-config-flow">${Object.entries(rec.inputs).map(([k,n])=>`<span class="machine-config-input">${esc(k)} ×${n}</span>`).join('')||'<span class="machine-config-none">无输入</span>'}<span class="machine-config-arrow">→</span><strong>${esc(rec.output)} ×${rec.qty}</strong></div>`
   :stampType==='仓出'?`<span>从仓库取出：<strong>${esc(stampItem||'未选择')}</strong></span>`:'';
@@ -115,7 +134,7 @@ function cellRoutes(x,y){return state.routes.filter(r=>r.path.some(p=>p[0]===x&&
 // remains protected by its belt tile and checkPath(), and a merger's output
 // remains a required clear port even when not connected.
 function needsClearOutside(m,p){
-  // Quantum-computer inlet is decorative: draw it, but permit it to be blocked when unused.
+  // Consumer inlet is optional; it needs exterior clearance only while wired.
   if(m.type==='电脑'&&p.kind==='in'&&!routeFor(m.id,'in',p.index))return false;
  if(m.type==='分流'&&p.kind==='out'&&!routeFor(m.id,'out',p.index))return false;
  if(m.type==='汇流'&&p.kind==='in'&&!routeFor(m.id,'in',p.index))return false;
@@ -142,7 +161,7 @@ function recipeOutput(m){if(m.type==='仓出')return m.item||'';return getRecipe
 // 物品限制仍可配置。分流/汇流接受混合物品，出口过滤不受影响。
 function acceptsMaterial(m,item,idx){
  if(!m||!inPort(m,idx)||!item)return false;
- const filter=m.type==='仓入'?(m.inletItem||''):'';
+ const filter=(m.type==='仓入'||m.type==='电脑')?(m.inletItem||''):'';
  if(filter&&filter!=='任意'&&filter!==item)return false;
  const rec=getRecipe(m);
  if(rec)return Object.prototype.hasOwnProperty.call(rec.inputs||{},item);

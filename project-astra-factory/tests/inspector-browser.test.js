@@ -38,12 +38,16 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
     const theory=[...root.querySelectorAll('.item')].find(el=>el.textContent.includes('稳态理论'));
     const live=root.querySelector('#inspectorLive');
     const props=root.querySelector('.machine-properties');
-    const propsCount=Number(!!root.querySelector('#modeSelect'))+
+    const propsCount=Number(!!root.querySelector('#panelSelect'))+Number(!!root.querySelector('#modeSelect'))+
      Number(!!root.querySelector('#itemSelect'))+Number(!!root.querySelector('#warehouseInFilterSelect'))+
      root.querySelectorAll('[data-out-filter]').length;
-    const expectedCount=(recipeModes(type).length>1?1:0)+
+    const expectedCount=(supportsMachinePanel(m)?1:0)+(recipeModes(type).length>1?1:0)+
      (type==='仓出'?1:0)+(type==='仓入'?1:0)+(type==='分流'?3:0);
-    inspected.push({type,propsCount,expectedCount,correctProperties:(propsCount===expectedCount)&&
+    inspected.push({type,propsCount,expectedCount,
+     editCardTitle:expectedCount===0?!root.querySelector('.machine-edit-heading'):root.querySelector('.machine-edit-heading')?.textContent==='编辑设置',
+     recipeInSummary:!!getRecipe(m)===!!root.querySelector('.machine-summary .machine-recipe-in-summary'),
+     noLooseRecipe:!root.querySelector('.inspector-machine > .machine-recipe'),
+     correctProperties:(propsCount===expectedCount)&&
      (!!props===(expectedCount>0)),allOnRight:!document.querySelector('.machine-library #itemSelect')&&
       !document.querySelector('.machine-library #warehouseInFilterSelect'),
      noLegacyInputs:!root.querySelector('[data-filter]')&&!root.querySelector('.machine-connections')&&
@@ -60,7 +64,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    return inspected;
   })()`);
   console.log('RIGHT MACHINE PROPERTIES',JSON.stringify(machineTypes));
-  assert(machineTypes.every(t=>t.correctProperties&&t.allOnRight&&t.noLegacyInputs&&
+  assert(machineTypes.every(t=>t.correctProperties&&t.editCardTitle&&t.recipeInSummary&&t.noLooseRecipe&&t.allOnRight&&t.noLegacyInputs&&
     t.leftNotSelected&&t.noDuplicateActions&&t.leftSelectionActions&&t.analysisOrder&&t.fit),'all machine types need correct compact right-side properties');
 
   await send('Emulation.setDeviceMetricsOverride',{width:1000,height:840,deviceScaleFactor:1,mobile:false});
@@ -158,6 +162,131 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   })()`);
   console.log('LEFT PLACEMENT LIBRARY',JSON.stringify(left));
   assert(Object.values(left).every(Boolean),'left palette should only select/prepare machines for placement');
+
+  const panels=await evaluate(`(()=>{
+   const expected={E:['N','E','S','W'],S:['E','S','W','N'],W:['S','W','N','E'],N:['W','N','E','S']};
+   const directions=Object.fromEntries(Object.keys(expected).map(face=>[face,[0,1,2,3].map(panel=>
+     machinePanelFacing({type:'量装',face,panel}))]));
+   const m={id:'panelA',type:'垃圾',mode:0,face:'E',x:12,y:12,panel:0};
+   const sink={id:'sink',type:'仓入',face:'E',x:22,y:11};
+   const route={id:'preserved',from:{id:m.id,port:0},to:{id:sink.id,port:2},
+     path:[[17,14],[18,14],[19,14],[20,14],[21,14]]};
+   state={name:'面板测试',machines:[m,sink],routes:[route]};selection={machineId:m.id};
+   inspectorRefresh();
+   const summary=$('inspector').querySelector('.machine-summary');
+   const recipe=summary.querySelector('.machine-recipe-in-summary');
+   const selector=$('inspector').querySelector('#panelSelect');
+   const defaultPanel=selector?.value==='0';
+   const inspectorPanelNames=[...selector.options].map(o=>o.textContent.trim());
+   const hiddenPanelIds=JSON.stringify(inspectorPanelNames)===JSON.stringify(MACHINE_PANEL_LABELS)&&
+     JSON.stringify(inspectorPanelNames)===JSON.stringify(['左侧','正面','右侧','背面']);
+   const recipeBelowRate=!!recipe&&!!summary.querySelector('.machine-summary-metrics')&&
+    !!(summary.querySelector('.machine-summary-metrics').compareDocumentPosition(recipe)&Node.DOCUMENT_POSITION_FOLLOWING);
+   selector.value='3';selector.dispatchEvent(new Event('change',{bubbles:true}));
+   const changedPanel=m.panel===3&&machinePanelFacing(m)==='W'&&
+     $('inspector').querySelector('#panelSelect').value==='3';
+   const encoded=ast1Encode(),bytes=Uint8Array.from(atob(encoded.slice(5)),c=>c.charCodeAt(0));
+   const astByte=bytes[3+4];
+   const roundtrip=ast1Decode(encoded).machines[0].panel;
+   const rawJSON=compactFactoryJSON(),jsonStored=JSON.parse(rawJSON).machines[0][5]?.panel;
+   const expanded=expandCompactFactoryLayout(JSON.parse(rawJSON)).machines[0].panel;
+   const selectMode=$('inspector').querySelector('#modeSelect');
+   selectMode.value='1';selectMode.dispatchEvent(new Event('change',{bubbles:true}));
+   const modeChanged=m.mode===1&&state.routes.length===1&&state.routes[0].id==='preserved'&&
+     $('inspector').querySelector('.machine-summary .machine-flow-output')?.textContent.includes('遐想物质');
+   const priorMode=m.mode;
+   const other={id:'fixed',type:'废料',mode:'标准',face:'W',x:12,y:12,panel:0};
+   state={name:'固定配方',machines:[other],routes:[]};selection={machineId:'fixed'};inspectorRefresh();
+   const fixedRecipe=!!$('inspector').querySelector('.machine-summary .machine-recipe-in-summary')&&
+    !$('inspector').querySelector('#modeSelect')&&!!$('inspector').querySelector('#panelSelect');
+   const noPanelLogistics=['分流','汇流','仓入','仓出'].every(type=>!supportsMachinePanel({type}));
+   delete stampPrefs['组装'];setStampType('组装');
+   const stampDefault=stampPanel===0&&getStampMachine(8,8).panel===0&&
+     $('stampPanelRow').style.display==='flex';
+   $('stampPanel').value='2';$('stampPanel').dispatchEvent(new Event('change',{bubbles:true}));
+   const stampEdited=stampPanel===2&&getStampMachine(8,8).panel===2&&stampPrefs['组装']?.panel===2;
+   setStampType('仓入');
+   const logisticStamp=$('stampPanelRow').style.display==='none'&&getStampMachine(8,8).panel===0;
+   const stampPanelNames=[...$('stampPanel').options].map(o=>o.textContent.trim());
+   const stampLabelsOnly=JSON.stringify(stampPanelNames)===JSON.stringify(['左侧','正面','右侧','背面']);
+   const noEmptyPlacementCards=['仓入','分流','汇流','发电','电脑','空间锚点'].every(type=>{
+    setStampType(type);
+    const box=$('stampRecipeText');
+    return box.style.display==='none'&&box.innerHTML.trim()==='';
+   });
+   setStampType('仓出');
+   const warehouseOutputCard=$('stampRecipeText').style.display==='block'&&
+     $('stampRecipeText').textContent.includes('从仓库取出');
+   setStampType('组装');
+   const producingRecipeCard=$('stampRecipeText').style.display==='block'&&
+     $('stampRecipeText').querySelector('.machine-config-flow')!==null;
+   const strokes=[],bars=[],portBoxes=[],arcs=[],moves=[],segments=[];let closedPaths=0;
+   const origStroke=ctx.stroke,origArc=ctx.arc,origFill=ctx.fillRect,origBox=ctx.strokeRect,origMove=ctx.moveTo,origLine=ctx.lineTo,origClose=ctx.closePath;
+   try{
+    ctx.stroke=function(){strokes.push({color:this.strokeStyle,width:this.lineWidth});return origStroke.apply(this,arguments)};
+    ctx.arc=function(){arcs.push([...arguments]);return origArc.apply(this,arguments)};
+    ctx.fillRect=function(x,y,w,h){bars.push({x,y,w,h,color:this.fillStyle});return origFill.apply(this,arguments)};
+    ctx.strokeRect=function(x,y,w,h){portBoxes.push({x,y,w,h,color:this.strokeStyle,width:this.lineWidth});return origBox.apply(this,arguments)};
+    ctx.moveTo=function(x,y){moves.push({x,y});return origMove.apply(this,arguments)};
+    ctx.lineTo=function(x,y){segments.push({x,y});return origLine.apply(this,arguments)};
+    ctx.closePath=function(){closedPaths++;return origClose.apply(this,arguments)};
+    const panelMachine={type:'量装',face:'W',panel:3,x:12,y:12},[pw,ph]=dims(panelMachine);
+    paintMachineIndicators(panelMachine,pw,ph);
+    const triangle=strokes[0],bar=bars[0],tip=moves[0],firstBase=segments[0],lastBase=segments[1];
+    const centerY=panelMachine.y+ph/2;
+    const within=(p)=>p.x>panelMachine.x&&p.x<panelMachine.x+pw&&
+      p.y>panelMachine.y&&p.y<panelMachine.y+ph;
+    const machineTriangle=strokes.length===1&&triangle.color===makeColor(panelMachine)&&
+      Math.abs(triangle.width-.105)<1e-8&&arcs.length===0&&
+      within(tip)&&within(firstBase)&&within(lastBase)&&segments.length===2&&closedPaths===1&&
+      tip.x<firstBase.x&&tip.x<lastBase.x&&
+      Math.abs(tip.y-centerY)<1e-8&&Math.abs((firstBase.y+lastBase.y)/2-centerY)<1e-8&&
+      Math.abs(firstBase.x-tip.x-.33)<1e-8&&
+      Math.abs(Math.abs(firstBase.y-lastBase.y)-.32)<1e-8;
+    const palePanelBar=bars.length===1&&bar.color==='#9dddff'&&
+      Math.abs(bar.x-(panelMachine.x+pw-.185))<1e-8&&
+      Math.abs(bar.y-(centerY-1))<1e-8&&
+      Math.abs(bar.w-.21)<1e-8&&Math.abs(bar.h-2)<1e-8;
+    strokes.length=0;arcs.length=0;bars.length=0;moves.length=0;segments.length=0;
+    const logisticMachine={type:'仓入',face:'W',x:12,y:12};
+    paintMachineIndicators(logisticMachine,...dims(logisticMachine));
+    const ins={kind:'in',x:13,y:16},outs={kind:'out',x:17,y:16};
+    bars.length=0;portBoxes.length=0;
+    paintPortSocket(ins);paintPortSocket(outs);
+    const transparentSockets=bars.length===0&&portBoxes.length===2&&
+      portBoxes[0].color==='#5baaff'&&portBoxes[1].color==='#ffae61'&&
+      portBoxes.every(b=>Math.abs(b.width-.13)<1e-8&&Math.abs(b.w-.8)<1e-8&&Math.abs(b.h-.8)<1e-8);
+    bars.length=0;portBoxes.length=0;
+    const preview={type:'冶炼',face:'E',x:12,y:12};
+    paintPreviewPorts(preview);
+    const previewSockets=bars.length===0&&portBoxes.length===3&&
+      portBoxes.filter(b=>b.color==='#5baaff').length===2&&
+      portBoxes.filter(b=>b.color==='#ffae61').length===1;
+    window.__panelCanvasTest={machineTriangle,palePanelBar,transparentSockets,previewSockets,
+      noLogisticPanel:strokes.length===1&&strokes[0].color===makeColor(logisticMachine)&&
+      bars.length===0&&arcs.length===0};
+   }finally{ctx.stroke=origStroke;ctx.arc=origArc;ctx.fillRect=origFill;ctx.strokeRect=origBox;ctx.moveTo=origMove;ctx.lineTo=origLine;ctx.closePath=origClose;}
+   const canvasTest=window.__panelCanvasTest;
+
+   const oldLayout=expandCompactFactoryLayout(JSON.parse(rawJSON));
+   delete oldLayout.machines[0].panel;
+   const oldDefault=machinePanelPosition(oldLayout.machines[0])===0;
+   return {directions,expected,defaultPanel,recipeBelowRate,changedPanel,astByte,roundtrip,stampDefault,stampEdited,logisticStamp,hiddenPanelIds,stampLabelsOnly,noEmptyPlacementCards,warehouseOutputCard,producingRecipeCard,canvasTest,
+     jsonStored,expanded,modeChanged,priorMode,fixedRecipe,noPanelLogistics,oldDefault};
+  })()`);
+  console.log('AST1 PANEL EDIT AND RECIPE CARD',JSON.stringify(panels));
+  assert.deepEqual(panels.directions,panels.expected,'panel side must follow machine facing across all four orientations');
+  assert(panels.defaultPanel&&panels.recipeBelowRate,'the default panel is 0 and recipe is under nominal output rate in Machine Details');
+  assert(panels.changedPanel&&panels.astByte===3&&panels.roundtrip===3,'panel editor must update AST1 Byte 4');
+  assert(panels.jsonStored===3&&panels.expanded===3&&panels.oldDefault,'JSON v12 round-trip must preserve the panel, older files default to zero');
+  assert(panels.modeChanged&&panels.fixedRecipe,'multi-output recipe changes keep physical routes, single-output machine shows read-only recipe');
+  assert(panels.noPanelLogistics&&panels.logisticStamp,'logistics machines must hide panel selection and default to zero');
+  assert(panels.hiddenPanelIds&&panels.stampLabelsOnly,'panel selectors must show natural language positions only, never encoded values');
+  assert(panels.noEmptyPlacementCards&&panels.warehouseOutputCard&&panels.producingRecipeCard,
+   'placement recipe card must vanish for non-recipe devices and appear only when relevant');
+  assert(panels.stampDefault&&panels.stampEdited,'new machine palette must save and preview the chosen panel position');
+  assert(panels.canvasTest.machineTriangle&&panels.canvasTest.palePanelBar&&panels.canvasTest.noLogisticPanel&&panels.canvasTest.transparentSockets&&panels.canvasTest.previewSockets,
+   'Canvas must draw thin triangle, 2-cell pale-blue edge panel 1.5x thick, transparent colored-outline ports in normal and preview, and no panel on logistics');
 
   assert.equal(exceptions.length,0,'uncaught Edge exceptions: '+exceptions.join(' | '));
   console.log('PASS: right attributes, auto-recipe inputs, and compact left machine library');
