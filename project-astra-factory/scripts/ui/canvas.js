@@ -23,26 +23,56 @@ function paintPreviewPorts(m){
 // with 1.5x the original .14-cell thickness (.21 cell).
 function paintMachineIndicators(m,w,h){
  const front=m.face||'E',cx=m.x+w/2,cy=m.y+h/2,d=V[front];
- const normalExtent=(d[0]?w:h)/2;
- const tx=-d[1],ty=d[0];
+ const normalExtent=(d[0]?w:h)/2,tx=-d[1],ty=d[0];
+ // World-space lines used to become subpixel strokes when zoomed out.
+ // Keep indicators at least 1 CSS pixel thick without changing their shape
+ // or edge locations at normal zoom. This is independent of devicePixelRatio.
+ const z=Math.max(.1,camera.z),stroke=Math.max(.105,1.05/z);
+ const triangleDepth=Math.max(.33,2/z),triangleHalfBase=Math.max(.16,1.15/z);
+ const tip=normalExtent-.28,base=tip-triangleDepth;
  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
- // Keep the pointed half of the original triangle: closed but only half as tall/wide.
- // The tip stays near the facing edge; its base is halfway toward the old base.
  ctx.beginPath();
- ctx.moveTo(cx+d[0]*(normalExtent-.28),cy+d[1]*(normalExtent-.28));
- ctx.lineTo(cx+d[0]*(normalExtent-.61)+tx*.16,cy+d[1]*(normalExtent-.61)+ty*.16);
- ctx.lineTo(cx+d[0]*(normalExtent-.61)-tx*.16,cy+d[1]*(normalExtent-.61)-ty*.16);
+ ctx.moveTo(cx+d[0]*tip,cy+d[1]*tip);
+ ctx.lineTo(cx+d[0]*base+tx*triangleHalfBase,cy+d[1]*base+ty*triangleHalfBase);
+ ctx.lineTo(cx+d[0]*base-tx*triangleHalfBase,cy+d[1]*base-ty*triangleHalfBase);
  ctx.closePath();
- ctx.lineWidth=.105;ctx.strokeStyle=makeColor(m);ctx.stroke();
+ ctx.lineWidth=stroke;ctx.strokeStyle=makeColor(m);ctx.stroke();
  if(supportsMachinePanel(m)){
   const side=machinePanelFacing(m),n=V[side];
-  const edge=(n[0]?w:h)/2-.08;
+  const thickness=Math.max(.21,1.2/z);
+  const edge=(n[0]?w:h)/2-thickness/2-.02;
   const x=cx+n[0]*edge,y=cy+n[1]*edge;
   ctx.fillStyle='#9dddff';
-  if(n[0])ctx.fillRect(x-.105,cy-1,.21,2);
-  else ctx.fillRect(cx-1,y-.105,2,.21);
+  if(n[0])ctx.fillRect(x-thickness/2,cy-1,thickness,2);
+  else ctx.fillRect(cx-1,y-thickness/2,2,thickness);
  }
  ctx.restore();
+}
+// At map overview zoom, multiple lines of recipe text cannot physically fit
+// inside a 3x3 machine. Draw a short, high-contrast name instead of hiding all
+// text. Full name + recipe automatically return at the normal readable zoom.
+function paintMachineCompactLabel(m,w,h){
+ const name=String(def(m)?.name||m.type||'?');
+ const z=Math.max(.1,camera.z);
+ const glyphs=Math.max(1,Math.min(2,Math.floor((w-.24)*z/7.7)));
+ const text=Array.from(name).slice(0,glyphs).join('');
+ if(!text)return;
+ ctx.save();
+ ctx.textAlign='center';ctx.textBaseline='middle';
+ ctx.fillStyle='#f0f6ff';
+ let size=7.4/z;
+ ctx.font='bold '+size+'px system-ui, "Microsoft YaHei", sans-serif';
+ const measured=ctx.measureText(text).width,available=Math.max(.65,w-.28);
+ if(measured>available){
+  size*=available/measured;
+  ctx.font='bold '+size+'px system-ui, "Microsoft YaHei", sans-serif';
+ }
+ ctx.fillText(text,m.x+w/2,m.y+h/2);
+ ctx.restore();
+}
+function paintMachineTextAtZoom(m,w,h,z,preview=false){
+ if(z>=(preview?5:6.5))paintMachineText(m,w,h,preview);
+ else paintMachineCompactLabel(m,w,h);
 }
 function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRect(0,0,pix.w,pix.h);ctx.fillStyle='#0c1622';ctx.fillRect(0,0,pix.w,pix.h);ctx.save();ctx.translate(camera.x,camera.y);ctx.scale(camera.z,camera.z);const z=camera.z;
  ctx.fillStyle='#142434';ctx.fillRect(0,0,72,72);ctx.fillStyle='#344255';ctx.fillRect(CENTER.x,CENTER.y,CENTER.w,CENTER.h);
@@ -70,9 +100,9 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle='#9affd0';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
  for(let m of state.machines){let[w,h]=dims(m),c=makeColor(m);ctx.fillStyle=hexAlpha(c,.18);ctx.fillRect(m.x+.08,m.y+.08,w-.16,h-.16);ctx.lineWidth=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id)) ? .29 : .14;ctx.strokeStyle=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id))?'#f5dc77':c;ctx.strokeRect(m.x+.08,m.y+.08,w-.16,h-.16);
  const ports=getPorts(m);for(let p of ports){paintPortSocket(p);if(draft&&draft.from.id===m.id&&draft.from.port===p.index&&p.kind==='out'){ctx.strokeStyle='#ffee88';ctx.lineWidth=.17;ctx.strokeRect(p.x-.06,p.y-.06,1.12,1.12);}}
- // Compositing order: socket squares < facing/panel marks < machine text.
- if(z>=4.8)paintMachineIndicators(m,w,h);
- if(z>=6.5)paintMachineText(m,w,h);
+ // Compositing order: socket squares < always-visible facing/panel marks < text.
+ paintMachineIndicators(m,w,h);
+ paintMachineTextAtZoom(m,w,h,z);
  // Connectivity warnings are drawn on the machine itself; they are not hidden behind the audit panel.
  const miss=missingMaterials(m),isProduct=!!getRecipe(m)&&!!outPort(m,0),idle=isProduct&&!routeFor(m.id,'out',0);
  if(miss.length||idle){ctx.save();ctx.strokeStyle=miss.length?'#ff657d':'#ffd16e';ctx.lineWidth=.18;ctx.setLineDash([.4,.18]);ctx.strokeRect(m.x+.16,m.y+.16,w-.32,h-.32);ctx.setLineDash([]);
@@ -82,8 +112,8 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  // The belt shape in its first outer cell already starts at the appropriate grid edge.
  if(stampType&&hoverCell){let d=DEF[stampType],m=getStampMachine(hoverCell.x,hoverCell.y),[w,h]=dims(m),ok=canPlace(m);ctx.fillStyle=ok?'#4ce4a34b':'#fe547755';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.2;ctx.strokeRect(m.x,m.y,w,h);
  paintPreviewPorts(m);
- if(z>=4.8)paintMachineIndicators(m,w,h);
- if(z>=5)paintMachineText(m,w,h,true);}
+ paintMachineIndicators(m,w,h);
+ paintMachineTextAtZoom(m,w,h,z,true);}
  if(draft){let locked=draft.path||[],all=draft.preview||locked;
  let startMachine=machineById(draft.from.id),startPort=startMachine&&outPort(startMachine,draft.from.port);
  const drawCells=(pts,color,dashed)=>{
@@ -105,7 +135,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  if(locked.length){let [x,y]=locked.at(-1);ctx.strokeStyle='#ffde74';ctx.lineWidth=.16;ctx.strokeRect(x+.12,y+.12,.76,.76);}
  }
  if(marquee){const x=Math.min(marquee.from.x,marquee.to.x),y=Math.min(marquee.from.y,marquee.to.y),w=Math.abs(marquee.to.x-marquee.from.x)+1,h=Math.abs(marquee.to.y-marquee.from.y)+1;ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
- if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=b&&inPort(b,r.to.port);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);if(z>=4.8)paintMachineIndicators(m,w,h);if(z>=5)paintMachineText(m,w,h,true);}ctx.restore();}
+ if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=b&&inPort(b,r.to.port);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
  ctx.strokeStyle='#637991';ctx.lineWidth=.1;ctx.strokeRect(0,0,72,72);ctx.restore();$('beltText').textContent=`${getBeltCount()}格传送带`;}
 function drawMovingPackets(){
  if(!sim)return;
