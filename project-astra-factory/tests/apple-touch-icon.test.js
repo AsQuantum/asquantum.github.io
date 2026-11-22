@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const png=fs.readFileSync(path.join(root,'apple-touch-icon.png'));
+assert.match(html,/<link rel="icon" type="image\/svg\+xml" href="favicon\.svg"/);
+assert.match(html,/<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon\.png"/);
+assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+assert.equal(png.readUInt32BE(16),180);
+assert.equal(png.readUInt32BE(20),180);
+console.log('PASS: Apple Home Screen icon is a local 180x180 PNG; SVG favicon preserved');
