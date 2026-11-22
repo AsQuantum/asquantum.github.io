@@ -65,6 +65,13 @@ fire('pointerup',1,210,224);
 assert.equal(placed.length,0,'drag release must not place anything');
 same(ctx.hoverCell,moved);
 fire('pointerdown',2,70,300);fire('pointerup',2,70,300);
+assert.equal(placed.length,0,'outside the preview must not confirm a placement');
+const previewPoint=cell=>({
+ x:bounds.left+ctx.camera.x+(cell.x+.5)*ctx.camera.z,
+ y:bounds.top+ctx.camera.y+(cell.y+.5)*ctx.camera.z
+});
+const first=previewPoint(moved);
+fire('pointerdown',22,first.x,first.y);fire('pointerup',22,first.x,first.y);
 assert.equal(placed.length,1);
 same(placed[0],moved);
 assert.equal(ctx.stampType,'垃圾','stamp mode remains active for continuous placement');
@@ -72,6 +79,9 @@ fire('pointerdown',3,170,200);fire('pointermove',3,230,260);fire('pointerup',3,2
 assert.equal(placed.length,1,'next drag is not an implicit placement');
 const second={...ctx.hoverCell};
 fire('pointerdown',4,90,320);fire('pointerup',4,90,320);
+assert.equal(placed.length,1,'second stamp also rejects off-ghost tap');
+const secondPoint=previewPoint(second);
+fire('pointerdown',44,secondPoint.x,secondPoint.y);fire('pointerup',44,secondPoint.x,secondPoint.y);
 assert.equal(placed.length,2);same(placed[1],second);
 const prior=ctx.camera.z;
 fire('pointerdown',5,120,200);fire('pointerdown',6,240,200);
@@ -83,6 +93,6 @@ const html=read('index.html'),styles=read('styles/mobile.css');
 assert(html.includes('class="editor-help-content mobile-help-content"'));
 assert(html.includes('class="editor-help-content desktop-help-content"'));
 assert(html.includes('松手后仅停留在当前位置'));
-assert(html.includes('再次点按'));
+assert(html.includes('点中虚影'));
 assert(styles.includes('.desktop-help-content{display:none!important}'));
 console.log('PASS: mobile ghost centers on map, drag previews without committing, next tap confirms, continuous placement, pinch protection and mobile help');

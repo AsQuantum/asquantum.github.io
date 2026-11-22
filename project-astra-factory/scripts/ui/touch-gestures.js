@@ -62,14 +62,30 @@
   onPointerDown({pointerId:e.pointerId,button:0,clientX:s.clientX,clientY:s.clientY,
    pointerType:'touch',preventDefault(){},stopPropagation(){}});
  }
+ // The tap must land INSIDE a rendered ghost machine, not just anywhere on
+ // the map or inside an empty gap between copied machines.
+ function hitPreviewMachine(cell,machines){
+  return !!cell&&machines.some(m=>{
+   const [w,h]=dims(m);
+   return cell.x>=m.x&&cell.x<m.x+w&&cell.y>=m.y&&cell.y<m.y+h;
+  });
+ }
  function confirmStampPreview(s,e){
-  // The second tap CONFIRMS the persisted ghost (not where the finger landed).
-  // Reuse onPointerDown for exactly the same collision/port/undo validation as
-  // desktop; no duplicated placement rules, no commit on pointer release.
-  const cell=hoverCell||screenToCell(s.x,s.y);
+  if(!stampType||!hoverCell)return false;
+  const finger=screenToCell(s.x,s.y);
+  if(!hitPreviewMachine(finger,[getStampMachine(hoverCell.x,hoverCell.y)]))return false;
+  // The ghost is selected. Reuse original desktop placement validation (undo,
+  // forbidden cells, ports, warehouse, etc.) at the actual preview position.
   const r=map.getBoundingClientRect();
-  replayDown({...s,clientX:r.left+camera.x+(cell.x+.5)*camera.z,
-   clientY:r.top+camera.y+(cell.y+.5)*camera.z},e);
+  replayDown({...s,clientX:r.left+camera.x+(hoverCell.x+.5)*camera.z,
+   clientY:r.top+camera.y+(hoverCell.y+.5)*camera.z},e);
+  return true;
+ }
+ function confirmGroupPreview(s){
+  const cell=screenToCell(s.x,s.y);
+  if(!groupTransform||!hitPreviewMachine(cell,groupTransform.plan?.machines||[]))
+   return false;
+  return commitGroupTransform();
  }
  map.addEventListener('pointerdown',e=>{
   if(!isMobileTouch(e))return;
@@ -82,7 +98,8 @@
   single={pointerId:e.pointerId,startX:p.x,startY:p.y,x:p.x,y:p.y,
    clientX:e.clientX,clientY:e.clientY,cameraX:camera.x,cameraY:camera.y,
    forwarded:false,continuation:false,moved:false,hadGroupTransform:!!groupTransform,
-   previewStart:stampType&&hoverCell?{...hoverCell}:null};
+   previewStart:stampType&&hoverCell?{...hoverCell}:null,
+   groupStart:groupTransform?{x:groupTransform.x,y:groupTransform.y}:null};
  },{capture:true,passive:false});
  map.addEventListener('pointermove',e=>{
   if(!touches.has(e.pointerId))return;
@@ -116,6 +133,19 @@
    }
    return;
   }
+  // A copied or moved group is also a preview. One finger drags it without
+  // placing anything; lifting the finger leaves its new position unchanged.
+  if(groupTransform){
+   if(single.moved&&single.groupStart){
+    const cell={x:single.groupStart.x+groupTransform.anchor.x+
+      Math.round((p.x-single.startX)/camera.z),
+     y:single.groupStart.y+groupTransform.anchor.y+
+      Math.round((p.y-single.startY)/camera.z)};
+    moveGroupPreviewTo(cell);
+    queuePaint();
+   }
+   return;
+  }
   // Preserve long one-finger selection/marquee drags. Editing starts only
   // once movement exceeds tap tolerance, keeping a possible second finger safe.
   if(distance>TAP_TOLERANCE&&!stampType&&!draft&&!groupTransform&&
@@ -144,6 +174,7 @@
     else onPointerUp(e);
    }else if(!cancelled&&!wasSingle.moved){
     if(stampType)confirmStampPreview(wasSingle,e);
+    else if(groupTransform)confirmGroupPreview(wasSingle);
     else replayDown(wasSingle,e);
     onPointerUp(e);
    }

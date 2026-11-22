@@ -43,7 +43,9 @@ function mobileUpdatePlacement(){
   message='放置：'+name+' · 拖动虚影定位，松手后再次点按放置';
  }else if(tool==='belt')message='接线：点橙色输出口 → 蓝色输入口';
  else if(tool==='pan')message='平移：单指拖动 · 双指缩放／平移';
- else if(groupTransform)message='移动预览：点击地图确认';
+ else if(groupTransform)message=groupTransform.mode==='copy'
+  ?'连续复制：拖动虚影，点中机器确认；点外面不会放置'
+  :'移动预览：拖动虚影，点中机器确认';
  else message='双指缩放、平移地图';
  mobileSetMapStatus(message);
 }
@@ -76,24 +78,39 @@ function mobileOpenView(view){
  }
  mobileUpdatePlacement();
 }
-function mobileZoom(factor){
- if(!mobileEditorActive())return;
- const center={x:pix.w/2,y:pix.h/2},old=camera.z;
- const next=Math.max(3,Math.min(48,old*factor));
- if(next===old)return;
- camera.x=center.x-(center.x-camera.x)*next/old;
- camera.y=center.y-(center.y-camera.y)*next/old;
- camera.z=next;
- draw();
-}
-
 document.querySelectorAll('.mobile-nav [data-mobile-view]').forEach(button=>{
  button.addEventListener('click',()=>mobileOpenView(button.dataset.mobileView));
 });
 $('mobilePlaceButton')?.addEventListener('click',()=>mobileOpenView('map'));
 $('mobileFit')?.addEventListener('click',()=>autoFit());
-$('mobileZoomIn')?.addEventListener('click',()=>mobileZoom(1.3));
-$('mobileZoomOut')?.addEventListener('click',()=>mobileZoom(1/1.3));
+$('mobileUndo')?.addEventListener('click',()=>undo());
+$('mobileRedo')?.addEventListener('click',()=>redo());
+// Choosing "选择" explicitly ends every mobile edit preview. Tapping outside
+// a ghost, in contrast, does nothing, avoiding accidental cancellation.
+document.querySelector('.mobile-map-tools [data-tool="select"]')?.addEventListener('click',()=>{
+ if(!mobileEditorActive())return;
+ resetEditorMode();
+ mobileStampPreviewType=null;
+ hoverCell=null;
+ mobileUpdatePlacement();
+});
+function mobileDeleteSelected(){
+ if(!mobileEditorActive())return;
+ if(stampType||groupTransform||draft){
+  mobileSetMapStatus('请先点「选择」结束当前编辑，再选中要删除的机器或线路');
+  return;
+ }
+ if(multiSelection?.machineIds?.length||multiSelection?.routeIds?.length){
+  deleteGroupSelection();
+ }else if(selection?.machineId){
+  removeMachine(selection.machineId);
+ }else if(selection?.routeId){
+  deleteRoute(selection.routeId);
+ }else{
+  mobileSetMapStatus('请先选中机器或线路，再点删除');
+ }
+}
+$('mobileDelete')?.addEventListener('click',mobileDeleteSelected);
 
 // These handlers run after the existing editor actions. Tool selection returns
 // to the map. Machine selection instead stays in the library so the user can

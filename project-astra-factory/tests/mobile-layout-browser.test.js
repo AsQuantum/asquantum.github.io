@@ -136,11 +136,23 @@ async function poll(fn){for(let i=0;i<120;i++){try{const v=await fn();if(v)retur
   const afterDrag=await evalJS('({count:state.machines.length,preview:{...hoverCell}})');
   assert.equal(afterDrag.count,touchPoint.countBefore,'lifting finger after ghost drag must not place');
   assert(afterDrag.preview.x>touchPoint.preview.x,'ghost must move after single-finger drag');
-  await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:touchPoint.x,y:touchPoint.y,id:22}]});
+  const outsideGhost=await evalJS(`(()=>{
+   const r=canvas.getBoundingClientRect();
+   return {x:r.left+r.width-18,y:r.top+r.height-40};
+  })()`);
+  await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...outsideGhost,id:22}]});
+  await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  assert.equal(await evalJS('state.machines.length'),touchPoint.countBefore,'tap outside ghost must not place');
+  const insideGhost=await evalJS(`(()=>{
+   const r=canvas.getBoundingClientRect();
+   return {x:r.left+camera.x+(hoverCell.x+.5)*camera.z,
+    y:r.top+camera.y+(hoverCell.y+.5)*camera.z};
+  })()`);
+  await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...insideGhost,id:23}]});
   await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   const placed=await evalJS("({count:state.machines.length,selected:selection?.machineId,tool,stampType,machine:state.machines.at(-1)&&{x:state.machines.at(-1).x,y:state.machines.at(-1).y}})");
   console.log('MOBILE TOUCH PREVIEW DRAG THEN TAP',JSON.stringify({touchPoint,afterDrag,placed}));
-  assert.equal(placed.count,touchPoint.countBefore+1,'later tap confirms one machine');
+  assert.equal(placed.count,touchPoint.countBefore+1,'tap on ghost confirms one machine');
   assert.deepEqual(placed.machine,afterDrag.preview,'tap places at the persisted ghost location');
   assert(placed.selected&&placed.stampType==='垃圾','machine selected and continuous stamping preserved');
 

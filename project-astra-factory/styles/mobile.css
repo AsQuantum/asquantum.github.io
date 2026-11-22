@@ -151,7 +151,7 @@
   color:#d4e8f3;border-color:#40576b;touch-action:manipulation}
  .mobile-map-tools button.active{background:#245b4a!important;color:#edfff4!important;
   border-color:#62b092!important}
- .mobile-map-tools #mobileZoomOut,.mobile-map-tools #mobileZoomIn{font-size:20px}
+ .mobile-map-tools #mobileUndo,.mobile-map-tools #mobileRedo{font-size:22px}
  .mobile-map-state.is-visible:not(:empty){display:block;position:absolute;bottom:18px;left:50%;
   transform:translateX(-50%);padding:6px 10px;white-space:nowrap;
   max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;

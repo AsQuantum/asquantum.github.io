@@ -27,7 +27,7 @@ function updateGroupControls(){
  const count=activeMachineSelectionIds().length,belts=multiSelection?.routeIds.length||0;
  panel.style.display=(count||belts||groupClipboard||groupTransform)?'block':'none';
  $('groupSelectionInfo').textContent=groupTransform
-  ?`正在${groupTransform.mode==='move'?'移动':'复制'} · ${groupTransform.plan?.valid?'可放置':'位置无效'} · 左键放置 / Esc 取消`
+  ?`正在${groupTransform.mode==='move'?'移动':'复制'} · ${groupTransform.plan?.valid?'可放置':'位置无效'} · ${typeof mobileEditorActive==='function'&&mobileEditorActive()?'点中虚影确认 / 点「选择」取消':'左键放置 / Esc 取消'}`
   :count||belts?`已框选 ${count} 台机器 / ${belts} 条完整线路`:'已复制选区，可粘贴';
  $('groupMove').disabled=!count||!!groupTransform;
  $('groupCopy').disabled=!count||!!groupTransform;
@@ -204,10 +204,21 @@ function commitGroupTransform(){
   for(let i=0;i<placed.length;i++)placed[i]=ids.get(placed[i]);
  }
  const finalRoutes=t.mode==='copy'?result.routes.filter(r=>r.id.startsWith('r')&&!state.routes.some(x=>x.id===r.id)).map(r=>r.id):routeIds;
+ // Mobile group copy remains in preview mode for repeated placement.
+ // Desktop keeps the original one-shot copy behavior.
+ const keepMobileCopy=t.mode==='copy'&&typeof mobileEditorActive==='function'&&mobileEditorActive();
  snapshot();state=result;selection=null;marquee=null;groupTransform=null;
  multiSelection={machineIds:placed,routeIds:finalRoutes};
  afterChange(t.mode==='copy'?`已放置 ${placed.length} 台复制机器及 ${plan.routes.length} 条内部线路`
   :`已移动 ${placed.length} 台机器及 ${plan.routes.length} 条内部线路，断开 ${Math.max(0,plan.disconnected)} 条外部线路`);
+ if(keepMobileCopy){
+  // A fresh red (occupied) ghost appears at the last copied coordinates.
+  // The user can drag it elsewhere, then tap ON a ghost machine to duplicate
+  // again. No further layout changes happen until that explicit confirmation.
+  groupTransform={...t,source:copy(t.source),anchor:{...t.anchor},plan:null};
+  updateGroupPreview();
+  if(typeof mobileUpdatePlacement==='function')mobileUpdatePlacement();
+ }
  updateGroupControls();draw();return true;
 }
 function deleteGroupSelection(){

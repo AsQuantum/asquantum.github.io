@@ -155,23 +155,23 @@
      <b>地图手势</b>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>双指张合</kbd></span><span class="shortcut-desc">以双指中心缩放地图</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>双指移动</kbd></span><span class="shortcut-desc">平移地图，放大时也可同步移动</span></div>
-     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>单指拖动</kbd></span><span class="shortcut-desc">在「平移」工具中移动地图</span></div>
-     <p>地图顶部可以切换「选择／接线／平移」，用 ＋／− 缩放或「适应」恢复视野。</p>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>双指拖动</kbd></span><span class="shortcut-desc">任意编辑模式下均可移动地图</span></div>
+     <p>地图顶部可以切换「选择／接线」，也可直接「删除」选中项目、↶ 撤销、↷ 重做。双指缩放和平移地图，「适应」恢复视野。</p>
     </div>
     <div class="editor-help-section">
      <b>放置机器（连续放置）</b>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>机器 → 地图</kbd></span><span class="shortcut-desc">选机器并配置配方、朝向，再点「返回地图放置」</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>中央虚影</kbd></span><span class="shortcut-desc">进入地图时出现待放置机器，红色代表位置无效</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>单指拖动</kbd></span><span class="shortcut-desc">移动虚影；松手后仅停留在当前位置</span></div>
-     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>再次点按</kbd></span><span class="shortcut-desc">确认放置；仍保留同种机器，继续拖动即可放下一台</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>点中虚影</kbd></span><span class="shortcut-desc">只在点中虚影的机器时确认；点外面不放置也不退出，点击顶部「选择」可结束连续放置</span></div>
      <p>双指缩放、平移不会意外放置。要退出放置模式，进入「工具」选择其他工具。</p>
     </div>
     <div class="editor-help-section">
      <b>选择与连线</b>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>点按机器</kbd></span><span class="shortcut-desc">选中并在「属性」查看详情</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>接线工具</kbd></span><span class="shortcut-desc">依次点橙色出口、空格转折点、蓝色输入口</span></div>
-     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>框选／移动</kbd></span><span class="shortcut-desc">在「工具」中框选、旋转、复制与确认移动</span></div>
-     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>撤销／重做</kbd></span><span class="shortcut-desc">顶部「编辑」菜单直接点按</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>复制／移动</kbd></span><span class="shortcut-desc">单指拖动虚影，点中虚影才确认；连续复制退出请点地图左上「选择」</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>删除选中</kbd></span><span class="shortcut-desc">先点机器或线路选中，再点地图顶部「删除」；可用 ↶ 撤销</span></div>
     </div>
    </div>
   </details>
@@ -212,9 +212,9 @@
  <div class="mobile-map-tools" role="toolbar" aria-label="地图快捷工具">
   <button type="button" data-tool="select" title="选择机器">选择</button>
   <button type="button" data-tool="belt" title="连接传送带">接线</button>
-  <button type="button" data-tool="pan" title="单指拖动平移画布">平移</button>
-  <button type="button" id="mobileZoomOut" title="缩小地图">−</button>
-  <button type="button" id="mobileZoomIn" title="放大地图">＋</button>
+  <button type="button" id="mobileDelete" title="删除当前选中的机器或线路" aria-label="删除选中项目">删除</button>
+  <button type="button" id="mobileUndo" title="撤销上一步" aria-label="撤销">↶</button>
+  <button type="button" id="mobileRedo" title="重做上一步" aria-label="重做">↷</button>
   <button type="button" id="mobileFit" title="适应地图">适应</button>
  </div>
  <div class="mobile-map-state" id="mobileMapState" aria-live="polite"></div><div class="legend"><span class="dot" style="background:#ffab61"></span>输出口　<span class="dot" style="background:#59acff"></span>输入口　<span class="dot" style="background:#48dc99"></span>传送带　<span class="dot" style="background:#f2d86b"></span>已选择</div>
