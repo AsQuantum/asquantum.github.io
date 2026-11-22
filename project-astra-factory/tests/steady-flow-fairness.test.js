@@ -43,3 +43,33 @@ vm.runInContext('state=d',ctx);
 const two=vm.runInContext('warehouseTheory()',ctx);
 for(const k of ['a','b'])assert(Math.abs(two.routeFlows[k][mat]-0.5)<1e-7,'two open '+k);
 console.log('PASS: 2 connected outlets = 0.5/0.5');
+
+vm.runInContext("DEF['test_slow_source']={name:'slow source',w:3,h:3,ins:0,outs:1,recipes:{slow:{output:mat,qty:1,seconds:1.5,inputs:{}}}};DEF['test_fast_consumer']={name:'fast consumer',w:3,h:3,ins:1,outs:1,recipes:{fast:{output:prod,qty:1,seconds:1,inputs:{[mat]:1}}}};",ctx);
+ctx.d={name:'duty cycle',machines:[
+ {id:'slow',type:'test_slow_source',mode:'slow',x:0,y:0,face:'E'},
+ {id:'fast',type:'test_fast_consumer',mode:'fast',x:8,y:0,face:'E'},
+ {id:'store',type:'\u4ed3\u5165',x:16,y:0,face:'E',inletItem:''}
+],routes:[
+ {id:'feed',from:{id:'slow',port:0},to:{id:'fast',port:0},path:[[1,1]]},
+ {id:'stock',from:{id:'fast',port:0},to:{id:'store',port:0},path:[[1,1]]}
+]};
+vm.runInContext('state=d',ctx);
+const duty=vm.runInContext('warehouseTheory()',ctx);
+assert(!duty.error,'Duty LP failed: '+duty.error);
+assert(Math.abs(duty.machineDuty.fast-2/3)<1e-7,'6 out of 9 working units expected');
+assert(Math.abs(duty.machineIdle.fast-1/3)<1e-7,'3 out of 9 idle units expected');
+assert(Math.abs(duty.machineCycles.fast-2/3)<1e-7,'2/3 machine cycles/s expected');
+assert(Math.abs(duty.routeFlows.feed[mat]-2/3)<1e-7,'2/3 inputs/s expected');
+assert(Math.abs(duty.routeFlows.stock[prod]-2/3)<1e-7,'2/3 outputs/s expected');
+console.log('PASS: math-only 6/9 working, 3/9 stopped -> 2/3 item/s in/out');
+
+ctx.materialColor=()=> '#abc';
+ctx.theoryDuty=duty;
+vm.runInContext('theoreticalBudget=theoryDuty',ctx);
+const dutyHtml=vm.runInContext('machineSteadyPanel(state.machines[1])',ctx);
+assert(dutyHtml.includes('66.67')&&dutyHtml.includes('33.33'),'Inspector must show both 66.67% working and 33.33% stopped');
+const bounded=vm.runInContext('factorySteadyTwoPhase([{a:[[0,1]],b:1},{a:[[0,-1]],b:-0.25}],1,new Float64Array([1]))',ctx);
+assert(bounded.ok&&Math.abs(bounded.x[0]-1)<1e-7,'Two-phase LP fails feasible negative RHS lower bound');
+const impossible=vm.runInContext('factorySteadyTwoPhase([{a:[[0,1]],b:1},{a:[[0,-1]],b:-2}],1,new Float64Array([1]))',ctx);
+assert(!impossible.ok,'Two-phase LP should reject inconsistent lower bound');
+console.log('PASS: inspector renders 66.67% duty +33.33% idle; two-phase LP accepts feasible lower bounds and rejects infeasible ones');

@@ -13,7 +13,7 @@
  <span class="counter" id="topStats">加载中…</span><div class="grow"></div>
  <button id="undo" title="Ctrl+Z">↶ 撤销</button><button id="redo" title="Ctrl+Y">↷ 重做</button>
  <button id="saveJson">导出布局 JSON</button><button id="loadJson">导入布局 JSON</button><button id="importAst1" title="粘贴游戏 AST1 蓝图代码，转为 Factory Lab 地图">导入游戏蓝图</button><button id="exportAst1" title="将当前 Factory Lab 地图编码为游戏 AST1 蓝图">导出游戏蓝图</button><input id="file" type="file" accept=".json,application/json"/>
- <button id="run" class="primary">▶ 运行模拟</button><label class="speed-label" for="simSpeed">速度</label><select id="simSpeed" title="模拟加速倍率（游戏时间 / 真实时间）"><option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option><option value="20">20×</option></select><button id="stepMinute" title="立即计算后续60秒的逐件模拟；会产生真实物流事件">⏩ +1分钟</button><button id="resetSim">重置模拟</button><button id="acceptance" title="原有13项净入库和齿轮线圈满速验收">✓ 验收13项</button><button id="warpCheck" title="从空库存开始模拟；只要求曲速线圈在两个时段都实际入库" style="border-color:#d2a95c">◎ 验证曲速线圈单链</button>
+ <button id="run" class="primary">▶ 运行模拟</button><label class="speed-label" for="simSpeed">速度</label><select id="simSpeed" title="模拟加速倍率（游戏时间 / 真实时间）"><option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option><option value="20">20×</option></select><button id="stepMinute" title="立即计算后续60秒的逐件模拟；会产生真实物流事件">⏩ +1分钟</button><button id="resetSim">重置模拟</button>
 </header>
 <div id="ast1Panel" style="display:none;position:absolute;z-index:80;top:58px;left:50%;transform:translateX(-50%);width:min(940px,calc(100vw - 30px));background:#172437;border:2px solid #5f8daa;border-radius:12px;box-shadow:0 14px 36px #000c;padding:16px;color:#e8f1ff">
  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b id="ast1PanelTitle" style="font-size:16px">游戏 AST1 蓝图</b><span id="ast1PanelHint" style="font-size:11px;color:#adc5d5"></span><button id="ast1Close" style="margin-left:auto">✕ 关闭</button></div>
@@ -24,8 +24,10 @@
 <div id="importFeedback" role="alert" aria-live="polite" style="display:none;position:absolute;z-index:30;top:64px;left:50%;transform:translateX(-50%);width:min(840px,calc(100vw - 24px));background:#4a2934;border:1px solid #ff9aa5;color:#ffe8e8;padding:12px 14px;border-radius:9px;box-shadow:0 10px 26px #0007"><span id="importFeedbackText"></span><button id="importFeedbackClose" style="float:right;margin-left:12px;padding:2px 7px" aria-label="关闭">✕</button></div>
 <main class="main">
 <aside class="side left">
- <h3>编辑工具</h3><div class="block"><div class="toolrow"><button data-tool="select" class="active">☝ 选择 / 拖动</button><button data-tool="belt">〰 连接传送带</button><button data-tool="pan">✥ 拖动画布</button><button data-tool="erase">⌫ 删除线路</button></div>
- <div class="help tiny"><span class="shortcut">Q</span> 逆时针旋转　<span class="shortcut">E</span> 顺时针旋转<br/><span class="shortcut">Backspace</span> 删除选中的机器 / 撤销接线转折点<br/><span class="shortcut">Esc</span> 取消接线/放置 · <span class="shortcut">滚轮</span> 缩放<br/><span class="shortcut">空格+拖动</span> 平移 · 放置工具会保持选择，可连续放置<br/>连线：点橙色出口 → 点击空地确定拐点 → 点蓝色入口完成。右键取消。<br/>机器加工秒数：标称秒数(全网稳态理论有效秒数/批)；∞ 表示未运行。<br/>生产机器的同一输入口允许混合配方原料，但合计最多1件/秒；运行时点击机器看各材料输入/输出缓存，点击绿色传送带看线上逐件物品。</div>
+ <h3>编辑工具</h3><div class="block"><div class="toolrow"><button data-tool="select" class="active">☝ 选择 / 拖动预览</button><button data-tool="belt">〰 连接传送带</button><button data-tool="marquee">▧ 框选区域</button><button data-tool="pan">✥ 拖动画布</button><button data-tool="erase">⌫ 删除线路</button></div>
+ <div class="help tiny"><span class="shortcut">S</span> 空闲时切换接线 / 选择　<span class="shortcut">Q</span> 逆时针旋转　<span class="shortcut">E</span> 顺时针旋转<br/><span class="shortcut">Backspace</span> 删除选中的机器 / 撤销接线转折点<br/><span class="shortcut">Esc</span> 取消接线/放置 · <span class="shortcut">滚轮</span> 缩放<br/><span class="shortcut">空格+拖动</span> 平移 · 放置工具会保持选择，可连续放置<br/>连线：点橙色出口 → 点击空地确定拐点 → 点蓝色入口完成。右键取消。<br/>机器加工秒数：标称秒数(全网稳态理论有效秒数/批)；∞ 表示未运行。<br/>生产机器的同一输入口允许混合配方原料，但合计最多1件/秒；运行时点击机器看各材料输入/输出缓存，点击绿色传送带看线上逐件物品。</div>
+ <div class="tiny" style="margin:8px 0">单选机器 / 框选机器：G 移动，Ctrl+D 复制并放置，Q/E 预览旋转，左键确认，Esc 取消。按住机器拖动也能进入预览（松开不提交）。</div>
+ <div id="groupControls" class="group-controls" style="display:none;margin:9px 0"><b id="groupSelectionInfo"></b><div class="group-buttons"><button id="groupMove">G 移动</button><button id="groupCopy">Ctrl+C 复制</button><button id="groupDuplicate">Ctrl+D 复制并放置</button><button id="groupPaste">Ctrl+V 粘贴</button><button id="groupLeft">Q ↶</button><button id="groupRight">E ↷</button><button id="groupDelete">Delete 删除</button><button id="groupCancel">Esc 取消放置</button></div><small>框选必须完整包含传送带路径；仅选中的机器间的线路可随组变换。</small></div>
  <div id="beltControls" class="actions" style="display:none;margin:8px 0"><button id="undoBend" class="smallbtn">↶ 撤销上一段</button><button id="cancelBelt" class="smallbtn">✕ 取消本次接线</button></div>
  <div class="actions"><button id="fit" class="smallbtn">适应地图</button><button id="clearRoutes" class="smallbtn">清除所有线路</button></div></div>
  <h3>放置机器</h3><div class="block"><input id="search" type="search" placeholder="搜索机器 / 材料"/>
@@ -45,7 +47,7 @@
  <h3>物品颜色图例</h3><div class="block"><div class="material-legend" id="materialLegend" aria-label="物品颜色对应表"></div></div>
 </aside>
 <section class="canvaswrap"><canvas id="map"></canvas><div class="legend"><span class="dot" style="background:#ffab61"></span>输出口　<span class="dot" style="background:#59acff"></span>输入口　<span class="dot" style="background:#48dc99"></span>传送带　<span class="dot" style="background:#f2d86b"></span>已选择</div></section>
-<aside class="side right"><h3>仓库材料 · 每分钟收支</h3><div class="block" id="warehouse"></div><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><h3>线路检查</h3><div class="block" id="audit"></div><h3>实际验收</h3><div class="block" id="acceptanceReport"><div class="boxnotice">13种材料的持续净入库验收：预热300秒，再测900秒。只有完整生产目标才需要执行本项。</div></div><h3>曲速线圈单链验收</h3><div class="block" id="warpReport"><div class="boxnotice">仅验证曲速线圈从空库存持续入库，不要求中间材料单独入仓。</div></div><h3>操作记录</h3><div class="block logs" id="logs"></div></aside>
+<aside class="side right"><h3>仓库材料 · 每分钟收支</h3><div class="block" id="warehouse"></div><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><h3>线路检查</h3><div class="block" id="audit"></div><h3>操作记录</h3><div class="block logs" id="logs"></div></aside>
 </main><footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
 </div>
 <script src="scripts/data/warp-preset.js"></script>
@@ -58,6 +60,7 @@
 <script src="scripts/ui/inspector.js"></script>
 <script src="scripts/core/layout-io.js"></script>
 <script src="scripts/ui/editor-controls.js"></script>
+<script src="scripts/core/selection-transform.js"></script>
 <script src="scripts/ui/canvas.js"></script>
 <script src="scripts/engine/steady-flow.js"></script>
 <script src="scripts/ui/warehouse.js"></script>
@@ -67,6 +70,5 @@
 <script src="scripts/blueprints/item-ids.js"></script>
 <script src="scripts/blueprints/ast1-codec.js"></script>
 <script src="scripts/blueprints/ast1-ui.js"></script>
-<script src="scripts/engine/acceptance.js"></script>
 <script src="scripts/ui/startup.js"></script>
 </body></html>

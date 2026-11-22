@@ -77,7 +77,7 @@ function inspectorRefresh(){const root=$('inspector');if(selection?.routeId){
  ${ports.map(p=>`<div class="portspec"><span style="color:${p.kind==='in'?'#65b3fc':'#ffb477'}">${p.kind==='in'?'入':'出'}${p.index+1} ${p.side}${p.kind==='out'&&m.type==='\u5206\u6d41'?'\uFF08'+esc(ast1FilterPortLabel(m,p.index))+'\u51fa\u53e3\uFF09':''} ${p.x},${p.y}${p.kind==='in'&&getRecipe(m)?' · '+esc([...inletMaterials(m,p.index)].join('、')||'未连接'):''} · ${portSteadyRate(m,p).toFixed(2)}/min</span>${p.kind==='in'&&m.type!=='汇流'&&m.type!=='仓入'&&m.type!=='分流'?`<select data-filter="${p.index}"><option value="">按配方自动</option>${MATERIALS.map(q=>`<option value="${esc(q)}" ${p.filter===q?'selected':''}>${esc(q)}</option>`).join('')}</select>`:p.kind==='out'&&m.type==='分流'?`<select data-out-filter="${p.index}"><option value="">任意</option>${MATERIALS.map(q=>`<option value="${esc(q)}" ${p.filter===q?'selected':''}>${esc(q)}</option>`).join('')}</select>`:`<span class="tiny">${esc(p.filter||'任意')}</span>`}</div>`).join('')}
  ${m.type==='分流'?`<p class="tiny">每个出口可过滤指定材料，或设为任意。每次轮流尝试可接收且不堵塞的出口，均堵则等待；输入最多1件/s。
 如果「任意」和指定物品的出口同时通畅，同种物品仍会轮流分流，过滤器不是流量比例调节器。</p>`:''}
- <div class="divider"></div><div class="actions"><button id="duplicate">复制机器</button><button id="deleteM" style="border-color:#944751">删除机器</button></div>`;
+ <div class="divider"></div><div class="actions"><button id="duplicate">复制并放置 (Ctrl+D)</button><button id="deleteM" style="border-color:#944751">删除机器</button></div>`;
 
 }
 function refresh(){ $('topStats').textContent=`${state.machines.length}台设备 · ${state.routes.length}条线路 · ${getBeltCount()}格传送带`; warehouseRefresh();inspectorRefresh();auditRefresh();draw();}
