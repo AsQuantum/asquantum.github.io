@@ -25,7 +25,7 @@ function packetCoords(r,p){
  const a=path[i],b=path[i+1];
  return [a[0]+.5+(b[0]-a[0])*f,a[1]+.5+(b[1]-a[1])*f];
 }
-function resetSimulation(){running=false;let btn=$('run');if(btn){btn.textContent='▶ 运行模拟';btn.classList.add('primary');}simTime=0;ware={};sim={byMachine:{},routes:{},inbound:{},outbound:{},crafts:{},minuteBuckets:[]};
+function resetSimulation(){running=false;let btn=$('run');if(btn){btn.textContent='▶ 运行模拟';btn.classList.add('primary');btn.classList.remove('sim-running');}simTime=0;ware={};sim={byMachine:{},routes:{},inbound:{},outbound:{},crafts:{},minuteBuckets:[]};stockChartReset();
  for(let m of state.machines)sim.byMachine[m.id]={inputs:{},portInputs:{},portItems:{},received:{},sent:{},queue:[],busy:0,tick:0,lastSend:{},lastReceive:{},roundRobin:0};
  for(let r of state.routes)sim.routes[r.id]=[];
  warehouseRefresh();draw();simVisualDirty=false;}
@@ -119,7 +119,7 @@ function stepLoop(t){
  if(running){let elapsed=elapsedReal*simulationSpeed,part=0.05;
   while(elapsed>.0001){let d=Math.min(part,elapsed);simulate(d);elapsed-=d;}
   simPaintTimer+=elapsedReal;
-  if(simPaintTimer>=.3){simPaintTimer=0;warehouseRefreshLive();inspectorRefreshLive();}
+  if(simPaintTimer>=.3){simPaintTimer=0;warehouseRefreshLive();inspectorRefreshLive();stockChartMaybeRefresh();}
  }
  // The animation is intentionally limited to 24 fps. RAF still schedules
  // simulation using elapsed time, so the game speed and logical tick are unchanged.
@@ -132,6 +132,6 @@ function stepLoop(t){
 function advanceSimulationMinute(){
  const previous=running;running=false;
  for(let i=0;i<1200;i++)simulate(.05);
- running=previous;warehouseRefreshLive();inspectorRefreshLive();draw(true);simVisualDirty=false;
+ running=previous;warehouseRefreshLive();inspectorRefreshLive();stockChartMaybeRefresh();draw(true);simVisualDirty=false;
  notify('已按逐件规则快进60秒，仓库每分钟记录已更新');
 }

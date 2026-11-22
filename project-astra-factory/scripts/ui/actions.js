@@ -40,7 +40,7 @@ $('fit').onclick=autoFit;$('clearRoutes').onclick=()=>{if(!state.routes.length)r
  };
 
 // Simulation controls are independent of the removed acceptance/check panels.
-$('run').onclick=()=>{warehouseRefreshLive();running=!running;if(running)setTool('select');$('run').textContent=running?'❚❚ 暂停模拟':'▶ 继续模拟';$('run').classList.toggle('primary',!running);notify(running?'模拟已开始：仓库每60秒保存一份真实收支记录':'模拟已暂停');};
+$('run').onclick=()=>{warehouseRefreshLive();running=!running;if(running)setTool('select');$('run').textContent=running?'❚❚ 暂停模拟':'▶ 继续模拟';$('run').classList.add('primary');$('run').classList.toggle('sim-running',running);notify(running?'模拟已开始：仓库每60秒保存一份真实收支记录':'模拟已暂停');};
 $('simSpeed').onchange=e=>{simulationSpeed=Number(e.target.value)||1;notify(`模拟速度已设为 ${simulationSpeed}×`);};
 $('stepMinute').onclick=advanceSimulationMinute;
 $('resetSim').onclick=()=>{resetSimulation();inspectorRefreshLive();notify('已清空模拟库存、生产队列和分钟统计记录');};

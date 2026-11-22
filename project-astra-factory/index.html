@@ -7,6 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="styles/main.css"/>
 <link rel="stylesheet" href="styles/sidebar-polish.css"/>
+<link rel="stylesheet" href="styles/stock-chart.css"/>
 </head>
 <body>
 <div class="app">
@@ -158,7 +159,24 @@
   </div>
  </details>
 </aside>
-<section class="canvaswrap"><canvas id="map"></canvas><div class="legend"><span class="dot" style="background:#ffab61"></span>输出口　<span class="dot" style="background:#59acff"></span>输入口　<span class="dot" style="background:#48dc99"></span>传送带　<span class="dot" style="background:#f2d86b"></span>已选择</div></section>
+<section class="canvaswrap"><canvas id="map"></canvas><div class="legend"><span class="dot" style="background:#ffab61"></span>输出口　<span class="dot" style="background:#59acff"></span>输入口　<span class="dot" style="background:#48dc99"></span>传送带　<span class="dot" style="background:#f2d86b"></span>已选择</div>
+<div id="stockChartPanel" class="stock-chart-panel" hidden aria-label="仓库存量趋势">
+ <div class="stock-chart-head">
+  <div><div class="stock-chart-eyebrow">WAREHOUSE · HISTORY</div><h3>仓库存量趋势</h3><p id="stockChartHint">实际逐件收支累计 · 从运行至重置</p></div>
+  <button class="stock-chart-close" type="button" data-stock-chart-close aria-label="关闭库存趋势图" title="关闭">×</button>
+ </div>
+ <div class="stock-chart-topline"><strong id="stockChartStats" class="stock-chart-stats">总库存 0 件</strong>
+  <div class="stock-chart-views" role="group" aria-label="显示时间范围">
+   <button type="button" class="selected" data-stock-window="all">全部</button>
+   <button type="button" data-stock-window="60">近 60 分</button>
+   <button type="button" data-stock-window="180">近 180 分</button>
+  </div>
+ </div>
+ <div id="stockChartPlot" class="stock-chart-plot-wrap"><div id="stockChartSvg"></div><div id="stockChartTooltip" class="stock-chart-tooltip" hidden></div></div>
+ <div class="stock-chart-legend-head"><strong>物品曲线 <span id="stockChartSelection"></span></strong><button type="button" class="stock-chart-show-all" data-stock-show-all>显示全部</button></div>
+ <div id="stockChartLegend" class="stock-chart-legend" aria-label="选择要显示的物品曲线"></div>
+ <div class="stock-chart-footer">按物品颜色绘制；点击下方物品可隐藏 / 显示折线。暂停后保留，重置模拟清空。</div>
+</div></section>
 <aside class="side right"><details id="warehousePanel" class="warehouse-panel"><summary>仓库材料 · 每分钟收支</summary><div class="block" id="warehouse"></div></details><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><details class="right-extra-panel" id="auditPanel">
  <summary>线路检查</summary><div class="block" id="audit"></div>
  </details><details class="right-extra-panel" id="logsPanel">
@@ -181,6 +199,7 @@
 <script src="scripts/engine/steady-flow.js"></script>
 <script src="scripts/ui/warehouse.js"></script>
 <script src="scripts/engine/simulation.js"></script>
+<script src="scripts/ui/stock-chart.js"></script>
 <script src="scripts/ui/actions.js"></script>
 <script src="scripts/blueprints/machine-ids.js"></script>
 <script src="scripts/blueprints/item-ids.js"></script>

@@ -48,7 +48,7 @@ function warehouseActualMarkup(v){
   const oCount=Object.values(bk?.outbound||{}).reduce((a,b)=>a+b,0);
   return `<tr><td>第${minute}分钟</td><td>${iCount}</td><td>${oCount}</td>${ledgerNetCell(iCount-oCount)}</tr>`;
  }).join('');
- return `<div id="warehouseLiveActual" class="ledger-panel"><div class="ledger-head"><strong>实际收支</strong><span class="ledger-chip">${v.elapsedMinutes>0?'第 '+v.elapsedMinutes+' 分钟':'等待首个完整分钟'}</span></div>
+ return `<div id="warehouseLiveActual" class="ledger-panel"><div class="ledger-head"><strong>实际收支</strong><button type="button" class="warehouse-stock-toggle" data-stock-chart-open title="查看仓库存量随模拟时间变化">▤ 库存趋势</button><span class="ledger-chip">${v.elapsedMinutes>0?'第 '+v.elapsedMinutes+' 分钟':'等待首个完整分钟'}</span></div>
  ${v.elapsedMinutes===0?`<div class="ledger-meta">已模拟 ${simTime.toFixed(1)}秒；运行满60秒后显示第一份准确的每分钟记录。可用顶部「+1分钟」快速计算。</div>`:''}
  <table class="ledger-table"><thead><tr><th>材料</th><th>入库</th><th>出库</th><th>净值</th><th>库存</th></tr></thead><tbody>${aRows||'<tr><td colspan="5">仓库暂无材料</td></tr>'}</tbody></table>
 
