@@ -45,8 +45,7 @@ for(const zoom of [3,4,4.79,4.8,5,6.49,6.5,9]){
  assert(direction.length>=3,'all direction triangles at zoom '+zoom);
  assert(direction.every(e=>e.lineWidth*zoom>=1-1e-6),'direction outline visible at zoom '+zoom);
  assert(panels.every(e=>Math.min(e.w,e.h)*zoom>=1-1e-6),'panel thickness visible at zoom '+zoom);
- if(zoom<6.5)assert(text.some(e=>e.value!=='完整文字'),'compact name at map-overview zoom '+zoom);
- else assert(text.some(e=>e.value==='完整文字'),'full text restored at readable zoom '+zoom);
+ assert(text.every(e=>e.value==='完整文字'),'full names and recipes must be drawn at every zoom '+zoom);
  rows.push({zoom,labels:text.length,panels:panels.length,directions:direction.length});
 }
-console.log('PASS: zoom labels, direction marks and control-panel bars remain visible across former 4.8/6.5 cutoffs',JSON.stringify(rows));
+console.log('PASS: full machine text, direction and panel drawn at all zoom levels without 6.5/4.8 cutoffs',JSON.stringify(rows));

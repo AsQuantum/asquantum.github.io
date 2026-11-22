@@ -48,31 +48,10 @@ function paintMachineIndicators(m,w,h){
  }
  ctx.restore();
 }
-// At map overview zoom, multiple lines of recipe text cannot physically fit
-// inside a 3x3 machine. Draw a short, high-contrast name instead of hiding all
-// text. Full name + recipe automatically return at the normal readable zoom.
-function paintMachineCompactLabel(m,w,h){
- const name=String(def(m)?.name||m.type||'?');
- const z=Math.max(.1,camera.z);
- const glyphs=Math.max(1,Math.min(2,Math.floor((w-.24)*z/7.7)));
- const text=Array.from(name).slice(0,glyphs).join('');
- if(!text)return;
- ctx.save();
- ctx.textAlign='center';ctx.textBaseline='middle';
- ctx.fillStyle='#f0f6ff';
- let size=7.4/z;
- ctx.font='bold '+size+'px system-ui, "Microsoft YaHei", sans-serif';
- const measured=ctx.measureText(text).width,available=Math.max(.65,w-.28);
- if(measured>available){
-  size*=available/measured;
-  ctx.font='bold '+size+'px system-ui, "Microsoft YaHei", sans-serif';
- }
- ctx.fillText(text,m.x+w/2,m.y+h/2);
- ctx.restore();
-}
+// Never gate machine text on zoom. Canvas will clip naturally at the physical
+// pixel limit, but a zoom threshold must never replace the full name/recipe.
 function paintMachineTextAtZoom(m,w,h,z,preview=false){
- if(z>=(preview?5:6.5))paintMachineText(m,w,h,preview);
- else paintMachineCompactLabel(m,w,h);
+ paintMachineText(m,w,h,preview);
 }
 function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRect(0,0,pix.w,pix.h);ctx.fillStyle='#0c1622';ctx.fillRect(0,0,pix.w,pix.h);ctx.save();ctx.translate(camera.x,camera.y);ctx.scale(camera.z,camera.z);const z=camera.z;
  ctx.fillStyle='#142434';ctx.fillRect(0,0,72,72);ctx.fillStyle='#344255';ctx.fillRect(CENTER.x,CENTER.y,CENTER.w,CENTER.h);
