@@ -1,8 +1,8 @@
 'use strict';
 // Real canvas editor handlers + real mobile capture-phase gesture handlers.
-// In phone Select mode a swipe beginning on a machine must box-select, NOT
-// trigger "machine-press" / implicit Move. A separately activated Move preview
-// must travel the full distance of the *first* swipe, without a one-tile freeze.
+// An unselected machine swipe must marquee; tapping first selects it, and a
+// subsequent swipe ON that same selected machine starts the move preview.
+// First-swipe displacement must be tracked through every frame of the gesture.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
@@ -13,7 +13,7 @@ const touch=fs.readFileSync(path.join(root,'scripts/ui/touch-gestures.js'),'utf8
 const from=canvas.indexOf('function onPointerDown(e)');
 const to=canvas.indexOf('function rotateSelected(steps)',from);
 assert(from>=0&&to>from,'actual canvas pointer handlers are present');
-const handlers={},marqueeResults=[],moveResults=[],stats={machinePress:0,draws:0};
+const handlers={},marqueeResults=[],moveResults=[],stats={machinePress:0,draws:0,moveStarts:0};
 const map={
  addEventListener(type,fn,opts){assert.equal(opts.capture,true);handlers[type]=fn},
  getBoundingClientRect(){return{left:0,top:0,width:400,height:640}},
@@ -32,7 +32,8 @@ const scope={
  $:()=>({textContent:''}),
  eventCoords:e=>({x:e.clientX,y:e.clientY}),
  screenToCell:(x,y)=>({x:Math.floor(x/10),y:Math.floor(y/10)}),
- cellMachine:(x,y)=>x>=5&&x<8&&y>=5&&y<8?{id:'m1'}:null,
+ cellMachine:(x,y)=>x>=5&&x<8&&y>=5&&y<8?{id:'m1'}:
+  x>=10&&x<13&&y>=5&&y<8?{id:'m2'}:null,
  portAt:()=>null,cellRoutes:()=>[],routeTile:()=>null,
  inMap:(x,y)=>x>=0&&y>=0&&x<72&&y<72,
  clearGroupSelection(){},inspectorRefresh(){},updateDraftPreview(){},
@@ -42,7 +43,16 @@ const scope={
   scope.selection={machineId:id};
   scope.drag={kind:'machine-press',pointerId:pid};
  },
- updateMachineDragPress(){throw Error('select swipe should never update machine drag')},
+ updateMachineDragPress(){throw Error('touch swipe must not enter desktop machine-press drag')},
+ startGroupTransform(mode){
+  assert.equal(mode,'move');
+  assert.equal(scope.selection?.machineId,'m1');
+  assert.deepEqual(JSON.parse(JSON.stringify(scope.hoverCell)),{x:5,y:5},
+   'first preview anchor must come from the touch-down cell');
+  stats.moveStarts++;
+  scope.groupTransform={mode,x:5,y:5,anchor:{x:0,y:0},
+   plan:{machines:[{id:'m1',x:5,y:5,w:3,h:3}]}};
+ },
  selectGroupRectangle(a,b){marqueeResults.push({from:{...a},to:{...b}})},
  moveGroupPreviewTo(cell){
   const t=scope.groupTransform;
@@ -82,9 +92,38 @@ fire('pointerdown',2,55,55);fire('pointerup',2,55,55);
 assert.equal(stats.machinePress,1,'tap machine to select is preserved');
 assert.deepEqual(plain(scope.selection),{machineId:'m1'});
 
-// 3. Explicit Move button already started a preview before touch-down.
-// It must keep following the first continuous finger drag, not stop at 1 tile.
-scope.drag=null;scope.groupTransform={
+// 3. Swiping a machine that was ALREADY selected starts its movement preview.
+// No preexisting groupTransform or extra tap is needed; the FIRST touch must
+// move continuously across multiple pointermove events.
+fire('pointerdown',20,55,55);
+fire('pointermove',20,68,67);
+assert.equal(stats.moveStarts,1,'selected machine enters move mode');
+assert.deepEqual(plain({x:scope.groupTransform.x,y:scope.groupTransform.y}),
+ {x:6,y:6},'initial movement uses the full origin displacement');
+fire('pointermove',20,95,105);
+assert.deepEqual(plain({x:scope.groupTransform.x,y:scope.groupTransform.y}),
+ {x:9,y:10},'selected machine continues moving within same swipe');
+fire('pointermove',20,137,145);
+assert.deepEqual(plain({x:scope.groupTransform.x,y:scope.groupTransform.y}),
+ {x:13,y:14},'selected machine moves beyond one tile');
+fire('pointerup',20,137,145);
+assert.equal(stats.machinePress,1,'selected swipe must not synthesize another tap');
+assert.equal(marqueeResults.length,1,'selected machine swipe is not marquee');
+assert(scope.groupTransform,'release leaves pending move preview');
+
+// 4. Swipe beginning on an UNSELECTED machine must STILL box-select, even when
+// another machine is selected. No additional movement preview is created.
+scope.groupTransform=null;scope.drag=null;scope.selection={machineId:'m1'};
+fire('pointerdown',21,105,55);
+fire('pointermove',21,120,75);
+fire('pointermove',21,145,95);
+fire('pointerup',21,145,95);
+assert.equal(stats.moveStarts,1,'unselected machine swipe cannot start move');
+assert.deepEqual(plain(marqueeResults.at(-1)),
+ {from:{x:10,y:5},to:{x:14,y:9}});
+
+// 5. A separately activated Move preview also follows the first full swipe.
+scope.drag=null;const beforeExplicitMoves=moveResults.length;scope.groupTransform={
  mode:'move',x:17,y:21,anchor:{x:2,y:1},plan:{machines:[{id:'m1',x:17,y:21,w:3,h:3}]}
 };
 fire('pointerdown',3,185,225);
@@ -98,11 +137,11 @@ fire('pointermove',3,306,335);
 assert.deepEqual(plain({x:scope.groupTransform.x,y:scope.groupTransform.y}),{x:29,y:32},
  'long first swipe must use its entire displacement');
 fire('pointerup',3,306,335);
-assert.equal(moveResults.length,3);
+assert.equal(moveResults.length,beforeExplicitMoves+3);
 assert.deepEqual(plain({x:scope.groupTransform.x,y:scope.groupTransform.y}),{x:29,y:32},
  'lifting finger leaves pending preview; no placement');
 
-// 4. Two fingers must not begin a selection or a machine move.
+// 6. Two fingers must not begin a selection or a machine move.
 scope.groupTransform=null;const previous=marqueeResults.length,press=stats.machinePress;
 fire('pointerdown',4,55,55);
 fire('pointerdown',5,155,55);
@@ -113,4 +152,4 @@ assert.equal(marqueeResults.length,previous);
 assert.equal(stats.machinePress,press);
 assert.equal(scope.groupTransform,null);
 assert(scope.camera.z>10,'pinch remains enabled');
-console.log('PASS mobile selection swipe over machine = marquee; tap selects; explicit move follows all first-swipe frames; pinch stays safe');
+console.log('PASS phone unselected swipe marquee; tap selects; selected machine drag follows first full swipe; preview remains pending; pinch safe');

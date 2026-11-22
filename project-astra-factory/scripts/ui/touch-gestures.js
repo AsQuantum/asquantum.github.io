@@ -48,6 +48,19 @@
   camera.y=midY-pinch.worldY*zoom;
   queuePaint();
  }
+ // Preserve a group's starting world coordinates for the entire finger gesture.
+ // Creating a move preview after the touch threshold must NOT reset its origin
+ // or forward onPointerMove (which follows hover and can jump one tile).
+ function movePreviewFromTouch(start,p){
+  if(!groupTransform||!start?.groupStart)return;
+  const t=groupTransform;
+  const cell={x:start.groupStart.x+t.anchor.x+
+    Math.round((p.x-start.startX)/camera.z),
+   y:start.groupStart.y+t.anchor.y+
+    Math.round((p.y-start.startY)/camera.z)};
+  moveGroupPreviewTo(cell);
+  queuePaint();
+ }
  function startRemainingPan(){
   const entry=touches.entries().next().value;
   if(!entry){single=null;return;}
@@ -95,9 +108,18 @@
   try{map.setPointerCapture(e.pointerId);}catch(_){}
   if(touches.size>=2){beginPinch();return;}
   usedMulti=false;pinch=null;
+  const startCell=screenToCell(p.x,p.y);
+  const hit=tool==='select'&&!stampType&&!groupTransform&&!draft
+   ?cellMachine(startCell.x,startCell.y):null;
+  // Only a machine selected BEFORE this touch can be dragged. Sliding over
+  // an unselected machine remains a marquee, even when the swipe begins on it.
+  const selectedMachineId=hit&&(
+   selection?.machineId===hit.id||multiSelection?.machineIds?.includes(hit.id))
+   ?hit.id:null;
   single={pointerId:e.pointerId,startX:p.x,startY:p.y,x:p.x,y:p.y,
    clientX:e.clientX,clientY:e.clientY,cameraX:camera.x,cameraY:camera.y,
    forwarded:false,continuation:false,moved:false,hadGroupTransform:!!groupTransform,
+   startCell,selectedMachineId,
    previewStart:stampType&&hoverCell?{...hoverCell}:null,
    groupStart:groupTransform?{x:groupTransform.x,y:groupTransform.y}:null};
  },{capture:true,passive:false});
@@ -136,31 +158,35 @@
   // A copied or moved group is also a preview. One finger drags it without
   // placing anything; lifting the finger leaves its new position unchanged.
   if(groupTransform){
-   if(single.moved&&single.groupStart){
-    const cell={x:single.groupStart.x+groupTransform.anchor.x+
-      Math.round((p.x-single.startX)/camera.z),
-     y:single.groupStart.y+groupTransform.anchor.y+
-      Math.round((p.y-single.startY)/camera.z)};
-    moveGroupPreviewTo(cell);
-    queuePaint();
-   }
+   if(single.moved)movePreviewFromTouch(single,p);
    return;
   }
-  // A mobile SELECT swipe is ALWAYS marquee selection, even when it starts
-  // over a machine. Previously replayDown() on the initial move synthesized a
-  // machine-press, which accidentally entered move mode and lost the rest of
-  // that first swipe (the preview had no groupStart recorded at pointerdown).
-  // A stationary tap still goes through the real machine selection handler.
+  // An unselected machine is never implicitly picked up by a swipe: marquee
+  // starts even when the finger lands on its footprint. A machine which was
+  // ALREADY selected at touch-down is the one exception: that swipe explicitly
+  // enters move-preview mode, tracking the FULL displacement from touch-down.
   if(distance>TAP_TOLERANCE&&!stampType&&!draft&&!groupTransform&&
      (tool==='select'||tool==='marquee')){
    if(!single.forwarded){
-    const from=screenToCell(single.startX,single.startY);
-    marquee={from:{...from},to:{...from}};
+    if(tool==='select'&&single.selectedMachineId){
+     const previousHover=hoverCell;
+     hoverCell={...single.startCell};
+     startGroupTransform('move');
+     hoverCell=previousHover;
+     if(groupTransform){
+      single.groupStart={x:groupTransform.x,y:groupTransform.y};
+      single.forwarded=true;
+      movePreviewFromTouch(single,p);
+      return;
+     }
+    }
+    const from={...single.startCell};
+    marquee={from,to:{...from}};
     drag={kind:'marquee'};
     single.forwarded=true;
    }
    onPointerMove(e);
-  }else if(single.forwarded){onPointerMove(e);}
+  }else if(single.forwarded&&drag?.kind==='marquee'){onPointerMove(e);}
  },{capture:true,passive:false});
  function endPointer(e,cancelled){
   if(!touches.has(e.pointerId))return;
