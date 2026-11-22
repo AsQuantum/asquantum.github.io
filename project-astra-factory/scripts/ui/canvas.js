@@ -141,14 +141,34 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    rt=hitRoutes.find(q=>{let i=q.path.findIndex(p=>p[0]===c.x&&p[1]===c.y);return orientation(q,i)===wanted;})||rt;
  }
  clearGroupSelection();if(!rt){selection=null;marquee={from:c,to:c};drag={kind:'marquee'};inspectorRefresh();draw();return;}selection=rt?{routeId:rt.id,crossAt:hitRoutes.length===2?[c.x,c.y]:null}:null;inspectorRefresh();draw();}
-function onPointerMove(e){const p=eventCoords(e),oldCell=hoverCell;hoverCell=screenToCell(p.x,p.y);if(draft&&(!oldCell||oldCell.x!==hoverCell.x||oldCell.y!==hoverCell.y))updateDraftPreview();const here=cellRoutes(hoverCell.x,hoverCell.y);
- const stateAt=here.map(r=>{let i=r.path.findIndex(([x,y])=>x===hoverCell.x&&y===hoverCell.y);let t=routeTile(r,i);return t?(t.type==='straight'?'直线':'转角')+' '+t.key:'无效状态';});
- $('cursorText').textContent=`格子 (${hoverCell.x},${hoverCell.y})${inMap(hoverCell.x,hoverCell.y)?'':' · 地图外'}${stateAt.length?' · '+(stateAt.length===2?'十字交叉 / ':'')+stateAt.join(' × '):''}`;
- if(drag?.kind==='machine-press')updateMachineDragPress(p,hoverCell,e.pointerId);
+function onPointerMove(e){
+ const p=eventCoords(e),oldCell=hoverCell;
+ hoverCell=screenToCell(p.x,p.y);
+ const cellChanged=!oldCell||oldCell.x!==hoverCell.x||oldCell.y!==hoverCell.y;
+ // Unchanged cells need neither route lookup nor a static-map redraw.
+ if(cellChanged){
+  if(draft)updateDraftPreview();
+  const here=cellRoutes(hoverCell.x,hoverCell.y);
+  const stateAt=here.map(r=>{
+   let i=r.path.findIndex(([x,y])=>x===hoverCell.x&&y===hoverCell.y);
+   let t=routeTile(r,i);
+   return t?(t.type==='straight'?'直线':'转角')+' '+t.key:'无效状态';
+  });
+  $('cursorText').textContent=`格子 (${hoverCell.x},${hoverCell.y})${inMap(hoverCell.x,hoverCell.y)?'':' · 地图外'}${stateAt.length?' · '+(stateAt.length===2?'十字交叉 / ':'')+stateAt.join(' × '):''}`;
+ }
+ const wasPress=drag?.kind==='machine-press';
+ if(wasPress)updateMachineDragPress(p,hoverCell,e.pointerId);
  if(groupTransform)moveGroupPreviewTo(hoverCell);
  if(drag?.kind==='marquee'&&marquee)marquee.to=hoverCell;
- if(drag?.kind==='pan'){camera.x=drag.sx+(p.x-drag.x);camera.y=drag.sy+(p.y-drag.y);}
- draw();}
+ if(drag?.kind==='pan'){
+  camera.x=drag.sx+(p.x-drag.x);
+  camera.y=drag.sy+(p.y-drag.y);
+ }
+ // Hover text is independent of the canvas. Paint only when a visible overlay
+ // or camera actually moves; simulation particles are painted by the RAF loop.
+ if((cellChanged&&(draft||stampType||groupTransform||marquee))||
+    drag?.kind==='pan'||(wasPress&&drag?.kind==='machine-preview'))draw();
+}
 function onPointerUp(e){
  if(drag?.kind==='machine-preview'||drag?.kind==='machine-press'){
   // Releasing the dragging button must NOT silently commit (or break belts).

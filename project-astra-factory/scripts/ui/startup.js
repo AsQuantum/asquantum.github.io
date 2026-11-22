@@ -28,5 +28,21 @@ document.addEventListener('keydown',e=>{
  }
 });
 document.addEventListener('keyup',e=>{if(e.key===' ')spaceDown=false;});
-window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden){try{localStorage.setItem('factory_lab_v2',JSON.stringify(state));}catch(e){}}});
-try{stampPrefs=JSON.parse(localStorage.getItem('factory_lab_v3_stamp_prefs')||'{}')||{};}catch(e){stampPrefs={};}try{const saved=localStorage.getItem('factory_lab_v2');loadState(saved?JSON.parse(saved):createEmpty());}catch(err){loadState(createEmpty());}buildPalette();renderMaterialLegend();updateHint();setTool('select');resize();requestAnimationFrame(stepLoop);
+window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden){try{localStorage.setItem('factory_lab_v12',compactFactoryJSON());saveCurrentScheme();}catch(e){}}});
+try{stampPrefs=JSON.parse(localStorage.getItem('factory_lab_v3_stamp_prefs')||'{}')||{};}catch(e){stampPrefs={};}
+let savedLayout=null,storageKey=null;
+try{
+ // Current compact format takes precedence. Older raw JSON is imported only by old.js.
+ storageKey=localStorage.getItem('factory_lab_v12')?'factory_lab_v12':'factory_lab_v2';
+ savedLayout=localStorage.getItem(storageKey);
+ loadState(savedLayout?JSON.parse(savedLayout):createEmpty());
+}catch(err){
+ // Keep the original invalid bytes for manual recovery; never overwrite that backup.
+ let backedUp=false;
+ const backupKey=storageKey+'_incompatible_backup';
+ if(savedLayout){try{localStorage.setItem(backupKey,savedLayout);backedUp=true;}catch(e){}}
+ loadState(createEmpty());
+ notify('原工厂存档无法加载：'+(err.message||err)+
+  (backedUp?'；原始 JSON 已备份至 localStorage 键 '+backupKey:'；请检查原始存档'),'warn');
+}
+initSchemes(!!savedLayout);buildPalette();renderMaterialLegend();updateHint();setTool('select');resize();requestAnimationFrame(stepLoop);

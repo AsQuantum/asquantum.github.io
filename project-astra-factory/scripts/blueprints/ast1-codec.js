@@ -61,7 +61,7 @@ function ast1Decode(code){
   if(rot>=4)throw Error(`机器序号${i}旋转参数无效`);
   const record=Array.from(data.slice(off,off+len));off+=len;
   const face=ast1Rotations(t)[rot],known=AST1_MODE[t];
-  if(known&&!known[modeId])throw Error(`第${i}台${t}存在未知游戏配方序号 ${modeId}`);
+  if(known&&(modeId>=known.length||known[modeId]===undefined))throw Error(`第${i}台${t}存在未知游戏配方序号 ${modeId}`);
   const mode=known?known[modeId]:(['废料','浇筑','燃料','电池','共鸣'].includes(t)?'标准':'');
   const m={id:'ast1_'+i,type:t,x,y,face:ast1MirrorFace(face),mode,ast1GamePorts:true,ast1Mirrored:true,
    ast1Meta:{record,originalType:typeId,originalMode:mode,originalItem:null,originalInletItem:null,originalOutFilters:null,filterOrderVersion:3}};
@@ -126,7 +126,7 @@ function ast1ToBytes(){
   const rec=old&&old[0]===type?old.slice():[type,0,0,0,0,0,0];
   rec[0]=type;rec[1]=m.ast1Mirrored?AST1_GRID_WIDTH-m.x-dims(m)[0]:m.x;rec[2]=m.y;rec[3]=r;
   const modes=AST1_MODE[m.type];if(modes){
-   const mode=m.mode||modes[0],k=modes.indexOf(mode);
+   const mode=m.mode===undefined||m.mode===null||m.mode===''?modes[0]:parseRecipeMode(m.type,m.mode),k=modes.indexOf(mode);
    if(k<0)throw Error(`${label(m)} 配方 ${mode} 没有游戏编码`);
    rec[5]=k;
   }

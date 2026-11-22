@@ -10,7 +10,7 @@ vm.runInContext(String.raw`
  checkPath=()=>null;
 `,ctx);
 const ms=[
- {id:'source',type:'\u5783\u573e',mode:'LV3',x:0,y:0,face:'E'},
+ {id:'source',type:'\u5783\u573e',mode:0,x:0,y:0,face:'E'},
  {id:'split',type:'\u5206\u6d41',x:10,y:10,face:'E',outFilters:{}},
  {id:'storeA',type:'\u4ed3\u5165',x:20,y:10,face:'E',inletItem:''},
  {id:'storeB',type:'\u4ed3\u5165',x:20,y:20,face:'E',inletItem:''},

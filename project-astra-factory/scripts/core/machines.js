@@ -1,22 +1,29 @@
 'use strict';
 function def(m){return DEF[m.type]}
-// 配方与升级等级无关：只在 UI 中选择产物 / 配方，兼容旧版本的 LV3/LV4 存档键。
-function recipeModes(type){const keys=Object.keys(DEF[type]?.recipes||{});if(typeof AST1_MODE==='undefined'||!AST1_MODE[type])return keys;const ordered=AST1_MODE[type];return [...ordered.filter(k=>keys.includes(k)),...keys.filter(k=>!ordered.includes(k))];}
-function defaultModeFor(type){return recipeModes(type)[0]||'';}
+// Collector modes are AST1 recipe indices (0/1), not names or upgrade levels.
+function numericRecipeMode(type){return type==='垃圾'||type==='粒子'||type==='采矿';}
+function parseRecipeMode(type,value){
+ if(!numericRecipeMode(type))return value;
+ // HTML selects deliver "0"/"1"; the actual layout and AST1 modes are numbers.
+ if(value===0||value===1||value==='0'||value==='1')return Number(value);
+ return NaN;
+}
+function recipeModes(type){const keys=Object.keys(DEF[type]?.recipes||{});if(typeof AST1_MODE==='undefined'||!AST1_MODE[type])return keys;const ordered=AST1_MODE[type].map(String);return [...ordered.filter(k=>keys.includes(k)),...keys.filter(k=>!ordered.includes(k))];}
+function defaultModeFor(type){const key=recipeModes(type)[0];return key===undefined?'':parseRecipeMode(type,key);}
 function recipeOptionLabel(type,key){const r=DEF[type]?.recipes?.[key];return r?.output||key;}
-function setStampType(type){const previous=stampPrefs[type]||{};stampType=type;stampFace=previous.face||'E';stampMode=previous.mode&&DEF[type].recipes?.[previous.mode]?previous.mode:defaultModeFor(type);stampItem=previous.item||'钛合金锭';updateStampControls();}
+function setStampType(type){const previous=stampPrefs[type]||{};stampType=type;stampFace=previous.face||'E';const savedMode=previous.mode;stampMode=savedMode!==undefined&&savedMode!==null&&Object.prototype.hasOwnProperty.call(DEF[type].recipes||{},savedMode)?parseRecipeMode(type,savedMode):defaultModeFor(type);stampItem=previous.item||'钛合金锭';updateStampControls();}
 function saveStampPreference(){if(!stampType)return;stampPrefs[stampType]={face:stampFace,mode:stampMode,item:stampItem};try{localStorage.setItem('factory_lab_v3_stamp_prefs',JSON.stringify(stampPrefs));}catch(e){}}
 function getStampMachine(x=0,y=0){const mirrored=state.machines.some(m=>m.ast1Mirrored);return {type:stampType,x,y,face:stampFace,mode:stampMode,item:stampItem,ast1Mirrored:mirrored,ast1GamePorts:mirrored};}
 function updateStampControls(){if(!stampType)return;const d=DEF[stampType],modes=recipeModes(stampType);
  $('stampName').textContent=d.name;
  $('stampModeRow').style.display=modes.length>1?'block':'none';
  $('stampItemRow').style.display=stampType==='仓出'?'block':'none';
- $('stampMode').innerHTML=modes.map(key=>`<option value="${esc(key)}" ${stampMode===key?'selected':''}>${esc(recipeOptionLabel(stampType,key))}</option>`).join('');
+ $('stampMode').innerHTML=modes.map(key=>`<option value="${esc(key)}" ${String(stampMode)===key?'selected':''}>${esc(recipeOptionLabel(stampType,key))}</option>`).join('');
  $('stampItem').innerHTML=MATERIALS.map(mat=>`<option value="${esc(mat)}" ${stampItem===mat?'selected':''}>${esc(mat)}</option>`).join('');
  const r=d.recipes?.[stampMode];
  $('stampRecipeText').innerHTML=r?`${Object.entries(r.inputs).map(([k,v])=>`<span style="color:#60b5ff">${esc(k)} ×${v}</span>`).join('　')}<div style="color:#ffb16b">${esc(r.output)} ×${r.qty}</div><small>${esc(timeLabel({type:stampType,mode:stampMode}))}</small>`:(stampType==='仓出'?`将取出：${esc(stampItem)}`:'无生产配方');
 }
-function getRecipe(m){const d=def(m);return d&&d.recipes?d.recipes[m.mode||Object.keys(d.recipes)[0]]:null}
+function getRecipe(m){const d=def(m);if(!d?.recipes)return null;const mode=m.mode===undefined||m.mode===null||m.mode===''?Object.keys(d.recipes)[0]:m.mode;return d.recipes[mode]||null;}
 // 左边是配方标称加工秒数，括号显示全网联立稳态求解的动态有效加工周期。
 // 按「每批加工」计：一次产生 qty 件的配方，周期 = 1 / 每秒完成的批次数。
 // 没有有效生产流量时是 ∞；未放入地图的预览机器没有连接，显示「待接线」。
@@ -61,7 +68,7 @@ function paintMachineText(m,w,h,preview=false){const lines=machineLabelLines(m);
  ctx.textAlign='center';ctx.textBaseline='middle';
  lines.forEach((line,i)=>{let sz=i===0?Math.min(1.04,heightLimit*1.22):heightLimit;ctx.font=(line.bold?'bold ':'')+sz+'px system-ui, "Microsoft YaHei", sans-serif';ctx.fillStyle=line.color;ctx.fillText(line.text,m.x+w/2,base+i*spacing,w-.42);});
 }
-function label(m){let s=def(m)?.name||m.type; if(m.type==='仓出')s+=' · '+(m.item||'未设置');else if(getRecipe(m))s+=' · '+(m.mode||'');return s}
+function label(m){let s=def(m)?.name||m.type; if(m.type==='仓出')s+=' · '+(m.item||'未设置');else if(getRecipe(m))s+=' · '+recipeOptionLabel(m.type,m.mode);return s}
 function dims(m){if(Number.isInteger(m.w)&&Number.isInteger(m.h))return [m.w,m.h];let d=def(m)||{w:5,h:5};return m.face==='N'||m.face==='S'?[d.h,d.w]:[d.w,d.h]}
 function getPorts(m){
  if(m.ast1Mirrored){

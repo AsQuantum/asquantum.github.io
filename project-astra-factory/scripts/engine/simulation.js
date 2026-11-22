@@ -1,6 +1,6 @@
 'use strict';
 // Simplified discrete-item experiment, intentionally distinct from a full game-accurate solver.
-let sim=null;
+let sim=null,simVisualDirty=false;
 // 每个传送带格沿入边中点 -> 中心 -> 出边中点走过1米；直角格两段各0.5米。
 // 线路起点是第一格与机器出口格的共享边中点；终点是最后一格与机器入口格的共享边中点。
 // 物品运动速度2米/秒；堵塞时以1米间距停在格子边中点，满线后背压到生产机器的输出缓存。
@@ -28,7 +28,7 @@ function packetCoords(r,p){
 function resetSimulation(){running=false;let btn=$('run');if(btn){btn.textContent='▶ 运行模拟';btn.classList.add('primary');}simTime=0;ware={};sim={byMachine:{},routes:{},inbound:{},outbound:{},crafts:{},minuteBuckets:[]};
  for(let m of state.machines)sim.byMachine[m.id]={inputs:{},portInputs:{},portItems:{},received:{},sent:{},queue:[],busy:0,tick:0,lastSend:{},lastReceive:{},roundRobin:0};
  for(let r of state.routes)sim.routes[r.id]=[];
- warehouseRefresh();draw();}
+ warehouseRefresh();draw();simVisualDirty=false;}
 function sendItem(m,s,index,item){const r=routeFor(m.id,'out',index);if(!r)return false;
  const list=sim.routes[r.id]??[];
  if(list.length&&list[list.length-1].distance<ITEM_SPACING-1e-8)return false;
@@ -36,7 +36,7 @@ function sendItem(m,s,index,item){const r=routeFor(m.id,'out',index);if(!r)retur
  const outFilter=outPort(m,index)?.filter||'';if(outFilter&&outFilter!=='任意'&&outFilter!==item)return false;
  const receiver=machineById(r.to.id);if(!receiver)return false;
  if(!acceptsMaterial(receiver,item,r.to.port))return false;
- list.push({item,distance:0});sim.routes[r.id]=list;s.lastSend[index]=simTime;s.sent[item]=(s.sent[item]||0)+1;return true;}
+ list.push({item,distance:0});simVisualDirty=true;sim.routes[r.id]=list;s.lastSend[index]=simTime;s.sent[item]=(s.sent[item]||0)+1;return true;}
 function inputCap(m,item,port){let rec=getRecipe(m);
  if(rec){return (rec.inputs[item]||0)*3;}
  // 分流/汇流按每个入口保留3件，普通配方缓存按其输入用量×3。
@@ -72,10 +72,12 @@ function simulate(dt){simTime+=dt;
  for(const r of state.routes){const pk=sim.routes[r.id]||[],target=machineById(r.to.id);const end=routeLength(r);
   for(let i=0;i<pk.length;i++){
    const ahead=i===0?end:pk[i-1].distance-ITEM_SPACING;
-   pk[i].distance=Math.max(pk[i].distance,Math.min(end,ahead,pk[i].distance+BELT_SPEED*dt));
+   const was=pk[i].distance;
+   pk[i].distance=Math.max(was,Math.min(end,ahead,was+BELT_SPEED*dt));
+   if(pk[i].distance!==was)simVisualDirty=true;
   }
   if(pk.length&&pk[0].distance>=end-1e-6){
-   if(target&&acceptItem(target,r.to.port,pk[0].item))pk.shift();
+   if(target&&acceptItem(target,r.to.port,pk[0].item)){pk.shift();simVisualDirty=true;}
   }
  }
  for(const m of state.machines){const s=sim.byMachine[m.id];if(!s)continue;const rec=getRecipe(m);
@@ -117,19 +119,19 @@ function stepLoop(t){
  if(running){let elapsed=elapsedReal*simulationSpeed,part=0.05;
   while(elapsed>.0001){let d=Math.min(part,elapsed);simulate(d);elapsed-=d;}
   simPaintTimer+=elapsedReal;
-  if(simPaintTimer>=.3){simPaintTimer=0;warehouseRefresh();inspectorRefresh();}
+  if(simPaintTimer>=.3){simPaintTimer=0;warehouseRefreshLive();inspectorRefreshLive();}
  }
  // The animation is intentionally limited to 24 fps. RAF still schedules
  // simulation using elapsed time, so the game speed and logical tick are unchanged.
  // When not running, there is no reason to repaint the map at all.
- if(running && t-frameLastPaint>=1000/24 && !document.hidden){
-  frameLastPaint=t;draw(true);
+ if(running && simVisualDirty && t-frameLastPaint>=1000/24 && !document.hidden){
+  frameLastPaint=t;simVisualDirty=false;draw(true);
  }
  requestAnimationFrame(stepLoop);
 }
 function advanceSimulationMinute(){
  const previous=running;running=false;
  for(let i=0;i<1200;i++)simulate(.05);
- running=previous;warehouseRefresh();inspectorRefresh();draw();
+ running=previous;warehouseRefreshLive();inspectorRefreshLive();draw(true);simVisualDirty=false;
  notify('已按逐件规则快进60秒，仓库每分钟记录已更新');
 }
