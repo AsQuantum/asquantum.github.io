@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="styles/main.css"/>
 <link rel="stylesheet" href="styles/sidebar-polish.css"/>
 <link rel="stylesheet" href="styles/stock-chart.css"/>
+<link rel="stylesheet" href="styles/mobile.css"/>
+<link rel="stylesheet" href="styles/window-motion.css"/>
 </head>
 <body>
 <div class="app">
@@ -23,18 +25,20 @@
  <div class="edit-menu-wrap" id="editMenuWrap">
   <button id="editMenuButton" class="edit-menu-trigger" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="editMenu">编辑 <span class="edit-caret" aria-hidden="true"></span></button>
   <div id="editMenu" class="edit-menu-panel" role="menu" aria-label="编辑菜单" hidden>
+   <div class="mobile-edit-head"><div><span>FACTORY LAB · ACTIONS</span><strong>编辑与文件</strong><small>选择操作，导入或导出工厂布局</small></div>
+    <button type="button" id="mobileEditClose" aria-label="关闭编辑操作">✕</button></div>
    <button id="undo" type="button" class="edit-menu-command" data-edit-action="undo" title="Ctrl+Z 撤销上一步"><span>↶ 撤销</span><kbd>Ctrl+Z</kbd></button>
    <button id="redo" type="button" class="edit-menu-command" data-edit-action="redo" title="Ctrl+Y 或 Ctrl+Shift+Z 重做"><span>↷ 重做</span><kbd>Ctrl+Y</kbd></button>
    <div class="edit-menu-divider"></div>
    <div class="edit-menu-parent">
-    <button type="button" class="edit-menu-parent-button" data-edit-submenu="import" aria-haspopup="true">导入为新方案 <span aria-hidden="true">›</span></button>
+    <button type="button" class="edit-menu-parent-button" data-edit-submenu="import" aria-haspopup="true" aria-expanded="false">导入为新方案 <span aria-hidden="true">›</span></button>
     <div class="edit-submenu" role="menu" aria-label="导入为新方案">
      <button type="button" data-edit-action="import-json">JSON 布局文件 <small>新增方案</small></button>
      <button type="button" data-edit-action="import-ast">AST1 游戏蓝图 <small>新增方案</small></button>
     </div>
    </div>
    <div class="edit-menu-parent">
-    <button type="button" class="edit-menu-parent-button" data-edit-submenu="overwrite" aria-haspopup="true">导入并覆盖 <span aria-hidden="true">›</span></button>
+    <button type="button" class="edit-menu-parent-button" data-edit-submenu="overwrite" aria-haspopup="true" aria-expanded="false">导入并覆盖 <span aria-hidden="true">›</span></button>
     <div class="edit-submenu" role="menu" aria-label="导入并覆盖当前方案">
      <button type="button" data-edit-action="overwrite-json">JSON 布局文件 <small>覆盖当前方案</small></button>
      <button type="button" data-edit-action="overwrite-ast">AST1 游戏蓝图 <small>覆盖当前方案</small></button>
@@ -42,7 +46,7 @@
    </div>
    <div class="edit-menu-divider"></div>
    <div class="edit-menu-parent">
-    <button type="button" class="edit-menu-parent-button" data-edit-submenu="export" aria-haspopup="true">导出 <span aria-hidden="true">›</span></button>
+    <button type="button" class="edit-menu-parent-button" data-edit-submenu="export" aria-haspopup="true" aria-expanded="false">导出 <span aria-hidden="true">›</span></button>
     <div class="edit-submenu" role="menu" aria-label="导出当前方案">
      <button type="button" data-edit-action="export-json">JSON 布局文件 <small>保存到本地</small></button>
      <button type="button" data-edit-action="export-ast">AST1 游戏蓝图 <small>复制代码</small></button>
@@ -159,10 +163,23 @@
    <div class="material-legend" id="materialLegend" aria-label="物品颜色对应表"></div>
   </div>
  </details>
+ <div class="mobile-stamp-bar" id="mobileStampBar" hidden>
+  <div><small>当前放置</small><strong id="mobileStampName">选择一台机器</strong></div>
+  <button id="mobilePlaceButton" type="button">返回地图放置 <span aria-hidden="true">→</span></button>
+ </div>
 </aside>
-<section class="canvaswrap"><canvas id="map"></canvas><div class="legend"><span class="dot" style="background:#ffab61"></span>输出口　<span class="dot" style="background:#59acff"></span>输入口　<span class="dot" style="background:#48dc99"></span>传送带　<span class="dot" style="background:#f2d86b"></span>已选择</div>
+<section class="canvaswrap"><canvas id="map"></canvas>
+ <div class="mobile-map-tools" role="toolbar" aria-label="地图快捷工具">
+  <button type="button" data-tool="select" title="选择机器">选择</button>
+  <button type="button" data-tool="belt" title="连接传送带">接线</button>
+  <button type="button" data-tool="pan" title="单指拖动平移画布">平移</button>
+  <button type="button" id="mobileZoomOut" title="缩小地图">−</button>
+  <button type="button" id="mobileZoomIn" title="放大地图">＋</button>
+  <button type="button" id="mobileFit" title="适应地图">适应</button>
+ </div>
+ <div class="mobile-map-state" id="mobileMapState" aria-live="polite"></div><div class="legend"><span class="dot" style="background:#ffab61"></span>输出口　<span class="dot" style="background:#59acff"></span>输入口　<span class="dot" style="background:#48dc99"></span>传送带　<span class="dot" style="background:#f2d86b"></span>已选择</div>
 <div id="stockChartPanel" class="stock-chart-panel" hidden aria-label="仓库存量趋势">
- <div class="stock-chart-head">
+ <div class="stock-chart-head" title="拖动标题栏移动图表">
   <div><div class="stock-chart-eyebrow">WAREHOUSE · HISTORY</div><h3>仓库存量趋势</h3><p id="stockChartHint">实际逐件收支累计 · 从运行至重置</p></div>
   <button class="stock-chart-close" type="button" data-stock-chart-close aria-label="关闭库存趋势图" title="关闭">×</button>
  </div>
@@ -177,13 +194,25 @@
  <div class="stock-chart-legend-head"><strong>物品曲线 <span id="stockChartSelection"></span></strong><button type="button" class="stock-chart-show-all" data-stock-show-all>显示全部</button></div>
  <div id="stockChartLegend" class="stock-chart-legend" aria-label="选择要显示的物品曲线"></div>
  <div class="stock-chart-footer">按物品颜色绘制；点击下方物品可隐藏 / 显示折线。暂停后保留，重置模拟清空。</div>
+  <div class="stock-chart-resize stock-chart-resize-nw" data-stock-resize="nw" title="拖动左上角缩放" aria-label="左上角缩放图表"></div>
+  <div class="stock-chart-resize stock-chart-resize-ne" data-stock-resize="ne" title="拖动右上角缩放" aria-label="右上角缩放图表"></div>
+  <div class="stock-chart-resize stock-chart-resize-sw" data-stock-resize="sw" title="拖动左下角缩放" aria-label="左下角缩放图表"></div>
+  <div class="stock-chart-resize stock-chart-resize-se" data-stock-resize="se" title="拖动右下角缩放" aria-label="右下角缩放图表"></div>
 </div></section>
 <aside class="side right"><details id="warehousePanel" class="warehouse-panel"><summary>仓库材料 · 每分钟收支</summary><div class="block" id="warehouse"></div></details><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><details class="right-extra-panel" id="auditPanel">
  <summary>线路检查</summary><div class="block" id="audit"></div>
  </details><details class="right-extra-panel" id="logsPanel">
  <summary>操作记录</summary><div class="block logs" id="logs"></div>
  </details></aside>
-</main><footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
+</main>
+<nav class="mobile-nav" aria-label="手机编辑导航">
+ <button type="button" data-mobile-view="map" class="active" aria-pressed="true"><span class="mobile-nav-icon" aria-hidden="true">▦</span><span>地图</span></button>
+ <button type="button" data-mobile-view="tools" aria-pressed="false"><span class="mobile-nav-icon" aria-hidden="true">✥</span><span>工具</span></button>
+ <button type="button" data-mobile-view="machines" aria-pressed="false"><span class="mobile-nav-icon" aria-hidden="true">▤</span><span>机器</span></button>
+ <button type="button" data-mobile-view="inspector" aria-pressed="false"><span class="mobile-nav-icon" aria-hidden="true">◇</span><span>属性</span></button>
+ <button type="button" data-mobile-view="warehouse" aria-pressed="false"><span class="mobile-nav-icon" aria-hidden="true">▥</span><span>仓库</span></button>
+</nav>
+<footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
 </div>
 <script src="scripts/data/warp-preset.js"></script>
 <script src="scripts/data/catalog.js"></script>
@@ -211,4 +240,5 @@
 <script src="scripts/ui/presets.js"></script>
 <script src="scripts/ui/edit-menu.js"></script>
 <script src="scripts/ui/startup.js"></script>
+<script src="scripts/ui/mobile.js"></script>
 </body></html>

@@ -1,0 +1,199 @@
+
+/* Factory Lab phone/tablet workspace. The map remains mounted underneath the
+   mobile pages, so switching tabs never loses the camera or in-progress routes. */
+.mobile-nav,.mobile-map-tools,.mobile-map-state,.mobile-stamp-bar{display:none}
+.mobile-edit-head{display:none}
+@media(max-width:900px){
+ html,body{height:100%;max-width:100%;overflow:hidden}
+ body{overscroll-behavior:none}
+ .app{height:100vh;height:100dvh;min-width:0;min-height:0;
+  display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+ .top{display:grid;grid-template-columns:max-content minmax(0,1fr) max-content;
+  grid-template-rows:auto auto;align-items:center;gap:7px 8px;
+  padding:8px 10px 7px;min-height:0;max-width:100%;z-index:60}
+ .top .brand{grid-column:1;grid-row:1;font-size:15px;margin:0}
+ .top .brand-mark{max-width:25px;max-height:25px}
+ .top #presetDropdown{grid-column:2;grid-row:1;min-width:0;width:100%;
+  max-width:none;flex:initial}
+ .top #presetDropdown .preset-combo{width:100%;min-width:0}
+ .top #editMenuWrap{grid-column:3;grid-row:1}
+ .top #topStats,.top .grow{display:none}
+ .top .sim-toolbar{grid-column:1/-1;grid-row:2;min-width:0;width:100%;
+  display:flex;align-items:center;flex-wrap:nowrap;justify-content:flex-start;
+  overflow-x:auto;overscroll-behavior-x:contain;white-space:nowrap;
+  padding:1px 0 3px;gap:6px;scrollbar-width:none}
+ .top .sim-toolbar::-webkit-scrollbar{display:none}
+ .top .sim-toolbar>*{flex-shrink:0}
+ .top .sim-toolbar button{min-height:34px;white-space:nowrap}
+ .top .sim-toolbar .sim-toolbar-caption{display:none}
+ .top .sim-toolbar .sim-speed{border-left:0;padding-left:0}
+ /* Full-screen action page on mobile: no tiny clipped popup or flyout.
+    Secondary operations are in-flow accordion rows with their own tap targets. */
+ .top #editMenu{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;
+  max-height:none;min-width:0;left:0;right:0;top:0;bottom:0;margin:0;
+  padding:calc(10px + env(safe-area-inset-top)) 14px calc(20px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:7px;overflow-y:auto;overflow-x:hidden;
+  overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#53778e #142538;
+  background:#101d2b;border:0;border-radius:0;box-shadow:none;z-index:300}
+ .top #editMenu[hidden]{display:none!important}
+ .mobile-edit-head{position:sticky;top:calc(-10px - env(safe-area-inset-top));
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  margin:calc(-10px - env(safe-area-inset-top)) -14px 10px;
+  padding:calc(15px + env(safe-area-inset-top)) 17px 13px;
+  border-bottom:1px solid #3d566d;background:#17293a;z-index:2}
+ .mobile-edit-head>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+ .mobile-edit-head span{color:#79b7aa;letter-spacing:.8px;font-size:10px;font-weight:680}
+ .mobile-edit-head strong{font-size:19px;color:#e7f5fd;font-weight:700}
+ .mobile-edit-head small{font-size:11px;color:#9db8cb}
+ .top #mobileEditClose{flex:none;display:grid;place-items:center;
+  width:43px;height:43px;padding:0;border-radius:11px;
+  background:#243b4f;border:1px solid #4d7086;color:#deeffb;font-size:18px}
+ .top #editMenu>.edit-menu-command{min-height:52px;display:flex;align-items:center;
+  padding:11px 15px;font-size:14px;background:#1c3042;border:1px solid #344e63;
+  border-radius:10px;color:#daeaf6}
+ .top #editMenu>.edit-menu-command kbd{color:#92b0c5}
+ .top #editMenu>.edit-menu-divider{height:1px;flex:none;margin:5px 2px;background:#344a5d}
+ .top #editMenu>.edit-menu-parent{position:relative;flex:none;
+  border:1px solid #36546a;border-radius:11px;background:#192d3f;overflow:hidden}
+ .top #editMenu .edit-menu-parent-button{min-height:58px;
+  padding:13px 15px;border:0;border-radius:0;font-size:14px;font-weight:620;
+  background:transparent;color:#e3f0fa;touch-action:manipulation}
+ .top #editMenu .edit-menu-parent-button span{color:#8bcbb8;font-size:21px;transition:transform .15s}
+ .top #editMenu .edit-menu-parent.submenu-open>.edit-menu-parent-button{
+  background:#254b49;color:#f1fff8}
+ .top #editMenu .edit-menu-parent.submenu-open>.edit-menu-parent-button span{transform:rotate(90deg)}
+ .top #editMenu .edit-submenu{position:static!important;inset:auto!important;
+  display:none!important;min-width:0;max-width:none;width:auto;margin:0 7px 8px;
+  padding:6px;border:1px solid #37586b;border-radius:8px;
+  background:#122637;box-shadow:none;overflow:visible}
+ .top #editMenu .edit-menu-parent.submenu-open>.edit-submenu{display:flex!important;
+  flex-direction:column;gap:4px}
+ .top #editMenu .edit-submenu button{min-height:55px;padding:10px 12px;
+  display:flex;flex-direction:column;justify-content:center;gap:4px;
+  font-size:13px;font-weight:610;color:#d9eefa;border-radius:7px;
+  background:#20384b;border:1px solid #31536b;touch-action:manipulation}
+ .top #editMenu .edit-submenu button small{font-size:11px;font-weight:430;color:#9ebccd}
+ .top #editMenu .edit-menu-note{max-width:none;font-size:11px;line-height:1.65;
+  margin:10px 4px 2px;color:#92acc1}
+
+ .status{display:none}
+ .main{position:relative;display:block;min-width:0;min-height:0;overflow:hidden}
+ .main>.canvaswrap{position:absolute;inset:0;height:100%;width:100%;
+  display:block;min-width:0;min-height:0;z-index:0}
+ .main>.side.left,.main>.side.right{position:absolute;inset:0;
+  display:none;width:100%;height:100%;min-width:0;min-height:0;
+  border:0;z-index:20;background:#111e2d;scrollbar-width:thin;
+  scrollbar-color:#55738b #142538}
+ .main[data-mobile-view="tools"]>.side.left,
+ .main[data-mobile-view="machines"]>.side.left{display:flex;flex-direction:column}
+ .main[data-mobile-view="inspector"]>.side.right,
+ .main[data-mobile-view="warehouse"]>.side.right{display:block;overflow-y:auto}
+ .main[data-mobile-view="tools"]>.side.left{overflow-y:auto;gap:0}
+ .main[data-mobile-view="tools"]>.side.left>.machine-library,
+ .main[data-mobile-view="tools"]>.side.left>h3:nth-of-type(2),
+ .main[data-mobile-view="tools"]>.side.left>.mobile-stamp-bar{display:none!important}
+ .main[data-mobile-view="tools"]>.side.left>.editor-tools{padding:4px 15px 12px}
+ .main[data-mobile-view="tools"]>.side.left>.editor-tools .editor-tool-grid [data-tool]{
+  min-height:65px;gap:5px}
+ .main[data-mobile-view="tools"]>.side.left>.editor-tools .editor-tool-name{font-size:13px}
+ .main[data-mobile-view="tools"]>.side.left>.editor-tools .editor-tool-name small{
+  display:block;font-size:10px}
+ .main[data-mobile-view="tools"]>.side.left>.library-reference{flex-shrink:0}
+ .main[data-mobile-view="machines"]>.side.left>h3:first-child,
+ .main[data-mobile-view="machines"]>.side.left>.editor-tools,
+ .main[data-mobile-view="machines"]>.side.left>.library-reference{display:none!important}
+ .main[data-mobile-view="machines"]>.side.left>.machine-library{
+  display:flex;flex-direction:column;flex:1 1 0;min-height:0;
+  padding:5px 13px 8px}
+ .main[data-mobile-view="machines"]>.side.left>.machine-library #search{height:42px;font-size:16px}
+ .main[data-mobile-view="machines"]>.side.left>.machine-library .machine-library-scroll{
+  overflow-y:auto;min-height:0;scrollbar-width:thin}
+ .main[data-mobile-view="machines"]>.side.left .machine-palette button[data-stamp]{
+  min-height:48px;padding:10px 12px}
+ .main[data-mobile-view="machines"]>.side.left .machine-palette-label span{font-size:13px}
+ .main[data-mobile-view="machines"]>.side.left .machine-config{flex:none}
+ .mobile-stamp-bar:not([hidden]){display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:9px 13px calc(10px + env(safe-area-inset-bottom)*0);
+  background:#162b35;border-top:1px solid #3f665f;min-height:64px}
+ .mobile-stamp-bar>div{display:flex;flex-direction:column;min-width:0}
+ .mobile-stamp-bar small{font-size:10px;color:#9bc9be}
+ .mobile-stamp-bar strong{font-size:12px;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;color:#e6f9f2}
+ .mobile-stamp-bar button{min-height:42px;flex:none;
+  background:#205c49;border-color:#449979;color:#e5ffef;font-weight:650}
+ .main[data-mobile-view="inspector"]>.side.right>#warehousePanel,
+ .main[data-mobile-view="inspector"]>.side.right>#auditPanel,
+ .main[data-mobile-view="inspector"]>.side.right>#logsPanel{display:none!important}
+ .main[data-mobile-view="warehouse"]>.side.right>h3,
+ .main[data-mobile-view="warehouse"]>.side.right>#inspector{display:none!important}
+ .main>.side.right>h3{margin-top:11px}
+ .main>.side.right #inspector{padding:0 12px 24px}
+ .main>.side.right .warehouse-panel{margin-bottom:12px}
+ .main>.side.right .right-extra-panel{margin-bottom:4px}
+ .mobile-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;
+  padding:5px 7px calc(6px + env(safe-area-inset-bottom));
+  background:#142231;border-top:1px solid #365168;
+  box-shadow:0 -6px 20px #050c17aa;position:relative;z-index:45}
+ .mobile-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:0;min-height:51px;gap:3px;padding:4px 1px;
+  font-size:11px;font-weight:590;color:#a5bdd0;background:transparent;
+  border:1px solid transparent;border-radius:10px;touch-action:manipulation}
+ .mobile-nav button .mobile-nav-icon{font-size:19px;line-height:1;color:inherit}
+ .mobile-nav button.active{background:#205045!important;border-color:#4b9a83!important;color:#f0fff8!important}
+ .mobile-nav button:not(.active):active{background:#293d50}
+ .mobile-map-tools{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:center;
+  gap:4px;position:absolute;top:9px;left:50%;transform:translateX(-50%);
+  width:min(370px,calc(100% - 20px));padding:5px;
+  background:#182a3bea;border:1px solid #456174;box-shadow:0 9px 25px #000a;
+  border-radius:12px;z-index:4;backdrop-filter:blur(10px)}
+ .mobile-map-tools button{min-width:0;min-height:40px;padding:3px 2px;
+  font-size:12px;white-space:nowrap;border-radius:7px;background:#21364a;
+  color:#d4e8f3;border-color:#40576b;touch-action:manipulation}
+ .mobile-map-tools button.active{background:#245b4a!important;color:#edfff4!important;
+  border-color:#62b092!important}
+ .mobile-map-tools #mobileZoomOut,.mobile-map-tools #mobileZoomIn{font-size:20px}
+ .mobile-map-state:not(:empty){display:block;position:absolute;bottom:18px;left:50%;
+  transform:translateX(-50%);padding:6px 10px;white-space:nowrap;
+  max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;
+  background:#142c3ce8;border:1px solid #486778;color:#dcf5e9;
+  border-radius:9px;font-size:11px;pointer-events:none;z-index:3}
+ .canvaswrap .legend{left:8px;bottom:7px;right:8px;width:max-content;
+  max-width:calc(100% - 16px);padding:5px 8px;font-size:10px;line-height:1.7}
+ .canvaswrap .stock-chart-panel:not(.stock-chart-sized){
+  width:min(785px,calc(100% - 16px));top:8px;right:8px;
+  max-height:calc(100% - 16px)}
+ #ast1Panel{top:8px!important;max-height:calc(100dvh - 18px);
+  overflow-y:auto;padding:12px!important;box-sizing:border-box}
+ #ast1Panel textarea{max-height:30dvh}
+ #importFeedback{top:8px!important;max-height:30dvh;overflow-y:auto}
+}
+@media(max-width:360px){
+ .top{gap:5px;padding:6px 6px}
+ .top .brand{font-size:13px}
+ .top .sim-toolbar{gap:4px}
+ .mobile-nav{padding-inline:3px;gap:1px}
+ .mobile-nav button{font-size:10px}
+ .mobile-map-tools{width:calc(100% - 12px);gap:2px;padding:3px}
+ .mobile-map-tools button{font-size:11px}
+}
+
+/* Small phones: do not squeeze the scheme picker down to a few characters. */
+@media(max-width:340px){
+ .top{grid-template-columns:minmax(0,1fr) max-content;grid-template-rows:auto auto auto}
+ .top .brand{grid-column:1;grid-row:1}
+ .top #editMenuWrap{grid-column:2;grid-row:1}
+ .top #presetDropdown{grid-column:1/-1;grid-row:2;max-width:none}
+ .top .sim-toolbar{grid-column:1/-1;grid-row:3;overflow:visible;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ .top .sim-toolbar button,.top .sim-toolbar .sim-speed{width:100%;justify-content:center}
+ .top .sim-toolbar .sim-speed select{flex:1;max-width:none}
+}
+/* Landscape phones need all navigation available, but a shorter header. */
+@media(max-width:900px) and (max-height:480px){
+ .top{padding-top:4px;padding-bottom:3px;gap:3px 6px}
+ .top .sim-toolbar{padding:0;gap:4px}
+ .top .sim-toolbar button{min-height:29px}
+ .mobile-nav{padding-top:2px;padding-bottom:calc(2px + env(safe-area-inset-bottom))}
+ .mobile-nav button{min-height:43px;gap:1px}
+ .mobile-map-tools{top:5px}
+}

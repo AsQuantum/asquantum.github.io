@@ -4,6 +4,129 @@
 const stockChartHiddenItems=new Set();
 let stockChartWindow='all',stockChartLastDraw=-Infinity,stockChartHoverData=null;
 
+// Floating chart geometry is independent of the factory map and its simulation.
+// Save it only after a successful drag or corner resize.
+const STOCK_CHART_LAYOUT_KEY='factory-lab.stock-chart.layout.v1';
+let stockChartLayoutReady=false,stockChartCustomLayout=false,stockChartPointerDrag=null,stockChartResizeFrame=0;
+const stockChartClamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+
+function stockChartGeometry(){
+ const panel=$('stockChartPanel');
+ const box=panel.getBoundingClientRect(),host=panel.parentElement.getBoundingClientRect();
+ return {left:box.left-host.left,top:box.top-host.top,width:box.width,height:box.height,
+  sized:panel.classList.contains('stock-chart-sized')};
+}
+function stockChartLimits(){
+ const panel=$('stockChartPanel'),host=panel.parentElement.getBoundingClientRect();
+ const gap=8,maxWidth=Math.max(1,host.width-2*gap),maxHeight=Math.max(1,host.height-2*gap);
+ return {gap,width:host.width,height:host.height,minWidth:Math.min(360,maxWidth),
+  minHeight:Math.min(340,maxHeight),maxWidth,maxHeight};
+}
+function stockChartApplyGeometry(geometry){
+ const panel=$('stockChartPanel');
+ if(!panel||panel.hidden||!geometry)return;
+ const limit=stockChartLimits();
+ if(limit.maxWidth<=1||limit.maxHeight<=1)return;
+ const width=stockChartClamp(Number(geometry.width)||limit.minWidth,limit.minWidth,limit.maxWidth);
+ const sized=!!geometry.sized;
+ panel.style.width=width+'px';
+ if(sized){
+  const height=stockChartClamp(Number(geometry.height)||limit.minHeight,limit.minHeight,limit.maxHeight);
+  panel.classList.add('stock-chart-sized');
+  panel.classList.toggle('stock-chart-short',height<435);
+  panel.style.height=height+'px';
+  panel.style.maxHeight='none';
+ }else{
+  panel.classList.remove('stock-chart-sized','stock-chart-short');
+  panel.style.height='';
+  panel.style.maxHeight='calc(100% - 16px)';
+ }
+ const height=panel.getBoundingClientRect().height;
+ panel.style.left=stockChartClamp(Number(geometry.left)||0,limit.gap,Math.max(limit.gap,limit.width-limit.gap-width))+'px';
+ panel.style.top=stockChartClamp(Number(geometry.top)||0,limit.gap,Math.max(limit.gap,limit.height-limit.gap-height))+'px';
+ panel.style.right='auto';
+ panel.style.bottom='auto';
+ stockChartCustomLayout=true;
+}
+function stockChartSaveGeometry(){
+ try{localStorage.setItem(STOCK_CHART_LAYOUT_KEY,JSON.stringify(stockChartGeometry()));}catch(e){/* Optional browser preference */ }
+}
+function stockChartRestoreGeometry(){
+ if(stockChartLayoutReady)return;
+ stockChartLayoutReady=true;
+ try{
+  const saved=JSON.parse(localStorage.getItem(STOCK_CHART_LAYOUT_KEY)||'null');
+  if(saved&&['left','top','width','height'].every(k=>Number.isFinite(saved[k]))&&typeof saved.sized==='boolean')
+   stockChartApplyGeometry(saved);
+ }catch(e){/* Private browsing or obsolete preference */ }
+}
+function stockChartScheduleRender(){
+ if(stockChartResizeFrame)return;
+ stockChartResizeFrame=requestAnimationFrame(()=>{
+  stockChartResizeFrame=0;
+  if(!$('stockChartPanel')?.hidden)stockChartRender();
+ });
+}
+function stockChartPointerStart(event){
+ if(event.button!==0||stockChartPointerDrag)return;
+ const resize=event.target.closest('[data-stock-resize]');
+ const head=event.target.closest('.stock-chart-head');
+ if(!resize&&!head)return;
+ if(!resize&&event.target.closest('button,a,input,select,textarea'))return;
+ const panel=$('stockChartPanel');
+ // Opening fade must never resume when the pointer is released.
+ panel.classList.remove('stock-chart-opening');
+ const geometry=stockChartGeometry();
+ stockChartPointerDrag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,geometry,
+  handle:resize?.dataset.stockResize||'',changed:false};
+ panel.classList.add('stock-chart-moving');
+ if(!resize)panel.classList.add('stock-chart-dragging');
+ try{panel.setPointerCapture(event.pointerId);}catch(e){/* Pointer capture is optional */ }
+ event.preventDefault();
+ event.stopPropagation();
+}
+function stockChartPointerUpdate(event){
+ const drag=stockChartPointerDrag;
+ if(!drag||event.pointerId!==drag.pointerId)return;
+ const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+ if(!drag.changed&&Math.abs(dx)+Math.abs(dy)<3)return;
+ drag.changed=true;
+ const g=drag.geometry,l=stockChartLimits();
+ let left=g.left,top=g.top,width=g.width,height=g.height;
+ if(!drag.handle){
+  left=stockChartClamp(g.left+dx,l.gap,Math.max(l.gap,l.width-l.gap-g.width));
+  top=stockChartClamp(g.top+dy,l.gap,Math.max(l.gap,l.height-l.gap-g.height));
+ }else{
+  const west=drag.handle.includes('w'),north=drag.handle.includes('n');
+  const right=g.left+g.width,bottom=g.top+g.height;
+  const maxWidth=west?right-l.gap:l.width-l.gap-g.left;
+  const maxHeight=north?bottom-l.gap:l.height-l.gap-g.top;
+  width=stockChartClamp(g.width+(west?-dx:dx),Math.min(l.minWidth,maxWidth),Math.max(1,maxWidth));
+  height=stockChartClamp(g.height+(north?-dy:dy),Math.min(l.minHeight,maxHeight),Math.max(1,maxHeight));
+  if(west)left=right-width;
+  if(north)top=bottom-height;
+ }
+ stockChartApplyGeometry({left,top,width,height,sized:!!drag.handle||g.sized});
+ // The existing SVG scales smoothly with CSS during resize. Replacing SVG
+ // innerHTML on every pointer move makes the graph visibly flash; redraw once
+ // after the final size is chosen instead.
+ event.preventDefault();
+}
+function stockChartPointerEnd(event){
+ const drag=stockChartPointerDrag;
+ if(!drag||(event&&event.pointerId!==drag.pointerId))return;
+ stockChartPointerDrag=null;
+ const panel=$('stockChartPanel');
+ panel.classList.remove('stock-chart-moving','stock-chart-dragging');
+ if(drag.changed){
+  stockChartSaveGeometry();
+  // A single coalesced redraw at the end catches up on any live stock changes
+  // skipped during the gesture. Dragging itself never replaces SVG contents.
+  stockChartScheduleRender();
+ }
+ try{if(panel.hasPointerCapture(drag.pointerId))panel.releasePointerCapture(drag.pointerId);}catch(e){}
+}
+
 function stockChartHistory(){
  const buckets=sim?.minuteBuckets||[],names=new Set(Object.keys(ware||{}));
  for(const b of buckets)if(b){
@@ -36,9 +159,23 @@ function stockChartHistory(){
 function stockChartOpen(open){
  const panel=$('stockChartPanel');
  if(!panel)return;
+ const wasHidden=panel.hidden;
  panel.hidden=!open;
- if(open)stockChartRender();
+ if(open){
+  if(wasHidden)panel.classList.add('stock-chart-opening');
+  stockChartRestoreGeometry();
+  if(stockChartCustomLayout)stockChartApplyGeometry(stockChartGeometry());
+  stockChartRender();
+ }else{
+  panel.classList.remove('stock-chart-opening');
+ }
 }
+// Clear animation state after the first open; subsequent live redraws,
+// dragging, resizing, tab switches and pointer release never restart it.
+$('stockChartPanel')?.addEventListener('animationend',event=>{
+ if(event.target===$('stockChartPanel')&&event.animationName==='factoryChartReveal')
+  event.target.classList.remove('stock-chart-opening');
+});
 
 function stockChartReset(){
  stockChartHiddenItems.clear();
@@ -47,7 +184,7 @@ function stockChartReset(){
 }
 
 function stockChartMaybeRefresh(){
- if(!$('stockChartPanel')||$('stockChartPanel').hidden)return;
+ if(!$('stockChartPanel')||$('stockChartPanel').hidden||stockChartPointerDrag)return;
  if(simTime-stockChartLastDraw>=1||simTime<stockChartLastDraw)stockChartRender();
 }
 
@@ -74,7 +211,10 @@ function stockChartRender(){
  $('stockChartSelection').textContent='已显示 '+shown.length+' / '+items.length+' 种';
  // Reserve two separate bottom rows: tick values and an axis unit label.
 // The old y=height-1 label overlapped the rightmost tick and was clipped.
- const width=850,height=315,margin={left:60,right:24,top:20,bottom:54},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
+ const sized=panel.classList.contains('stock-chart-sized'),chartArea=$('stockChartPlot');
+ const width=sized?Math.max(280,Math.round(chartArea.clientWidth)):850;
+ const height=sized?Math.max(155,Math.round(chartArea.clientHeight)):315;
+ const margin={left:60,right:24,top:20,bottom:54},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom;
  const end=Math.max(1,minute),from=Math.min(start,end),span=Math.max(1e-8,end-from);
  const inside=points.filter(p=>p.minute>=from-1e-8);
  if(from>0&&points.length){
@@ -186,3 +326,17 @@ document.addEventListener('click',event=>{
 });
 $('stockChartPlot')?.addEventListener('pointermove',stockChartPointerMove);
 $('stockChartPlot')?.addEventListener('pointerleave',stockChartPointerLeave);
+$('stockChartPanel')?.addEventListener('pointerdown',stockChartPointerStart);
+document.addEventListener('pointermove',stockChartPointerUpdate);
+document.addEventListener('pointerup',stockChartPointerEnd);
+document.addEventListener('pointercancel',stockChartPointerEnd);
+window.addEventListener('blur',()=>stockChartPointerEnd());
+if(typeof ResizeObserver!=='undefined'){
+ const chartHost=$('stockChartPanel')?.parentElement;
+ if(chartHost)new ResizeObserver(()=>{
+  if(stockChartCustomLayout&&!$('stockChartPanel').hidden){
+   stockChartApplyGeometry(stockChartGeometry());
+   stockChartScheduleRender();
+  }
+ }).observe(chartHost);
+}

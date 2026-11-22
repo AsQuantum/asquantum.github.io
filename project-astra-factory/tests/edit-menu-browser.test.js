@@ -3,7 +3,7 @@ const fs=require('fs'),os=require('os'),path=require('path'),assert=require('ass
 const edge='C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const file=path.resolve(__dirname,'../index.html').replace(/\\/g,'/');
 const dir=fs.mkdtempSync(path.join(os.tmpdir(),'factory-button-'));
-const child=spawn(edge,['--headless=new','--no-first-run','--no-default-browser-check','--disable-gpu','--disable-extensions','--remote-allow-origins=*','--remote-debugging-port=0','--user-data-dir='+dir,'file:///'+file],{stdio:'ignore',windowsHide:true});
+const child=spawn(edge,['--headless=new','--no-first-run','--no-default-browser-check','--window-size=1480,920','--disable-gpu','--disable-extensions','--remote-allow-origins=*','--remote-debugging-port=0','--user-data-dir='+dir,'file:///'+file],{stdio:'ignore',windowsHide:true});
 async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return v;}catch(e){}await new Promise(r=>setTimeout(r,200));}throw new Error('Edge CDP timeout');}
 (async()=>{
  try{

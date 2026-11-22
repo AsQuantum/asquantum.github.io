@@ -1,0 +1,83 @@
+/* Motion language for Factory Lab windows.
+   Only animate visibility changes, never stock data updates or map drawing.
+   Fade/brightness never changes layout or temporarily clips resize handles. */
+:root{
+ --window-motion-ease:cubic-bezier(.22,.85,.3,1);
+ --window-motion-fast:150ms;
+ --window-motion-normal:220ms;
+}
+@keyframes factoryChartReveal{
+ from{opacity:.15;filter:brightness(.88)}
+ to{opacity:1;filter:brightness(1)}
+}
+@keyframes factoryPopupReveal{
+ from{opacity:.12;filter:brightness(.9)}
+ to{opacity:1;filter:brightness(1)}
+}
+@keyframes factoryPopoverReveal{
+ from{opacity:0;transform:translateY(-7px)}
+ to{opacity:1;transform:translateY(0)}
+}
+@keyframes factoryMobileEditReveal{
+ from{opacity:.15;filter:brightness(.82)}
+ to{opacity:1;filter:brightness(1)}
+}
+@keyframes factoryMobileSectionReveal{
+ from{opacity:.2;filter:brightness(.87)}
+ to{opacity:1;filter:brightness(1)}
+}
+@keyframes factoryTabReveal{
+ from{opacity:.4;transform:translateY(7px)}
+ to{opacity:1;transform:translateY(0)}
+}
+/* Floating warehouse graph: soften the initial paint without altering hit-testing,
+   its rectangle, corners or any saved resize geometry. */
+/* Apply the entrance animation ONLY for a new open event. Toggling the
+   moving class or resizing must not restart the fade and darken the panel. */
+.stock-chart-panel.stock-chart-opening:not([hidden]){
+ animation:factoryChartReveal var(--window-motion-normal) var(--window-motion-ease) both;
+}
+/* Desktop editing menu and format flyouts. */
+.edit-menu-panel:not([hidden]){
+ animation:factoryPopoverReveal var(--window-motion-fast) var(--window-motion-ease) both;
+}
+.edit-submenu{
+ animation:factoryPopoverReveal var(--window-motion-fast) var(--window-motion-ease) both;
+}
+/* AST1 code dialog preserves its inline translateX(-50%) positioning. */
+#ast1Panel{
+ animation:factoryPopupReveal var(--window-motion-normal) var(--window-motion-ease) both;
+}
+#importFeedback{
+ animation:factoryPopupReveal var(--window-motion-fast) var(--window-motion-ease) both;
+}
+@media(max-width:900px){
+ /* Full-screen Edit fades into focus without temporarily blocking menu taps. */
+ .top #editMenu:not([hidden]){
+  animation:factoryMobileEditReveal 240ms var(--window-motion-ease) both;
+ }
+ .top #editMenu .edit-menu-parent.submenu-open>.edit-submenu{
+  animation:factoryMobileSectionReveal 175ms var(--window-motion-ease) both;
+ }
+ /* Workspaces enter softly while map/camera stay mounted underneath. */
+ .main[data-mobile-view="tools"]>.side.left,
+ .main[data-mobile-view="machines"]>.side.left,
+ .main[data-mobile-view="inspector"]>.side.right,
+ .main[data-mobile-view="warehouse"]>.side.right{
+  animation:factoryTabReveal 175ms var(--window-motion-ease) both;
+ }
+}
+/* Respect accessibility settings on every window and child animation. */
+@media(prefers-reduced-motion:reduce){
+ .stock-chart-panel.stock-chart-opening:not([hidden]),.edit-menu-panel:not([hidden]),
+ .edit-submenu,#ast1Panel,#importFeedback,
+ .top #editMenu:not([hidden]),
+ .top #editMenu .edit-menu-parent.submenu-open>.edit-submenu,
+ .main[data-mobile-view="tools"]>.side.left,
+ .main[data-mobile-view="machines"]>.side.left,
+ .main[data-mobile-view="inspector"]>.side.right,
+ .main[data-mobile-view="warehouse"]>.side.right{
+  animation:none!important;
+  transition:none!important;
+ }
+}

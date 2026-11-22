@@ -5,20 +5,43 @@
  position:absolute;top:16px;right:16px;z-index:16;
  width:min(785px,calc(100% - 32px));max-height:calc(100% - 32px);
  display:flex;flex-direction:column;overflow:hidden;
+ container-type:inline-size;
  background:linear-gradient(160deg,rgba(30,49,67,.98),rgba(15,27,42,.99));
  border:1px solid #54738b;border-radius:14px;
  box-shadow:0 16px 54px #000a,0 0 0 1px #bde4ed0d;
  color:#dcebf5;backdrop-filter:blur(15px);
 }
 .stock-chart-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 17px 11px;border-bottom:1px solid #375068}
+/* The title bar moves the panel; the close button still acts independently. */
+.stock-chart-head{cursor:grab;touch-action:none;user-select:none}
+.stock-chart-panel.stock-chart-dragging .stock-chart-head{cursor:grabbing}
+.stock-chart-panel.stock-chart-moving,.stock-chart-panel.stock-chart-moving *{user-select:none}
+.stock-chart-panel.stock-chart-sized{max-height:none;min-height:0}
+.stock-chart-panel.stock-chart-sized .stock-chart-plot-wrap{flex:1 1 auto;min-height:100px}
+.stock-chart-panel.stock-chart-sized #stockChartSvg{height:100%;min-height:0}
+.stock-chart-panel.stock-chart-sized .stock-chart-plot-wrap svg{height:100%;width:100%;max-height:none}
+.stock-chart-panel.stock-chart-sized .stock-chart-legend{flex:0 1 auto;min-height:0;max-height:90px}
+/* The four resize corners grow/shrink the chart against the opposite corner. */
+.stock-chart-resize{position:absolute;width:21px;height:21px;z-index:4;touch-action:none;user-select:none}
+.stock-chart-resize::after{content:"";position:absolute;width:9px;height:9px;border-color:#8bd9cf;opacity:.9}
+.stock-chart-resize-nw{top:0;left:0;cursor:nwse-resize}
+.stock-chart-resize-ne{top:0;right:0;cursor:nesw-resize}
+.stock-chart-resize-sw{bottom:0;left:0;cursor:nesw-resize}
+.stock-chart-resize-se{bottom:0;right:0;cursor:nwse-resize}
+.stock-chart-resize-nw::after{top:4px;left:4px;border-left:2px solid;border-top:2px solid;border-radius:4px 0 0}
+.stock-chart-resize-ne::after{top:4px;right:4px;border-right:2px solid;border-top:2px solid;border-radius:0 4px 0 0}
+.stock-chart-resize-sw::after{bottom:4px;left:4px;border-left:2px solid;border-bottom:2px solid;border-radius:0 0 0 4px}
+.stock-chart-resize-se::after{bottom:4px;right:4px;border-right:2px solid;border-bottom:2px solid;border-radius:0 0 4px}
+.stock-chart-resize:hover::after{border-color:#d6fff2;opacity:1}
+
 .stock-chart-eyebrow{font-size:10px;letter-spacing:1.1px;color:#7fb9b6;font-weight:700}
 .stock-chart-head h3{font-size:17px;font-weight:650;margin:2px 0;color:#e8f3fc;letter-spacing:.2px}
 .stock-chart-head p{font-size:11px;margin:0;color:#a1b7c8}
 .stock-chart-close{font-size:17px;line-height:1;border:1px solid #49677f;background:#22364b;width:30px;height:30px;padding:0;flex:none}
 .stock-chart-topline{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:12px 16px 6px}
 .stock-chart-stats{font-variant-numeric:tabular-nums;color:#c9e7dd;font-size:12px;font-weight:600}
-.stock-chart-views{display:flex;gap:4px;flex-wrap:wrap}
-.stock-chart-views button{font-size:11px;padding:4px 8px;background:#1c3044;border:1px solid #365269;color:#a9bfce;border-radius:6px}
+.stock-chart-views{display:flex;gap:4px;flex-wrap:nowrap;min-width:0}
+.stock-chart-views button{font-size:11px;padding:4px 8px;background:#1c3044;border:1px solid #365269;color:#a9bfce;border-radius:6px;white-space:nowrap}
 .stock-chart-views button.selected{background:#2d5d56;border-color:#54988b;color:#e6fff5}
 .stock-chart-plot-wrap{min-height:0;position:relative;margin:0 12px}
 .stock-chart-plot-wrap svg{width:100%;height:auto;max-height:min(310px,40vh);display:block;user-select:none}
@@ -39,12 +62,17 @@
 .stock-chart-legend-head strong{font-weight:600;color:#b8d0df;font-size:11.5px}
 .stock-chart-legend-head span{font-size:11px;color:#93adbf}
 .stock-chart-show-all{background:transparent;border:0;font-size:11px;color:#8adbc5;padding:3px 4px}
-.stock-chart-legend{display:flex;flex-wrap:wrap;align-content:flex-start;gap:5px;overflow:auto;max-height:115px;padding:0 16px 12px;scrollbar-width:thin}
+.stock-chart-legend{display:flex;flex-wrap:wrap;align-content:flex-start;gap:5px;overflow-y:auto;overflow-x:hidden;min-height:0;max-height:115px;padding:0 16px 12px;scrollbar-width:thin;scrollbar-color:#53778e #152638;overscroll-behavior:contain}
 .stock-legend-item{display:flex;align-items:center;gap:6px;min-width:0;padding:4px 7px;font-size:10.5px;background:#23384b;border:1px solid #365168;border-radius:6px;color:#d6e7f0}
 .stock-legend-color{width:9px;height:9px;flex:none;border-radius:50%;box-shadow:0 0 0 2px #ffffff0b}
 .stock-legend-name{max-width:95px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stock-legend-item b{margin-left:3px;color:#e5f4f8;font-variant-numeric:tabular-nums}
 .stock-legend-item.muted{opacity:.42}
+/* Explicit Chromium/Edge scrollbar colors, matching the editor palette. */
+.stock-chart-legend::-webkit-scrollbar{width:8px}
+.stock-chart-legend::-webkit-scrollbar-track{background:#152638;border-radius:10px}
+.stock-chart-legend::-webkit-scrollbar-thumb{background:#53778e;border-radius:10px;border:2px solid #152638}
+.stock-chart-legend::-webkit-scrollbar-thumb:hover{background:#78a3b7}
 .stock-chart-empty-legend{font-size:12px;color:#8ca7b9;padding:6px 0}
 .stock-chart-footer{padding:8px 17px 11px;font-size:10.5px;color:#8faabd;border-top:1px solid #345064}
 .side.right #warehouseLiveActual .ledger-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
@@ -56,3 +84,24 @@
 .side.right #warehouseLiveActual .warehouse-stock-toggle:hover{background:#2a6053}
 @media(max-width:1150px){.stock-chart-panel{width:min(700px,calc(100% - 24px));top:12px;right:12px;max-height:calc(100% - 24px)}.stock-chart-head{padding:10px 13px 8px}.stock-chart-legend{max-height:80px}}
 @media(max-height:650px){.stock-chart-plot-wrap svg{max-height:31vh}.stock-chart-legend{max-height:75px}.stock-chart-topline{padding-top:6px}.stock-chart-footer{display:none}}
+
+/* A narrow resized panel needs its stats and three controls on separate rows.
+   Container query follows the floating chart, not the viewport. */
+@container (max-width: 520px){
+ .stock-chart-topline{flex-direction:column;align-items:stretch;gap:7px;padding:10px 14px 8px}
+ .stock-chart-stats{font-size:11.5px;white-space:nowrap;line-height:1.4}
+ .stock-chart-views{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:100%}
+ .stock-chart-views button{min-width:0;padding:5px 2px;font-size:10.5px}
+ .stock-chart-head{gap:7px;padding:10px 13px 8px}
+ .stock-chart-head h3{font-size:15px}
+ .stock-chart-head p{font-size:10px}
+ .stock-chart-eyebrow{font-size:9px}
+ .stock-chart-legend-head{padding:7px 13px 5px}
+ .stock-chart-legend{padding:0 13px 8px;max-height:90px}
+ .stock-chart-footer{font-size:10px;padding:6px 13px 8px}
+}
+/* At minimum window height, prioritize actual chart and usable legend over footer text. */
+.stock-chart-panel.stock-chart-short .stock-chart-footer{display:none}
+.stock-chart-panel.stock-chart-short .stock-chart-head{padding-top:8px;padding-bottom:7px}
+.stock-chart-panel.stock-chart-short .stock-chart-topline{padding-top:7px;padding-bottom:6px}
+.stock-chart-panel.stock-chart-short .stock-chart-legend{max-height:70px;padding-bottom:4px}

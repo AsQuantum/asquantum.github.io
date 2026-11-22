@@ -12,9 +12,17 @@ const editMenuOperations={
  'export-json':()=>exportLayoutJson(),
  'export-ast':()=>openAST1Export()
 };
+const mobileEditMode=()=>window.matchMedia('(max-width: 900px)').matches;
 function setEditMenuOpen(open){
  editMenu.hidden=!open;
  editMenuButton.setAttribute('aria-expanded',String(!!open));
+ if(open&&mobileEditMode()){
+  editMenu.setAttribute('role','dialog');
+  editMenu.setAttribute('aria-modal','true');
+ }else{
+  editMenu.setAttribute('role','menu');
+  editMenu.removeAttribute('aria-modal');
+ }
  if(!open)editMenu.querySelectorAll('.edit-menu-parent').forEach(p=>{
   p.classList.remove('submenu-open');
   p.querySelector('[data-edit-submenu]').setAttribute('aria-expanded','false');
@@ -28,9 +36,10 @@ function openEditSubmenu(parent){
  });
 }
 editMenu.querySelectorAll('.edit-menu-parent').forEach(parent=>{
- parent.addEventListener('pointerenter',()=>{if(!editMenu.hidden)openEditSubmenu(parent);});
+ parent.addEventListener('pointerenter',()=>{if(!editMenu.hidden&&!mobileEditMode())openEditSubmenu(parent);});
 });
 editMenuButton.onclick=()=>setEditMenuOpen(editMenu.hidden);
+$('mobileEditClose').onclick=()=>{setEditMenuOpen(false);editMenuButton.focus();};
 editMenu.onclick=e=>{
  const action=e.target.closest('[data-edit-action]');
  if(action){

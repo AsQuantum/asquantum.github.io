@@ -135,8 +135,123 @@ async function poll(fn){for(let i=0;i<120;i++){try{const result=await fn();if(re
   assert.equal(toggle.paused.border,toggle.start.border,'Resume restores original green border');
   assert.equal(toggle.reset.bg,toggle.start.bg,'reset must restore green');
   assert(toggle.runningState.primary&&toggle.paused.primary&&toggle.reset.primary);
+  // Real browser pointer input: drag by the title, then resize from every corner.
+  // These are end-to-end CDP mouse operations, not calls to the geometry helpers.
+  async function stockMouseDrag(from,dx,dy){
+   await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:from.x,y:from.y});
+   await send('Input.dispatchMouseEvent',{type:'mousePressed',x:from.x,y:from.y,button:'left',clickCount:1});
+   await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:from.x+dx,y:from.y+dy,button:'left',buttons:1});
+   await send('Input.dispatchMouseEvent',{type:'mouseReleased',x:from.x+dx,y:from.y+dy,button:'left',clickCount:1});
+   await delay(90);
+  }
+  const chartGeo=()=>evaluate('(()=>{const g=stockChartGeometry(),l=stockChartLimits(),svg=$("stockChartSvg").querySelector("svg");return {...g,hostW:l.width,hostH:l.height,viewW:svg.viewBox.baseVal.width,viewH:svg.viewBox.baseVal.height,plotH:$("stockChartPlot").clientHeight}})()');
+  const chartAnchor=selector=>evaluate('(()=>{const r=document.querySelector('+JSON.stringify(selector)+').getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()');
+  const initial=await chartGeo();
+  const heading=await chartAnchor('.stock-chart-head h3');
+  await stockMouseDrag(heading,-35,45);
+  const moved=await chartGeo();
+  console.log('CHART TITLE MOVE',JSON.stringify({initial,moved}));
+  assert(Math.abs(moved.left-(initial.left-35))<3,'title drag should move chart horizontally');
+  assert(Math.abs(moved.top-(initial.top+45))<3,'title drag should move chart vertically');
+  assert(moved.left>=7&&moved.top>=7&&moved.left+moved.width<=moved.hostW-7,'drag must remain inside map');
+  // Leave room to grow in either direction for exact four-corner tests.
+  await evaluate('(()=>{const l=stockChartLimits();stockChartApplyGeometry({left:75,top:70,width:Math.min(540,l.maxWidth-70),height:Math.min(390,l.maxHeight-70),sized:true});stockChartRender()})()');
+  const corners=[
+   {dir:'se',dx:34,dy:31,mode:'grow-both'},
+   {dir:'nw',dx:27,dy:22,mode:'shrink-from-top-left'},
+   {dir:'ne',dx:-32,dy:23,mode:'shrink-from-top-right'},
+   {dir:'sw',dx:-24,dy:29,mode:'grow-from-bottom-left'}
+  ];
+  for(const test of corners){
+   const before=await chartGeo();
+   const anchor=await chartAnchor('[data-stock-resize="'+test.dir+'"]');
+   await stockMouseDrag(anchor,test.dx,test.dy);
+   const after=await chartGeo();
+   console.log('CHART RESIZE '+test.dir.toUpperCase(),JSON.stringify({before,after}));
+   const west=test.dir.includes('w'),north=test.dir.includes('n');
+   const expectedW=before.width+(west?-test.dx:test.dx);
+   const expectedH=before.height+(north?-test.dy:test.dy);
+   assert(Math.abs(after.width-expectedW)<3,'resize '+test.dir+' width delta');
+   assert(Math.abs(after.height-expectedH)<3,'resize '+test.dir+' height delta');
+   assert(Math.abs((west?after.left+after.width:after.left)-(west?before.left+before.width:before.left))<3,'resize '+test.dir+' fixed horizontal edge');
+   assert(Math.abs((north?after.top+after.height:after.top)-(north?before.top+before.height:before.top))<3,'resize '+test.dir+' fixed vertical edge');
+   assert(after.left>=7&&after.top>=7&&after.left+after.width<=after.hostW-7&&after.top+after.height<=after.hostH-7,'chart cannot resize offscreen');
+   assert.equal(after.viewW,Math.round(after.width-26),'resized chart SVG X scale tracks plot width');
+   assert(after.viewH>=155,'resized chart preserves a usable graph height');
+   assert.equal(await evaluate('getComputedStyle($("stockChartPanel")).animationName'),'none',
+    'dragging or resizing must not restart the chart opening fade');
+  }
+  // Simulate a continuous resize while the production simulation advances.
+  // The live chart must retain its existing SVG (no full redraw/flicker)
+  // until the pointer is released, when a single redraw refreshes it.
+  const stableResize=await evaluate(`(()=>{
+   const panel=$('stockChartPanel'),handle=panel.querySelector('[data-stock-resize="se"]');
+   const bounds=handle.getBoundingClientRect(),x=bounds.left+bounds.width/2,y=bounds.top+bounds.height/2;
+   const original=$('stockChartSvg').firstElementChild;
+   handle.dispatchEvent(new PointerEvent('pointerdown',{pointerId:713,button:0,bubbles:true,cancelable:true,clientX:x,clientY:y}));
+   const active=!!stockChartPointerDrag;
+   stockChartPointerUpdate(new PointerEvent('pointermove',{pointerId:713,button:0,cancelable:true,clientX:x+15,clientY:y+10}));
+   const sameAfterMove=$('stockChartSvg').firstElementChild===original;
+   simTime+=2;
+   stockChartMaybeRefresh();
+   const sameAfterLiveUpdate=$('stockChartSvg').firstElementChild===original;
+   const animation=getComputedStyle(panel).animationName;
+   stockChartPointerEnd(new PointerEvent('pointerup',{pointerId:713,button:0,cancelable:true}));
+   return{active,sameAfterMove,sameAfterLiveUpdate,animation};
+  })()`);
+  console.log('CHART NO FLASH DURING RESIZE',JSON.stringify(stableResize));
+  assert(stableResize.active&&stableResize.sameAfterMove&&stableResize.sameAfterLiveUpdate,
+    'live SVG must not be reconstructed during a drag or resize');
+  assert.equal(stableResize.animation,'none','opening animation does not re-activate during resize');
+  await delay(90);
+  const beforeClose=await chartGeo();
+  const save=await evaluate('JSON.parse(localStorage.getItem(STOCK_CHART_LAYOUT_KEY)||"null")');
+  assert(save?.sized,'successful corner drag should persist a resized chart');
+  assert(Math.abs(save.width-beforeClose.width)<3&&Math.abs(save.height-beforeClose.height)<3);
+  await evaluate('(()=>{document.querySelector("[data-stock-chart-close]").click();document.querySelector("[data-stock-chart-open]").click()})()');
+  const reopened=await chartGeo();
+  assert(Math.abs(reopened.left-beforeClose.left)<3&&Math.abs(reopened.width-beforeClose.width)<3&&Math.abs(reopened.height-beforeClose.height)<3,'close/reopen retains chart geometry');
+  // Opening after a complete page reload restores the local layout preference.
+  await send('Page.reload',{ignoreCache:true});
+  await poll(()=>evaluate('document.readyState==="complete" && typeof stockChartOpen==="function"'));
+  const restored=await evaluate('(()=>{document.querySelector("[data-stock-chart-open]").click();return stockChartGeometry()})()');
+  console.log('CHART PERSISTED GEOMETRY',JSON.stringify({beforeClose,restored}));
+  assert(Math.abs(restored.left-beforeClose.left)<3&&Math.abs(restored.top-beforeClose.top)<3&&Math.abs(restored.width-beforeClose.width)<3&&Math.abs(restored.height-beforeClose.height)<3,'chart should restore position and size across reload');
+  // Regression: at 360px panel width, all three time-range buttons must stay
+  // on one row BELOW the stock summary, never wrap into its column.
+  // The legend uses a dark scrollbar, not native Windows white.
+  const compact=await evaluate(`(()=>{
+   resetSimulation();ware=Object.fromEntries(MATERIALS.slice(0,14).map((m,i)=>[m,(i+1)*11]));
+   simTime=48.3*60;
+   sim.minuteBuckets=Array.from({length:49},()=>({inbound:Object.fromEntries(MATERIALS.slice(0,14).map(m=>[m,1])),outbound:{}}));
+   stockChartApplyGeometry({left:30,top:30,width:360,height:340,sized:true});
+   stockChartRender();
+   const panel=$('stockChartPanel'),toolbar=panel.querySelector('.stock-chart-topline'),
+    stats=$('stockChartStats'),buttons=[...panel.querySelectorAll('[data-stock-window]')],
+    legend=$('stockChartLegend'),plot=$('stockChartPlot'),footer=panel.querySelector('.stock-chart-footer');
+   const pos=el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
+   return {panel:pos(panel),topline:pos(toolbar),stats:pos(stats),buttonRects:buttons.map(pos),
+    statsOverflows:stats.scrollWidth>stats.clientWidth+1,compactHeight:panel.classList.contains('stock-chart-short'),
+    legend:pos(legend),legendScrollHeight:legend.scrollHeight,legendClientHeight:legend.clientHeight,
+    legendScrollbarColor:getComputedStyle(legend).scrollbarColor,
+    legendScrollbarWidth:getComputedStyle(legend).scrollbarWidth,
+    legendTrack:getComputedStyle(legend,'::-webkit-scrollbar-track').backgroundColor,
+    legendThumb:getComputedStyle(legend,'::-webkit-scrollbar-thumb').backgroundColor,
+    plot:pos(plot),footerDisplay:getComputedStyle(footer).display};
+  })()`);
+  console.log('MINIMUM CHART 360×340',JSON.stringify(compact));
+  assert.equal(compact.buttonRects.length,3);
+  assert(compact.buttonRects.every(b=>Math.abs(b.top-compact.buttonRects[0].top)<2),'all 3 time buttons must be one row');
+  assert(compact.buttonRects[0].top>=compact.stats.bottom+3,'time buttons must be below stock statistics');
+  assert(compact.buttonRects.every(b=>b.left>=compact.panel.left&&b.right<=compact.panel.right),'all time buttons remain inside compact chart');
+  assert(!compact.statsOverflows,'stock summary must not overflow at minimum width');
+  assert(compact.plot.height>=90,'compact chart must keep graph usable');
+  assert(compact.legend.height>=25,'compact chart must show the item legend');
+  assert(compact.legendScrollHeight>compact.legendClientHeight+4,'legend must remain vertically scrollable');
+  assert(compact.legendScrollbarColor!=='auto'&&compact.legendScrollbarWidth==='thin','dark custom scrollbar should override native Windows white');
+  assert.equal(compact.footerDisplay,'none','minimum-height panel prioritizes plot and legend');
   assert.deepEqual(errors,[]);
-  console.log('PASS: history chart axis ticks do not overlap minute label, interactive controls and pause has hue-shifted dark gold background and outline; recent charts auto-scale Y from selected-series extrema');
+  console.log('PASS: chart title dragging, all four resize corners, responsive SVG size, bounds, close/reopen and reload persistence; existing chart and simulation controls unchanged');
  }finally{
   try{ws?.close();}catch(e){}
   child.kill();

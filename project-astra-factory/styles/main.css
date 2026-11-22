@@ -290,3 +290,20 @@
  color:#fff!important;
 }
 #run.primary.sim-running:hover{background:#725c1e!important}
+
+
+/* Shared dark-theme scrollbars for the AST1 import/export code and dialog,
+   on both desktop and mobile, including horizontal scrolling of long codes. */
+#ast1Panel,#ast1Text{
+ scrollbar-width:thin;
+ scrollbar-color:#648ba1 #0a1928;
+}
+#ast1Panel::-webkit-scrollbar,#ast1Text::-webkit-scrollbar{width:9px;height:9px}
+#ast1Panel::-webkit-scrollbar-track,#ast1Text::-webkit-scrollbar-track{
+ background:#0a1928;border-radius:9px}
+#ast1Panel::-webkit-scrollbar-thumb,#ast1Text::-webkit-scrollbar-thumb{
+ background:#648ba1;border:2px solid #0a1928;border-radius:9px}
+#ast1Panel::-webkit-scrollbar-thumb:hover,#ast1Text::-webkit-scrollbar-thumb:hover{
+ background:#8ab2bf}
+#ast1Text::-webkit-scrollbar-corner{background:#0a1928}
+#ast1Text{overscroll-behavior:contain;scrollbar-gutter:stable}
