@@ -127,7 +127,64 @@ function warehouseTheory(){
   const entries=(routeItems.get(r.id)||[]).map(item=>[routeVar.get(r.id+'|'+item),1]);
   add(entries,1);
  }
- const materials=new Set([...routeVar.keys()].map(k=>labels[routeVar.get(k)].item));
+   // Round-robin: each eligible unblocked outlet receives a turn.
+  // In particular, if a splitter has a branch that is PROVABLY able to drain
+  // into the warehouse without output contention, that branch cannot
+  // receive less than any other eligible outlet of the same material.
+  // This is a necessary fairness bound, not a full min(cap_i,level) solver.
+  // Never give the warehouse a higher objective weight or force unconditional
+  // equal splitting: blocked/limited branches are supposed to be skipped.
+  const routeUpperCache=new Map();
+  function upstreamRateUpper(route,visiting=new Set()){
+   if(routeUpperCache.has(route.id))return routeUpperCache.get(route.id);
+   if(visiting.has(route.id))return 1; // cycle: do not claim safe capacity
+   const next=new Set(visiting);next.add(route.id);
+   const source=byId.get(route.from.id);
+   let bound=1;
+   const producer=source&&machineRecords.get(source.id);
+   if(producer)bound=Math.min(1,producer.qty/producer.seconds);
+   else if(source&&['分流','汇流'].includes(source.type)){
+    const inbound=machineInputs.get(source.id)||[];
+    bound=Math.min(1,inbound.reduce((sum,r)=>sum+upstreamRateUpper(r,next),0));
+   }
+   routeUpperCache.set(route.id,bound);
+   return bound;
+  }
+  function guaranteedWarehouseDrain(route,item,seen=new Set()){
+   if(seen.has(route.id))return false;
+   const dest=byId.get(route.to.id);
+   if(!dest)return false;
+   if(dest.type==='仓入')return acceptsMaterial(dest,item,route.to.port);
+   if(dest.type!=='汇流')return false;
+   const incoming=machineInputs.get(dest.id)||[];
+   // Total worst-case input must fit the merger output (1 item/s).
+   // Otherwise competing materials may fill its buffer and block this path.
+   const upper=incoming.reduce((sum,r)=>sum+upstreamRateUpper(r),0);
+   if(upper>1-1e-7)return false;
+   const downstream=machineOutputs.get(dest.id)||[];
+   if(downstream.length!==1||!routeVar.has(downstream[0].id+'|'+item))return false;
+   const next=new Set(seen);next.add(route.id);
+   return guaranteedWarehouseDrain(downstream[0],item,next);
+  }
+  let fairSplitConstraints=0;
+  for(const splitter of state.machines)if(splitter.type==='分流'){
+   const outbound=machineOutputs.get(splitter.id)||[];
+   const items=new Set(outbound.flatMap(r=>routeItems.get(r.id)||[]));
+   for(const item of items){
+    const eligible=outbound.filter(r=>routeVar.has(r.id+'|'+item));
+    if(eligible.length<2)continue;
+    const drains=eligible.filter(r=>guaranteedWarehouseDrain(r,item));
+    if(!drains.length)continue;
+    // An always-available outlet gets at least as many successful sends
+    // as a blocked one. Two always-available outlets get equal turns.
+    for(const drain of drains)for(const rival of eligible){
+     if(drain.id===rival.id)continue;
+     add([[routeVar.get(rival.id+'|'+item),1],[routeVar.get(drain.id+'|'+item),-1]],0);
+     fairSplitConstraints++;
+    }
+   }
+  }
+const materials=new Set([...routeVar.keys()].map(k=>labels[routeVar.get(k)].item));
  for(const mat of materials){
   const entries=new Map();
   for(const r of validRoutes){
@@ -181,7 +238,7 @@ function warehouseTheory(){
   }
  }
  return {inflow,outflow,machineCycles,machineNeeds,machineFeeds:Object.fromEntries(machineFeeds),routeFlows,warnings,
-  diagnostics:{variables:n,constraints:rows.length,pivots:result.pivots,elapsedMs:result.elapsedMs,objective:result.objective,method:'纯数字线性规划：配方守恒＋端口／线路限流＋分流／汇流守恒＋仓库收支约束'}};
+  diagnostics:{variables:n,constraints:rows.length,fairSplitConstraints,pivots:result.pivots,elapsedMs:result.elapsedMs,objective:result.objective,method:'纯数字线性规划：配方守恒＋端口／线路限流＋分流／汇流守恒＋仓库收支约束'}};
 }
 
 function portSteadyRate(m,port){
