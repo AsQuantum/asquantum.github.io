@@ -151,3 +151,28 @@ for(const face of ['E','S','W','N']){
  }
 }
 console.log('preview socket rendering tests passed');
+
+// Escape and right-click both restore the same empty default editor state.
+// These controls must never change the map, remove belts, or clear the clipboard.
+const editorControls=fs.readFileSync(root+'/scripts/ui/editor-controls.js','utf8');
+vm.runInContext(editorControls.slice(0,editorControls.indexOf('function rotateStamp(')),ctx);
+ctx.onKeydown=null;
+ctx.document.addEventListener=(type,fn)=>{if(type==='keydown')ctx.onKeydown=fn;};
+const startupScript=fs.readFileSync(root+'/scripts/ui/startup.js','utf8');
+vm.runInContext(startupScript.slice(0,startupScript.indexOf("document.addEventListener('keyup'")),ctx);
+assert(ctx.onKeydown,'keydown handler must register');
+const originalLayout=evalJS('JSON.stringify(state)');
+for(const mode of ['belt','stamp','marquee','erase','pan','select']){
+ for(const gesture of ['escape','rightclick']){
+  evalJS(`tool='${mode}';selection={machineId:'m100'};multiSelection={machineIds:['m100'],routeIds:[]};groupTransform={mode:'move',plan:null};marquee={from:{x:1,y:2},to:{x:3,y:4}};drag={kind:'marquee'};draft={from:{id:'m100',port:0}};stampType='分流';spaceDown=true;groupClipboard={machines:[],routes:[]}`);
+  if(gesture==='rightclick')evalJS('onPointerDown({button:2})');
+  else ctx.onKeydown({key:'Escape',target:{closest(){return true}},preventDefault(){}});
+  assert.strictEqual(evalJS('tool'),'select',gesture+' '+mode+' tool');
+  for(const field of ['selection','multiSelection','groupTransform','marquee','drag','draft','stampType'])
+   assert.strictEqual(evalJS(field),null,gesture+' '+mode+' '+field);
+  assert.strictEqual(evalJS('spaceDown'),false);
+  assert(evalJS('groupClipboard'),'clipboard must be preserved');
+  assert.strictEqual(evalJS('JSON.stringify(state)'),originalLayout,'cancel must preserve machines and belts');
+ }
+}
+console.log('Esc and right-click full editor reset tests passed');

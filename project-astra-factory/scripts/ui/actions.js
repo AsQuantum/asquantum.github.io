@@ -1,4 +1,10 @@
 'use strict';
+// The warehouse panel is folded by default; remember the user's last toggle.
+const warehousePanel=$('warehousePanel');
+try{warehousePanel.open=localStorage.getItem('factory_lab_warehouse_expanded')==='true';}catch(e){}
+warehousePanel.addEventListener('toggle',()=>{
+ try{localStorage.setItem('factory_lab_warehouse_expanded',String(warehousePanel.open));}catch(e){}
+});
 $('map').addEventListener('pointerdown',onPointerDown);$('map').addEventListener('pointermove',onPointerMove);$('map').addEventListener('pointerup',onPointerUp);$('map').addEventListener('pointercancel',onPointerUp);$('map').addEventListener('contextmenu',e=>e.preventDefault());
 for(const [id,fn] of [['groupMove',()=>startGroupTransform('move')],['groupCopy',copyGroupSelection],['groupDuplicate',duplicateGroup],['groupPaste',pasteGroup],['groupLeft',()=>rotateGroup(-1)],['groupRight',()=>rotateGroup(1)],['groupDelete',deleteGroupSelection],['groupCancel',cancelGroupTransform]])$(id).onclick=fn;
 $('map').addEventListener('wheel',e=>{e.preventDefault();const p=eventCoords(e),factor=Math.exp(-e.deltaY*.0012),nz=Math.max(3,Math.min(48,camera.z*factor));camera.x=p.x-(p.x-camera.x)*nz/camera.z;camera.y=p.y-(p.y-camera.y)*nz/camera.z;camera.z=nz;draw();},{passive:false});
@@ -45,3 +51,9 @@ $('saveJson').onclick=exportLayoutJson;
   importFeedbackDismissTimer=null;
   $('importFeedback').style.display='none';
  };
+
+// Simulation controls are independent of the removed acceptance/check panels.
+$('run').onclick=()=>{warehouseRefresh();running=!running;if(running)setTool('select');$('run').textContent=running?'❚❚ 暂停模拟':'▶ 继续模拟';$('run').classList.toggle('primary',!running);notify(running?'模拟已开始：仓库每60秒保存一份真实收支记录':'模拟已暂停');};
+$('simSpeed').onchange=e=>{simulationSpeed=Number(e.target.value)||1;notify(`模拟速度已设为 ${simulationSpeed}×`);};
+$('stepMinute').onclick=advanceSimulationMinute;
+$('resetSim').onclick=()=>{resetSimulation();notify('已清空模拟库存、生产队列和分钟统计记录');};

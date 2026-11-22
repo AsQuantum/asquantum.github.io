@@ -1,5 +1,19 @@
 'use strict';
 function setTool(t){if(groupTransform)cancelGroupTransform();if(t!=='marquee'&&t!=='select')clearGroupSelection();tool=t;stampType=null;draft=null;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));document.querySelectorAll('#palette button').forEach(b=>b.classList.remove('active'));updateHint();draw();}
+// Escape/right-click always return to an idle, unselected editor.
+// Never touch persistent layout, undo history, or the copied clipboard.
+function resetEditorMode(){
+ selection=null;
+ multiSelection=null;
+ groupTransform=null;
+ marquee=null;
+ drag=null;
+ draft=null;
+ spaceDown=false;
+ setTool('select');
+ updateGroupControls();
+ inspectorRefresh();
+}
 function rotateStamp(steps=1){if(!stampType)return;const faces=['E','S','W','N'];stampFace=faces[(faces.indexOf(stampFace)+steps+4)%4];saveStampPreference();updateHint();draw();}
 function cancelDraft(){if(!draft)return;draft=null;updateHint();notify('本次传送带接线已取消');draw();}
 function undoDraftBend(){if(!draft)return;if(draft.history?.length){draft.path=draft.history.pop();draft.preview=null;updateDraftPreview();updateHint();draw();}else cancelDraft();}
