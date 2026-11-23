@@ -127,7 +127,7 @@ function factorySteadyTwoPhase(ineq,n,c){
 
 function warehouseTheory(targetItem=null){
  const byId=new Map(state.machines.map(m=>[m.id,m]));
- const validRoutes=state.routes.filter(r=>byId.has(r.from.id)&&byId.has(r.to.id)&&!checkPath(r.path,r.from,r.to,r.id));
+ const validRoutes=state.routes.filter(r=>byId.has(r.from.id)&&r.to&&byId.has(r.to.id)&&!checkPath(r.path,r.from,r.to,r.id));
  const routesIn=new Map(),routesOut=new Map();
  const machineRecords=new Map();
  for(const m of state.machines)if(getRecipe(m))machineRecords.set(m.id,getRecipe(m));
@@ -386,7 +386,7 @@ function portSteadyRate(m,port){
 // The LP stores per-route, per-item rates in items/s; show items/min in the inspector.
 function steadyPortFlowDetails(m,p,theory){
  const route=routeFor(m.id,p.kind==='in'?'in':'out',p.index);
- const valid=!!route&&!checkPath(route.path,route.from,route.to,route.id);
+ const valid=!!route&&!!route.to&&!checkPath(route.path,route.from,route.to,route.id);
  const flows=valid?(theory.routeFlows?.[route.id]||{}):{};
  const materials=new Set(Object.keys(flows)),rec=getRecipe(m);
  if(rec){
@@ -400,7 +400,7 @@ function steadyPortFlowDetails(m,p,theory){
   if(p.kind==='in'){
    if(acceptsMaterial(m,item,p.index))materials.add(item);
   }else{
-   const target=machineById(route.to.id);
+   const target=route.to&&machineById(route.to.id);
    if(target&&acceptsMaterial(target,item,route.to.port))materials.add(item);
   }
  }
@@ -455,7 +455,7 @@ function machineSteadyPanel(m){
    if(subset.length>1)rows+=`<div class="tiny">${subset.length} 个接口合计</div>`;
   }else{
    for(const d of subset){
-    const p=d.port,stateText=d.valid?'已连接':d.route?'线路无效':'未连接';
+    const p=d.port,stateText=d.valid?'已连接':d.route&&!d.route.to?'末端悬空（理论流量 0）':d.route?'线路无效':'未连接';
     const filter=p.kind==='out'&&m.type==='分流'&&p.filter&&p.filter!=='任意'
      ?' · 过滤 '+esc(p.filter):'';
     rows+=`<div class="machine-port-detail-row ${cls==='out'?'is-out':'is-in'}">
