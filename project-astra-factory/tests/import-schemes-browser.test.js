@@ -20,7 +20,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    if(msg.id){const p=pending.get(msg.id);if(p){pending.delete(msg.id);p(msg);}}
   };
   const send=(method,params={})=>new Promise(resolve=>{const id=++next;pending.set(id,resolve);ws.send(JSON.stringify({id,method,params}));});
-  const evaluate=async expr=>{const ret=await send('Runtime.evaluate',{expression:expr,returnByValue:true,awaitPromise:true});return ret.result?.result?.value??ret.result?.exceptionDetails?.text??ret.error??ret;};
+  const evaluate=async expr=>{const ret=await send('Runtime.evaluate',{expression:expr,returnByValue:true,awaitPromise:true});if(ret.result?.exceptionDetails)throw Error(ret.result.exceptionDetails.exception?.description||ret.result.exceptionDetails.text);return ret.result?.result?.value??ret.error??ret;};
   await send('Runtime.enable');
   await send('Page.enable');
   await send('Page.reload',{ignoreCache:true});
@@ -41,7 +41,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    afterChange('保存原模板修改');
    const original=solverSchemeId;
    const oldSaved=JSON.parse(localStorage.getItem(SCHEME_STORE))[0];
-   const oldCode=oldSaved.json||oldSaved.ast;
+   const oldCode=oldSaved.json||oldSaved.ast;window.__originalStoredCode=oldCode;
    const backupState=state;
    state={name:'生成 AST 输入',machines:[{id:'game-source',type:'垃圾',mode:1,x:15,y:16,face:'E'}],routes:[]};
    const ast=ast1Encode();
@@ -52,9 +52,9 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   assert(prepared.ast.startsWith('AST1:'));
 
   const gameFirst=await evaluate(`(()=>{
-   document.getElementById('importAst1').click();
+   document.querySelector('[data-edit-action="import-ast"]').click();
    const hint=document.getElementById('ast1PanelHint').textContent;
-   document.getElementById('ast1Text').value=' \n '+window.__astTestCode+' \t';
+   document.getElementById('ast1Text').value=String.fromCharCode(32,10)+window.__astTestCode+String.fromCharCode(32,9);
    document.getElementById('ast1Apply').click();
    const t=currentScheme();
    const original=solverSchemes.find(t=>t.id==='builtin-warp');
@@ -68,10 +68,10 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   assert.equal(gameFirst.name,'游戏蓝图1');
   assert.equal(gameFirst.count,2);
   assert(gameFirst.savedAsAST&&gameFirst.originalTag&&gameFirst.panelHidden&&
-   gameFirst.hint.includes('新增独立方案'),'AST1 import must add scheme and preserve old layout');
+   gameFirst.hint.includes('创建独立方案'),'AST1 import must add scheme and preserve old layout');
   assert(gameFirst.mode===1&&gameFirst.machines===1);
   await evaluate(`(()=>{
-   document.getElementById('importAst1').click();
+   document.querySelector('[data-edit-action="import-ast"]').click();
    document.getElementById('ast1Text').value=window.__astTestCode;
    document.getElementById('ast1Apply').click();
   })()`);
@@ -122,7 +122,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   assert.equal(invalidLayout.activeId,currentBeforeBad.activeId);
   assert(invalidSyntax.feedback.includes('无法导入')&&invalidLayout.feedback.includes('无法导入'));
   const astInvalid=await evaluate(`(()=>{
-   document.getElementById('importAst1').click();
+   document.querySelector('[data-edit-action="import-ast"]').click();
    document.getElementById('ast1Text').value='INVALID-AST';
    document.getElementById('ast1Apply').click();
    return {active:currentScheme()?.name,count:solverSchemes.length,

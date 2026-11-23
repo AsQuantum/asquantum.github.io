@@ -7,7 +7,7 @@ for(const file of ['scripts/data/catalog.js','scripts/core/machines.js','scripts
 }
 vm.runInContext(`
 let state={machines:[],routes:[]},multiSelection=null,groupTransform=null,groupClipboard=null,marquee=null,selection=null;
-let hoverCell={x:4,y:5},idSeed=900,stampType=null,draft=null,tool='select',drag=null,spaceDown=false;
+let hoverCell={x:4,y:5},idSeed=900,stampType=null,draft=null,beltTrim=null,tool='select',drag=null,spaceDown=false;
 const copy=v=>JSON.parse(JSON.stringify(v)), $=id=>document.getElementById(id);
 const snapshot=()=>{},afterChange=()=>{},notify=()=>{},draw=()=>{},inspectorRefresh=()=>{};
 const updateHint=()=>{};
@@ -130,7 +130,7 @@ console.log('release-then-click placement regression test passed');
 // Preview sockets must remain visible for every face/orientation.
 const previewScript=fs.readFileSync(root+'/scripts/ui/canvas.js','utf8');
 const previewPortPainter=previewScript.slice(previewScript.indexOf('function paintPortSocket('),previewScript.indexOf('function drawStaticScene('));
-assert(previewScript.includes('paintPreviewPorts(m);if(z>=4.8)paintMachineIndicators(m,w,h);if(z>=5)paintMachineText'),
+assert(/paintPreviewPorts\(m\);\s*paintMachineIndicators\(m,w,h\);\s*paintMachineTextAtZoom\(m,w,h,z,true\)/.test(previewScript),
  'group placement preview must draw sockets then indicators then text');
 const paintedSockets=[];
 ctx.paintedSockets=paintedSockets;

@@ -244,7 +244,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
       Math.abs(firstBase.x-tip.x-.33)<1e-8&&
       Math.abs(Math.abs(firstBase.y-lastBase.y)-.32)<1e-8;
     const palePanelBar=bars.length===1&&bar.color==='#9dddff'&&
-      Math.abs(bar.x-(panelMachine.x+pw-.185))<1e-8&&
+      Math.abs(bar.x-(panelMachine.x+pw-.21-.02))<1e-8&&
       Math.abs(bar.y-(centerY-1))<1e-8&&
       Math.abs(bar.w-.21)<1e-8&&Math.abs(bar.h-2)<1e-8;
     strokes.length=0;arcs.length=0;bars.length=0;moves.length=0;segments.length=0;

@@ -123,6 +123,7 @@ function compactFactoryLayout(layout=state){
  });
  const routes=layout.routes.map((r,index)=>{
   const from=indices.get(r?.from?.id),to=r?.to===null?-1:indices.get(r?.to?.id);
+  if(r?.to&&r.from?.id===r.to.id)throw Error('JSON 不能将机器输出口连接到自身输入口');
   if(from===undefined||to===undefined)throw Error('第'+index+'条线路引用了不存在的机器');
   if(!Number.isInteger(r.from.port)||r.from.port<0||(to!==-1&&(!Number.isInteger(r.to.port)||r.to.port<0)))
    throw Error('第'+index+'条线路接口编号无效');
@@ -151,6 +152,7 @@ function expandCompactFactoryLayout(source){
  const routes=source.routes.map((row,i)=>{
   if(!Array.isArray(row)||(row.length!==6&&row.length!==7))throw Error('JSON 第'+i+'条线路数组格式错误');
   const [fi,fp,ti,tp,start,runs,extra]=row;
+  if(fi===ti)throw Error('JSON 线路不能将机器输出口连接到自身输入口');
   if(!Number.isInteger(fi)||!machines[fi]||!Number.isInteger(ti)||(ti!==-1&&!machines[ti])||
      !Number.isInteger(fp)||fp<0||!Number.isInteger(tp)||tp<0)throw Error('JSON 第'+i+'条线路机器/接口索引无效');
   const props=expandOptionalFields(extra,FACTORY_JSON_BASE_ROUTE);

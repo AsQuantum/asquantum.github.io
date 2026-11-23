@@ -245,8 +245,17 @@ function deleteGroupSelection(){
  if(!ids.size&&!routeIds.size)return;
  snapshot();
  const before=state.routes.length;
+ // Detach (rather than delete) incoming routes fed by machines OUTSIDE
+ // the selection. Explicitly selected belts still follow Delete semantics.
+ for(const r of state.routes){
+  if(!ids.has(r.to?.id)||ids.has(r.from.id)||routeIds.has(r.id))continue;
+  const last=routeTile(r,r.path.length-1);
+  r.to=null;
+  if(last?.outgoing)r.openEndSide=last.outgoing;
+  else delete r.openEndSide;
+ }
  state.machines=state.machines.filter(m=>!ids.has(m.id));
- state.routes=state.routes.filter(r=>!ids.has(r.from.id)&&!ids.has(r.to?.id)&&!routeIds.has(r.id));
+ state.routes=state.routes.filter(r=>!ids.has(r.from.id)&&!routeIds.has(r.id));
  const count=ids.size,lines=before-state.routes.length;
  clearGroupSelection();selection=null;
  afterChange(`已删除 ${count} 台机器和 ${lines} 条线路`);

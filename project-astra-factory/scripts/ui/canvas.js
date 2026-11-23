@@ -64,7 +64,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  // No extra line is drawn inside machine ports.
  for(let r of state.routes){
   let selected=selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id);
-  ctx.strokeStyle=selected?'#f3d875':'#50e0a0';ctx.lineWidth=selected?.44:.32;
+  ctx.strokeStyle=selected?'#f3d875':r.to?'#50e0a0':'#f2bf4b';ctx.lineWidth=selected?.44:.32;
   ctx.lineCap='butt';ctx.lineJoin='round';ctx.beginPath();
   for(let i=0;i<r.path.length;i++){
    let [x,y]=r.path[i],t=routeTile(r,i);
@@ -76,7 +76,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
   }
   ctx.stroke();
  }
- for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle='#9affd0';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
+ for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle=one.r.to?'#9affd0':'#f7cc63';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
  if(typeof beltTrim!=='undefined'&&beltTrim){
   const r=state.routes.find(q=>q.id===beltTrim.routeId);
   if(r&&beltTrim.index>=0&&(r.to||!beltTrim.hoverOutside)){

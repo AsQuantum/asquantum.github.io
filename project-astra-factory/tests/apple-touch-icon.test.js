@@ -10,4 +10,9 @@ assert.match(html,/<link rel="apple-touch-icon" sizes="180x180" href="apple-touc
 assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
 assert.equal(png.readUInt32BE(16),180);
 assert.equal(png.readUInt32BE(20),180);
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));
+assert.match(html,/<title>Factory Lab · Project:Astra<\/title>/);
+assert.match(html,/<meta name="apple-mobile-web-app-title" content="Factory Lab"\/>/);
+assert.equal(manifest.name,'Factory Lab');
+assert.equal(manifest.short_name,'Factory Lab');
 console.log('PASS: Apple Home Screen icon is a local 180x180 PNG; SVG favicon preserved');

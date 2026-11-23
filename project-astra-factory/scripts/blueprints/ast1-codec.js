@@ -110,6 +110,7 @@ function ast1Decode(code){
   if(off+7>data.length)throw Error(`第${ri}条线路头不完整`);
   const fi=u16(off),fp=data[off+2],ti=u16(off+3),tp=data[off+5],steps=data[off+6],np=Math.ceil(Math.max(0,steps-1)/4);
   if(fi>=machines.length||(ti!==0xffff&&ti>=machines.length)||steps<1||off+7+np>data.length)throw Error(`第${ri}条线路索引、步数或二进制长度无效`);
+  if(ti!==0xffff&&ti===fi)throw Error('机器输出口不能连接自身输入口：第'+ri+'条线路');
   const sm=machines[fi],tm=ti===0xffff?null:machines[ti],outidx=ast1PortFromGame(sm,'out',fp),inidx=tm?ast1PortFromGame(tm,'in',tp):null,sp=ast1GetPort(sm,'out',outidx),ep=tm?ast1GetPort(tm,'in',inidx):null;
   if(!sp||(tm&&!ep))throw Error(`第${ri}条线路连接了无效的机器接口`);
   const path=[[sp.ex,sp.ey]];
@@ -185,6 +186,7 @@ function ast1ToBytes(){
  ast1WriteU16(buf,rs.length);
  for(let i=0;i<rs.length;i++){
   const route=rs[i],fi=ids.get(route.from.id),ti=route.to?ids.get(route.to.id):0xffff;
+  if(route.to&&route.to.id===route.from.id)throw Error('机器输出口不能连接自身输入口：第'+i+'条线路');
   if(fi===undefined||ti===undefined)throw Error('第'+i+'条线路引用了不存在的机器');
   const sm=machineById(route.from.id),tm=route.to&&machineById(route.to.id),sp=sm&&outPort(sm,route.from.port),ep=route.to&&(tm&&inPort(tm,route.to.port)),path=route.path;
   if(!sp||(route.to&&!ep)||!Array.isArray(path)||!path.length||path.length>255)throw Error(`第${i}条线路的接口或长度无法用AST1编码（最多255格）`);

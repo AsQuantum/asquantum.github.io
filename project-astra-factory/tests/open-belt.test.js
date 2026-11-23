@@ -318,3 +318,79 @@ test('fresh output route may click an existing perpendicular straight belt as a 
  assert.equal(routeTile(newRoute,newRoute.path.length-1).axis,'V');
  assert.equal(checkPath(newRoute.path,newRoute.from,null,newRoute.id),null);
 }));
+
+test('deleting a destination machine preserves incoming belt and final corner as an open route',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};
+ updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const a={id:'m1',type:'垃圾',x:8,y:9,face:'E',mode:0};
+ const b={id:'m2',type:'废料',x:22,y:15,face:'E',mode:'标准'};
+ const op=outPort(a,0),ip=inPort(b,0);
+ assert(ip.ex>op.ex&&ip.ey>op.ey);
+ const cells=[];
+ for(let x=op.ex;x<=ip.ex;x++)cells.push([x,op.ey]);
+ for(let y=op.ey+1;y<=ip.ey;y++)cells.push([ip.ex,y]);
+ const r={id:'r1',from:{id:a.id,port:0},to:{id:b.id,port:0},path:cells};
+ state={name:'delete receiver',machines:[a,b],routes:[r]};
+ assert.equal(checkPath(r.path,r.from,r.to,r.id),null);
+ const lastShape=routeTile(r,cells.length-1);
+ assert.equal(lastShape.type,'turn','final belt enters input at right angle');
+ const before=JSON.stringify(r.path);
+ removeMachine(b.id);
+ assert.equal(state.machines.length,1);
+ assert.equal(state.routes.length,1,'incoming route must NOT disappear');
+ assert.equal(r.to,null);
+ assert.equal(JSON.stringify(r.path),before);
+ assert.equal(r.openEndSide,lastShape.outgoing,'last corner orientation preserved');
+ assert.equal(routeTile(r,r.path.length-1).type,'turn');
+ assert.equal(checkPath(r.path,r.from,null,r.id),null);
+ assert.equal(expandCompactFactoryLayout(compactFactoryLayout(state)).routes[0].openEndSide,lastShape.outgoing);
+ assert.throws(()=>ast1Encode(),/最后一格是拐角/);
+ // Restoring another receiver at that position must not silently reconnect.
+ const replacement={...b,id:'m3'};
+ state.machines.push(replacement);
+ assert.equal(r.to,null);
+ assert.equal(routeFor(replacement.id,'in',0),undefined);
+ tool='belt';
+ const click=(x,y)=>onPointerDown({button:0,pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ const last=r.path.at(-1);
+ click(...last);click(...last);
+ assert.equal(r.path.length,cells.length-1,'player must delete last belt tile first');
+ assert.equal(r.to,null);
+ assert.doesNotThrow(()=>ast1Encode(),'after trimming final corner AST1 can export');
+ // Deliberately connect to actual input port, not the adjacent outside tile.
+ click(ip.x,ip.y);
+ assert.equal(r.to.id,replacement.id);
+ assert.equal(checkPath(r.path,r.from,r.to,r.id),null);
+}));
+test('group-delete retains unselected incoming belts but explicitly selected belts may be removed',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateGroupControls=function(){};
+ const a={id:'m1',type:'垃圾',x:8,y:10,face:'E',mode:0},b={id:'m2',type:'废料',x:22,y:9,face:'E',mode:'标准'};
+ const p=outPort(a,0),q=inPort(b,0),cells=[];
+ for(let x=p.ex;x<=q.ex;x++)cells.push([x,p.ey]);
+ state={name:'group delete',machines:[a,b],routes:[
+  {id:'r1',from:{id:a.id,port:0},to:{id:b.id,port:0},path:cells}
+ ]};
+ assert.equal(checkPath(cells,state.routes[0].from,state.routes[0].to,'r1'),null);
+ multiSelection={machineIds:[b.id],routeIds:[]};
+ deleteGroupSelection();
+ assert.equal(state.machines.length,1);
+ assert.equal(state.routes.length,1);
+ assert.equal(state.routes[0].to,null);
+ assert.equal(checkPath(state.routes[0].path,state.routes[0].from,null,'r1'),null);
+}));
+test('outside tile beside an input is not a connection; self-machine inlet is rejected in all codecs',()=>run(function(){
+ const m={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0};
+ const p=outPort(m,0);
+ state={name:'same-machine',machines:[m],routes:[]};
+ assert.equal(checkPath([[p.ex,p.ey]],{id:m.id,port:0},{id:m.id,port:0},null).includes('自身输入口'),true);
+ // A disconnected path is still valid at the machine exit and cannot infer a receiver.
+ const cells=[[p.ex,p.ey],[p.ex+1,p.ey]];
+ state.routes=[{id:'r1',from:{id:m.id,port:0},to:null,path:cells}];
+ assert.equal(checkPath(cells,state.routes[0].from,null,'r1'),null);
+ assert.equal(ast1Decode(ast1Encode()).routes[0].to,null);
+ assert.equal(expandCompactFactoryLayout(compactFactoryLayout(state)).routes[0].to,null);
+ state.routes[0].to={id:m.id,port:0};
+ assert.throws(()=>ast1Encode(),/自身输入口/);
+ assert.throws(()=>compactFactoryLayout(state),/自身输入口/);
+}));

@@ -41,6 +41,7 @@ function routeTile(r,i){
 function orientation(r,i){return routeTile(r,i)?.axis||null;}
 function pathAxis(path,i,src,dst){return tileShape(path,i,src,dst)?.axis||null;}
 function checkPath(path,from,to,excluded){
+ if(to&&from?.id===to.id)return '同一台机器的输出口不能连接自身输入口';
  if(!Array.isArray(path)||path.length===0)return '线路为空';
  const sm=machineById(from?.id),tm=to&&machineById(to.id);
  const src=sm&&outPort(sm,from.port);
@@ -158,7 +159,7 @@ function pathSearch(start,end,avoid=new Set(),options={}){
  }
  return null;
 }
-function connect(from,to,waypoints=[],manualPath=null){let a=machineById(from.id),b=machineById(to.id);if(!a||!b)return notify('接口所属机器不存在','bad');let p=outPort(a,from.port),q=inPort(b,to.port);if(!p||!q)return notify('请选择橙色输出口、蓝色输入口','bad');if(routeFor(a.id,'out',from.port)||routeFor(b.id,'in',to.port))return notify('接口已被线路使用；一对一连接需要先删除旧线或放分流器 / 汇流器','bad');let item=recipeOutput(a);if(a.type==='分流'){const f=p.filter;if(f&&f!=='任意'&&!acceptsMaterial(b,f,to.port))return notify('分流器出口过滤物品 '+f+' 不符合目标配方','bad');}
+function connect(from,to,waypoints=[],manualPath=null){if(from.id===to.id)return notify('机器输出口不能连接自身输入口','bad');let a=machineById(from.id),b=machineById(to.id);if(!a||!b)return notify('接口所属机器不存在','bad');let p=outPort(a,from.port),q=inPort(b,to.port);if(!p||!q)return notify('请选择橙色输出口、蓝色输入口','bad');if(routeFor(a.id,'out',from.port)||routeFor(b.id,'in',to.port))return notify('接口已被线路使用；一对一连接需要先删除旧线或放分流器 / 汇流器','bad');let item=recipeOutput(a);if(a.type==='分流'){const f=p.filter;if(f&&f!=='任意'&&!acceptsMaterial(b,f,to.port))return notify('分流器出口过滤物品 '+f+' 不符合目标配方','bad');}
  if(getRecipe(b)){
   // Mixed upstream streams are valid if every known material matches this recipe
   // and any player-selected input filter. Unknown stream is permitted for later wiring.

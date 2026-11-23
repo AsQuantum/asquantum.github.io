@@ -40,6 +40,7 @@ function undoDraftBend(){
 // It must survive Escape, switching tools and JSON/AST1 export.
 function saveDraftRoute(path,to=null){
  if(!draft||!Array.isArray(path)||!path.length)return false;
+ if(to&&to.id===draft.from.id){notify('不能将机器输出口连接到自身输入口','bad');return false;}
  if(to){
   const source=machineById(draft.from.id),target=machineById(to.id);
   const outlet=source&&outPort(source,draft.from.port);

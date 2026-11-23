@@ -53,7 +53,7 @@ async function verify(){
   mobileCode+';return mobileSetMapStatus')(
    id=>id==='mobileMapState'?toast:null,
    {matchMedia(){return{matches:false,addEventListener(){}}}},
-   {querySelectorAll(){return[]},addEventListener(){}},
+   {querySelector(){return null},querySelectorAll(){return[]},addEventListener(){}},
    (fn,delay)=>{assert.equal(delay,3000);scheduled.set(++count,fn);return count},
    id=>scheduled.delete(id)
  );

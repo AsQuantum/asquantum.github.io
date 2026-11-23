@@ -1,6 +1,25 @@
 'use strict';
 function deleteRoute(id){let index=state.routes.findIndex(r=>r.id===id);if(index<0)return;snapshot();let [r]=state.routes.splice(index,1);selection=null;afterChange('删除线路：'+routeTitle(r));}
-function removeMachine(id){let m=machineById(id);if(!m)return;snapshot();state.machines=state.machines.filter(a=>a.id!==id);state.routes=state.routes.filter(r=>r.from.id!==id&&r.to?.id!==id);selection=null;afterChange('删除机器 '+label(m));}
+function removeMachine(id){
+ const m=machineById(id);if(!m)return;
+ snapshot();
+ // Incoming belts have a physical end tile OUTSIDE this machine. Removing
+ // the receiver must detach the endpoint, never erase that upstream route.
+ // Capture the actual final outgoing arm before removing the receiver ports:
+ // otherwise a final corner would silently become a straight piece.
+ for(const r of state.routes){
+  if(r.to?.id!==id||r.from.id===id)continue;
+  const last=routeTile(r,r.path.length-1);
+  r.to=null;
+  if(last?.outgoing)r.openEndSide=last.outgoing;
+  else delete r.openEndSide;
+ }
+ state.routes=state.routes.filter(r=>r.from.id!==id);
+ state.machines=state.machines.filter(a=>a.id!==id);
+ if(draft?.from?.id===id)draft=null;
+ beltTrim=null;selection=null;
+ afterChange('删除机器 '+label(m)+'（连接其输入口的传送带保留为悬空线路）');
+}
 function snapshot(){undoStack.push(JSON.stringify(state));if(undoStack.length>80)undoStack.shift();redoStack=[];}
 function undo(){if(!undoStack.length)return;clearGroupSelection();redoStack.push(JSON.stringify(state));state=JSON.parse(undoStack.pop());selection=null;draft=null;afterChange('已撤销');}
 function redo(){if(!redoStack.length)return;clearGroupSelection();undoStack.push(JSON.stringify(state));state=JSON.parse(redoStack.pop());selection=null;draft=null;afterChange('已重做');}
