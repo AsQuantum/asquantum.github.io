@@ -82,8 +82,34 @@ function saveCurrentScheme(){
   schemeSaveRegistry();
  }catch(e){notify('自动保存方案失败：'+e.message+'；请导出 JSON 备份','bad');}
 }
+// Clamp the expanded scheme list inside the phone's *visible* viewport.
+// This also responds to keyboard/rotation changes without moving the header.
+function positionSchemeMenu(){
+ const panel=$('presetList');
+ const vars=['--scheme-list-left','--scheme-list-top','--scheme-list-width','--scheme-list-max-height'];
+ if(!window.matchMedia('(max-width: 900px)').matches){
+  for(const v of vars)panel.style.removeProperty(v);
+  return;
+ }
+ const viewport=window.visualViewport;
+ const visibleLeft=viewport?.offsetLeft||0;
+ const visibleTop=viewport?.offsetTop||0;
+ const visibleWidth=viewport?.width||document.documentElement.clientWidth;
+ const visibleHeight=viewport?.height||window.innerHeight;
+ const margin=10;
+ const width=Math.max(1,Math.min(340,visibleWidth-margin*2));
+ const anchor=$('presetDropdown').getBoundingClientRect();
+ const left=Math.max(visibleLeft+margin,Math.min(anchor.left,visibleLeft+visibleWidth-width-margin));
+ const top=anchor.bottom+7;
+ const maxHeight=Math.max(48,Math.min(320,visibleTop+visibleHeight-top-margin));
+ panel.style.setProperty('--scheme-list-left',left+'px');
+ panel.style.setProperty('--scheme-list-top',top+'px');
+ panel.style.setProperty('--scheme-list-width',width+'px');
+ panel.style.setProperty('--scheme-list-max-height',maxHeight+'px');
+}
 function setSchemeMenuOpen(open){
  const panel=$('presetList');
+ if(open)positionSchemeMenu();
  panel.hidden=!open;
  $('preset').setAttribute('aria-expanded',String(!!open));
  $('presetName').setAttribute('aria-expanded',String(!!open));
@@ -320,6 +346,12 @@ function initSchemes(hadSavedWorkspace=false){
 $('presetName').addEventListener('focus',()=>setSchemeMenuOpen(true));
 $('presetName').addEventListener('click',()=>setSchemeMenuOpen(true));
 $('preset').onclick=()=>setSchemeMenuOpen($('presetList').hidden);
+function refreshSchemeMenuPosition(){
+ if(!$('presetList').hidden)positionSchemeMenu();
+}
+window.addEventListener('resize',refreshSchemeMenuPosition);
+window.visualViewport?.addEventListener('resize',refreshSchemeMenuPosition);
+window.visualViewport?.addEventListener('scroll',refreshSchemeMenuPosition);
 $('presetList').addEventListener('click',e=>{
  const remove=e.target.closest('[data-remove-scheme]');
  if(remove){
