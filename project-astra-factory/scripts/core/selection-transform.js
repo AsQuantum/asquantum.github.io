@@ -66,8 +66,28 @@ function selectGroupRectangle(a,b){
  groupTransform=null;selection=null;inspectorRefresh();updateGroupControls();draw();
  if(multiSelection)notify(`框选 ${machines.length} 台机器、${routes.length} 条线路（含截取段）（G 移动 / Ctrl+D 复制）`,'good');
 }
-// A mouse press only selects. Moving more than 5 screen pixels switches to
-// the same non-destructive placement preview used by G (never mutates state).
+// Exact rectangle selection: only grid tiles fully enclosed by the actual
+// continuous pointer rectangle count. Sub-cell drags cannot accidentally
+// select the tile under the pointer. One fully enclosed tile is valid.
+function selectEnclosedRectangle(start,end){
+ const a={x:Math.ceil(Math.min(start.x,end.x)-1e-9),
+  y:Math.ceil(Math.min(start.y,end.y)-1e-9)};
+ const b={x:Math.floor(Math.max(start.x,end.x)+1e-9)-1,
+  y:Math.floor(Math.max(start.y,end.y)+1e-9)-1};
+ if(a.x>b.x||a.y>b.y){
+  multiSelection=null;groupTransform=null;selection=null;
+  inspectorRefresh();updateGroupControls();draw();
+  return;
+ }
+ selectGroupRectangle(a,b);
+}
+// A machine may only enter move preview if it WAS selected before pointer
+// down. First touching a different machine selects it on release; dragging
+// that first touch starts a rectangle selection instead of moving the machine.
+function beginUnselectedMachinePress(machineId,point,cell,pointerId){
+ drag={kind:'machine-select-press',pointerId,machineId,
+  startX:point.x,startY:point.y,startCell:{...cell}};
+}
 function beginMachineDragPress(machineId,point,cell,pointerId){
  if(!multiSelection?.machineIds.includes(machineId)){
   clearGroupSelection();

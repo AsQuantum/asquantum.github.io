@@ -90,7 +90,22 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
   }
   ctx.stroke();
  }
- for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle=one.r.to?'#9affd0':'#f7cc63';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
+ // A crossing contains two independent straight belts. Use only a dark X
+ // connecting the four corners of their overlapping belt-width square.
+ // This is STATIC map artwork and is always painted UNDER moving item dots.
+ for(const entries of occupancy.values())if(entries.length===2){
+  const vertical=entries.find(a=>orientation(a.r,a.i)==='V');
+  const horizontal=entries.find(a=>orientation(a.r,a.i)==='H');
+  if(!vertical||!horizontal)continue;
+  const [x,y]=vertical.r.path[vertical.i],cx=x+.5,cy=y+.5;
+  const beltWidth=r=>(selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id))?.44:.32;
+  const half=Math.min(beltWidth(vertical.r),beltWidth(horizontal.r))*.5;
+  ctx.strokeStyle='#080e17';ctx.lineWidth=.075;ctx.lineCap='butt';
+  ctx.beginPath();
+  ctx.moveTo(cx-half,cy-half);ctx.lineTo(cx+half,cy+half);
+  ctx.moveTo(cx+half,cy-half);ctx.lineTo(cx-half,cy+half);
+  ctx.stroke();
+ }
  if(typeof beltTrim!=='undefined'&&beltTrim){
   const r=state.routes.find(q=>q.id===beltTrim.routeId);
   if(r&&beltTrim.index>=0&&beltTrim.hoverAnchor===true){
@@ -159,7 +174,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  }
  if(!persisted&&!draft.preview)drawCells(locked,'#f2bf4b',false);
  }
- if(marquee){const x=Math.min(marquee.from.x,marquee.to.x),y=Math.min(marquee.from.y,marquee.to.y),w=Math.abs(marquee.to.x-marquee.from.x)+1,h=Math.abs(marquee.to.y-marquee.from.y)+1;ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
+ if(marquee){const m=marquee,a=m.fromWorld||m.from,b=m.toWorld||m.to,x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),w=Math.abs(b.x-a.x),h=Math.abs(b.y-a.y);ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
  if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=r.to&&plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
  ctx.strokeStyle='#637991';ctx.lineWidth=.1;ctx.strokeRect(0,0,72,72);ctx.restore();$('beltText').textContent=`${getBeltCount()}格传送带`;}
 function drawMovingPackets(){
@@ -216,7 +231,11 @@ function renderMaterialLegend(){
 function interpolate(path,pos){if(!path.length)return null;let p=Math.max(0,Math.min(path.length-1.00001,pos*(path.length-1))),i=Math.floor(p),j=Math.min(path.length-1,i+1),t=p-i;return [path[i][0]*(1-t)+path[j][0]*t,path[i][1]*(1-t)+path[j][1]*t]}
 function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTransform){if(e.button===0){commitGroupTransform();return;}}const pt=eventCoords(e),c=screenToCell(pt.x,pt.y);canvas.setPointerCapture(e.pointerId);
  if(e.button===1||tool==='pan'||spaceDown){drag={kind:'pan',x:pt.x,y:pt.y,sx:camera.x,sy:camera.y};return;}
- if(tool==='marquee'||(tool==='select'&&e.shiftKey)){marquee={from:c,to:c};drag={kind:'marquee'};draw();return;}
+ if(tool==='marquee'||(tool==='select'&&e.shiftKey)){
+  const w={x:(pt.x-camera.x)/camera.z,y:(pt.y-camera.y)/camera.z};
+  marquee={from:c,to:c,fromWorld:w,toWorld:{...w}};
+  drag={kind:'marquee'};draw();return;
+ }
  if(stampType){let m={...getStampMachine(c.x,c.y),id:'m'+(++idSeed)};if(!canPlace(m))return notify('不能放这里：与障碍物、机器或传送带重叠','bad');snapshot();state.machines.push(m);selection={machineId:m.id};afterChange('放置 '+label(m)+'；可继续放置');return;}
  if(tool==='erase'){let r=cellRoutes(c.x,c.y).at(-1);if(r)deleteRoute(r.id);else notify('点绿色传送带删除整条线路');return;}
  if(tool==='belt'){
@@ -282,15 +301,8 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    if(draft&&draft.routeId&&draft.routeId!==r.id){
     clearBeltTrimSelection();return;
    }
-   // First click locks one exact grid cell, not the whole red interval.
-   if(draft&&draft.routeId!==r.id)draft=null;
-   beltTrim={routeId:r.id,index:idx,cell:[c.x,c.y],hoverOutside:false,hoverAnchor:true};
-   draft=r.to?null:{
-    from:copy(r.from),fromName:routeTitle(r),
-    path:copy(r.path),routeId:r.id,history:[],preview:null,phase:'editing'
-   };
-   updateHint();updateDraftPreview();draw();
-   notify('仅在悬停刚点击的格子时显示红色尾段；再次点击同一格删除，点击其他线段格取消');
+   // First edit click only arms a tail; a THIRD tap confirms deletion.
+   beginExistingRouteEdit(r,idx,c);
    return;
   }
   if(!draft){
@@ -320,7 +332,13 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
   }
   return;
  }
- const hit=portAt(c.x,c.y);let m=cellMachine(c.x,c.y);if(m){beginMachineDragPress(m.id,pt,c,e.pointerId);return;}
+ const hit=portAt(c.x,c.y);let m=cellMachine(c.x,c.y);
+ if(m){
+  if(selection?.machineId===m.id||multiSelection?.machineIds?.includes(m.id))
+   beginMachineDragPress(m.id,pt,c,e.pointerId);
+  else beginUnselectedMachinePress(m.id,pt,c,e.pointerId);
+  return;
+ }
  const hitRoutes=cellRoutes(c.x,c.y);
  let rt=hitRoutes.at(-1);
  if(hitRoutes.length===2){
@@ -330,7 +348,20 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    const wanted=Math.abs(localX)>Math.abs(localY)?'H':'V';
    rt=hitRoutes.find(q=>{let i=q.path.findIndex(p=>p[0]===c.x&&p[1]===c.y);return orientation(q,i)===wanted;})||rt;
  }
- clearGroupSelection();if(!rt){selection=null;marquee={from:c,to:c};drag={kind:'marquee'};inspectorRefresh();draw();return;}selection=rt?{routeId:rt.id,crossAt:hitRoutes.length===2?[c.x,c.y]:null}:null;inspectorRefresh();draw();}
+ clearGroupSelection();
+ if(!rt){
+  selection=null;
+  const world={x:(pt.x-camera.x)/camera.z,y:(pt.y-camera.y)/camera.z};
+  marquee={from:c,to:c,fromWorld:world,toWorld:{...world}};
+  drag={kind:'marquee'};inspectorRefresh();draw();return;
+ }
+ // A route gets inspected only on a COMPLETED click. Dragging from a
+ // route's tile creates a marquee instead of selecting that route by accident.
+ drag={kind:'route-select-press',pointerId:e.pointerId,routeId:rt.id,
+  wasSelected:selection?.routeId===rt.id,
+  crossAt:hitRoutes.length===2?[c.x,c.y]:null,
+  startX:pt.x,startY:pt.y,startCell:{...c}};
+}
 function onPointerMove(e){
  const p=eventCoords(e),oldCell=hoverCell;
  hoverCell=screenToCell(p.x,p.y);
@@ -357,8 +388,19 @@ function onPointerMove(e){
  }
  const wasPress=drag?.kind==='machine-press';
  if(wasPress)updateMachineDragPress(p,hoverCell,e.pointerId);
+ if((drag?.kind==='machine-select-press'||drag?.kind==='route-select-press')&&
+    drag.pointerId===e.pointerId&&Math.hypot(p.x-drag.startX,p.y-drag.startY)>=5){
+  const start=drag;
+  const a={x:(start.startX-camera.x)/camera.z,y:(start.startY-camera.y)/camera.z};
+  marquee={from:start.startCell,to:hoverCell,fromWorld:a,toWorld:{
+   x:(p.x-camera.x)/camera.z,y:(p.y-camera.y)/camera.z}};
+  drag={kind:'marquee',pointerId:e.pointerId};
+ }
  if(groupTransform)moveGroupPreviewTo(hoverCell);
- if(drag?.kind==='marquee'&&marquee)marquee.to=hoverCell;
+ if(drag?.kind==='marquee'&&marquee){
+  marquee.to=hoverCell;
+  marquee.toWorld={x:(p.x-camera.x)/camera.z,y:(p.y-camera.y)/camera.z};
+ }
  if(drag?.kind==='pan'){
   camera.x=drag.sx+(p.x-drag.x);
   camera.y=drag.sy+(p.y-drag.y);
@@ -366,7 +408,7 @@ function onPointerMove(e){
  // Hover text is independent of the canvas. Paint only when a visible overlay
  // or camera actually moves; simulation particles are painted by the RAF loop.
  if(trimHoverChanged||(cellChanged&&(draft||stampType||groupTransform||marquee||(tool==='belt'&&activeTrim)))||
-    drag?.kind==='pan'||(wasPress&&drag?.kind==='machine-preview'))draw();
+    drag?.kind==='pan'||drag?.kind==='marquee'||(wasPress&&drag?.kind==='machine-preview'))draw();
 }
 function onPointerLeave(){
  // The deletion cue must disappear as soon as the pointer leaves the map.
@@ -375,12 +417,33 @@ function onPointerLeave(){
  }
 }
 function onPointerUp(e){
+ if(drag?.kind==='route-select-press'){
+  const {routeId,crossAt,wasSelected,startCell}=drag;drag=null;
+  const route=state.routes.find(r=>r.id===routeId);
+  if(wasSelected&&route){
+   const index=route.path.findIndex(([x,y])=>x===startCell.x&&y===startCell.y);
+   if(index>=0){
+    beginExistingRouteEdit(route,index,startCell);
+    return;
+   }
+  }
+  clearGroupSelection();selection={routeId,crossAt};
+  inspectorRefresh();draw();return;
+ }
+ if(drag?.kind==='machine-select-press'){
+  const id=drag.machineId;drag=null;
+  clearGroupSelection();selection={machineId:id};
+  updateGroupControls();inspectorRefresh();draw();return;
+ }
  if(drag?.kind==='machine-preview'||drag?.kind==='machine-press'){
   // Releasing the dragging button must NOT silently commit (or break belts).
   drag=null;draw();return;
  }
  if(drag?.kind==='marquee'&&marquee){
-  const box=marquee;marquee=null;drag=null;selectGroupRectangle(box.from,box.to);return;
+  const box=marquee;marquee=null;drag=null;
+  if(box.fromWorld&&box.toWorld)selectEnclosedRectangle(box.fromWorld,box.toWorld);
+  else selectGroupRectangle(box.from,box.to);
+  return;
  }
  drag=null;draw();
 }

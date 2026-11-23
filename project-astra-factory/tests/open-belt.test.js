@@ -692,3 +692,152 @@ test('a rotated confirmed last tile renders solid while only newly proposed tile
  assert.equal(logs.filter(x=>x.color==='#ffd176'&&x.width===.29).length,0,
   'zero-new-cell orientation preview must never introduce dashed geometry');
 }));
+
+test('desktop route click inspects only on release; dragging the same route starts an exact marquee instead',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};
+ updateGroupControls=function(){};camera={x:0,y:0,z:10};
+ const src={id:'source',type:'垃圾',x:5,y:9,face:'E',mode:0};
+ const op=outPort(src,0);
+ const cells=[];for(let x=op.ex;x<=op.ex+12;x++)cells.push([x,op.ey]);
+ state={name:'route gesture',machines:[src],routes:[
+  {id:'r1',from:{id:src.id,port:0},to:null,path:cells}
+ ]};tool='select';selection=null;multiSelection=null;
+ const down=(x,y,id)=>onPointerDown({button:0,pointerId:id,clientX:x,clientY:y});
+ const move=(x,y,id)=>onPointerMove({pointerId:id,clientX:x,clientY:y});
+ const up=id=>onPointerUp({pointerId:id});
+ const x=cells[4][0],y=cells[4][1];
+ down((x+.5)*10,(y+.5)*10,1);
+ assert.equal(drag.kind,'route-select-press');
+ assert.equal(selection,null,'down on route may not select it before confirming tap');
+ up(1);
+ assert.equal(selection.routeId,'r1','release confirms inspecting route properties');
+ selection=null;multiSelection=null;
+ down((x+.2)*10,(y+.2)*10,2);
+ move((x+7.7)*10,(y+2.8)*10,2);
+ assert.equal(drag.kind,'marquee','dragging on route enters marquee, never route click');
+ assert.equal(selection,null,'drag cannot accidentally select its starting route');
+ up(2);
+ assert.equal(selection,null);
+ assert.equal(multiSelection,null,'the belt cell under initial press is only partially enclosed, so it is not selected');
+ assert.deepEqual(state.routes[0].path,cells,'drag selection must not change belt geometry');
+}));
+test('marquee fully enclosed cell geometry supports 1 tile but refuses all sub-cell drags',()=>run(function(){
+ draw=function(){};updateGroupControls=function(){};notify=function(){};
+ state={name:'one tile',machines:[{id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0}],routes:[]};
+ selection=null;multiSelection=null;
+ selectEnclosedRectangle({x:10.1,y:10.1},{x:10.9,y:10.9});
+ assert.equal(multiSelection,null,'a movement under one whole cell does not select any tiles');
+ selectEnclosedRectangle({x:10,y:10},{x:11,y:11});
+ assert.deepEqual(multiSelection.machineIds,['m1']);
+ assert.deepEqual(multiSelection.bounds,{x:10,y:10,w:1,h:1},'exact one-cell selection is allowed');
+ selectEnclosedRectangle({x:11,y:11},{x:10,y:10});
+ assert.deepEqual(multiSelection.bounds,{x:10,y:10,w:1,h:1},'reverse drag selects same one-cell region');
+ selectEnclosedRectangle({x:10.01,y:10.01},{x:11.01,y:11.01});
+ assert.equal(multiSelection,null,'no full cell if rectangle is shifted off both boundaries');
+}));
+test('dragging an unselected machine does not move it; a later tap enables move preview',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};
+ updateGroupControls=function(){};camera={x:0,y:0,z:10};
+ const m={id:'m1',type:'垃圾',x:9,y:10,face:'E',mode:0};
+ state={name:'machine gesture',machines:[m],routes:[]};
+ tool='select';selection=null;multiSelection=null;
+ onPointerDown({button:0,pointerId:1,clientX:95,clientY:105});
+ assert.equal(drag.kind,'machine-select-press');
+ assert.equal(selection,null);
+ onPointerMove({pointerId:1,clientX:155,clientY:156});
+ assert.equal(drag.kind,'marquee');
+ assert.equal(groupTransform,null,'unselected machine never starts move');
+ onPointerUp({pointerId:1});
+ assert.equal(m.x,9);assert.equal(m.y,10);
+ // A completed marquee may select this machine as part of a group. Clear
+ // that legitimate selection to verify the independent first-click workflow.
+ clearGroupSelection();selection=null;
+ onPointerDown({button:0,pointerId:2,clientX:95,clientY:105});
+ assert.equal(drag.kind,'machine-select-press','second click is inside actual machine');
+ onPointerUp({pointerId:2});
+ assert.equal(selection.machineId,'m1');
+ onPointerDown({button:0,pointerId:3,clientX:95,clientY:105});
+ assert.equal(drag.kind,'machine-press');
+ onPointerMove({pointerId:3,clientX:125,clientY:115});
+ assert.equal(drag.kind,'machine-preview');
+ assert.equal(groupTransform.mode,'move');
+ assert.equal(m.x,9,'dragging selected machine only previews until user confirms placement');
+ onPointerUp({pointerId:3});
+ assert.equal(m.x,9);
+}));
+
+test('select mode second click on selected belt opens editing; third same-tile click alone cuts it',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};
+ updateGroupControls=function(){};camera={x:0,y:0,z:10};
+ const m={id:'source',type:'垃圾',x:8,y:10,face:'E',mode:0},p=outPort(m,0);
+ const path=[];for(let x=p.ex;x<p.ex+6;x++)path.push([x,p.ey]);
+ const r={id:'r1',from:{id:m.id,port:0},to:null,path};
+ state={name:'select then edit',machines:[m],routes:[r]};
+ tool='select';selection=null;multiSelection=null;beltTrim=null;draft=null;
+ const [x,y]=path[2];
+ const tap=(id)=>{onPointerDown({button:0,pointerId:id,clientX:(x+.5)*10,clientY:(y+.5)*10});onPointerUp({pointerId:id});};
+ tap(1);
+ assert.equal(selection.routeId,'r1');
+ assert.equal(tool,'select');
+ assert.equal(beltTrim,null);
+ tap(2);
+ assert.equal(tool,'belt','second selected route click enters edit mode');
+ assert.equal(selection,null);
+ assert.equal(beltTrim.index,2,'second click arms exactly that tile but does not cut');
+ assert.equal(draft.phase,'editing','open belt remains extendable');
+ assert.equal(r.path.length,path.length);
+ onPointerDown({button:0,pointerId:3,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ onPointerUp({pointerId:3});
+ assert.equal(r.path.length,2,'third same-tile click confirms tail deletion');
+ assert.equal(r.to,null);
+ assert.equal(draft.phase,'placing');
+}));
+test('crossing marker is black X within belt overlap corners, composited below animated item dots',()=>run(function(){
+ const strokes=[],calls=[],points=[];
+ let currentDash=[];
+ for(const method of ['setTransform','clearRect','save','restore','translate','scale',
+  'fillRect','strokeRect','fillText','closePath'])ctx[method]=()=>{};
+ ctx.setLineDash=v=>{currentDash=v.slice()};
+ ctx.beginPath=()=>{points.length=0};
+ ctx.moveTo=(x,y)=>points.push(['M',x,y]);
+ ctx.lineTo=(x,y)=>points.push(['L',x,y]);
+ ctx.stroke=()=>{strokes.push({color:ctx.strokeStyle,width:ctx.lineWidth,
+  points:points.map(v=>v.slice())});calls.push('stroke:'+ctx.strokeStyle)};
+ ctx.fill=()=>calls.push('fill:'+ctx.fillStyle);
+ ctx.arc=(x,y,radius)=>calls.push('arc:'+x+':'+y+':'+radius);
+ missingMaterials=()=>[];machineOutputWarning=()=>null;
+ paintMachineIndicators=()=>{};paintMachineTextAtZoom=()=>{};paintPortSocket=()=>{};
+ pix={w:600,h:600,dpr:1};camera={x:0,y:0,z:10};
+ const a={id:'a',type:'垃圾',x:6,y:10,face:'E',mode:0},ap=outPort(a,0);
+ const center={x:ap.ex+8,y:ap.ey};
+ const b={id:'b',type:'垃圾',x:43,y:43,face:'S',mode:0};
+ let bp=outPort(b,0);b.x+=center.x-bp.ex;b.y+=center.y-5-bp.ey;
+ bp=outPort(b,0);
+ const horizontal=[];for(let x=ap.ex;x<=center.x+5;x++)horizontal.push([x,ap.ey]);
+ const vertical=[];for(let y=bp.ey;y<=center.y+4;y++)vertical.push([bp.ex,y]);
+ const r1={id:'r1',from:{id:'a',port:0},to:null,path:horizontal};
+ const r2={id:'r2',from:{id:'b',port:0},to:null,path:vertical};
+ state={name:'cross X',machines:[a,b],routes:[r1,r2]};
+ selection=null;multiSelection=null;groupTransform=null;marquee=null;stampType=null;
+ draft=null;beltTrim=null;
+ assert.equal(checkPath(horizontal,r1.from,null,'r1'),null);
+ assert.equal(checkPath(vertical,r2.from,null,'r2'),null);
+ drawStaticScene();
+ const marks=strokes.filter(v=>v.color==='#080e17'&&v.width===.075);
+ assert.equal(marks.length,1,'one crossing has exactly one dark X');
+ assert.deepEqual(marks[0].points,[
+  ['M',center.x+.34,center.y+.34],
+  ['L',center.x+.66,center.y+.66],
+  ['M',center.x+.66,center.y+.34],
+  ['L',center.x+.34,center.y+.66]
+ ]);
+ const xDrawIndex=calls.indexOf('stroke:#080e17');
+ assert(xDrawIndex>=0);
+ const beforeDraw=calls.length;
+ sim={routes:{r1:[{item:'太空垃圾',distance:8}],r2:[]}};
+ drawMovingPackets();
+ const packetIndex=calls.findIndex((x,i)=>i>=beforeDraw&&x.startsWith('arc:'));
+ assert(packetIndex>xDrawIndex,'black crossing X must render before foreground moving item circle');
+ assert.equal(strokes.filter(v=>v.color==='#9affd0').length,0,
+  'no old green crossing border stroke');
+}));

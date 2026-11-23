@@ -181,7 +181,9 @@
      }
     }
     const from={...single.startCell};
-    marquee={from,to:{...from}};
+    const fromWorld={x:(single.startX-camera.x)/camera.z,
+     y:(single.startY-camera.y)/camera.z};
+    marquee={from,to:{...from},fromWorld,toWorld:{...fromWorld}};
     drag={kind:'marquee'};
     single.forwarded=true;
    }

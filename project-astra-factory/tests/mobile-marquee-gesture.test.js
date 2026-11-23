@@ -38,6 +38,11 @@ const scope={
  inMap:(x,y)=>x>=0&&y>=0&&x<72&&y<72,
  clearGroupSelection(){},inspectorRefresh(){},updateDraftPreview(){},
  resetEditorMode(){},draw(){stats.draws++},
+ beginUnselectedMachinePress(id,pt,c,pid){
+  stats.machinePress++;
+  scope.drag={kind:'machine-select-press',machineId:id,pointerId:pid,
+   startX:pt.x,startY:pt.y,startCell:{...c}};
+ },
  beginMachineDragPress(id,pt,c,pid){
   stats.machinePress++;
   scope.selection={machineId:id};
@@ -54,6 +59,11 @@ const scope={
    plan:{machines:[{id:'m1',x:5,y:5,w:3,h:3}]}};
  },
  selectGroupRectangle(a,b){marqueeResults.push({from:{...a},to:{...b}})},
+ selectEnclosedRectangle(a,b){
+  const from={x:Math.ceil(Math.min(a.x,b.x)-1e-9),y:Math.ceil(Math.min(a.y,b.y)-1e-9)};
+  const to={x:Math.floor(Math.max(a.x,b.x)+1e-9)-1,y:Math.floor(Math.max(a.y,b.y)+1e-9)-1};
+  if(from.x<=to.x&&from.y<=to.y)marqueeResults.push({from,to});
+ },
  moveGroupPreviewTo(cell){
   const t=scope.groupTransform;
   t.x=cell.x-t.anchor.x;
@@ -83,7 +93,7 @@ fire('pointerup',1,137,145);
 assert.equal(stats.machinePress,0,'drag must not enter machine edit/move mode');
 assert.equal(scope.groupTransform,null,'no preview may be started by marquee');
 assert.equal(marqueeResults.length,1);
-assert.deepEqual(plain(marqueeResults[0]),{from:{x:5,y:5},to:{x:13,y:14}});
+assert.deepEqual(plain(marqueeResults[0]),{from:{x:6,y:6},to:{x:12,y:13}});
 assert.equal(scope.drag,null);
 assert.equal(scope.marquee,null);
 
@@ -120,7 +130,7 @@ fire('pointermove',21,145,95);
 fire('pointerup',21,145,95);
 assert.equal(stats.moveStarts,1,'unselected machine swipe cannot start move');
 assert.deepEqual(plain(marqueeResults.at(-1)),
- {from:{x:10,y:5},to:{x:14,y:9}});
+ {from:{x:11,y:6},to:{x:13,y:8}});
 
 // 5. A separately activated Move preview also follows the first full swipe.
 scope.drag=null;const beforeExplicitMoves=moveResults.length;scope.groupTransform={

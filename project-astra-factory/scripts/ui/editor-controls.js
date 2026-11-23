@@ -198,6 +198,21 @@ function previewBeltTrim(cell,pt){
   else updateDraftPreview();
  }
 }
+// Enter edit mode only after an explicit tap on an EXISTING route.
+// This merely arms a red suffix (on the exact tile), never deletes data;
+// a further same-tile tap is required to confirm deletion.
+function beginExistingRouteEdit(route,index,cell){
+ setTool('belt');
+ selection=null;
+ beltTrim={routeId:route.id,index,cell:[cell.x,cell.y],
+  hoverOutside:false,hoverAnchor:true};
+ draft=route.to?null:{
+  from:copy(route.from),fromName:routeTitle(route),
+  path:copy(route.path),routeId:route.id,history:[],preview:null,phase:'editing'
+ };
+ updateHint();updateDraftPreview();draw();
+ notify('已进入线路编辑；再次点击原格才会删除尾段，移到其他位置可继续未完成线路');
+}
 function clearBeltTrimSelection(){
  beltTrim=null;draft=null;updateHint();draw();
 }
