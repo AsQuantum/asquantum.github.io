@@ -50,9 +50,11 @@ function schemeCanUseAST(src,decoded){
  for(let i=0;i<src.routes.length;i++){
   const a=src.routes[i],b=decoded.routes[i];
   if(Object.keys(a).some(k=>!['id','from','to','path'].includes(k)))return false;
+  const aTarget=a.to?sourceIndices.get(a.to.id):-1;
+  const bTarget=b.to?Number(String(b.to.id).slice(5)):-1;
   if(sourceIndices.get(a.from.id)!==Number(String(b.from.id).slice(5))||
-     sourceIndices.get(a.to.id)!==Number(String(b.to.id).slice(5))||
-     a.from.port!==b.from.port||a.to.port!==b.to.port||
+     aTarget!==bTarget||
+     a.from.port!==b.from.port||(a.to&&a.to.port!==b.to.port)||
      JSON.stringify(a.path)!==JSON.stringify(b.path))return false;
  }
  return true;
