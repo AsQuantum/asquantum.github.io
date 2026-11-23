@@ -75,8 +75,25 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
    ctx.lineTo(cx+vout[0]*.5,cy+vout[1]*.5);
   }
   ctx.stroke();
+  if(!r.to&&r.path.length){
+   const [x,y]=r.path.at(-1);
+   ctx.fillStyle='#ffd18a';ctx.beginPath();ctx.arc(x+.5,y+.5,.18,0,Math.PI*2);ctx.fill();
+  }
  }
  for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle='#9affd0';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
+ if(beltTrim){
+  const r=state.routes.find(q=>q.id===beltTrim.routeId);
+  if(r){
+   ctx.strokeStyle='#ff6478';ctx.lineWidth=.45;ctx.lineCap='butt';ctx.beginPath();
+   for(let i=beltTrim.index;i<r.path.length;i++){
+    const [x,y]=r.path[i],t=routeTile(r,i);if(!t)continue;
+    ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);
+    ctx.lineTo(x+.5,y+.5);
+    ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);
+   }
+   ctx.stroke();
+  }
+ }
  for(let m of state.machines){let[w,h]=dims(m),c=makeColor(m);ctx.fillStyle=hexAlpha(c,.18);ctx.fillRect(m.x+.08,m.y+.08,w-.16,h-.16);ctx.lineWidth=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id)) ? .29 : .14;ctx.strokeStyle=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id))?'#f5dc77':c;ctx.strokeRect(m.x+.08,m.y+.08,w-.16,h-.16);
  const ports=getPorts(m);for(let p of ports){paintPortSocket(p);if(draft&&draft.from.id===m.id&&draft.from.port===p.index&&p.kind==='out'){ctx.strokeStyle='#ffee88';ctx.lineWidth=.17;ctx.strokeRect(p.x-.06,p.y-.06,1.12,1.12);}}
  // Compositing order: socket squares < always-visible facing/panel marks < text.
@@ -114,7 +131,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  if(locked.length){let [x,y]=locked.at(-1);ctx.strokeStyle='#ffde74';ctx.lineWidth=.16;ctx.strokeRect(x+.12,y+.12,.76,.76);}
  }
  if(marquee){const x=Math.min(marquee.from.x,marquee.to.x),y=Math.min(marquee.from.y,marquee.to.y),w=Math.abs(marquee.to.x-marquee.from.x)+1,h=Math.abs(marquee.to.y-marquee.from.y)+1;ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
- if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=b&&inPort(b,r.to.port);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
+ if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=r.to&&plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
  ctx.strokeStyle='#637991';ctx.lineWidth=.1;ctx.strokeRect(0,0,72,72);ctx.restore();$('beltText').textContent=`${getBeltCount()}格传送带`;}
 function drawMovingPackets(){
  if(!sim)return;
@@ -158,18 +175,53 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
  if(tool==='marquee'||(tool==='select'&&e.shiftKey)){marquee={from:c,to:c};drag={kind:'marquee'};draw();return;}
  if(stampType){let m={...getStampMachine(c.x,c.y),id:'m'+(++idSeed)};if(!canPlace(m))return notify('不能放这里：与障碍物、机器或传送带重叠','bad');snapshot();state.machines.push(m);selection={machineId:m.id};afterChange('放置 '+label(m)+'；可继续放置');return;}
  if(tool==='erase'){let r=cellRoutes(c.x,c.y).at(-1);if(r)deleteRoute(r.id);else notify('点绿色传送带删除整条线路');return;}
- if(tool==='belt'){const hit=portAt(c.x,c.y);if(!draft){if(hit?.p.kind==='out'){
-  if(routeFor(hit.m.id,'out',hit.p.index))return notify('该输出口已接线；请先拆线或使用分流器','bad');
-  draft={from:{id:hit.m.id,port:hit.p.index},fromName:label(hit.m),path:[],history:[],preview:null};updateDraftPreview();updateHint();draw();
- }else notify('请先点击机器内部的橙色输出口');}
- else if(hit?.p.kind==='in'){let target=[hit.p.ex,hit.p.ey],candidate=draftSegment(target,hit.p);
-  if(!candidate)return notify('无法从当前段到达该输入口；请撤销上一段或换个转折点','bad');
-  let to={id:hit.m.id,port:hit.p.index};connect(draft.from,to,[],candidate);updateHint();draw();
- }else if(inMap(c.x,c.y)&&!cellMachine(c.x,c.y)&&!reserved(c.x,c.y)){
-  let candidate=draftSegment([c.x,c.y]);if(!candidate)return notify('该格无法从当前线段正交连通；可撤销上一段重试','bad');
-  if(candidate.length===draft.path.length&&draft.path.length)return notify('这里已经是当前段的终点');
-  draft.history.push(draft.path.map(p=>p.slice()));draft.path=candidate;updateDraftPreview();updateHint();draw();notify('当前路段已固定；继续选择下一个拐点或蓝色输入口');
- }else notify('请选择蓝色输入口或空白格作为转折点');return;}
+ if(tool==='belt'){
+  const hit=portAt(c.x,c.y),belts=cellRoutes(c.x,c.y);
+  if(belts.length){
+   const localX=pt.x-camera.x-(c.x+.5)*camera.z,localY=pt.y-camera.y-(c.y+.5)*camera.z;
+   const wanted=Math.abs(localX)>Math.abs(localY)?'H':'V';
+   const r=belts.length===2?(belts.find(q=>{
+    const i=q.path.findIndex(p=>p[0]===c.x&&p[1]===c.y);
+    return orientation(q,i)===wanted;
+   })||belts.at(-1)):belts[0];
+   const idx=r.path.findIndex(p=>p[0]===c.x&&p[1]===c.y);
+   if(draft&&draft.routeId!==r.id){draft=null;updateHint();}
+   if(beltTrim?.routeId===r.id&&beltTrim.index===idx){
+    snapshot();
+    if(idx===0){state.routes=state.routes.filter(q=>q.id!==r.id);draft=null;}
+    else{
+     r.path=r.path.slice(0,idx);r.to=null;
+     draft={from:copy(r.from),fromName:routeTitle(r),path:copy(r.path),routeId:r.id,history:[],preview:null};
+     updateDraftPreview();
+    }
+    beltTrim=null;afterChange(idx===0?'已删除从首格开始的整条传送带':'已删除红色尾段，保留起点连接，可继续延长');
+    updateHint();draw();
+   }else{
+    beltTrim={routeId:r.id,index:idx};
+    notify('红色为待删除尾段；再次点击同一格确认删除，点击其他位置取消','warn');draw();
+   }
+   return;
+  }
+  beltTrim=null;
+  if(!draft){
+   if(hit?.p.kind==='out'){
+    if(routeFor(hit.m.id,'out',hit.p.index))return notify('该输出口已有线路；点击传送带可截断并继续延长','bad');
+    draft={from:{id:hit.m.id,port:hit.p.index},fromName:label(hit.m),path:[],history:[],preview:null,routeId:null};
+    updateDraftPreview();updateHint();draw();
+   }else notify('请先点击机器内部的橙色输出口');
+  }else if(hit?.p.kind==='in'){
+   const candidate=draftSegment([hit.p.ex,hit.p.ey],hit.p);
+   if(!candidate)return notify('无法从当前段到达该输入口；请撤销上一段或换个转折点','bad');
+   saveDraftRoute(candidate,{id:hit.m.id,port:hit.p.index});
+  }else if(inMap(c.x,c.y)&&!cellMachine(c.x,c.y)&&!reserved(c.x,c.y)){
+   const candidate=draftSegment([c.x,c.y]);
+   if(!candidate)return notify('该格无法从当前线段正交连通；可撤销上一段重试','bad');
+   if(candidate.length===draft.path.length&&draft.path.length)return notify('这里已经是当前段的终点');
+   const previous=copy(draft.path);
+   if(saveDraftRoute(candidate))draft.history.push(previous);
+  }else notify('请选择蓝色输入口或空白格作为转折点');
+  return;
+ }
  const hit=portAt(c.x,c.y);let m=cellMachine(c.x,c.y);if(m){beginMachineDragPress(m.id,pt,c,e.pointerId);return;}
  const hitRoutes=cellRoutes(c.x,c.y);
  let rt=hitRoutes.at(-1);
