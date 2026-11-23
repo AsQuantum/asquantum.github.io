@@ -1,6 +1,6 @@
 'use strict';
 // A selection is editor-only; saved JSON still contains only machines and routes.
-// Only complete, internally connected belts are transformed with a group.
+// Copy a contiguous belt prefix only when its source machine is selected; orphan fragments are discarded.
 function groupBounds(machines,routes){
  const points=[];
  for(const m of machines){const [w,h]=dims(m);points.push([m.x,m.y],[m.x+w-1,m.y+h-1]);}
@@ -39,7 +39,7 @@ function updateGroupControls(){
  panel.style.display=(count||belts||groupClipboard||groupTransform)?'block':'none';
  $('groupSelectionInfo').textContent=groupTransform
   ?`正在${groupTransform.mode==='move'?'移动':'复制'} · ${groupTransform.plan?.valid?'可放置':'位置无效'} · ${typeof mobileEditorActive==='function'&&mobileEditorActive()?'点中虚影确认 / 点「选择」取消':'左键放置 / Esc 取消'}`
-  :count||belts?`已框选 ${count} 台机器 / ${belts} 条完整线路`:'已复制选区，可粘贴';
+  :count||belts?`已框选 ${count} 台机器 / ${belts} 条线路（含截取段）`:'已复制选区，可粘贴';
  $('groupMove').disabled=!count||!!groupTransform;
  $('groupCopy').disabled=!count||!!groupTransform;
  $('groupDuplicate').disabled=!count||!!groupTransform;
@@ -58,7 +58,7 @@ function selectGroupRectangle(a,b){
  const routes=state.routes.filter(r=>r.path.length&&r.path.some(([x,y])=>x>=left&&x<=right&&y>=top&&y<=bottom));
  multiSelection=machines.length||routes.length?{machineIds:machines.map(m=>m.id),routeIds:routes.map(r=>r.id),bounds:{x:left,y:top,w:right-left+1,h:bottom-top+1}}:null;
  groupTransform=null;selection=null;inspectorRefresh();updateGroupControls();draw();
- if(multiSelection)notify(`框选 ${machines.length} 台机器、${routes.length} 条完整线路（G 移动 / Ctrl+D 复制）`,'good');
+ if(multiSelection)notify(`框选 ${machines.length} 台机器、${routes.length} 条线路（含截取段）（G 移动 / Ctrl+D 复制）`,'good');
 }
 // A mouse press only selects. Moving more than 5 screen pixels switches to
 // the same non-destructive placement preview used by G (never mutates state).
