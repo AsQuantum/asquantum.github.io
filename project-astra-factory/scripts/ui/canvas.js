@@ -1,5 +1,15 @@
 'use strict';
 const makeColor=m=>DEF[m.type]?.color||'#8796ac';
+// An output linked to an open belt does not yet reach any receiving machine.
+function machineOutputWarning(m){
+ const ports=getPorts(m).filter(p=>p.kind==='out');
+ const dangling=ports.some(p=>{
+  const r=routeFor(m.id,'out',p.index);
+  return r&&!r.to;
+ });
+ if(dangling)return '出线悬空';
+ return getRecipe(m)&&ports.length&&!routeFor(m.id,'out',ports[0].index)?'无出线':null;
+}
 // The factory geometry rarely changes. Cache the static canvas in device pixels and
 // overlay only moving packages; this avoids redrawing all machines and 1300+ belt tiles
 // up to 60 times per second while simulating.
@@ -96,9 +106,18 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  paintMachineIndicators(m,w,h);
  paintMachineTextAtZoom(m,w,h,z);
  // Connectivity warnings are drawn on the machine itself; they are not hidden behind the audit panel.
- const miss=missingMaterials(m),isProduct=!!getRecipe(m)&&!!outPort(m,0),idle=isProduct&&!routeFor(m.id,'out',0);
- if(miss.length||idle){ctx.save();ctx.strokeStyle=miss.length?'#ff657d':'#ffd16e';ctx.lineWidth=.18;ctx.setLineDash([.4,.18]);ctx.strokeRect(m.x+.16,m.y+.16,w-.32,h-.32);ctx.setLineDash([]);
- if(z>=5){ctx.fillStyle=miss.length?'#ff657d':'#ffd16e';ctx.font='bold .84px system-ui';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(miss.length?`缺料${miss.length}`:'无出线',m.x+.25,m.y+.22,w-.4);}ctx.restore();}
+ const miss=missingMaterials(m),outputWarning=machineOutputWarning(m);
+ if(miss.length||outputWarning){ctx.save();ctx.strokeStyle=miss.length?'#ff657d':'#ffd16e';ctx.lineWidth=.18;ctx.setLineDash([.4,.18]);ctx.strokeRect(m.x+.16,m.y+.16,w-.32,h-.32);ctx.setLineDash([]);
+ if(z>=5){
+   ctx.font='bold .84px system-ui';ctx.textAlign='left';ctx.textBaseline='top';
+   if(miss.length){
+    ctx.fillStyle='#ff657d';ctx.fillText('缺料'+miss.length,m.x+.25,m.y+.22,w-.4);
+   }
+   if(outputWarning){
+    ctx.fillStyle='#ffd16e';
+    ctx.fillText(outputWarning,m.x+.25,m.y+(miss.length?1.15:.22),w-.4);
+   }
+  }ctx.restore();}
  }
  // Machine port squares already indicate the contacts. Never add a separate green port stub.
  // The belt shape in its first outer cell already starts at the appropriate grid edge.
@@ -212,7 +231,7 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    const target=targetPort?[targetPort.ex,targetPort.ey]:
     inMap(c.x,c.y)&&!cellMachine(c.x,c.y)&&!reserved(c.x,c.y)?[c.x,c.y]:null;
    const candidate=target?draftSegment(target,targetPort):null;
-   if(!candidate||candidate.length<=draft.path.length){
+   if(!candidate||candidate.length<draft.path.length||(!targetPort&&candidate.length===draft.path.length)){
     clearBeltTrimSelection();return;
    }
    const previous=copy(draft.path);
@@ -255,7 +274,7 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    const target=targetPort?[targetPort.ex,targetPort.ey]:
     inMap(c.x,c.y)&&!cellMachine(c.x,c.y)&&!reserved(c.x,c.y)?[c.x,c.y]:null;
    const candidate=target?draftSegment(target,targetPort):null;
-   if(!candidate||candidate.length===draft.path.length){
+   if(!candidate||(!targetPort&&candidate.length===draft.path.length)){
     if(draft.routeId)clearBeltTrimSelection();
     else notify('无法合法接线；不能回头、重叠或穿越障碍物','bad');
     return;
