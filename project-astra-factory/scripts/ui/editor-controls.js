@@ -173,7 +173,11 @@ function previewBeltTrim(cell,pt){
  const hit=beltCellHit(cell,pt);
  const onThisRoute=hit?.route.id===route.id;
  beltTrim.hoverOutside=!onThisRoute;
- // Keep the click-confirmation coordinate FIXED across all hover movements.
+ // Red is a confirmation cue, not a persistent selection: it is visible
+ // ONLY while hovering the exact grid tile (and crossing strand) first clicked.
+ // The confirmation cell itself never changes when the pointer moves.
+ beltTrim.hoverAnchor=!!(beltTrim.index>=0&&onThisRoute&&
+  hit.index===beltTrim.index&&beltTrim.cell?.[0]===cell.x&&beltTrim.cell?.[1]===cell.y);
  if(draft?.routeId===route.id){
   if(onThisRoute&&beltTrim.index>=0)draft.preview=null;
   else updateDraftPreview();

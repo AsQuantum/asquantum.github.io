@@ -6,7 +6,7 @@ warehousePanel.addEventListener('toggle',()=>{
  try{localStorage.setItem('factory_lab_warehouse_expanded',String(warehousePanel.open));}catch(e){}
  if(warehousePanel.open&&$('warehouse').firstElementChild)warehouseRefreshLive();
 });
-$('map').addEventListener('pointerdown',onPointerDown);$('map').addEventListener('pointermove',onPointerMove);$('map').addEventListener('pointerup',onPointerUp);$('map').addEventListener('pointercancel',onPointerUp);$('map').addEventListener('contextmenu',e=>e.preventDefault());
+$('map').addEventListener('pointerdown',onPointerDown);$('map').addEventListener('pointermove',onPointerMove);$('map').addEventListener('pointerleave',onPointerLeave);$('map').addEventListener('pointerup',onPointerUp);$('map').addEventListener('pointercancel',onPointerUp);$('map').addEventListener('contextmenu',e=>e.preventDefault());
 for(const [id,fn] of [['groupMove',()=>startGroupTransform('move')],['groupCopy',copyGroupSelection],['groupDuplicate',duplicateGroup],['groupPaste',pasteGroup],['groupLeft',()=>rotateGroup(-1)],['groupRight',()=>rotateGroup(1)],['groupDelete',deleteGroupSelection],['groupCancel',cancelGroupTransform]])$(id).onclick=fn;
 $('map').addEventListener('wheel',e=>{e.preventDefault();const p=eventCoords(e),factor=Math.exp(-e.deltaY*.0012),nz=Math.max(3,Math.min(48,camera.z*factor));camera.x=p.x-(p.x-camera.x)*nz/camera.z;camera.y=p.y-(p.y-camera.y)*nz/camera.z;camera.z=nz;draw();},{passive:false});
 document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));$('search').oninput=buildPalette;

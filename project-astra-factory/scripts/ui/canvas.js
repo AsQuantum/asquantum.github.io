@@ -93,7 +93,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle=one.r.to?'#9affd0':'#f7cc63';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
  if(typeof beltTrim!=='undefined'&&beltTrim){
   const r=state.routes.find(q=>q.id===beltTrim.routeId);
-  if(r&&beltTrim.index>=0&&(r.to||!beltTrim.hoverOutside)){
+  if(r&&beltTrim.index>=0&&beltTrim.hoverAnchor===true){
    ctx.strokeStyle='#ff6478';ctx.lineWidth=.45;ctx.lineCap='butt';ctx.beginPath();
    for(let i=beltTrim.index;i<r.path.length;i++){
     const [x,y]=r.path[i],t=routeTile(r,i);if(!t)continue;
@@ -256,13 +256,13 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    }
    // First click locks one exact grid cell, not the whole red interval.
    if(draft&&draft.routeId!==r.id)draft=null;
-   beltTrim={routeId:r.id,index:idx,cell:[c.x,c.y],hoverOutside:false};
+   beltTrim={routeId:r.id,index:idx,cell:[c.x,c.y],hoverOutside:false,hoverAnchor:true};
    draft=r.to?null:{
     from:copy(r.from),fromName:routeTitle(r),
     path:copy(r.path),routeId:r.id,history:[],preview:null
    };
    updateHint();updateDraftPreview();draw();
-   notify('已标记从该格到终点的红色尾段；仅再次点击同一格会删除，点击其他线段格取消');
+   notify('仅在悬停刚点击的格子时显示红色尾段；再次点击同一格删除，点击其他线段格取消');
    return;
   }
   if(!draft){
@@ -307,10 +307,18 @@ function onPointerMove(e){
  const p=eventCoords(e),oldCell=hoverCell;
  hoverCell=screenToCell(p.x,p.y);
  const cellChanged=!oldCell||oldCell.x!==hoverCell.x||oldCell.y!==hoverCell.y;
- // Unchanged cells need neither route lookup nor a static-map redraw.
+ // Crossing strands can change under the pointer without changing grid cell.
+ // The gesture-only editor test loads these handlers without full belt state.
+ const activeTrim=typeof beltTrim!=='undefined'?beltTrim:null;
+ const onAnchorCell=activeTrim?.index>=0&&activeTrim.cell?.[0]===hoverCell.x&&
+  activeTrim.cell?.[1]===hoverCell.y;
+ let trimHoverChanged=false;
+ if(tool==='belt'&&activeTrim&&(cellChanged||onAnchorCell)){
+  const previous=activeTrim.hoverAnchor;
+  previewBeltTrim(hoverCell,p);
+  trimHoverChanged=previous!==activeTrim.hoverAnchor;
+ }else if(cellChanged&&draft)updateDraftPreview();
  if(cellChanged){
-  if(tool==='belt'&&beltTrim)previewBeltTrim(hoverCell,p);
-  else if(draft)updateDraftPreview();
   const here=cellRoutes(hoverCell.x,hoverCell.y);
   const stateAt=here.map(r=>{
    let i=r.path.findIndex(([x,y])=>x===hoverCell.x&&y===hoverCell.y);
@@ -329,8 +337,14 @@ function onPointerMove(e){
  }
  // Hover text is independent of the canvas. Paint only when a visible overlay
  // or camera actually moves; simulation particles are painted by the RAF loop.
- if((cellChanged&&(draft||stampType||groupTransform||marquee||(tool==='belt'&&beltTrim)))||
+ if(trimHoverChanged||(cellChanged&&(draft||stampType||groupTransform||marquee||(tool==='belt'&&activeTrim)))||
     drag?.kind==='pan'||(wasPress&&drag?.kind==='machine-preview'))draw();
+}
+function onPointerLeave(){
+ // The deletion cue must disappear as soon as the pointer leaves the map.
+ if(typeof beltTrim!=='undefined'&&beltTrim?.hoverAnchor){
+  beltTrim.hoverAnchor=false;draw();
+ }
 }
 function onPointerUp(e){
  if(drag?.kind==='machine-preview'||drag?.kind==='machine-press'){
