@@ -71,7 +71,7 @@ function saveDraftRoute(path,to=null){
  // Hovering its own cells previews a red suffix immediately; hovering away
  // previews the next leg. Escape only exits editing, not the saved segment.
  if(to){draft=null;beltTrim=null;}
- else beltTrim={routeId:draft.routeId,index:-1};
+ else beltTrim={routeId:draft.routeId,index:-1,cell:null,hoverOutside:false};
  afterChange(to?'已连接线路到输入口':'已确认放置悬空线路；可继续延长或连接蓝色输入口');
  if(draft)updateDraftPreview();
  updateHint();draw();return true;
@@ -84,11 +84,15 @@ function draftSegment(target,targetPort=null){
  const src=outPort(machineById(draft.from.id),draft.from.port);
  const startPrev=draft.path.length>1?draft.path.at(-2):src?[src.x,src.y]:null;
  const endNext=targetPort?[targetPort.x,targetPort.y]:null;
- const avoid=new Set(draft.path.slice(0,-1).map(p=>p.join(',')));
- const segment=pathSearch(start,target,avoid,{startPrev,endNext,allowOpenCrossingEnd:!endNext,excludeRouteId:draft.routeId});
+ const existing=draft.routeId&&state.routes.find(r=>r.id===draft.routeId);
+ const segment=pathSearch(start,target,new Set(),{
+  startPrev,endNext,allowOpenCrossingEnd:!endNext,excludeRouteId:draft.routeId,
+  priorPath:draft.path,priorSource:src,priorEndSide:existing?.openEndSide
+ });
  if(!segment)return null;
  const combined=draft.path.length?[...draft.path,...segment.slice(1)]:segment;
- if(new Set(combined.map(p=>p.join(','))).size!==combined.length)return null;
+ // Unlike same-axis overlap, one orthogonal self-crossing is a legal tile.
+ if(checkPath(combined,draft.from,null,draft.routeId))return null;
  return combined;
 }
 function draftTarget(cell){if(!cell||!inMap(cell.x,cell.y))return null;let hit=portAt(cell.x,cell.y);if(hit?.p.kind==='in')return [hit.p.ex,hit.p.ey];if(!cellMachine(cell.x,cell.y)&&!reserved(cell.x,cell.y))return [cell.x,cell.y];return null;}
@@ -103,29 +107,35 @@ function updateDraftPreview(){
 }
 // When a crossing occupies one cell, select its horizontal/vertical strand
 // according to cursor position rather than arbitrarily trimming the wrong line.
-function beltRouteAtCell(cell,pt){
+function beltCellHit(cell,pt){
  if(!cell)return null;
- const routes=cellRoutes(cell.x,cell.y);
- if(routes.length<=1)return routes[0]||null;
+ const matches=[];
+ for(const r of cellRoutes(cell.x,cell.y))
+  for(let i=0;i<r.path.length;i++)
+   if(r.path[i][0]===cell.x&&r.path[i][1]===cell.y)
+    matches.push({route:r,index:i});
+ if(matches.length<2)return matches[0]||null;
  const x=pt.x-camera.x-(cell.x+.5)*camera.z;
  const y=pt.y-camera.y-(cell.y+.5)*camera.z;
  const wanted=Math.abs(x)>Math.abs(y)?'H':'V';
- return routes.find(r=>{
-  const i=r.path.findIndex(p=>p[0]===cell.x&&p[1]===cell.y);
-  return orientation(r,i)===wanted;
- })||routes.at(-1);
+ return matches.find(h=>orientation(h.route,h.index)===wanted)||matches.at(-1);
 }
+function beltRouteAtCell(cell,pt){return beltCellHit(cell,pt)?.route||null;}
 function previewBeltTrim(cell,pt){
  if(!beltTrim)return;
  const route=state.routes.find(r=>r.id===beltTrim.routeId);
  if(!route){beltTrim=null;return;}
- const hit=beltRouteAtCell(cell,pt);
- beltTrim.index=hit?.id===route.id
-  ?route.path.findIndex(p=>p[0]===cell.x&&p[1]===cell.y):-1;
+ const hit=beltCellHit(cell,pt);
+ const onThisRoute=hit?.route.id===route.id;
+ beltTrim.hoverOutside=!onThisRoute;
+ // Keep the click-confirmation coordinate FIXED across all hover movements.
  if(draft?.routeId===route.id){
-  if(beltTrim.index>=0)draft.preview=null;
+  if(onThisRoute)draft.preview=null;
   else updateDraftPreview();
  }
+}
+function clearBeltTrimSelection(){
+ beltTrim=null;draft=null;updateHint();draw();
 }
 
 function updateHint(){

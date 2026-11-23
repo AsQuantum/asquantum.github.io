@@ -55,14 +55,21 @@ function checkPath(path,from,to,excluded){
  // Each physical interface can be wired once (no hidden branching or merging).
  if(state.routes.some(r=>r.id!==excluded&&r.from.id===from.id&&r.from.port===from.port))return '输出接口已连接其他线路';
  if(to&&state.routes.some(r=>r.id!==excluded&&r.to?.id===to.id&&r.to.port===to.port))return '输入接口已连接其他线路';
- const seen=new Set(),occupied=occupiedRouteMap(excluded);
+ const seen=new Map(),occupied=occupiedRouteMap(excluded);
  for(let i=0;i<path.length;i++){
   const [x,y]=path[i],key=x+','+y;
-  if(!Number.isInteger(x)||!Number.isInteger(y)||!inMap(x,y)||reserved(x,y)||cellMachine(x,y))return `第${i+1}格穿过机器或障碍物 (${x},${y})`;
-  if(seen.has(key))return `第${i+1}格发生自交 (${x},${y})`;
-  seen.add(key);
+  if(!Number.isInteger(x)||!Number.isInteger(y)||!inMap(x,y)||reserved(x,y)||cellMachine(x,y))
+   return '第'+(i+1)+'格穿过机器或障碍物 ('+x+','+y+')';
   const node=tileShape(path,i,src,dst);
-  if(!node)return `第${i+1}格的入边/出边不连续或出现回头弯 (${x},${y})`;
+  if(!node)return '第'+(i+1)+'格出现掉头或接边错误 ('+x+','+y+')';
+  const previous=seen.get(key);
+  if(previous!==undefined){
+   // Same route may cross its earlier perpendicular STRAIGHT section once.
+   const old=tileShape(path,previous,src,dst);
+   if(!old||old.type!=='straight'||node.type!=='straight'||old.axis===node.axis||
+      seen.get(key+'#crossed'))return '第'+(i+1)+'格发生非法自交 ('+x+','+y+')';
+   seen.set(key+'#crossed',true);
+  }else seen.set(key,i);
   const existing=occupied.get(key)||[];
   if(existing.length>1)return `格 (${x},${y}) 已被两条直线占用，不可再叠加`;
   if(existing.length===1){
@@ -79,7 +86,22 @@ function checkPath(path,from,to,excluded){
 function pathSearch(start,end,avoid=new Set(),options={}){
  if(!inMap(...start)||!inMap(...end))return null;
  const directions=[[1,0],[0,1],[-1,0],[0,-1]],occ=occupiedRouteMap(options.excludeRouteId);
- const kOf=(x,y)=>x+','+y,at=(x,y)=>occ.get(kOf(x,y))||[];
+ const kOf=(x,y)=>x+','+y,prior=new Map();
+ // The active belt is excluded from global occupancy but its earlier tiles
+ // still block corners and same-axis overlaps, permitting 90-degree crosses.
+ if(options.priorPath?.length>1&&options.priorSource){
+  const path=options.priorPath,src=options.priorSource;
+  const dst=openRouteVirtualEnd(path,src,options.priorEndSide);
+  for(let i=0;i<path.length-1;i++){
+   const [x,y]=path[i],shape=dst&&tileShape(path,i,src,dst),key=kOf(x,y);
+   const entries=prior.get(key)||[];
+   entries.push({priorAxis:shape?.type==='straight'?shape.axis:null});
+   prior.set(key,entries);
+  }
+ }
+ const at=(x,y)=>[...(occ.get(kOf(x,y))||[]),...(prior.get(kOf(x,y))||[])];
+ const otherAxis=entry=>Object.prototype.hasOwnProperty.call(entry,'priorAxis')
+  ?entry.priorAxis:orientation(entry.r,entry.i);
  const dir=(a,b)=>directions.findIndex(d=>a[0]+d[0]===b[0]&&a[1]+d[1]===b[1]);
  const axis=d=>d%2===0?'H':'V';
  const initial=options.startPrev?dir(options.startPrev,start):-1;
@@ -88,7 +110,7 @@ function pathSearch(start,end,avoid=new Set(),options={}){
  if(options.endNext&&endExit<0)return null;
  if(avoid.has(kOf(...start))||reserved(...start)||cellMachine(...start))return null;
  const startOther=at(...start);
- if(startOther.length){if(startOther.length!==1||initial===-1||orientation(startOther[0].r,startOther[0].i)!==(axis(initial)==='H'?'V':'H'))return null;}
+ if(startOther.length){if(startOther.length!==1||initial===-1||otherAxis(startOther[0])!==(axis(initial)==='H'?'V':'H'))return null;}
  const id=(x,y,d)=>x+'/'+y+'/'+d,heur=(x,y)=>Math.abs(x-end[0])+Math.abs(y-end[1]);
  const root={x:start[0],y:start[1],d:initial,g:0,f:heur(...start),id:id(...start,initial)};
  let heap=[],dist=new Map([[root.id,0]]),prev=new Map(),nodes=new Map([[root.id,root]]),serial=0;
@@ -113,7 +135,7 @@ function pathSearch(start,end,avoid=new Set(),options={}){
    // If a is occupied, its orthogonal strand must not bend inside this cell.
    if(currOther.length){
     if(currOther.length!==1||a.d!==d)continue;
-    const old=orientation(currOther[0].r,currOther[0].i);
+    const old=otherAxis(currOther[0]);
     if(!old||old===axis(d))continue;
    }
    const v=directions[d],nx=a.x+v[0],ny=a.y+v[1],key=kOf(nx,ny);
@@ -121,7 +143,7 @@ function pathSearch(start,end,avoid=new Set(),options={}){
    const nextOther=at(nx,ny);
    if(nextOther.length){
     if(nextOther.length!==1)continue;
-    const old=orientation(nextOther[0].r,nextOther[0].i);
+    const old=otherAxis(nextOther[0]);
     if(!old||old===axis(d))continue;
     if(nx===end[0]&&ny===end[1]){
      if(endExit!==-1&&endExit!==d)continue;

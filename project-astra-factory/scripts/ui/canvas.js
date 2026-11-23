@@ -75,15 +75,11 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
    ctx.lineTo(cx+vout[0]*.5,cy+vout[1]*.5);
   }
   ctx.stroke();
-  if(!r.to&&r.path.length){
-   const [x,y]=r.path.at(-1);
-   ctx.fillStyle='#ffd18a';ctx.beginPath();ctx.arc(x+.5,y+.5,.18,0,Math.PI*2);ctx.fill();
-  }
  }
  for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle='#9affd0';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
  if(typeof beltTrim!=='undefined'&&beltTrim){
   const r=state.routes.find(q=>q.id===beltTrim.routeId);
-  if(r&&beltTrim.index>=0){
+  if(r&&beltTrim.index>=0&&(r.to||!beltTrim.hoverOutside)){
    ctx.strokeStyle='#ff6478';ctx.lineWidth=.45;ctx.lineCap='butt';ctx.beginPath();
    for(let i=beltTrim.index;i<r.path.length;i++){
     const [x,y]=r.path[i],t=routeTile(r,i);if(!t)continue;
@@ -131,7 +127,6 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  const persisted=!!draft.routeId&&state.routes.some(r=>r.id===draft.routeId);
  if(all&&all.length>locked.length)drawCells(all,'#ffd176',true,persisted?locked.length:0);
  if(!persisted)drawCells(locked,'#3fe6ac',false);
- if(locked.length){let [x,y]=locked.at(-1);ctx.strokeStyle='#ffde74';ctx.lineWidth=.16;ctx.strokeRect(x+.12,y+.12,.76,.76);}
  }
  if(marquee){const x=Math.min(marquee.from.x,marquee.to.x),y=Math.min(marquee.from.y,marquee.to.y),w=Math.abs(marquee.to.x-marquee.from.x)+1,h=Math.abs(marquee.to.y-marquee.from.y)+1;ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
  if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=r.to&&plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
@@ -179,57 +174,87 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
  if(stampType){let m={...getStampMachine(c.x,c.y),id:'m'+(++idSeed)};if(!canPlace(m))return notify('不能放这里：与障碍物、机器或传送带重叠','bad');snapshot();state.machines.push(m);selection={machineId:m.id};afterChange('放置 '+label(m)+'；可继续放置');return;}
  if(tool==='erase'){let r=cellRoutes(c.x,c.y).at(-1);if(r)deleteRoute(r.id);else notify('点绿色传送带删除整条线路');return;}
  if(tool==='belt'){
-  const hit=portAt(c.x,c.y),belts=cellRoutes(c.x,c.y);
-  if(belts.length){
-   const r=beltRouteAtCell(c,pt);
-   const idx=r.path.findIndex(p=>p[0]===c.x&&p[1]===c.y);
-   if(draft&&draft.routeId!==r.id){draft=null;updateHint();}
-   if(beltTrim?.routeId===r.id){
+  // A tap may occur without a preceding pointermove (notably on mobile).
+  hoverCell=c;
+  const hit=portAt(c.x,c.y),beltHit=beltCellHit(c,pt);
+  const r=beltHit?.route,idx=beltHit?.index;
+  if(beltTrim?.index>=0){
+   const selected=state.routes.find(q=>q.id===beltTrim.routeId);
+   const sameCell=!!selected&&r?.id===selected.id&&idx===beltTrim.index&&
+    beltTrim.cell?.[0]===c.x&&beltTrim.cell?.[1]===c.y;
+   if(sameCell){
     snapshot();
-    if(idx===0){state.routes=state.routes.filter(q=>q.id!==r.id);draft=null;}
+    if(idx===0){state.routes=state.routes.filter(q=>q.id!==selected.id);draft=null;}
     else{
-     const lastKept=routeTile(r,idx-1);
-     r.path=r.path.slice(0,idx);r.to=null;
-     if(lastKept?.type==='turn')r.openEndSide=lastKept.outgoing;
-     else delete r.openEndSide;
-     draft={from:copy(r.from),fromName:routeTitle(r),path:copy(r.path),routeId:r.id,history:[],preview:null};
-     updateDraftPreview();
+     const lastKept=routeTile(selected,idx-1);
+     selected.path=selected.path.slice(0,idx);selected.to=null;
+     if(lastKept?.type==='turn')selected.openEndSide=lastKept.outgoing;
+     else delete selected.openEndSide;
+     draft={from:copy(selected.from),fromName:routeTitle(selected),
+      path:copy(selected.path),routeId:selected.id,history:[],preview:null};
+     // Do not instantly paint the just-deleted tail as a new ghost preview.
+     // It becomes extendable after the pointer moves to another cell.
     }
-    beltTrim=null;afterChange(idx===0?'已删除从首格开始的整条传送带':'已删除红色尾段，保留起点连接，可继续延长');
-    updateHint();draw();
-   }else{
-    beltTrim={routeId:r.id,index:idx};
-    // Open routes support both hover-to-trim and off-route continuation.
-    draft=r.to?null:{
-     from:copy(r.from),fromName:routeTitle(r),
-     path:copy(r.path),routeId:r.id,history:[],preview:null
-    };
-    updateHint();previewBeltTrim(c,pt);
-    notify('已选中线路：鼠标沿线预览红色尾段，再次点击截断；悬空线路可移到空白处继续接线','warn');
-    draw();
+    beltTrim=null;
+    afterChange(idx===0?'已删除整条传送带':'已删除从选中格开始的尾段；可从保留终点继续接线');
+    updateHint();draw();return;
    }
+   // Only the SAME selected tile confirms deletion. Another belt tile,
+   // including the rest of the red suffix, only cancels selection.
+   // An open belt may additionally be extended by a legal off-route click.
+   if(r||!draft||draft.routeId!==selected?.id){
+    clearBeltTrimSelection();return;
+   }
+   const targetPort=hit?.p.kind==='in'?hit.p:null;
+   const target=targetPort?[targetPort.ex,targetPort.ey]:
+    inMap(c.x,c.y)&&!cellMachine(c.x,c.y)&&!reserved(c.x,c.y)?[c.x,c.y]:null;
+   const candidate=target?draftSegment(target,targetPort):null;
+   if(!candidate||candidate.length<=draft.path.length){
+    clearBeltTrimSelection();return;
+   }
+   const previous=copy(draft.path);
+   const historyEntry={path:previous,endSide:selected?.openEndSide||null};
+   if(saveDraftRoute(candidate,targetPort?{id:hit.m.id,port:hit.p.index}:null)&&draft)
+    draft.history.push(historyEntry);
    return;
   }
-  beltTrim=null;
+  if(r){
+   // First click locks one exact grid cell, not the whole red interval.
+   if(draft&&draft.routeId!==r.id)draft=null;
+   beltTrim={routeId:r.id,index:idx,cell:[c.x,c.y],hoverOutside:false};
+   draft=r.to?null:{
+    from:copy(r.from),fromName:routeTitle(r),
+    path:copy(r.path),routeId:r.id,history:[],preview:null
+   };
+   updateHint();updateDraftPreview();draw();
+   notify('已标记从该格到终点的红色尾段；仅再次点击同一格会删除，点击其他线段格取消');
+   return;
+  }
   if(!draft){
+   beltTrim=null;
    if(hit?.p.kind==='out'){
-    if(routeFor(hit.m.id,'out',hit.p.index))return notify('该输出口已有线路；点击传送带可截断并继续延长','bad');
-    draft={from:{id:hit.m.id,port:hit.p.index},fromName:label(hit.m),path:[],history:[],preview:null,routeId:null};
+    if(routeFor(hit.m.id,'out',hit.p.index))
+     return notify('该输出口已有线路；请点击对应传送带进行编辑','bad');
+    draft={from:{id:hit.m.id,port:hit.p.index},fromName:label(hit.m),
+     path:[],history:[],preview:null,routeId:null};
     updateDraftPreview();updateHint();draw();
    }else notify('请先点击机器内部的橙色输出口');
-  }else if(hit?.p.kind==='in'){
-   const candidate=draftSegment([hit.p.ex,hit.p.ey],hit.p);
-   if(!candidate)return notify('无法从当前段到达该输入口；请撤销上一段或换个转折点','bad');
-   saveDraftRoute(candidate,{id:hit.m.id,port:hit.p.index});
-  }else if(inMap(c.x,c.y)&&!cellMachine(c.x,c.y)&&!reserved(c.x,c.y)){
-   const candidate=draftSegment([c.x,c.y]);
-   if(!candidate)return notify('该格无法从当前线段正交连通；可撤销上一段重试','bad');
-   if(candidate.length===draft.path.length&&draft.path.length)return notify('这里已经是当前段的终点');
+  }else{
+   const targetPort=hit?.p.kind==='in'?hit.p:null;
+   const target=targetPort?[targetPort.ex,targetPort.ey]:
+    inMap(c.x,c.y)&&!cellMachine(c.x,c.y)&&!reserved(c.x,c.y)?[c.x,c.y]:null;
+   const candidate=target?draftSegment(target,targetPort):null;
+   if(!candidate||candidate.length===draft.path.length){
+    if(draft.routeId)clearBeltTrimSelection();
+    else notify('无法合法接线；不能回头、重叠或穿越障碍物','bad');
+    return;
+   }
    const previous=copy(draft.path);
-   const oldRoute=draft.routeId&&state.routes.find(r=>r.id===draft.routeId);
-   const historyEntry={path:previous,endSide:oldRoute?.openEndSide||null};
-   if(saveDraftRoute(candidate))draft.history.push(historyEntry);
-  }else notify('请选择蓝色输入口或空白格作为转折点');
+   const existing=draft.routeId&&state.routes.find(q=>q.id===draft.routeId);
+   const historyEntry={path:previous,endSide:existing?.openEndSide||null};
+   if(saveDraftRoute(candidate,targetPort?{id:hit.m.id,port:hit.p.index}:null)&&draft)
+    draft.history.push(historyEntry);
+  }
   return;
  }
  const hit=portAt(c.x,c.y);let m=cellMachine(c.x,c.y);if(m){beginMachineDragPress(m.id,pt,c,e.pointerId);return;}
