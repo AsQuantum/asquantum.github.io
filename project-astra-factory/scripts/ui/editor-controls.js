@@ -99,23 +99,35 @@ function draftSegment(target,targetPort=null){
  });
  if(!segment)return null;
  const combined=draft.path.length?[...draft.path,...segment.slice(1)]:segment;
- // Unlike same-axis overlap, one orthogonal self-crossing is a legal tile.
- // When aiming at a machine inlet, the inlet itself supplies the last tile's
- // outgoing arm; validating as an open end would incorrectly reject corners.
- if(!targetPort&&checkPath(combined,draft.from,null,draft.routeId))return null;
+ // For an inlet preview the physical port, rather than an imagined open-end
+ // continuation, determines whether the final cell is straight or a turn.
+ // In particular, a crossing cannot turn inside its occupied cell.
+ const inletHit=targetPort&&portAt(targetPort.x,targetPort.y);
+ const to=targetPort?(inletHit?.p.kind==='in'?{id:inletHit.m.id,port:targetPort.index}:null):null;
+ if(targetPort&&!to)return null;
+ if(checkPath(combined,draft.from,to,draft.routeId))return null;
  return combined;
 }
 function draftTarget(cell){if(!cell||!inMap(cell.x,cell.y))return null;let hit=portAt(cell.x,cell.y);if(hit?.p.kind==='in')return [hit.p.ex,hit.p.ey];if(!cellMachine(cell.x,cell.y)&&!reserved(cell.x,cell.y))return [cell.x,cell.y];return null;}
+function draftPreviewTile(path,i,src,to=null){
+ const machine=to&&machineById(to.id);
+ const dst=to?(machine&&inPort(machine,to.port)):openRouteVirtualEnd(path,src);
+ return dst?tileShape(path,i,src,dst):null;
+}
 function updateDraftPreview(){
  if(!draft)return;
  const onSameBelt=draft.routeId&&hoverCell&&cellRoutes(hoverCell.x,hoverCell.y)
   .some(r=>r.id===draft.routeId);
- // A selected red tail always wins over drawing a new preview; otherwise an
- // unfinished line may cross a PREVIOUS straight tile of itself at 90 degrees.
- if(onSameBelt&&beltTrim?.index>=0){draft.preview=null;return;}
+ // A selected red tail wins over the inlet preview, but leaving the belt
+ // restores both the preview path and its endpoint direction.
+ if(onSameBelt&&beltTrim?.index>=0){
+  draft.preview=null;draft.previewTo=null;return;
+ }
  const target=draftTarget(hoverCell);
- const port=hoverCell&&portAt(hoverCell.x,hoverCell.y)?.p;
- draft.preview=target?draftSegment(target,port?.kind==='in'?port:null):null;
+ const hit=hoverCell&&portAt(hoverCell.x,hoverCell.y);
+ const port=hit?.p.kind==='in'?hit.p:null;
+ draft.preview=target?draftSegment(target,port):null;
+ draft.previewTo=draft.preview&&port?{id:hit.m.id,port:port.index}:null;
 }
 function commitDraftAtCrossing(cell,route){
  if(!draft||!route)return false;

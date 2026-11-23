@@ -76,7 +76,11 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
   let selected=selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id);
   ctx.strokeStyle=selected?'#f3d875':r.to?'#50e0a0':'#f2bf4b';ctx.lineWidth=selected?.44:.32;
   ctx.lineCap='butt';ctx.lineJoin='round';ctx.beginPath();
+  const previewReplacesEnd=draft?.routeId===r.id&&draft.preview?.length>=r.path.length;
   for(let i=0;i<r.path.length;i++){
+   // A valid endpoint preview can rotate the already confirmed final tile.
+   // Hide its old arm so the preview cannot look like an illegal T junction.
+   if(previewReplacesEnd&&i===r.path.length-1)continue;
    let [x,y]=r.path[i],t=routeTile(r,i);
    if(!t)continue;
    let vin=V[t.incoming],vout=V[t.outgoing],cx=x+.5,cy=y+.5;
@@ -127,25 +131,26 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  paintMachineTextAtZoom(m,w,h,z,true);}
  if(draft){let locked=draft.path||[],all=draft.preview||locked;
  let startMachine=machineById(draft.from.id),startPort=startMachine&&outPort(startMachine,draft.from.port);
- const drawCells=(pts,color,dashed,startIndex=0)=>{
+ const drawCells=(pts,color,dashed,startIndex=0,to=null)=>{
   if(!pts?.length||!startPort)return;
   ctx.strokeStyle=color;ctx.lineWidth=.29;ctx.lineCap='butt';ctx.lineJoin='round';
   ctx.setLineDash(dashed?[.35,.16]:[]);ctx.beginPath();
   for(let i=startIndex;i<pts.length;i++){
-   const [x,y]=pts[i],prev=i?pts[i-1]:[startPort.x,startPort.y],next=pts[i+1];
-   const inc=edgeFromTo([x,y],prev),out=next?edgeFromTo([x,y],next):null;
-   if(!inc)continue;
-   ctx.moveTo(x+.5+V[inc][0]*.5,y+.5+V[inc][1]*.5);
+   const [x,y]=pts[i],tile=draftPreviewTile(pts,i,startPort,to);
+   if(!tile)continue;
+   // Draw both arms of the last tile. The target inlet determines whether
+   // that tile points straight ahead or turns into the machine.
+   ctx.moveTo(x+.5+V[tile.incoming][0]*.5,y+.5+V[tile.incoming][1]*.5);
    ctx.lineTo(x+.5,y+.5);
-   if(out&&out!==inc)ctx.lineTo(x+.5+V[out][0]*.5,y+.5+V[out][1]*.5);
+   ctx.lineTo(x+.5+V[tile.outgoing][0]*.5,y+.5+V[tile.outgoing][1]*.5);
   }
   ctx.stroke();ctx.setLineDash([]);
  };
- // Confirmed cells are already rendered from state.routes. Avoid repainting
- // them over the red tail preview of the active (persisted) line.
+ // Always redraw the existing last tile when extending or connecting a
+ // persisted route. A neighbouring inlet can change only its outgoing arm.
  const persisted=!!draft.routeId&&state.routes.some(r=>r.id===draft.routeId);
- if(all&&all.length>locked.length)drawCells(all,'#ffd176',true,persisted?locked.length:0);
- if(!persisted)drawCells(locked,'#3fe6ac',false);
+ if(draft.preview)drawCells(all,'#ffd176',true,persisted?Math.max(0,locked.length-1):0,draft.previewTo);
+ if(!persisted&&!draft.preview)drawCells(locked,'#f2bf4b',false);
  }
  if(marquee){const x=Math.min(marquee.from.x,marquee.to.x),y=Math.min(marquee.from.y,marquee.to.y),w=Math.abs(marquee.to.x-marquee.from.x)+1,h=Math.abs(marquee.to.y-marquee.from.y)+1;ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
  if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=r.to&&plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
