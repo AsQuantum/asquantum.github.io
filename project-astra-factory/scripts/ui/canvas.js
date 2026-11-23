@@ -81,9 +81,9 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
   }
  }
  for(let entries of occupancy.values())if(entries.length===2){let one=entries.find(a=>orientation(a.r,a.i)==='V');if(one){let [x,y]=one.r.path[one.i];ctx.fillStyle='#142434';ctx.fillRect(x+.33,y+.22,.34,.56);ctx.strokeStyle='#9affd0';ctx.lineWidth=.26;ctx.beginPath();ctx.moveTo(x+.5,y+.16);ctx.lineTo(x+.5,y+.84);ctx.stroke();}}
- if(beltTrim){
+ if(typeof beltTrim!=='undefined'&&beltTrim){
   const r=state.routes.find(q=>q.id===beltTrim.routeId);
-  if(r){
+  if(r&&beltTrim.index>=0){
    ctx.strokeStyle='#ff6478';ctx.lineWidth=.45;ctx.lineCap='butt';ctx.beginPath();
    for(let i=beltTrim.index;i<r.path.length;i++){
     const [x,y]=r.path[i],t=routeTile(r,i);if(!t)continue;
@@ -112,11 +112,11 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  paintMachineTextAtZoom(m,w,h,z,true);}
  if(draft){let locked=draft.path||[],all=draft.preview||locked;
  let startMachine=machineById(draft.from.id),startPort=startMachine&&outPort(startMachine,draft.from.port);
- const drawCells=(pts,color,dashed)=>{
+ const drawCells=(pts,color,dashed,startIndex=0)=>{
   if(!pts?.length||!startPort)return;
   ctx.strokeStyle=color;ctx.lineWidth=.29;ctx.lineCap='butt';ctx.lineJoin='round';
   ctx.setLineDash(dashed?[.35,.16]:[]);ctx.beginPath();
-  for(let i=0;i<pts.length;i++){
+  for(let i=startIndex;i<pts.length;i++){
    const [x,y]=pts[i],prev=i?pts[i-1]:[startPort.x,startPort.y],next=pts[i+1];
    const inc=edgeFromTo([x,y],prev),out=next?edgeFromTo([x,y],next):null;
    if(!inc)continue;
@@ -126,8 +126,11 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
   }
   ctx.stroke();ctx.setLineDash([]);
  };
- if(all&&all.length>locked.length){drawCells(all,'#ffd176',true);}
- drawCells(locked,'#3fe6ac',false);
+ // Confirmed cells are already rendered from state.routes. Avoid repainting
+ // them over the red tail preview of the active (persisted) line.
+ const persisted=!!draft.routeId&&state.routes.some(r=>r.id===draft.routeId);
+ if(all&&all.length>locked.length)drawCells(all,'#ffd176',true,persisted?locked.length:0);
+ if(!persisted)drawCells(locked,'#3fe6ac',false);
  if(locked.length){let [x,y]=locked.at(-1);ctx.strokeStyle='#ffde74';ctx.lineWidth=.16;ctx.strokeRect(x+.12,y+.12,.76,.76);}
  }
  if(marquee){const x=Math.min(marquee.from.x,marquee.to.x),y=Math.min(marquee.from.y,marquee.to.y),w=Math.abs(marquee.to.x-marquee.from.x)+1,h=Math.abs(marquee.to.y-marquee.from.y)+1;ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
@@ -178,19 +181,17 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
  if(tool==='belt'){
   const hit=portAt(c.x,c.y),belts=cellRoutes(c.x,c.y);
   if(belts.length){
-   const localX=pt.x-camera.x-(c.x+.5)*camera.z,localY=pt.y-camera.y-(c.y+.5)*camera.z;
-   const wanted=Math.abs(localX)>Math.abs(localY)?'H':'V';
-   const r=belts.length===2?(belts.find(q=>{
-    const i=q.path.findIndex(p=>p[0]===c.x&&p[1]===c.y);
-    return orientation(q,i)===wanted;
-   })||belts.at(-1)):belts[0];
+   const r=beltRouteAtCell(c,pt);
    const idx=r.path.findIndex(p=>p[0]===c.x&&p[1]===c.y);
    if(draft&&draft.routeId!==r.id){draft=null;updateHint();}
-   if(beltTrim?.routeId===r.id&&beltTrim.index===idx){
+   if(beltTrim?.routeId===r.id){
     snapshot();
     if(idx===0){state.routes=state.routes.filter(q=>q.id!==r.id);draft=null;}
     else{
+     const lastKept=routeTile(r,idx-1);
      r.path=r.path.slice(0,idx);r.to=null;
+     if(lastKept?.type==='turn')r.openEndSide=lastKept.outgoing;
+     else delete r.openEndSide;
      draft={from:copy(r.from),fromName:routeTitle(r),path:copy(r.path),routeId:r.id,history:[],preview:null};
      updateDraftPreview();
     }
@@ -198,7 +199,14 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
     updateHint();draw();
    }else{
     beltTrim={routeId:r.id,index:idx};
-    notify('红色为待删除尾段；再次点击同一格确认删除，点击其他位置取消','warn');draw();
+    // Open routes support both hover-to-trim and off-route continuation.
+    draft=r.to?null:{
+     from:copy(r.from),fromName:routeTitle(r),
+     path:copy(r.path),routeId:r.id,history:[],preview:null
+    };
+    updateHint();previewBeltTrim(c,pt);
+    notify('已选中线路：鼠标沿线预览红色尾段，再次点击截断；悬空线路可移到空白处继续接线','warn');
+    draw();
    }
    return;
   }
@@ -218,7 +226,9 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    if(!candidate)return notify('该格无法从当前线段正交连通；可撤销上一段重试','bad');
    if(candidate.length===draft.path.length&&draft.path.length)return notify('这里已经是当前段的终点');
    const previous=copy(draft.path);
-   if(saveDraftRoute(candidate))draft.history.push(previous);
+   const oldRoute=draft.routeId&&state.routes.find(r=>r.id===draft.routeId);
+   const historyEntry={path:previous,endSide:oldRoute?.openEndSide||null};
+   if(saveDraftRoute(candidate))draft.history.push(historyEntry);
   }else notify('请选择蓝色输入口或空白格作为转折点');
   return;
  }
@@ -239,7 +249,8 @@ function onPointerMove(e){
  const cellChanged=!oldCell||oldCell.x!==hoverCell.x||oldCell.y!==hoverCell.y;
  // Unchanged cells need neither route lookup nor a static-map redraw.
  if(cellChanged){
-  if(draft)updateDraftPreview();
+  if(tool==='belt'&&beltTrim)previewBeltTrim(hoverCell,p);
+  else if(draft)updateDraftPreview();
   const here=cellRoutes(hoverCell.x,hoverCell.y);
   const stateAt=here.map(r=>{
    let i=r.path.findIndex(([x,y])=>x===hoverCell.x&&y===hoverCell.y);
@@ -258,7 +269,7 @@ function onPointerMove(e){
  }
  // Hover text is independent of the canvas. Paint only when a visible overlay
  // or camera actually moves; simulation particles are painted by the RAF loop.
- if((cellChanged&&(draft||stampType||groupTransform||marquee))||
+ if((cellChanged&&(draft||stampType||groupTransform||marquee||(tool==='belt'&&beltTrim)))||
     drag?.kind==='pan'||(wasPress&&drag?.kind==='machine-preview'))draw();
 }
 function onPointerUp(e){

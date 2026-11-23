@@ -11,7 +11,7 @@ function packetCoords(r,p){
  const path=r.path||[],n=path.length;
  if(!n)return null;
  const source=machineById(r.from.id),target=r.to&&machineById(r.to.id);
- const op=source&&outPort(source,r.from.port),ip=r.to?(target&&inPort(target,r.to.port)):openRouteVirtualEnd(r.path,op);
+ const op=source&&outPort(source,r.from.port),ip=r.to?(target&&inPort(target,r.to.port)):openRouteVirtualEnd(r.path,op,r.openEndSide);
  if(!op||!ip)return null;
  const first=path[0],last=path[n-1],d=Math.max(0,Math.min(n,p.distance));
  // Adjacent physical port CENTER is used only to determine the outer tile's entry/exit direction.

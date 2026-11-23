@@ -20,11 +20,16 @@ function cancelDraft(){if(!draft&&!beltTrim)return;draft=null;beltTrim=null;upda
 function undoDraftBend(){
  if(!draft)return;
  if(!draft.history?.length)return cancelDraft();
- const previous=draft.history.pop();
+ const historyEntry=draft.history.pop();
+ const previous=Array.isArray(historyEntry)?historyEntry:historyEntry.path;
  const route=draft.routeId&&state.routes.find(r=>r.id===draft.routeId);
  if(route){
   snapshot();
-  if(previous.length){route.path=copy(previous);route.to=null;}
+  if(previous.length){
+   route.path=copy(previous);route.to=null;
+   if(!Array.isArray(historyEntry)&&historyEntry.endSide)route.openEndSide=historyEntry.endSide;
+   else delete route.openEndSide;
+  }
   else{state.routes=state.routes.filter(r=>r.id!==route.id);draft.routeId=null;}
  }
  draft.path=copy(previous);draft.preview=null;
@@ -56,13 +61,17 @@ function saveDraftRoute(path,to=null){
  const reason=checkPath(path,draft.from,to,existing?.id);
  if(reason){notify('线路验证失败：'+reason,'bad');return false;}
  snapshot();
- if(existing){existing.path=copy(path);existing.to=to?copy(to):null;}
+ if(existing){existing.path=copy(path);existing.to=to?copy(to):null;delete existing.openEndSide;}
  else{
   const route={id:'r'+(++idSeed),from:copy(draft.from),to:to?copy(to):null,path:copy(path)};
   state.routes.push(route);draft.routeId=route.id;
  }
  draft.path=copy(path);
- if(to)draft=null;
+ // A newly confirmed open segment stays active for continued routing.
+ // Hovering its own cells previews a red suffix immediately; hovering away
+ // previews the next leg. Escape only exits editing, not the saved segment.
+ if(to){draft=null;beltTrim=null;}
+ else beltTrim={routeId:draft.routeId,index:-1};
  afterChange(to?'已连接线路到输入口':'已确认放置悬空线路；可继续延长或连接蓝色输入口');
  if(draft)updateDraftPreview();
  updateHint();draw();return true;
@@ -83,7 +92,41 @@ function draftSegment(target,targetPort=null){
  return combined;
 }
 function draftTarget(cell){if(!cell||!inMap(cell.x,cell.y))return null;let hit=portAt(cell.x,cell.y);if(hit?.p.kind==='in')return [hit.p.ex,hit.p.ey];if(!cellMachine(cell.x,cell.y)&&!reserved(cell.x,cell.y))return [cell.x,cell.y];return null;}
-function updateDraftPreview(){if(!draft)return;let target=draftTarget(hoverCell);const port=hoverCell&&portAt(hoverCell.x,hoverCell.y)?.p;draft.preview=target?draftSegment(target,port?.kind==='in'?port:null):null;}
+function updateDraftPreview(){
+ if(!draft)return;
+ const onSameBelt=draft.routeId&&hoverCell&&cellRoutes(hoverCell.x,hoverCell.y)
+  .some(r=>r.id===draft.routeId);
+ if(onSameBelt){draft.preview=null;return;}
+ const target=draftTarget(hoverCell);
+ const port=hoverCell&&portAt(hoverCell.x,hoverCell.y)?.p;
+ draft.preview=target?draftSegment(target,port?.kind==='in'?port:null):null;
+}
+// When a crossing occupies one cell, select its horizontal/vertical strand
+// according to cursor position rather than arbitrarily trimming the wrong line.
+function beltRouteAtCell(cell,pt){
+ if(!cell)return null;
+ const routes=cellRoutes(cell.x,cell.y);
+ if(routes.length<=1)return routes[0]||null;
+ const x=pt.x-camera.x-(cell.x+.5)*camera.z;
+ const y=pt.y-camera.y-(cell.y+.5)*camera.z;
+ const wanted=Math.abs(x)>Math.abs(y)?'H':'V';
+ return routes.find(r=>{
+  const i=r.path.findIndex(p=>p[0]===cell.x&&p[1]===cell.y);
+  return orientation(r,i)===wanted;
+ })||routes.at(-1);
+}
+function previewBeltTrim(cell,pt){
+ if(!beltTrim)return;
+ const route=state.routes.find(r=>r.id===beltTrim.routeId);
+ if(!route){beltTrim=null;return;}
+ const hit=beltRouteAtCell(cell,pt);
+ beltTrim.index=hit?.id===route.id
+  ?route.path.findIndex(p=>p[0]===cell.x&&p[1]===cell.y):-1;
+ if(draft?.routeId===route.id){
+  if(beltTrim.index>=0)draft.preview=null;
+  else updateDraftPreview();
+ }
+}
 
 function updateHint(){
  updateStampControls();

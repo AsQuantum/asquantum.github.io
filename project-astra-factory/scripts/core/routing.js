@@ -24,15 +24,18 @@ function tileShape(path,i,src,dst){
   // N→E and E→N have identical geometry, but are two distinct directed turns.
   key:incoming+'>'+outgoing};
 }
-function openRouteVirtualEnd(path,src){
+function openRouteVirtualEnd(path,src,endSide=null){
  if(!path?.length||!src)return null;
  const last=path.at(-1),prev=path.length>1?path.at(-2):[src.x,src.y];
  const dx=last[0]-prev[0],dy=last[1]-prev[1];
- return Math.abs(dx)+Math.abs(dy)===1?{x:last[0]+dx,y:last[1]+dy}:null;
+ if(Math.abs(dx)+Math.abs(dy)!==1)return null;
+ // Preserve a clipped corner's outgoing arm without inventing an extra belt cell.
+ const vec=endSide&&V[endSide]||[dx,dy];
+ return {x:last[0]+vec[0],y:last[1]+vec[1]};
 }
 function routeTile(r,i){
  const a=machineById(r.from.id),b=r.to&&machineById(r.to.id);
- const src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);
+ const src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src,r.openEndSide);
  return src&&dst?tileShape(r.path,i,src,dst):null;
 }
 function orientation(r,i){return routeTile(r,i)?.axis||null;}
@@ -40,7 +43,13 @@ function pathAxis(path,i,src,dst){return tileShape(path,i,src,dst)?.axis||null;}
 function checkPath(path,from,to,excluded){
  if(!Array.isArray(path)||path.length===0)return '线路为空';
  const sm=machineById(from?.id),tm=to&&machineById(to.id);
- const src=sm&&outPort(sm,from.port),dst=to?(tm&&inPort(tm,to.port)):openRouteVirtualEnd(path,src);
+ const src=sm&&outPort(sm,from.port);
+ // Only apply stored final-tile orientation to the exact saved path, never to a
+ // newly extended draft being validated against its previous version.
+ const saved=excluded&&state.routes.find(r=>r.id===excluded);
+ const savedSide=!to&&saved?.to===null&&saved.path.length===path.length&&
+  saved.path.every((v,i)=>v[0]===path[i][0]&&v[1]===path[i][1])?saved.openEndSide:null;
+ const dst=to?(tm&&inPort(tm,to.port)):openRouteVirtualEnd(path,src,savedSide);
  if(!src||!dst)return '源或目标接口无效';
  if(path[0][0]!==src.ex||path[0][1]!==src.ey||(to&&(path.at(-1)[0]!==dst.ex||path.at(-1)[1]!==dst.ey)))return '线路首尾没有连接到机器实际接口';
  // Each physical interface can be wired once (no hidden branching or merging).

@@ -29,7 +29,13 @@ function selectedGroupData(){
    for(const cell of r.path){if(!inside(cell))break;prefix.push(cell);}
    if(!prefix.length)return null;
    const keepDestination=prefix.length===r.path.length&&r.to&&ids.has(r.to.id);
-   return {...copy(r),path:copy(prefix),to:keepDestination?copy(r.to):null};
+   const next={...copy(r),path:copy(prefix),to:keepDestination?copy(r.to):null};
+   if(!keepDestination&&prefix.length<r.path.length){
+    const lastKept=routeTile(r,prefix.length-1);
+    if(lastKept?.type==='turn')next.openEndSide=lastKept.outgoing;
+    else delete next.openEndSide;
+   }
+   return next;
   }).filter(Boolean);
  return {machines,routes,bounds:groupBounds(machines,routes)};
 }
@@ -156,6 +162,7 @@ function createGroupPlan(transform){
   if(mode==='copy')next.id='__group_preview_r'+i;
   next.from.id=remap.get(old.from.id);if(next.to)next.to.id=remap.get(old.to.id);
   next.from.port=portRemaps.get(old.from.id)?.out[old.from.port]??old.from.port;
+  if(next.openEndSide)next.openEndSide=rotateFace(next.openEndSide,rotation);
   if(next.to)next.to.port=portRemaps.get(old.to.id)?.in[old.to.port]??old.to.port;
   next.path=old.path.map(([x,y])=>{const [rx,ry]=groupRotateCell(x,y,b,rotation);return [transform.x+rx,transform.y+ry];});
   return next;
