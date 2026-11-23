@@ -1,0 +1,61 @@
+/* Shared dark dropdown theme. Works for every Factory Lab select, including
+   splitters, warehouse inlet filters, recipes, machine panel direction,
+   simulation speed and other selectors, across desktop and mobile. */
+select{
+ color-scheme:dark;
+ scrollbar-width:thin;
+ scrollbar-color:#648ba1 #112638;
+}
+select option,select optgroup{
+ background-color:#172b3e;
+ color:#e5f2ff;
+}
+select option:disabled{color:#849eac}
+select::-webkit-scrollbar{width:9px}
+select::-webkit-scrollbar-track{background:#112638}
+select::-webkit-scrollbar-thumb{
+ background:#648ba1;border:2px solid #112638;border-radius:8px;
+}
+/* Chromium 135+/modern browsers support author-styled native SELECT pickers.
+   This is required because OS popups ignore option:hover background CSS and
+   otherwise show a light-grey hover row with dark text, even in dark mode. */
+@supports (appearance:base-select){
+ select:not([multiple]),::picker(select){appearance:base-select}
+ ::picker(select){
+  color-scheme:dark;
+  color:#e5f2ff;
+  background:#132a3d;
+  border:1px solid #3c6478;
+  border-radius:8px;
+  box-shadow:0 13px 28px #020d19bf;
+  padding:4px;
+  max-height:min(340px,54vh);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#648ba1 #112638;
+ }
+ ::picker(select)::-webkit-scrollbar{width:9px}
+ ::picker(select)::-webkit-scrollbar-track{background:#112638}
+ ::picker(select)::-webkit-scrollbar-thumb{
+  background:#648ba1;border:2px solid #112638;border-radius:8px;
+ }
+ select:not([multiple]) option{
+  display:flex;align-items:center;min-height:30px;
+  padding:7px 10px;margin:1px 0;
+  border-radius:5px;background:#172b3e;color:#e5f2ff;
+  font-size:inherit;
+ }
+ select:not([multiple]) option:checked{
+  background:#215148;color:#f1fff9;
+ }
+ select:not([multiple]) option:is(:hover,:focus,:focus-visible),
+ select:not([multiple]) option:checked:is(:hover,:focus,:focus-visible){
+  background:#2b5971;color:#f8ffff;
+ }
+ select:not([multiple]) option::checkmark{color:#82dbba}
+ select:not([multiple])::picker-icon{color:#b7d2df}
+ select:not([multiple]):open{border-color:#76afaa}
+}
+/* In older native widgets CSS can't override the system hover highlight;
+   all supported browsers still receive the standard dark color-scheme. */

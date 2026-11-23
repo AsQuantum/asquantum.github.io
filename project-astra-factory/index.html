@@ -11,17 +11,18 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <meta name="apple-mobile-web-app-title" content="Factory Lab"/>
 <meta name="theme-color" content="#0b111c"/>
-<link rel="stylesheet" href="styles/main.css"/>
+<link rel="stylesheet" href="styles/main.css?v=20261123-039"/>
 <link rel="stylesheet" href="styles/sidebar-polish.css"/>
 <link rel="stylesheet" href="styles/stock-chart.css"/>
-<link rel="stylesheet" href="styles/mobile.css?v=20261123-schemepopup1"/>
+<link rel="stylesheet" href="styles/mobile.css?v=20261123-039"/>
 <link rel="stylesheet" href="styles/window-motion.css"/>
 <link rel="stylesheet" href="styles/ast1-dialog.css"/>
-<link rel="stylesheet" href="styles/changelog.css?v=20261123-038"/>
+<link rel="stylesheet" href="styles/changelog.css?v=20261123-039"/>
+<link rel="stylesheet" href="styles/select-theme.css?v=20261123-039"/>
 </head>
 <body>
 <div class="app">
-<header class="top"><div class="brand"><img class="brand-mark" src="favicon.svg" alt="" aria-hidden="true"/> <span>Factory</span> Lab <button id="changelogOpen" class="changelog-trigger" type="button" aria-haspopup="dialog" aria-controls="changelogPanel" aria-label="查看 Factory Lab 版本更新记录" title="查看版本更新记录">v0.38 <span aria-hidden="true">▾</span></button></div>
+<header class="top"><div class="brand"><img class="brand-mark" src="favicon.svg" alt="" aria-hidden="true"/> <span>Factory</span> Lab <button id="changelogOpen" class="changelog-trigger" type="button" aria-haspopup="dialog" aria-controls="changelogPanel" aria-label="查看 Factory Lab 版本更新记录" title="查看版本更新记录">v0.39 <span aria-hidden="true">▾</span></button></div>
  <div class="preset-manager" id="presetDropdown" aria-label="求解器方案管理">
   <div class="preset-combo">
    <input id="presetName" type="text" maxlength="64" placeholder="方案名称" role="combobox" aria-label="方案名称，可编辑；点击显示方案列表" aria-haspopup="dialog" aria-expanded="false" aria-controls="presetList" autocomplete="off" title="点击显示方案列表，修改文字可重命名"/>
@@ -65,6 +66,8 @@
  </div>
  <input id="file" type="file" accept=".json,application/json"/>
  <div class="sim-toolbar" role="group" aria-label="模拟控制">
+  <button type="button" class="mobile-sim-tool" data-tool="select" title="选择机器或退出编辑">选择</button>
+  <button type="button" class="mobile-sim-tool" data-tool="belt" title="连接传送带">接线</button>
   <span class="sim-toolbar-caption">模拟</span>
   <button id="run" class="primary sim-run" title="开始或暂停逐件生产与物流模拟">▶ 运行模拟</button>
   <label class="sim-speed" for="simSpeed"><span>倍率</span><select id="simSpeed" title="模拟速度（游戏时间 / 真实时间）"><option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option><option value="20">20×</option><option value="60">60×</option></select></label>
@@ -197,12 +200,15 @@
   <div id="stampControls" class="machine-config" style="display:none">
    <div class="machine-config-top"><span id="configContext">放置设置</span><button id="stampCancel" type="button" title="关闭机器设置／结束放置">×</button></div>
    <div class="machine-config-identity"><strong id="stampName">—</strong><span id="stampFacing">右 →</span></div>
-   <div class="machine-config-rotations">
-    <button id="stampLeft" title="逆时针旋转 90°（Q）">↶ <span>左转</span><small>Q</small></button>
-    <button id="stampRight" title="顺时针旋转 90°（E）">↷ <span>右转</span><small>E</small></button>
-   </div>
    <label class="machine-config-field" id="stampModeRow"><span>生产配方</span><select id="stampMode" class="full"></select></label>
    <label class="machine-config-field" id="stampItemRow"><span>仓库取出物品</span><select id="stampItem" class="full"></select></label>
+   <label class="machine-config-field" id="stampInletFilterRow" style="display:none"><span>入仓物品过滤（全部输入口）</span><select id="stampInletFilter" class="full" aria-label="新仓库存入口物品过滤"></select></label>
+   <div id="stampSplitterFilterRows" class="machine-config-filter-options" style="display:none">
+    <div class="machine-config-filter-title">分流出口物品过滤</div>
+    <label class="machine-config-field"><span id="stampSplitFilterLabel0">前侧</span><select id="stampSplitFilter0" class="full" data-stamp-filter-slot="0"></select></label>
+    <label class="machine-config-field"><span id="stampSplitFilterLabel1">右侧</span><select id="stampSplitFilter1" class="full" data-stamp-filter-slot="1"></select></label>
+    <label class="machine-config-field"><span id="stampSplitFilterLabel2">左侧</span><select id="stampSplitFilter2" class="full" data-stamp-filter-slot="2"></select></label>
+   </div>
    <label class="machine-config-field" id="stampPanelRow"><span>面板方向（相对输出朝向）</span><select id="stampPanel" class="full" aria-label="面板方向"></select></label>
    <div id="stampRecipeText" class="machine-config-recipe"></div>
    <p id="stampHelp" class="machine-config-hint"></p>
@@ -225,12 +231,13 @@
  </div>
 </aside>
 <section class="canvaswrap"><canvas id="map"></canvas>
+ <div id="mobileGroupDock" class="mobile-group-dock"></div>
  <div class="mobile-map-tools" role="toolbar" aria-label="地图快捷工具">
-  <button type="button" data-tool="select" title="选择机器">选择</button>
-  <button type="button" data-tool="belt" title="连接传送带">接线</button>
+  <button type="button" id="mobileRotateLeft" title="逆时针旋转放置中的或选中的机器">左转</button>
+  <button type="button" id="mobileRotateRight" title="顺时针旋转放置中的或选中的机器">右转</button>
   <button type="button" id="mobileDelete" title="删除当前选中的机器或线路" aria-label="删除选中项目">删除</button>
-  <button type="button" id="mobileUndo" title="撤销上一步" aria-label="撤销">↶</button>
-  <button type="button" id="mobileRedo" title="重做上一步" aria-label="重做">↷</button>
+  <button type="button" id="mobileUndo" title="撤销上一步" aria-label="撤销">撤销</button>
+  <button type="button" id="mobileRedo" title="重做上一步" aria-label="重做">重做</button>
   <button type="button" id="mobileFit" title="适应地图">适应</button>
  </div>
  <div class="mobile-map-state" id="mobileMapState" aria-live="polite"></div><div class="legend"><span class="dot" style="background:#ffab61"></span>输出口　<span class="dot" style="background:#59acff"></span>输入口　<span class="dot" style="background:#48dc99"></span>传送带　<span class="dot" style="background:#f2d86b"></span>已选择</div>
@@ -270,34 +277,34 @@
 </nav>
 <footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
 </div>
-<script src="scripts/data/warp-preset.js?v=20261123-038"></script>
-<script src="scripts/data/catalog.js?v=20261123-038"></script>
-<script src="scripts/core/state.js?v=20261123-038"></script>
-<script src="scripts/core/machines.js?v=20261123-038"></script>
-<script src="scripts/core/routing.js?v=20261123-038"></script>
-<script src="scripts/core/editor.js?v=20261123-038"></script>
-<script src="scripts/core/audit.js?v=20261123-038"></script>
-<script src="scripts/ui/inspector.js?v=20261123-038"></script>
-<script src="scripts/core/layout-io.js?v=20261123-038"></script>
-<script src="scripts/ui/editor-controls.js?v=20261123-038"></script>
-<script src="scripts/core/selection-transform.js?v=20261123-038"></script>
-<script src="scripts/ui/canvas.js?v=20261123-038"></script>
-<script src="scripts/engine/steady-flow.js?v=20261123-038"></script>
-<script src="scripts/ui/warehouse.js?v=20261123-038"></script>
-<script src="scripts/engine/simulation.js?v=20261123-038"></script>
-<script src="scripts/ui/stock-chart.js?v=20261123-038"></script>
-<script src="scripts/ui/actions.js?v=20261123-038"></script>
-<script src="scripts/blueprints/machine-ids.js?v=20261123-038"></script>
-<script src="scripts/blueprints/item-ids.js?v=20261123-038"></script>
-<script src="scripts/core/old.js?v=20261123-038"></script>
-<script src="scripts/core/compact-json.js?v=20261123-038"></script>
-<script src="scripts/blueprints/ast1-codec.js?v=20261123-038"></script>
-<script src="scripts/blueprints/ast1-ui.js?v=20261123-038"></script>
-<script src="scripts/ui/presets.js?v=20261123-038"></script>
-<script src="scripts/ui/edit-menu.js?v=20261123-038"></script>
-<script src="scripts/data/changelog.js?v=20261123-038"></script>
-<script src="scripts/ui/changelog.js?v=20261123-038"></script>
-<script src="scripts/ui/startup.js?v=20261123-038"></script>
-<script src="scripts/ui/mobile.js?v=20261123-038"></script>
-<script src="scripts/ui/touch-gestures.js?v=20261123-038"></script>
+<script src="scripts/data/warp-preset.js?v=20261123-039"></script>
+<script src="scripts/data/catalog.js?v=20261123-039"></script>
+<script src="scripts/core/state.js?v=20261123-039"></script>
+<script src="scripts/core/machines.js?v=20261123-039"></script>
+<script src="scripts/core/routing.js?v=20261123-039"></script>
+<script src="scripts/core/editor.js?v=20261123-039"></script>
+<script src="scripts/core/audit.js?v=20261123-039"></script>
+<script src="scripts/ui/inspector.js?v=20261123-039"></script>
+<script src="scripts/core/layout-io.js?v=20261123-039"></script>
+<script src="scripts/ui/editor-controls.js?v=20261123-039"></script>
+<script src="scripts/core/selection-transform.js?v=20261123-039"></script>
+<script src="scripts/ui/canvas.js?v=20261123-039"></script>
+<script src="scripts/engine/steady-flow.js?v=20261123-039"></script>
+<script src="scripts/ui/warehouse.js?v=20261123-039"></script>
+<script src="scripts/engine/simulation.js?v=20261123-039"></script>
+<script src="scripts/ui/stock-chart.js?v=20261123-039"></script>
+<script src="scripts/ui/actions.js?v=20261123-039"></script>
+<script src="scripts/blueprints/machine-ids.js?v=20261123-039"></script>
+<script src="scripts/blueprints/item-ids.js?v=20261123-039"></script>
+<script src="scripts/core/old.js?v=20261123-039"></script>
+<script src="scripts/core/compact-json.js?v=20261123-039"></script>
+<script src="scripts/blueprints/ast1-codec.js?v=20261123-039"></script>
+<script src="scripts/blueprints/ast1-ui.js?v=20261123-039"></script>
+<script src="scripts/ui/presets.js?v=20261123-039"></script>
+<script src="scripts/ui/edit-menu.js?v=20261123-039"></script>
+<script src="scripts/data/changelog.js?v=20261123-039"></script>
+<script src="scripts/ui/changelog.js?v=20261123-039"></script>
+<script src="scripts/ui/startup.js?v=20261123-039"></script>
+<script src="scripts/ui/mobile.js?v=20261123-039"></script>
+<script src="scripts/ui/touch-gestures.js?v=20261123-039"></script>
 </body></html>

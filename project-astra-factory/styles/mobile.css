@@ -151,7 +151,15 @@
   color:#d4e8f3;border-color:#40576b;touch-action:manipulation}
  .mobile-map-tools button.active{background:#245b4a!important;color:#edfff4!important;
   border-color:#62b092!important}
- .mobile-map-tools #mobileUndo,.mobile-map-tools #mobileRedo{font-size:22px}
+ .mobile-map-tools #mobileUndo,.mobile-map-tools #mobileRedo{font-size:12px}
+ /* All six quick actions are labels, not symbols: keep identical typography. */
+ .mobile-map-tools button,
+ .mobile-map-tools #mobileRotateLeft,
+ .mobile-map-tools #mobileRotateRight,
+ .mobile-map-tools #mobileUndo,
+ .mobile-map-tools #mobileRedo{
+  font-size:12px;font-weight:560;line-height:1.4;
+ }
  .mobile-map-state.is-visible:not(:empty){display:block;position:absolute;bottom:18px;left:50%;
   transform:translateX(-50%);padding:6px 10px;white-space:nowrap;
   max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;
@@ -222,4 +230,77 @@
   max-height:var(--scheme-list-max-height,320px);
   box-sizing:border-box;overscroll-behavior:contain
  }
+}
+
+/* Keep selection and wiring beside simulation, not inside map overlay. */
+.mobile-sim-tool{display:none}
+@media(max-width:900px){
+ .top .sim-toolbar .mobile-sim-tool{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:34px;padding:4px 10px;font-size:12px;
+  color:#d9e8f3;background:#21364a;border:1px solid #40576b;
+  border-radius:7px;touch-action:manipulation;
+ }
+ .top .sim-toolbar .mobile-sim-tool.active{
+  background:#245b4a!important;border-color:#62b092!important;
+  color:#edfff4!important;
+ }
+ .machine-library .machine-config-filter-options{max-width:100%}
+ /* Three filter dropdowns plus the rest of placement controls must scroll on
+    short phones instead of pushing the item list past a clipped flex pane. */
+ .machine-library #stampControls{
+  max-height:min(56vh,460px);overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:#557b90 #142538;
+ }
+}
+/* 341-430px uses a scrollable single row; <=340px retains the existing
+   two-column grid so no simulator control is clipped off-screen. */
+@media(min-width:341px) and (max-width:430px){
+ .top .sim-toolbar{overflow-x:auto;display:flex;flex-wrap:nowrap}
+}
+@media(max-width:360px){
+ .top .sim-toolbar .mobile-sim-tool{padding-inline:8px;font-size:11.5px}
+}
+
+/* Six simulator/quick-tool controls fit in three compact 320px rows. */
+@media(max-width:340px){
+ .top .sim-toolbar{gap:3px;padding:0}
+ .top .sim-toolbar button{height:28px;min-height:28px;padding:1px 4px;font-size:11px}
+ .top .sim-toolbar .sim-speed{height:28px;min-height:28px;padding:0}
+ .top .sim-toolbar .sim-speed select{height:28px;min-height:28px}
+}
+
+/* Keep all six quick/simulation controls in one visible row on ordinary
+   portrait phones. At <=340px the compact two-column grid above still wins. */
+@media(min-width:341px) and (max-width:900px){
+ .top .sim-toolbar{gap:4px}
+ .top .sim-toolbar .mobile-sim-tool{padding-inline:7px}
+ .top .sim-toolbar .sim-run{padding-inline:5px;font-size:11px}
+ .top .sim-toolbar .sim-speed{min-width:0;max-width:61px;gap:0;padding:0}
+ .top .sim-toolbar .sim-speed>span{display:none}
+ .top .sim-toolbar .sim-speed select{
+  min-width:52px;max-width:60px;padding:2px 4px;font-size:11px
+ }
+ .top .sim-toolbar .sim-step{font-size:0;padding-inline:4px}
+ .top .sim-toolbar .sim-step::after{content:'+1分';font-size:11px}
+ .top .sim-toolbar .sim-reset{font-size:0;padding-inline:4px}
+ .top .sim-toolbar .sim-reset::after{content:'重置';font-size:11px}
+}
+
+/* Reuse the pre-existing selection/group action panel on the phone map,
+   rather than hiding it inside an inactive left-pane tab. Desktop keeps it
+   in its original editor-tools location. */
+.mobile-group-dock{display:none}
+@media(max-width:900px){
+ .main[data-mobile-view="map"]>.canvaswrap>.mobile-group-dock:not(:empty){
+  display:block;position:absolute;left:10px;right:10px;top:69px;z-index:12;
+  max-width:min(420px,calc(100% - 20px));margin-inline:auto;
+  pointer-events:none;
+ }
+ .mobile-group-dock #groupControls{
+  pointer-events:auto;max-height:min(42vh,310px);overflow-y:auto;
+  margin:0!important;box-shadow:0 12px 25px #04111dba;
+  scrollbar-width:thin;scrollbar-color:#597b8f #142538;
+ }
+ .mobile-group-dock #groupControls[style*="display: none"]{display:none!important}
 }

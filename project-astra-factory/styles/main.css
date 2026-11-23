@@ -307,3 +307,33 @@
  background:#8ab2bf}
 #ast1Text::-webkit-scrollbar-corner{background:#0a1928}
 #ast1Text{overscroll-behavior:contain;scrollbar-gutter:stable}
+
+/* Native select popups use the OS palette unless explicitly opted into dark.
+   This includes the scrollbar within the expanded filter list in Chromium. */
+#inspector .machine-properties select,
+.machine-library .machine-config-field select{
+ color-scheme:dark;
+ scrollbar-width:thin;
+ scrollbar-color:#5f839b #122437;
+}
+#inspector .machine-properties select option,
+.machine-library .machine-config-field select option{
+ color:#e7f2fa;
+ background-color:#152839;
+}
+#inspector .machine-properties select::-webkit-scrollbar,
+.machine-library .machine-config-field select::-webkit-scrollbar{width:9px}
+#inspector .machine-properties select::-webkit-scrollbar-track,
+.machine-library .machine-config-field select::-webkit-scrollbar-track{background:#122437}
+#inspector .machine-properties select::-webkit-scrollbar-thumb,
+.machine-library .machine-config-field select::-webkit-scrollbar-thumb{
+ background:#5f839b;border-radius:8px;border:2px solid #122437
+}
+.machine-config-filter-options{
+ margin:3px 0 10px;padding:9px 10px 1px;
+ background:#142d38;border:1px solid #365c60;border-radius:7px;
+}
+.machine-config-filter-title{
+ color:#a9d5d1;font-size:11px;font-weight:650;margin-bottom:8px;
+}
+.machine-config-filter-options .machine-config-field{margin-bottom:9px}

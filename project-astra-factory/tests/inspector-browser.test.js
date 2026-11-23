@@ -153,7 +153,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const selectedMode=$('stampMode');selectedMode.value='1';
    selectedMode.dispatchEvent(new Event('change',{bubbles:true}));
    const modeChanged=stampMode===1;
-   const faceBefore=stampFace;$('stampRight').click();
+   const faceBefore=stampFace;rotateStamp(1);
    const rotated=stampFace!==faceBefore;
    $('stampCancel').click();
    const closed=!stampType&&$('stampControls').style.display==='none';

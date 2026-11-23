@@ -35,9 +35,43 @@ function machinePanelOptionLabel(m,index){
 function machinePanelDescription(m){
  return machinePanelOptionLabel(m,machinePanelPosition(m));
 }
-function setStampType(type){const previous=stampPrefs[type]||{};stampType=type;stampFace=previous.face||'E';const savedMode=previous.mode;stampMode=savedMode!==undefined&&savedMode!==null&&Object.prototype.hasOwnProperty.call(DEF[type].recipes||{},savedMode)?parseRecipeMode(type,savedMode):defaultModeFor(type);stampItem=previous.item||'钛合金锭';stampPanel=Number.isInteger(previous.panel)&&previous.panel>=0&&previous.panel<=3?previous.panel:0;updateStampControls();}
-function saveStampPreference(){if(!stampType)return;stampPrefs[stampType]={face:stampFace,mode:stampMode,item:stampItem,panel:stampPanel};try{localStorage.setItem('factory_lab_v3_stamp_prefs',JSON.stringify(stampPrefs));}catch(e){}}
-function getStampMachine(x=0,y=0){const mirrored=state.machines.some(m=>m.ast1Mirrored);return {type:stampType,x,y,face:stampFace,mode:stampMode,item:stampItem,panel:supportsMachinePanel({type:stampType})?stampPanel:0,ast1Mirrored:mirrored,ast1GamePorts:mirrored};}
+// Only catalog entries can be picked for new machines. Imported unknown IDs
+// still remain visible and roundtrip through the existing Inspector and codecs.
+function stampKnownFilter(item){return MATERIALS.includes(item)?item:'';}
+function setStampType(type){
+ const previous=stampPrefs[type]||{};
+ stampType=type;stampFace=previous.face||'E';
+ const savedMode=previous.mode;
+ stampMode=savedMode!==undefined&&savedMode!==null&&Object.prototype.hasOwnProperty.call(DEF[type].recipes||{},savedMode)
+  ?parseRecipeMode(type,savedMode):defaultModeFor(type);
+ stampItem=previous.item||'钛合金锭';
+ stampPanel=Number.isInteger(previous.panel)&&previous.panel>=0&&previous.panel<=3?previous.panel:0;
+ stampInletItem=stampKnownFilter(previous.inletItem);
+ stampSplitterFilters=[0,1,2].map(i=>stampKnownFilter(previous.splitterFilters?.[i]));
+ updateStampControls();
+}
+function saveStampPreference(){
+ if(!stampType)return;
+ stampPrefs[stampType]={face:stampFace,mode:stampMode,item:stampItem,panel:stampPanel,
+  inletItem:stampInletItem,splitterFilters:stampSplitterFilters.slice()};
+ try{localStorage.setItem('factory_lab_v3_stamp_prefs',JSON.stringify(stampPrefs));}catch(e){}
+}
+function getStampMachine(x=0,y=0){
+ const mirrored=state.machines.some(m=>m.ast1Mirrored);
+ const m={type:stampType,x,y,face:stampFace,mode:stampMode,item:stampItem,
+  panel:supportsMachinePanel({type:stampType})?stampPanel:0,
+  ast1Mirrored:mirrored,ast1GamePorts:mirrored};
+ if(stampType==='仓入')m.inletItem=stampInletItem;
+ if(stampType==='分流'){
+  // Preferences are [front,right,left], never physical port indices.
+  m.outFilters={};
+  for(let slot=0;slot<3;slot++){
+   const item=stampSplitterFilters[slot];
+   if(item)m.outFilters[ast1FilterPortFromGame(m,slot)]=item;
+  }
+ }
+ return m;
+}
 function updateStampControls(){
  const panel=$('stampControls');
  if(!stampType){panel.style.display='none';return;}
@@ -56,6 +90,21 @@ function updateStampControls(){
  $('stampItemRow').style.display=stampType==='仓出'?'flex':'none';
  $('stampMode').innerHTML=modes.map(key=>`<option value="${esc(key)}" ${String(stampMode)===String(key)?'selected':''}>${esc(recipeOptionLabel(stampType,key))}</option>`).join('');
  $('stampItem').innerHTML=MATERIALS.map(mat=>`<option value="${esc(mat)}" ${stampItem===mat?'selected':''}>${esc(mat)}</option>`).join('');
+ // Warehouse inlet and the three splitter outlets are placement options.
+ const filterOptions=selected=>'<option value="">任意</option>'+
+  MATERIALS.map(mat=>'<option value="'+esc(mat)+'"'+(selected===mat?' selected':'')+'>'+esc(mat)+'</option>').join('');
+ $('stampInletFilterRow').style.display=stampType==='仓入'?'flex':'none';
+ $('stampInletFilter').innerHTML=filterOptions(stampInletItem);
+ $('stampSplitterFilterRows').style.display=stampType==='分流'?'block':'none';
+ if(stampType==='分流'){
+  const splitter=getStampMachine(),ports=getPorts(splitter);
+  for(let slot=0;slot<3;slot++){
+   const index=ast1FilterPortFromGame(splitter,slot);
+   const port=ports.find(p=>p.kind==='out'&&p.index===index);
+   $('stampSplitFilterLabel'+slot).textContent=ast1FilterPortLabel(splitter,index)+' · '+portDirectionArrow(port.side);
+   $('stampSplitFilter'+slot).innerHTML=filterOptions(stampSplitterFilters[slot]);
+  }
+ }
  $('stampRecipeText').style.display=rec||stampType==='仓出'?'block':'none';
  $('stampRecipeText').innerHTML=rec?
   `<div class="machine-config-recipe-head"><span>配方</span><small>${rec.seconds} 秒/次</small></div><div class="machine-config-flow">${Object.entries(rec.inputs).map(([k,n])=>`<span class="machine-config-input">${esc(k)} ×${n}</span>`).join('')||'<span class="machine-config-none">无输入</span>'}<span class="machine-config-arrow">→</span><strong>${esc(rec.output)} ×${rec.qty}</strong></div>`

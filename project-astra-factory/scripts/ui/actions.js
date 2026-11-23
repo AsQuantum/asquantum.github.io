@@ -11,9 +11,17 @@ for(const [id,fn] of [['groupMove',()=>startGroupTransform('move')],['groupCopy'
 $('map').addEventListener('wheel',e=>{e.preventDefault();const p=eventCoords(e),factor=Math.exp(-e.deltaY*.0012),nz=Math.max(3,Math.min(48,camera.z*factor));camera.x=p.x-(p.x-camera.x)*nz/camera.z;camera.y=p.y-(p.y-camera.y)*nz/camera.z;camera.z=nz;draw();},{passive:false});
 document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));$('search').oninput=buildPalette;
 $('palette').onclick=e=>{let b=e.target.closest('[data-stamp]');if(!b)return;setStampType(b.dataset.stamp);tool='stamp';selection=null;draft=null;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.remove('active'));document.querySelectorAll('#palette button').forEach(b=>b.classList.toggle('active',b.dataset.stamp===stampType));updateHint();draw();};
-$('stampLeft').onclick=()=>rotateStamp(-1);$('stampRight').onclick=()=>rotateStamp(1);$('stampCancel').onclick=()=>setTool('select');
+$('stampCancel').onclick=()=>setTool('select');
 $('stampMode').onchange=e=>{stampMode=parseRecipeMode(stampType,e.target.value);saveStampPreference();updateStampControls();updateHint();draw();};
 $('stampItem').onchange=e=>{stampItem=e.target.value;saveStampPreference();updateStampControls();updateHint();draw();};
+$('stampInletFilter').onchange=e=>{
+ stampInletItem=stampKnownFilter(e.target.value);
+ saveStampPreference();updateStampControls();draw();
+};
+for(let slot=0;slot<3;slot++)$('stampSplitFilter'+slot).onchange=e=>{
+ stampSplitterFilters[slot]=stampKnownFilter(e.target.value);
+ saveStampPreference();updateStampControls();draw();
+};
 $('stampPanel').onchange=e=>{stampPanel=Number(e.target.value);saveStampPreference();updateStampControls();draw();};$('undoBend').onclick=undoDraftBend;$('cancelBelt').onclick=cancelDraft;
 $('inspector').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.rotate)rotateSelected(Number(b.dataset.rotate));else if(b.dataset.selectRoute){selection={routeId:b.dataset.selectRoute,crossAt:selection?.crossAt||null};inspectorRefresh();draw();}else if(b.dataset.deleteRoute)deleteRoute(b.dataset.deleteRoute);};
 $('inspector').onchange=e=>{let m=machineById(selection?.machineId);if(!m)return; if(e.target.id==='modeSelect'){

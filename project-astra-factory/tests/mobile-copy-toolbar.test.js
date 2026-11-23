@@ -27,7 +27,7 @@ const document={
  getElementById:id=>id==='map'?map:els[id],
  querySelectorAll:selector=>selector==='[data-tool]'?[selectBtn]:[],
  querySelector:selector=>selector==='.main'?{dataset:{}}:
-  selector==='.mobile-map-tools [data-tool="select"]'?selectBtn:null,
+  selector==='.top .mobile-sim-tool[data-tool="select"]'?selectBtn:null,
  addEventListener(){}
 };
 const window={PointerEvent:function(){},matchMedia:()=>media,addEventListener(){}};

@@ -101,7 +101,7 @@ async function poll(fn){for(let i=0;i<120;i++){try{const v=await fn();if(v)retur
   const choose=await evalJS(`(()=>{
    document.querySelector('.side.left .editor-tools [data-tool="belt"]').click();
    return{tool,view:document.querySelector('.main').dataset.mobileView,
-    quickActive:document.querySelector('.mobile-map-tools [data-tool="belt"]').classList.contains('active')};
+    quickActive:document.querySelector('.top .mobile-sim-tool[data-tool="belt"]').classList.contains('active')};
   })()`);
   assert.deepEqual(choose,{tool:'belt',view:'map',quickActive:true});
   const library=await evalJS(`(()=>{
