@@ -1,7 +1,12 @@
 'use strict';
+function importedUnknownItemOption(item){
+ // Visible only for already imported values; never adds a new selectable ID.
+ if(!item||MATERIALS.includes(item)||item==='任意')return '';
+ return '<option value="'+esc(item)+'" selected disabled data-imported-unknown="true">'+esc(item)+'</option>';
+}
 function warehouseInFilterHTML(m){
  const options=MATERIALS.map(q=>'<option value="'+esc(q)+'" '+(m.inletItem===q?'selected':'')+'>'+esc(q)+'</option>').join('');
- const unknown=m.inletItem&&!MATERIALS.includes(m.inletItem)?'<option value="'+esc(m.inletItem)+'" selected>'+esc(m.inletItem)+'</option>':'';
+ const unknown=importedUnknownItemOption(m.inletItem);
  return '<label class="machine-field"><span>入仓物品过滤（全部输入口）</span><select id="warehouseInFilterSelect" class="full"><option value="">任意</option>'+unknown+options+'</select></label>';
 }
 // A disclosure is a view preference, not a machine attribute. Preserve its
@@ -192,14 +197,14 @@ function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosure
   <select id="modeSelect" class="full">${modes.map(q=>`<option value="${esc(q)}" ${String(m.mode)===String(q)?'selected':''}>${esc(recipeOptionLabel(m.type,q))}</option>`).join('')}</select>
  </label>`);
  if(m.type==='仓出')machineProps.push(`<label class="machine-field"><span>仓库取出物品</span>
-  <select id="itemSelect" class="full">${MATERIALS.map(q=>`<option value="${esc(q)}" ${m.item===q?'selected':''}>${esc(q)}</option>`).join('')}</select>
+  <select id="itemSelect" class="full">${importedUnknownItemOption(m.item)}${MATERIALS.map(q=>`<option value="${esc(q)}" ${m.item===q?'selected':''}>${esc(q)}</option>`).join('')}</select>
  </label>`);
  if(m.type==='仓入')machineProps.push(warehouseInFilterHTML(m));
  if(m.type==='分流')machineProps.push(`<div class="machine-filter-options">
   <div class="machine-field-caption">分流出口物品过滤</div>
   ${ports.filter(p=>p.kind==='out').map(p=>`<label class="machine-field"><span>${esc(ast1FilterPortLabel(m,p.index))} · ${esc(p.side)}</span>
     <select data-out-filter="${p.index}" aria-label="${esc(ast1FilterPortLabel(m,p.index))} 输出物品">
-     <option value="">任意</option>${MATERIALS.map(q=>`<option value="${esc(q)}" ${p.filter===q?'selected':''}>${esc(q)}</option>`).join('')}
+     <option value="">任意</option>${importedUnknownItemOption(p.filter)}${MATERIALS.map(q=>`<option value="${esc(q)}" ${p.filter===q?'selected':''}>${esc(q)}</option>`).join('')}
     </select></label>`).join('')}
   </div>`);
  root.innerHTML=`<div class="inspector-machine">

@@ -10,12 +10,14 @@ const FACTORY_JSON_BASE_MACHINE=new Set(['id','type','x','y','face','mode']);
 const FACTORY_JSON_BASE_ROUTE=new Set(['id','from','to','path']);
 const FACTORY_JSON_DANGEROUS=new Set(['__proto__','prototype','constructor']);
 function compactItem(value){
- return typeof value==='string'&&AST1_ITEM_IDS[value]!==undefined?AST1_ITEM_IDS[value]:value;
+ if(value===''||value==='任意')return value;
+ const id=ast1ItemNumber(value);
+ return id===undefined?value:id;
 }
 function expandItem(value){
+ if(typeof value==='string')return ast1CanonicalItem(value);
  if(typeof value!=='number')return value;
- if(!Number.isInteger(value)||!AST1_ITEMS[value])throw Error('JSON 物品 ID 不存在：'+value);
- return AST1_ITEMS[value];
+ return ast1ItemLabel(value);
 }
 function compactOptionalFields(obj,skip){
  const extras={};

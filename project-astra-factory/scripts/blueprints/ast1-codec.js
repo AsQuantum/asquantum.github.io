@@ -32,7 +32,7 @@ function ast1GetPort(m,kind,index){return getPorts(m).find(p=>p.kind===kind&&p.i
 function ast1ExtraItems(record){
  return Array.from({length:record[6]},(_,i)=>{
   const id=record[7+i*2]|(record[8+i*2]<<8);
-  return {id,item:id===0?'任意':(AST1_ITEMS[id]||'未识别游戏物品 #'+id)};
+  return {id,item:ast1ItemLabel(id)};
  });
 }
 // Belt-route indices [front,left,right], but filter fields [front,right,left].
@@ -76,13 +76,13 @@ function ast1Decode(code){
   if(t==='仓出'){
    if(extend!==1)throw Error(`第${i}台仓库取出口配置结构暂不支持`);
    const itemId=record[7]|record[8]<<8;
-   m.item=AST1_ITEMS[itemId]||`未识别游戏物品 #${itemId}`;
+   m.item=ast1ItemLabel(itemId);
    m.ast1Meta.originalItem=m.item;
   }
   if(t==='仓入'){
     if(extend!==0&&extend!==1)throw Error('Unsupported AST1 warehouse inlet data at index '+i);
     const matid=extend===1?(record[7]|(record[8]<<8)):0;
-    m.inletItem=matid?(AST1_ITEMS[matid]||('未识别游戏物品 #'+matid)):'';
+    m.inletItem=matid?ast1ItemLabel(matid):'';
     m.ast1Meta.originalInletItem=m.inletItem;
    }
   if(t==='电脑'){
@@ -95,7 +95,7 @@ function ast1Decode(code){
    if(extend!==0&&extend!==3)throw Error(`第${i}台分流器过滤参数结构暂不支持`);
    const filters={};for(let port=0;port<(extend===3?3:0);port++){
     const matid=record[7+2*port]|record[8+2*port]<<8;
-    if(matid){const p=ast1FilterPortFromGame(m,port);filters[p]=AST1_ITEMS[matid]||`未识别游戏物品 #${matid}`;}
+    if(matid){const p=ast1FilterPortFromGame(m,port);filters[p]=ast1ItemLabel(matid);}
    }
    m.outFilters=filters;m.ast1Meta.originalOutFilters=JSON.stringify(filters);
   }
@@ -147,13 +147,13 @@ function ast1ToBytes(){
   }
   if(m.type==='仓出'){
    const item=m.item||m.ast1Meta?.originalItem;
-   let id=AST1_ITEM_IDS[item];
+   let id=ast1ItemNumber(item);
    if(id===undefined&&item===m.ast1Meta?.originalItem&&rec[6]===1)id=rec[7]|(rec[8]<<8);
    if(id===undefined)throw Error(`仓库取出口 ${m.id} 的物料 ${item} 尚未获得游戏物品ID，不能安全导出`);
    rec[6]=1;rec.splice(7,rec.length-7,id&255,(id>>8)&255);
   }else if(m.type==='仓入'){
     const item=m.inletItem||'';
-    let id=!item||item==='任意'?0:AST1_ITEM_IDS[item];
+    let id=!item||item==='任意'?0:ast1ItemNumber(item);
     if(id===undefined&&old?.[6]===1&&item===m.ast1Meta?.originalInletItem)id=old[7]|(old[8]<<8);
     if(id===undefined)throw Error('Warehouse inlet '+m.id+' has unknown filter item ID: '+item);
     if(!old||item!==m.ast1Meta?.originalInletItem){rec[6]=id?1:0;rec.splice(7,rec.length-7,...(id?[id&255,(id>>8)&255]:[]));}
@@ -163,7 +163,7 @@ function ast1ToBytes(){
     let extra=[],filtered=false;
     for(let gp=0;gp<3;gp++){
      const hp=ast1FilterPortFromGame(m,gp),item=m.outFilters?.[hp]||'';
-     const id=!item||item==='任意'?0:AST1_ITEM_IDS[item];
+     const id=!item||item==='任意'?0:ast1ItemNumber(item);
      if(id===undefined)throw Error(`分流器 ${m.id} 出口${gp+1} 的过滤物料 ${item} 尚未识别游戏ID`);
      if(id!==0)filtered=true;
      extra.push(id&255,(id>>8)&255);

@@ -7,6 +7,9 @@ function recordWarehouseMovement(direction,item){
  bucket[direction][item]=(bucket[direction][item]||0)+1;
 }
 function ledgerNumber(v,decimals=2){return Number(v||0).toFixed(decimals);}
+function ledgerMaterialLabel(item){
+ return '<span aria-hidden="true" style="color:'+materialColor(item)+'">●</span> '+esc(item);
+}
 function ledgerNetCell(net){net=Math.abs(Number(net)||0)<0.005?0:Number(net);return `<td class="${net>1e-8?'positive':net<-1e-8?'negative':''}">${net>1e-8?'+':''}${ledgerNumber(net)}</td>`;}
 
 // Static theory is assembled only on layout changes. Simulation ticks update
@@ -16,7 +19,8 @@ function warehouseView(theoryRows=false){
  const budget=theoreticalBudget||{inflow:{},outflow:{}};
  const materialSet=new Set([...Object.keys(budget.inflow||{}),...Object.keys(budget.outflow||{}),...Object.keys(ware||{}),
   ...Object.keys(sim?.inbound||{}),...Object.keys(sim?.outbound||{}),
-  ...state.machines.filter(m=>m.type==='仓出').map(m=>m.item).filter(Boolean)]);
+  ...state.machines.filter(m=>m.type==='仓出').map(m=>m.item).filter(Boolean),
+  ...state.machines.filter(m=>m.type==='仓入').map(m=>m.inletItem).filter(Boolean)]);
  const known=[...MATERIALS,...REQUIRED_STOCK];
  const materials=[...materialSet].filter(Boolean).sort((a,b)=>{
   const ia=known.indexOf(a),ib=known.indexOf(b);
@@ -24,7 +28,7 @@ function warehouseView(theoryRows=false){
  });
  const tRows=theoryRows?materials.map(mat=>{
   const inc=(budget.inflow[mat]||0)*60,out=(budget.outflow[mat]||0)*60;
-  return `<tr><td class="ledger-name" title="${esc(mat)}">${esc(mat)}</td><td>${ledgerNumber(inc)}</td><td>${ledgerNumber(out)}</td>${ledgerNetCell(inc-out)}</tr>`;
+  return `<tr><td class="ledger-name" title="${esc(mat)}">${ledgerMaterialLabel(mat)}</td><td>${ledgerNumber(inc)}</td><td>${ledgerNumber(out)}</td>${ledgerNetCell(inc-out)}</tr>`;
  }).join(''):'';
  const elapsedMinutes=Math.floor((simTime+1e-7)/60);
  const finished=elapsedMinutes>0?sim?.minuteBuckets?.[elapsedMinutes-1]:null;
@@ -40,7 +44,7 @@ function warehouseSummaryMarkup(v){
 function warehouseActualMarkup(v){
  const aRows=v.materials.map(mat=>{
   const inc=v.showBucket.inbound[mat]||0,out=v.showBucket.outbound[mat]||0;
-  return `<tr><td class="ledger-name" title="${esc(mat)}">${esc(mat)}</td><td>${inc}</td><td>${out}</td>${ledgerNetCell(inc-out)}<td>${ware[mat]||0}</td></tr>`;
+  return `<tr><td class="ledger-name" title="${esc(mat)}">${ledgerMaterialLabel(mat)}</td><td>${inc}</td><td>${out}</td>${ledgerNetCell(inc-out)}<td>${ware[mat]||0}</td></tr>`;
  }).join('');
  const history=v.recentBuckets.map((bk,i)=>{
   const minute=v.elapsedMinutes-v.recentBuckets.length+i+1;

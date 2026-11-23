@@ -91,10 +91,13 @@ function expandOldFactoryLayout(v){
      if(corrected&&m.mode===m.ast1Meta.originalMode){m.mode=corrected;m.ast1Meta.originalMode=corrected;}
     }
    m.item=m.item||'钛合金锭';delete m.level;
+   if(m.item)m.item=ast1CanonicalItem(m.item);
+   if(m.inletItem)m.inletItem=ast1CanonicalItem(m.inletItem);
+   if(m.outFilters)for(const p of Object.keys(m.outFilters))m.outFilters[p]=ast1CanonicalItem(m.outFilters[p]);
     if(m.type==='仓入'&&m.inletItem===undefined){
      const raw=m.ast1Meta?.record;
      const id=raw?.[0]===10&&raw[6]===1?(raw[7]|(raw[8]<<8)):0;
-     m.inletItem=id?(AST1_ITEMS[id]||('未识别游戏物品 #'+id)):'';
+     m.inletItem=id?(ast1ItemLabel(id)):'';
      if(m.ast1Meta)m.ast1Meta.originalInletItem=m.inletItem;
     }
      // Restore original game item IDs after correcting the coil/wafer ID map.
@@ -115,7 +118,7 @@ function expandOldFactoryLayout(v){
        const fixed={};
        if(raw[6]===3)for(let gp=0;gp<3;gp++){
         const id=raw[7+gp*2]|(raw[8+gp*2]<<8);
-        if(id)fixed[ast1FilterPortFromGame(m,gp)]=AST1_ITEMS[id]||('未识别游戏物品 #'+id);
+        if(id)fixed[ast1FilterPortFromGame(m,gp)]=ast1ItemLabel(id);
        }
        m.outFilters=fixed;meta.originalOutFilters=JSON.stringify(fixed);
       }

@@ -193,7 +193,22 @@ function draw(animationOnly=false){
 }
 
 function hexAlpha(h,a){const x=h.replace('#','');let r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16);return `rgba(${r},${g},${b},${a})`;}
-function materialColor(s){let x=0;for(let i=0;i<s.length;i++)x=(x*31+s.charCodeAt(i))>>>0;return `hsl(${x%360} 85% 71%)`;}
+function materialColor(s){
+ const label=String(s??'');
+ // Imported unknown item colors are deterministic hashes of ItemID.
+ // Unknown items never enter the selectable catalog.
+ const number=/^(?:物品\s*#\s*|(?:未识别|未知)游戏物品\s*#\s*)(\d+)$/u.exec(label);
+ if(number){
+  let hash=Number(number[1])>>>0;
+  hash=Math.imul(hash^(hash>>>16),0x45d9f3b)>>>0;
+  hash=Math.imul(hash^(hash>>>16),0x45d9f3b)>>>0;
+  hash=(hash^(hash>>>16))>>>0;
+  return 'hsl('+(hash%360)+' 82% 67%)';
+ }
+ let hash=0;
+ for(let i=0;i<label.length;i++)hash=(Math.imul(hash,31)+label.charCodeAt(i))>>>0;
+ return 'hsl('+(hash%360)+' 85% 71%)';
+}
 function renderMaterialLegend(){
  $('materialLegend').innerHTML=MATERIALS.map(item=>`<div class="material-legend-row" title="${esc(item)}"><span class="material-legend-dot" style="background:${materialColor(item)}" aria-hidden="true"></span><span class="material-legend-name">${esc(item)}</span></div>`).join('');
 }
