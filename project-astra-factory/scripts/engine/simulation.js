@@ -10,8 +10,8 @@ function routeLength(r){return (r.path?.length||0);}
 function packetCoords(r,p){
  const path=r.path||[],n=path.length;
  if(!n)return null;
- const source=machineById(r.from.id),target=machineById(r.to.id);
- const op=source&&outPort(source,r.from.port),ip=target&&inPort(target,r.to.port);
+ const source=machineById(r.from.id),target=r.to&&machineById(r.to.id);
+ const op=source&&outPort(source,r.from.port),ip=r.to?(target&&inPort(target,r.to.port)):openRouteVirtualEnd(r.path,op);
  if(!op||!ip)return null;
  const first=path[0],last=path[n-1],d=Math.max(0,Math.min(n,p.distance));
  // Adjacent physical port CENTER is used only to determine the outer tile's entry/exit direction.
@@ -34,8 +34,8 @@ function sendItem(m,s,index,item){const r=routeFor(m.id,'out',index);if(!r)retur
  if(list.length&&list[list.length-1].distance<ITEM_SPACING-1e-8)return false;
  const last=s.lastSend[index]??-1e6;if(simTime-last<PORT_INTERVAL-1e-6)return false;
  const outFilter=outPort(m,index)?.filter||'';if(outFilter&&outFilter!=='任意'&&outFilter!==item)return false;
- const receiver=machineById(r.to.id);if(!receiver)return false;
- if(!acceptsMaterial(receiver,item,r.to.port))return false;
+ const receiver=r.to&&machineById(r.to.id);
+ if(r.to&&(!receiver||!acceptsMaterial(receiver,item,r.to.port)))return false;
  list.push({item,distance:0});simVisualDirty=true;sim.routes[r.id]=list;s.lastSend[index]=simTime;s.sent[item]=(s.sent[item]||0)+1;return true;}
 function inputCap(m,item,port){let rec=getRecipe(m);
  if(rec){return (rec.inputs[item]||0)*3;}
@@ -79,7 +79,7 @@ function removeBuffered(m,s,item){if(!(s.inputs[item]>0))return false;
 function simulate(dt){simTime+=dt;
  // 队列 index=0 永远是最前面的物品；先移动前车，再移动后车。
  // 接收方停止收货时，最前面的包裹停在机器入口边中点，其余包裹以1米间隔停在连续格边中点。
- for(const r of state.routes){const pk=sim.routes[r.id]||[],target=machineById(r.to.id);const end=routeLength(r);
+ for(const r of state.routes){const pk=sim.routes[r.id]||[],target=r.to&&machineById(r.to.id);const end=routeLength(r);
   for(let i=0;i<pk.length;i++){
    const ahead=i===0?end:pk[i-1].distance-ITEM_SPACING;
    const was=pk[i].distance;
