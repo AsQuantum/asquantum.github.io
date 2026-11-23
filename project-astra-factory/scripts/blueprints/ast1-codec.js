@@ -109,16 +109,16 @@ function ast1Decode(code){
  for(let ri=0;ri<routeCount;ri++){
   if(off+7>data.length)throw Error(`第${ri}条线路头不完整`);
   const fi=u16(off),fp=data[off+2],ti=u16(off+3),tp=data[off+5],steps=data[off+6],np=Math.ceil(Math.max(0,steps-1)/4);
-  if(fi>=machines.length||ti>=machines.length||steps<1||off+7+np>data.length)throw Error(`第${ri}条线路索引、步数或二进制长度无效`);
-  const sm=machines[fi],tm=machines[ti],outidx=ast1PortFromGame(sm,'out',fp),inidx=ast1PortFromGame(tm,'in',tp),sp=ast1GetPort(sm,'out',outidx),ep=ast1GetPort(tm,'in',inidx);
-  if(!sp||!ep)throw Error(`第${ri}条线路连接了无效的机器接口`);
+  if(fi>=machines.length||(ti!==0xffff&&ti>=machines.length)||steps<1||off+7+np>data.length)throw Error(`第${ri}条线路索引、步数或二进制长度无效`);
+  const sm=machines[fi],tm=ti===0xffff?null:machines[ti],outidx=ast1PortFromGame(sm,'out',fp),inidx=tm?ast1PortFromGame(tm,'in',tp):null,sp=ast1GetPort(sm,'out',outidx),ep=tm?ast1GetPort(tm,'in',inidx):null;
+  if(!sp||(tm&&!ep))throw Error(`第${ri}条线路连接了无效的机器接口`);
   const path=[[sp.ex,sp.ey]];
   for(let j=0;j<steps-1;j++){
    const d=(data[off+7+Math.floor(j/4)]>>((j%4)*2))&3,vec=AST1_DIRECTIONS[d],v=path[path.length-1];
    path.push([v[0]+(sm.ast1Mirrored?-vec[0]:vec[0]),v[1]+vec[1]]);
   }
-  if(path.at(-1)[0]!==ep.ex||path.at(-1)[1]!==ep.ey)throw Error(`第${ri}条线路解码后未命中游戏接口 ${path.at(-1)}≠${[ep.ex,ep.ey]}`);
-  routes.push({id:'ast1_r'+ri,from:{id:sm.id,port:outidx},to:{id:tm.id,port:inidx},path});
+  if(ep&&(path.at(-1)[0]!==ep.ex||path.at(-1)[1]!==ep.ey))throw Error(`第${ri}条线路解码后未命中游戏接口 ${path.at(-1)}≠${[ep.ex,ep.ey]}`);
+  routes.push({id:'ast1_r'+ri,from:{id:sm.id,port:outidx},to:tm?{id:tm.id,port:inidx}:null,path});
   off+=7+np;
  }
  if(off!==data.length)throw Error(`蓝图尾部还有${data.length-off}字节未解析，可能是另一个格式版本`);
@@ -184,13 +184,13 @@ function ast1ToBytes(){
  });
  ast1WriteU16(buf,rs.length);
  for(let i=0;i<rs.length;i++){
-  const route=rs[i],fi=ids.get(route.from.id),ti=ids.get(route.to.id);
+  const route=rs[i],fi=ids.get(route.from.id),ti=route.to?ids.get(route.to.id):0xffff;
   if(fi===undefined||ti===undefined)throw Error('第'+i+'条线路引用了不存在的机器');
-  const sm=machineById(route.from.id),tm=machineById(route.to.id),sp=outPort(sm,route.from.port),ep=inPort(tm,route.to.port),path=route.path;
-  if(!sp||!ep||!Array.isArray(path)||!path.length||path.length>255)throw Error(`第${i}条线路的接口或长度无法用AST1编码（最多255格）`);
-  if(path[0][0]!==sp.ex||path[0][1]!==sp.ey||path.at(-1)[0]!==ep.ex||path.at(-1)[1]!==ep.ey)
+  const sm=machineById(route.from.id),tm=route.to&&machineById(route.to.id),sp=sm&&outPort(sm,route.from.port),ep=route.to&&(tm&&inPort(tm,route.to.port)),path=route.path;
+  if(!sp||(route.to&&!ep)||!Array.isArray(path)||!path.length||path.length>255)throw Error(`第${i}条线路的接口或长度无法用AST1编码（最多255格）`);
+  if(path[0][0]!==sp.ex||path[0][1]!==sp.ey||(ep&&(path.at(-1)[0]!==ep.ex||path.at(-1)[1]!==ep.ey)))
    throw Error(`第${i}条线路首尾端口不匹配，无法导出游戏蓝图`);
-  const fp=ast1PortToGame(sm,'out',route.from.port),tp=ast1PortToGame(tm,'in',route.to.port);
+  const fp=ast1PortToGame(sm,'out',route.from.port),tp=route.to?ast1PortToGame(tm,'in',route.to.port):0;
   ast1WriteU16(buf,fi);buf.push(fp);ast1WriteU16(buf,ti);buf.push(tp,path.length);
   let byte=0;
   for(let k=1;k<path.length;k++){
