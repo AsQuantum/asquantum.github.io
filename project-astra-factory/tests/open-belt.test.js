@@ -603,3 +603,92 @@ test('unfinished open belt also hides red on other tiles and previews extension 
  assert.equal(beltTrim.hoverAnchor,true);
  assert.equal(draft.preview,null,'armed deletion tile suppresses continuation ghost');
 }));
+
+test('continuous placement clicking its own last confirmed tile ends placing without cutting',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const m={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},p=outPort(m,0);
+ state={name:'continuous placement',machines:[m],routes:[]};tool='belt';
+ const click=(x,y)=>onPointerDown({button:0,pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ click(p.x,p.y);
+ assert.equal(draft.phase,'placing');
+ click(p.ex+2,p.ey);
+ assert.equal(draft.phase,'placing');
+ const r=state.routes[0],previous=copy(r.path);
+ assert.equal(r.to,null);
+ assert.equal(beltTrim.index,-1,'confirmed waypoint is placement, not delete selection');
+ click(...r.path.at(-1));
+ assert.equal(draft,null,'clicking current confirmed tip finishes placement');
+ assert.equal(beltTrim,null,'no red trim selection is armed');
+ assert.deepEqual(r.path,previous,'no confirmed cells may be cut by finishing');
+ assert.equal(tool,'belt','belt tool remains active');
+ click(...r.path.at(-1));
+ assert.equal(draft.phase,'editing','reselecting the same line starts separate edit interaction');
+ assert.equal(beltTrim.index,r.path.length-1);
+ assert.equal(beltTrim.hoverAnchor,true);
+}));
+test('editing an old open belt then adding one tile switches to placing and next tip click ends',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const m={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},p=outPort(m,0);
+ const cells=[[p.ex,p.ey],[p.ex+1,p.ey]];
+ const r={id:'r1',from:{id:m.id,port:0},to:null,path:copy(cells)};
+ state={name:'edit into place',machines:[m],routes:[r]};tool='belt';
+ const click=(x,y)=>onPointerDown({button:0,pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ click(...cells.at(-1));
+ assert.equal(draft.phase,'editing');
+ assert.equal(beltTrim.index,1);
+ click(p.ex+2,p.ey);
+ assert.equal(r.path.length,3,'one new tile is confirmed');
+ assert.equal(draft.phase,'placing','editing -> placing after any committed extension');
+ assert.equal(beltTrim.index,-1,'cut selection must clear when adding a tile');
+ click(...r.path.at(-1));
+ assert.equal(draft,null,'new tip now finishes placement, not deletion');
+ assert.equal(beltTrim,null);
+ assert.equal(r.path.length,3);
+ click(...r.path.at(-1));
+ assert.equal(draft.phase,'editing','a later independent click starts editing');
+ click(...r.path.at(-1));
+ assert.equal(r.path.length,2,'only a separate deliberate editing double click trims the tail');
+ assert.equal(draft.phase,'placing','cutting the tail begins a new continuation placement');
+}));
+test('a rotated confirmed last tile renders solid while only newly proposed tiles are dashed',()=>run(function(){
+ // Spy on the actual canvas painter, not merely preview path geometry.
+ const logs=[],grid=[];
+ let dash=[];
+ for(const method of ['setTransform','clearRect','fillRect','save','restore','translate','scale',
+  'beginPath','closePath','strokeRect','fillText'])ctx[method]=()=>{};
+ ctx.setLineDash=v=>{dash=v.slice();};
+ ctx.moveTo=(x,y)=>grid.push([x,y]);
+ ctx.lineTo=(x,y)=>grid.push([x,y]);
+ ctx.stroke=()=>{if(grid.length)logs.push({color:ctx.strokeStyle,width:ctx.lineWidth,
+  dash:dash.slice(),coords:grid.slice()});grid.length=0;};
+ paintMachineTextAtZoom=function(){};
+ paintMachineIndicators=function(){};
+ paintPortSocket=function(){};
+ missingMaterials=function(){return[];};
+ machineOutputWarning=function(){return null;};
+ pix={w:600,h:600,dpr:1};camera={x:0,y:0,z:10};
+ const m={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},p=outPort(m,0);
+ const cells=[[p.ex,p.ey],[p.ex+1,p.ey]],extended=[...cells,[p.ex+2,p.ey]];
+ const r={id:'r1',from:{id:m.id,port:0},to:null,path:cells};
+ state={name:'solid final tile',machines:[m],routes:[r]};
+ selection=null;multiSelection=null;stampType=null;marquee=null;groupTransform=null;beltTrim=null;
+ draft={from:copy(r.from),routeId:r.id,path:copy(cells),preview:copy(extended),
+  previewTo:null,phase:'placing'};
+ drawStaticScene();
+ const solid=logs.filter(x=>x.color==='#f2bf4b'&&x.width===.29);
+ const dashed=logs.filter(x=>x.color==='#ffd176'&&x.width===.29);
+ assert.equal(solid.length,1,'already placed final tile has exactly one solid preview stroke');
+ assert.deepEqual(solid[0].dash,[],'confirmed final tile is NEVER dashed');
+ assert.equal(dashed.length,1,'new unplaced tile has dashed ghost stroke');
+ assert(dashed[0].dash.length>0);
+ logs.length=0;
+ draft.preview=copy(cells);
+ drawStaticScene();
+ const solidTurn=logs.filter(x=>x.color==='#f2bf4b'&&x.width===.29);
+ assert.equal(solidTurn.length,1,'already confirmed tile remains solid when only its orientation is previewed');
+ assert.deepEqual(solidTurn[0].dash,[]);
+ assert.equal(logs.filter(x=>x.color==='#ffd176'&&x.width===.29).length,0,
+  'zero-new-cell orientation preview must never introduce dashed geometry');
+}));

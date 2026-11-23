@@ -131,11 +131,11 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  paintMachineTextAtZoom(m,w,h,z,true);}
  if(draft){let locked=draft.path||[],all=draft.preview||locked;
  let startMachine=machineById(draft.from.id),startPort=startMachine&&outPort(startMachine,draft.from.port);
- const drawCells=(pts,color,dashed,startIndex=0,to=null)=>{
+ const drawCells=(pts,color,dashed,startIndex=0,to=null,endIndex=pts.length)=>{
   if(!pts?.length||!startPort)return;
   ctx.strokeStyle=color;ctx.lineWidth=.29;ctx.lineCap='butt';ctx.lineJoin='round';
   ctx.setLineDash(dashed?[.35,.16]:[]);ctx.beginPath();
-  for(let i=startIndex;i<pts.length;i++){
+  for(let i=startIndex;i<endIndex;i++){
    const [x,y]=pts[i],tile=draftPreviewTile(pts,i,startPort,to);
    if(!tile)continue;
    // Draw both arms of the last tile. The target inlet determines whether
@@ -146,10 +146,17 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
   }
   ctx.stroke();ctx.setLineDash([]);
  };
- // Always redraw the existing last tile when extending or connecting a
- // persisted route. A neighbouring inlet can change only its outgoing arm.
+ // A confirmed final tile EXISTS already: it may change facing, but must
+ // stay SOLID. Only new, uncommitted belt cells are shown dashed.
  const persisted=!!draft.routeId&&state.routes.some(r=>r.id===draft.routeId);
- if(draft.preview)drawCells(all,'#ffd176',true,persisted?Math.max(0,locked.length-1):0,draft.previewTo);
+ if(draft.preview){
+  if(persisted&&locked.length){
+   const lastConfirmed=locked.length-1;
+   drawCells(all,'#f2bf4b',false,lastConfirmed,draft.previewTo,locked.length);
+   if(all.length>locked.length)
+    drawCells(all,'#ffd176',true,locked.length,draft.previewTo);
+  }else drawCells(all,'#ffd176',true,0,draft.previewTo);
+ }
  if(!persisted&&!draft.preview)drawCells(locked,'#f2bf4b',false);
  }
  if(marquee){const x=Math.min(marquee.from.x,marquee.to.x),y=Math.min(marquee.from.y,marquee.to.y),w=Math.abs(marquee.to.x-marquee.from.x)+1,h=Math.abs(marquee.to.y-marquee.from.y)+1;ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
@@ -215,7 +222,7 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
      if(lastKept?.type==='turn')selected.openEndSide=lastKept.outgoing;
      else delete selected.openEndSide;
      draft={from:copy(selected.from),fromName:routeTitle(selected),
-      path:copy(selected.path),routeId:selected.id,history:[],preview:null};
+      path:copy(selected.path),routeId:selected.id,history:[],preview:null,phase:'placing'};
      // Do not instantly paint the just-deleted tail as a new ghost preview.
      // It becomes extendable after the pointer moves to another cell.
     }
@@ -246,9 +253,15 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    return;
   }
   if(r){
+   // During continuous placement a click on the LAST confirmed tile means
+   // finish, not select that tile for a destructive second click.
+   if(draft?.phase==='placing'&&draft.routeId===r.id&&
+      idx===r.path.length-1){finishBeltPlacement();return;}
    // An unfinished route may END on another belt (or its own earlier straight
    // strand) if it arrives perpendicularly. Keep the two routes unconnected.
    if(draft&&commitDraftAtCrossing(c,r))return;
+   // Do not implicitly switch from placement to modifying an existing route.
+   if(draft?.phase==='placing'){finishBeltPlacement();return;}
    // An invalid attempt on someone else's belt cancels the active route edit;
    // it must never silently switch to selecting or deleting the other route.
    if(draft&&draft.routeId&&draft.routeId!==r.id){
@@ -259,7 +272,7 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    beltTrim={routeId:r.id,index:idx,cell:[c.x,c.y],hoverOutside:false,hoverAnchor:true};
    draft=r.to?null:{
     from:copy(r.from),fromName:routeTitle(r),
-    path:copy(r.path),routeId:r.id,history:[],preview:null
+    path:copy(r.path),routeId:r.id,history:[],preview:null,phase:'editing'
    };
    updateHint();updateDraftPreview();draw();
    notify('仅在悬停刚点击的格子时显示红色尾段；再次点击同一格删除，点击其他线段格取消');
@@ -271,7 +284,7 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
     if(routeFor(hit.m.id,'out',hit.p.index))
      return notify('该输出口已有线路；请点击对应传送带进行编辑','bad');
     draft={from:{id:hit.m.id,port:hit.p.index},fromName:label(hit.m),
-     path:[],history:[],preview:null,routeId:null};
+     path:[],history:[],preview:null,routeId:null,phase:'placing'};
     updateDraftPreview();updateHint();draw();
    }else notify('请先点击机器内部的橙色输出口');
   }else{

@@ -17,6 +17,15 @@ function resetEditorMode(){
 }
 function rotateStamp(steps=1){if(!stampType)return;const faces=['E','S','W','N'];stampFace=faces[(faces.indexOf(stampFace)+steps+4)%4];saveStampPreference();updateHint();draw();}
 function cancelDraft(){if(!draft&&!beltTrim)return;draft=null;beltTrim=null;updateHint();notify('已退出线路编辑；已确认的传送带保留');draw();}
+// A placement is not an interaction with an already drawn route.
+// While placing, clicking the last confirmed tile FINISHES placement rather
+// than arming a destructive red-tail edit. Belt tool remains selected.
+function finishBeltPlacement(){
+ if(!draft||draft.phase!=='placing')return false;
+ draft=null;beltTrim=null;updateHint();
+ notify('已结束当前线路铺设；确认的线段已保留');
+ draw();return true;
+}
 function undoDraftBend(){
  if(!draft)return;
  if(!draft.history?.length)return cancelDraft();
@@ -68,11 +77,17 @@ function saveDraftRoute(path,to=null){
   state.routes.push(route);draft.routeId=route.id;
  }
  draft.path=copy(path);
- // A newly confirmed open segment stays active for continued routing.
- // Hovering its own cells previews a red suffix immediately; hovering away
- // previews the next leg. Escape only exits editing, not the saved segment.
+ // A confirmed open segment stays active for another placement leg.
+ // It is no longer an edit selection: clicking its last confirmed tile
+ // finishes placing, and no red deletion preview is armed. Escape only exits
+ // the editor, never removes already saved route cells.
  if(to){draft=null;beltTrim=null;}
- else beltTrim={routeId:draft.routeId,index:-1,cell:null,hoverOutside:false};
+ else{
+  // Every successfully confirmed waypoint begins a NEW placement leg, even
+  // if the route had originally been opened through existing-line editing.
+  draft.phase='placing';
+  beltTrim={routeId:draft.routeId,index:-1,cell:null,hoverOutside:false};
+ }
  afterChange(to?'已连接线路到输入口':'已确认放置悬空线路；可继续延长或连接蓝色输入口');
  if(draft)updateDraftPreview();
  updateHint();draw();return true;
