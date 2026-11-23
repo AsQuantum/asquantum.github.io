@@ -19,7 +19,18 @@ function selectedGroupData(){
  if(!selected.length)return null;
  const ids=new Set(selected);
  const machines=copy(state.machines.filter(m=>ids.has(m.id)));
- const routes=copy(state.routes.filter(r=>multiSelection?.routeIds.includes(r.id)&&ids.has(r.from.id)&&ids.has(r.to.id)));
+ // Keep only the source-connected prefix inside a marquee. A middle/tail-only
+ // fragment has no output machine and is not a legal AST1 route.
+ const box=multiSelection?.bounds;
+ const inside=([x,y])=>!box||(x>=box.x&&y>=box.y&&x<box.x+box.w&&y<box.y+box.h);
+ const routes=state.routes.filter(r=>multiSelection?.routeIds.includes(r.id)&&ids.has(r.from.id))
+  .map(r=>{
+   const prefix=[];
+   for(const cell of r.path){if(!inside(cell))break;prefix.push(cell);}
+   if(!prefix.length)return null;
+   const keepDestination=prefix.length===r.path.length&&r.to&&ids.has(r.to.id);
+   return {...copy(r),path:copy(prefix),to:keepDestination?copy(r.to):null};
+  }).filter(Boolean);
  return {machines,routes,bounds:groupBounds(machines,routes)};
 }
 function updateGroupControls(){
@@ -44,8 +55,8 @@ function selectGroupRectangle(a,b){
  const top=Math.min(a.y,b.y),bottom=Math.max(a.y,b.y);
  const machines=state.machines.filter(m=>{const [w,h]=dims(m);
   return m.x<=right&&m.x+w-1>=left&&m.y<=bottom&&m.y+h-1>=top;});
- const routes=state.routes.filter(r=>r.path.length&&r.path.every(([x,y])=>x>=left&&x<=right&&y>=top&&y<=bottom));
- multiSelection=machines.length||routes.length?{machineIds:machines.map(m=>m.id),routeIds:routes.map(r=>r.id)}:null;
+ const routes=state.routes.filter(r=>r.path.length&&r.path.some(([x,y])=>x>=left&&x<=right&&y>=top&&y<=bottom));
+ multiSelection=machines.length||routes.length?{machineIds:machines.map(m=>m.id),routeIds:routes.map(r=>r.id),bounds:{x:left,y:top,w:right-left+1,h:bottom-top+1}}:null;
  groupTransform=null;selection=null;inspectorRefresh();updateGroupControls();draw();
  if(multiSelection)notify(`框选 ${machines.length} 台机器、${routes.length} 条完整线路（G 移动 / Ctrl+D 复制）`,'good');
 }
@@ -143,17 +154,17 @@ function createGroupPlan(transform){
  const routes=source.routes.map((old,i)=>{
   const next=copy(old);
   if(mode==='copy')next.id='__group_preview_r'+i;
-  next.from.id=remap.get(old.from.id);next.to.id=remap.get(old.to.id);
+  next.from.id=remap.get(old.from.id);if(next.to)next.to.id=remap.get(old.to.id);
   next.from.port=portRemaps.get(old.from.id)?.out[old.from.port]??old.from.port;
-  next.to.port=portRemaps.get(old.to.id)?.in[old.to.port]??old.to.port;
+  if(next.to)next.to.port=portRemaps.get(old.to.id)?.in[old.to.port]??old.to.port;
   next.path=old.path.map(([x,y])=>{const [rx,ry]=groupRotateCell(x,y,b,rotation);return [transform.x+rx,transform.y+ry];});
   return next;
  });
  const moving=new Set(mode==='move'?source.machines.map(m=>m.id):[]);
  const keptMachines=state.machines.filter(m=>!moving.has(m.id));
  // Any route crossing a moved-group boundary is deliberately disconnected.
- const removedRoutes=state.routes.filter(r=>moving.has(r.from.id)||moving.has(r.to.id));
- const keptRoutes=state.routes.filter(r=>!moving.has(r.from.id)&&!moving.has(r.to.id));
+ const removedRoutes=state.routes.filter(r=>moving.has(r.from.id)||moving.has(r.to?.id));
+ const keptRoutes=state.routes.filter(r=>!moving.has(r.from.id)&&!moving.has(r.to?.id));
  const candidate={...state,machines:[...keptMachines,...machines],routes:[...keptRoutes,...routes]};
  let error=null;
  const original=state;
@@ -199,7 +210,7 @@ function commitGroupTransform(){
   const ids=new Map();
   for(const m of result.machines)if(placed.includes(m.id)){const id='m'+(++idSeed);ids.set(m.id,id);m.id=id;}
   for(const r of result.routes)if(routeIds.includes(r.id)){
-   r.id='r'+(++idSeed);r.from.id=ids.get(r.from.id);r.to.id=ids.get(r.to.id);
+   r.id='r'+(++idSeed);r.from.id=ids.get(r.from.id);if(r.to)r.to.id=ids.get(r.to.id);
   }
   for(let i=0;i<placed.length;i++)placed[i]=ids.get(placed[i]);
  }
@@ -228,7 +239,7 @@ function deleteGroupSelection(){
  snapshot();
  const before=state.routes.length;
  state.machines=state.machines.filter(m=>!ids.has(m.id));
- state.routes=state.routes.filter(r=>!ids.has(r.from.id)&&!ids.has(r.to.id)&&!routeIds.has(r.id));
+ state.routes=state.routes.filter(r=>!ids.has(r.from.id)&&!ids.has(r.to?.id)&&!routeIds.has(r.id));
  const count=ids.size,lines=before-state.routes.length;
  clearGroupSelection();selection=null;
  afterChange(`已删除 ${count} 台机器和 ${lines} 条线路`);
