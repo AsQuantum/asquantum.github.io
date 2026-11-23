@@ -1,5 +1,5 @@
 'use strict';
-function setTool(t){if(groupTransform)cancelGroupTransform();if(t!=='marquee'&&t!=='select')clearGroupSelection();tool=t;stampType=null;draft=null;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));document.querySelectorAll('#palette button').forEach(b=>b.classList.remove('active'));updateHint();draw();}
+function setTool(t){if(groupTransform)cancelGroupTransform();if(t!=='marquee'&&t!=='select')clearGroupSelection();tool=t;stampType=null;draft=null;beltTrim=null;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));document.querySelectorAll('#palette button').forEach(b=>b.classList.remove('active'));updateHint();draw();}
 // Escape/right-click always return to an idle, unselected editor.
 // Never touch persistent layout, undo history, or the copied clipboard.
 function resetEditorMode(){
@@ -9,14 +9,47 @@ function resetEditorMode(){
  marquee=null;
  drag=null;
  draft=null;
+ beltTrim=null;
  spaceDown=false;
  setTool('select');
  updateGroupControls();
  inspectorRefresh();
 }
 function rotateStamp(steps=1){if(!stampType)return;const faces=['E','S','W','N'];stampFace=faces[(faces.indexOf(stampFace)+steps+4)%4];saveStampPreference();updateHint();draw();}
-function cancelDraft(){if(!draft)return;draft=null;updateHint();notify('本次传送带接线已取消');draw();}
-function undoDraftBend(){if(!draft)return;if(draft.history?.length){draft.path=draft.history.pop();draft.preview=null;updateDraftPreview();updateHint();draw();}else cancelDraft();}
+function cancelDraft(){if(!draft&&!beltTrim)return;draft=null;beltTrim=null;updateHint();notify('已退出线路编辑；已确认的传送带保留');draw();}
+function undoDraftBend(){
+ if(!draft)return;
+ if(!draft.history?.length)return cancelDraft();
+ const previous=draft.history.pop();
+ const route=draft.routeId&&state.routes.find(r=>r.id===draft.routeId);
+ if(route){
+  snapshot();
+  if(previous.length){route.path=copy(previous);route.to=null;}
+  else{state.routes=state.routes.filter(r=>r.id!==route.id);draft.routeId=null;}
+ }
+ draft.path=copy(previous);draft.preview=null;
+ if(route)afterChange('已撤销最后一段已确认线路');
+ updateDraftPreview();updateHint();draw();
+}
+// A confirmed waypoint is a real, persistent open-ended AST1 belt.
+// It must survive Escape, switching tools and JSON/AST1 export.
+function saveDraftRoute(path,to=null){
+ if(!draft||!Array.isArray(path)||!path.length)return false;
+ const existing=draft.routeId&&state.routes.find(r=>r.id===draft.routeId);
+ const reason=checkPath(path,draft.from,to,existing?.id);
+ if(reason){notify('线路验证失败：'+reason,'bad');return false;}
+ snapshot();
+ if(existing){existing.path=copy(path);existing.to=to?copy(to):null;}
+ else{
+  const route={id:'r'+(++idSeed),from:copy(draft.from),to:to?copy(to):null,path:copy(path)};
+  state.routes.push(route);draft.routeId=route.id;
+ }
+ draft.path=copy(path);
+ if(to)draft=null;
+ afterChange(to?'已连接线路到输入口':'已确认放置悬空线路；可继续延长或连接蓝色输入口');
+ if(draft)updateDraftPreview();
+ updateHint();draw();return true;
+}
 function draftEndpoint(){if(!draft)return null;const s=outPort(machineById(draft.from.id),draft.from.port);return draft.path.length?draft.path.at(-1):s?[s.ex,s.ey]:null;}
 // Commit waypoints as actual orthogonal belt cells. Locked segments are never recalculated afterwards.
 function draftSegment(target,targetPort=null){
@@ -26,7 +59,7 @@ function draftSegment(target,targetPort=null){
  const startPrev=draft.path.length>1?draft.path.at(-2):src?[src.x,src.y]:null;
  const endNext=targetPort?[targetPort.x,targetPort.y]:null;
  const avoid=new Set(draft.path.slice(0,-1).map(p=>p.join(',')));
- const segment=pathSearch(start,target,avoid,{startPrev,endNext,allowOpenCrossingEnd:!endNext});
+ const segment=pathSearch(start,target,avoid,{startPrev,endNext,allowOpenCrossingEnd:!endNext,excludeRouteId:draft.routeId});
  if(!segment)return null;
  const combined=draft.path.length?[...draft.path,...segment.slice(1)]:segment;
  if(new Set(combined.map(p=>p.join(','))).size!==combined.length)return null;
