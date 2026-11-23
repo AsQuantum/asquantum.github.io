@@ -24,22 +24,28 @@ function tileShape(path,i,src,dst){
   // N→E and E→N have identical geometry, but are two distinct directed turns.
   key:incoming+'>'+outgoing};
 }
+function openRouteVirtualEnd(path,src){
+ if(!path?.length||!src)return null;
+ const last=path.at(-1),prev=path.length>1?path.at(-2):[src.x,src.y];
+ const dx=last[0]-prev[0],dy=last[1]-prev[1];
+ return Math.abs(dx)+Math.abs(dy)===1?{x:last[0]+dx,y:last[1]+dy}:null;
+}
 function routeTile(r,i){
- const a=machineById(r.from.id),b=machineById(r.to.id);
- const src=a&&outPort(a,r.from.port),dst=b&&inPort(b,r.to.port);
+ const a=machineById(r.from.id),b=r.to&&machineById(r.to.id);
+ const src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);
  return src&&dst?tileShape(r.path,i,src,dst):null;
 }
 function orientation(r,i){return routeTile(r,i)?.axis||null;}
 function pathAxis(path,i,src,dst){return tileShape(path,i,src,dst)?.axis||null;}
 function checkPath(path,from,to,excluded){
  if(!Array.isArray(path)||path.length===0)return '线路为空';
- const sm=machineById(from.id),tm=machineById(to.id);
- const src=sm&&outPort(sm,from.port),dst=tm&&inPort(tm,to.port);
+ const sm=machineById(from?.id),tm=to&&machineById(to.id);
+ const src=sm&&outPort(sm,from.port),dst=to?(tm&&inPort(tm,to.port)):openRouteVirtualEnd(path,src);
  if(!src||!dst)return '源或目标接口无效';
- if(path[0][0]!==src.ex||path[0][1]!==src.ey||path.at(-1)[0]!==dst.ex||path.at(-1)[1]!==dst.ey)return '线路首尾没有连接到机器实际接口';
+ if(path[0][0]!==src.ex||path[0][1]!==src.ey||(to&&(path.at(-1)[0]!==dst.ex||path.at(-1)[1]!==dst.ey)))return '线路首尾没有连接到机器实际接口';
  // Each physical interface can be wired once (no hidden branching or merging).
  if(state.routes.some(r=>r.id!==excluded&&r.from.id===from.id&&r.from.port===from.port))return '输出接口已连接其他线路';
- if(state.routes.some(r=>r.id!==excluded&&r.to.id===to.id&&r.to.port===to.port))return '输入接口已连接其他线路';
+ if(to&&state.routes.some(r=>r.id!==excluded&&r.to?.id===to.id&&r.to.port===to.port))return '输入接口已连接其他线路';
  const seen=new Set(),occupied=occupiedRouteMap(excluded);
  for(let i=0;i<path.length;i++){
   const [x,y]=path[i],key=x+','+y;
@@ -63,7 +69,7 @@ function checkPath(path,from,to,excluded){
 // A crossing MUST be traversed straight. Turns can start in the next free cell.
 function pathSearch(start,end,avoid=new Set(),options={}){
  if(!inMap(...start)||!inMap(...end))return null;
- const directions=[[1,0],[0,1],[-1,0],[0,-1]],occ=occupiedRouteMap();
+ const directions=[[1,0],[0,1],[-1,0],[0,-1]],occ=occupiedRouteMap(options.excludeRouteId);
  const kOf=(x,y)=>x+','+y,at=(x,y)=>occ.get(kOf(x,y))||[];
  const dir=(a,b)=>directions.findIndex(d=>a[0]+d[0]===b[0]&&a[1]+d[1]===b[1]);
  const axis=d=>d%2===0?'H':'V';
