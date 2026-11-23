@@ -5,7 +5,7 @@ function possibleSourceMaterials(m,seen=new Set(),throughOutputPort=null){
  if(m.type==='仓出'){if(m.item)result.add(m.item);return result;}
  if(m.type!=='分流'&&m.type!=='汇流')return result;
  const next=new Set(seen);next.add(m.id);
- for(const r of state.routes.filter(r=>r.to.id===m.id)){
+ for(const r of state.routes.filter(r=>r.to?.id===m.id)){
   if(checkPath(r.path,r.from,r.to,r.id))continue;
   for(const mat of possibleSourceMaterials(machineById(r.from.id),next,r.from.port))result.add(mat);
  }
@@ -75,7 +75,7 @@ function warnings(){
  for(const m of state.machines){
   if(['仓入','仓出','分流','汇流','发电','电脑','空间锚点'].includes(m.type))continue;
   for(const mat of missingMaterials(m))unconnected.push(`${label(m)} [${m.id}]：缺 ${mat}`);
-  if(outPort(m,0)&&!routeFor(m.id,'out',0))unservedOutputs.push(`${label(m)} [${m.id}]`);
+  if(outPort(m,0)&&!routeFor(m.id,'out',0)?.to)unservedOutputs.push(`${label(m)} [${m.id}]`);
  }
  for(const r of state.routes){const error=checkPath(r.path,r.from,r.to,r.id);if(error)invalid.push(`${r.label||r.id}: ${error}`);}
  return {unconnected,invalid,unservedOutputs,blocked:blockedPorts()};
@@ -89,7 +89,7 @@ function hasProducerWarehousePath(mat){
   const seen=new Set(),queue=[root.id];
   while(queue.length){const id=queue.shift();if(seen.has(id))continue;seen.add(id);
    for(const r of state.routes.filter(q=>q.from.id===id&&!checkPath(q.path,q.from,q.to,q.id))){
-    const dest=machineById(r.to.id),source=machineById(r.from.id);
+    const dest=r.to&&machineById(r.to.id),source=machineById(r.from.id);
     if(source?.type==='分流'){const f=outPort(source,r.from.port)?.filter;if(f&&f!=='任意'&&f!==mat)continue;}
     if(!dest||!acceptsMaterial(dest,mat,r.to.port))continue;
     if(dest.type==='仓入')return true;
