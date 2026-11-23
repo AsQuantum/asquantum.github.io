@@ -167,5 +167,5 @@ function acceptsMaterial(m,item,idx){
  if(rec)return Object.prototype.hasOwnProperty.call(rec.inputs||{},item);
  return true;
 }
-function routeFor(id,kind,index){return state.routes.find(r=>r[kind==='out'?'from':'to'].id===id&&r[kind==='out'?'from':'to'].port===index)}
-function routeTitle(r){let a=machineById(r.from.id),b=machineById(r.to.id);return `${a?label(a):'?'} → ${b?label(b):'?'}`}
+function routeFor(id,kind,index){return state.routes.find(r=>{const p=r[kind==='out'?'from':'to'];return p?.id===id&&p.port===index;})}
+function routeTitle(r){let a=machineById(r.from.id),b=r.to&&machineById(r.to.id);return `${a?label(a):'?'} → ${r.to?(b?label(b):'?'):'悬空终点'}`}
