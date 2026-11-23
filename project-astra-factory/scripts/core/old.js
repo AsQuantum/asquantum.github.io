@@ -123,7 +123,7 @@ function expandOldFactoryLayout(v){
      }
   }
   for(const [i,r] of incoming.routes.entries()){
-   if(!r||!r.from?.id||!r.to?.id||!Array.isArray(r.path)||!r.path.length||r.path.some(p=>!Array.isArray(p)||p.length!==2||!p.every(Number.isInteger)))
+   if(!r||!r.from?.id||!(r.to===null||r.to?.id)||!Array.isArray(r.path)||!r.path.length||r.path.some(p=>!Array.isArray(p)||p.length!==2||!p.every(Number.isInteger)))
     throw Error(`第${i+1}条线路数据不完整（需要 from、to、path 坐标数组）`);
   }
   repair=repairLegacyIdentifiers(incoming);
