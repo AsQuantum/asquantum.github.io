@@ -210,3 +210,16 @@
  .mobile-help-content .shortcut-desc{min-width:0;flex:1;line-height:1.55}
  .mobile-help-content p{margin:6px 0 0;font-size:11px;line-height:1.65;color:#a5bfd1}
 }
+
+/* Keep the editable scheme name at iOS-safe text size and the popup in the visible viewport. */
+@media(max-width:900px){
+ .top #presetDropdown .preset-combo #presetName{font-size:16px}
+ .top #presetDropdown .preset-list{
+  position:fixed;left:var(--scheme-list-left,10px);right:auto;
+  top:var(--scheme-list-top,60px);
+  width:var(--scheme-list-width,min(340px,calc(100vw - 20px)));
+  min-width:0;max-width:calc(100vw - 20px);
+  max-height:var(--scheme-list-max-height,320px);
+  box-sizing:border-box;overscroll-behavior:contain
+ }
+}
