@@ -70,19 +70,46 @@ function desktopCase(){
 }
 function mobileCase(){
  state={name:'mobile filters',machines:[],routes:[]};selection=null;multiSelection=null;
- groupTransform=null;setStampType('分流');mobileOpenView('machines');
+ groupTransform=null;mobileOpenView('machines');
+ const paletteButton=[...document.querySelectorAll('#palette [data-stamp]')].find(b=>b.dataset.stamp==='分流');
+ paletteButton.click();
+ const groupCard=$('groupControls'),library=$('stampControls').parentElement,originalGroupHome=groupCard.parentNode;
+ const machineLibraryHasNoGroupPanel=originalGroupHome.classList.contains('editor-tools')&&
+  !library.contains(groupCard)&&groupCard.getBoundingClientRect().width===0;
+ const libraryIsOriginal=document.querySelectorAll('#groupControls').length===1&&
+  groupCard.parentNode===originalGroupHome&&!library.contains(groupCard);
+ // Placement controls stay in the existing Tools card, not the machine list.
+ mobileOpenView('tools');
+ const cancelButton=$('groupCancel'),cancelHint=cancelButton.querySelector('small');
+ const cancelStyle=getComputedStyle(cancelButton),cancelHintStyle=getComputedStyle(cancelHint);
+ const cancelRect=cancelButton.getBoundingClientRect(),hintRect=cancelHint.getBoundingClientRect();
+ const cancelEscInline=cancelStyle.display==='flex'&&cancelStyle.flexDirection==='row'&&
+  cancelStyle.whiteSpace==='nowrap'&&cancelHintStyle.display!=='block'&&
+  cancelHintStyle.whiteSpace==='nowrap'&&
+  Math.abs((hintRect.top+hintRect.height/2)-(cancelRect.top+cancelRect.height/2))<4;
+ mobileOpenView('machines');
+ const pendingFace=stampFace;$('mobileRotateRight').click();
+ const pendingRotates=stampFace!==pendingFace;
+ $('mobileRotateLeft').click();
+ const pendingRestores=stampFace===pendingFace;
  const left=$('stampSplitterFilterRows');
  const filterCardVisible=left.style.display==='block'&&left.getBoundingClientRect().width>150;
  const allOptions=[0,1,2].every(i=>$('stampSplitFilter'+i).options.length===MATERIALS.length+1);
  const cardScrollable=getComputedStyle($('stampControls')).overflowY==='auto';
  const noDupButtons=!$('stampLeft')&&!$('stampRight');
  mobileOpenView('map');
+ const mapHasNoGroupOverlay=!document.querySelector('.canvaswrap #groupControls')&&
+  groupCard.parentNode===originalGroupHome;
  const topTools=[...document.querySelector('.top .sim-toolbar').children];
  const select=topTools.findIndex(e=>e.dataset.tool==='select');
  const belt=topTools.findIndex(e=>e.dataset.tool==='belt');
  const run=topTools.findIndex(e=>e.id==='run');
  const topOK=select>=0&&belt>select&&run>belt&&
   getComputedStyle(topTools[select]).display!=='none'&&getComputedStyle(topTools[belt]).display!=='none';
+ const simStep=$('stepMinute'),simStepStyle=getComputedStyle(simStep);
+ const minuteSymbolVisible=simStep.textContent.includes('⏩')&&
+  parseFloat(simStepStyle.fontSize)>=10&&
+  getComputedStyle(simStep,'::after').content==='none';
  const mapTools=document.querySelector('.mobile-map-tools');
  const rotateButtons=!!$('mobileRotateLeft')&&!!$('mobileRotateRight')&&
   !mapTools.querySelector('[data-tool=select]')&&!mapTools.querySelector('[data-tool=belt]');
@@ -102,25 +129,32 @@ function mobileCase(){
  const groupSafe=groupTransform?.rotation===1&&state.machines[0].face==='E';
  cancelGroupTransform();
  const canceled=groupTransform===null&&state.machines[0].face==='E';
- // The original selection toolbar must be directly visible and usable on
- // the map. Reuse the SAME #groupControls card as on desktop.
+ // Keep the original #groupControls card in its editor-tools home. It is
+ // intentionally NOT duplicated or overlaid on the phone map.
  updateGroupControls();
- const groupCard=$('groupControls'),groupDock=$('mobileGroupDock');
- const groupDebug={dock:groupCard.parentNode===groupDock,
-  style:getComputedStyle(groupCard).display,dockStyle:getComputedStyle(groupDock).display,
+ const cancelHiddenForSelection=getComputedStyle($('groupCancel')).display==='none';
+ const groupHome=groupCard.parentNode;
+ const groupDebug={originalSlot:groupHome.classList.contains('editor-tools'),
+  style:getComputedStyle(groupCard).display,
   text:$('groupSelectionInfo').textContent,width:groupCard.getBoundingClientRect().width,
-  moveDisabled:$('groupMove').disabled,copyDisabled:$('groupCopy').disabled,deleteDisabled:$('groupDelete').disabled,
-  view:mobileActiveView};
- const selectedPanelVisible=groupDebug.dock&&groupDebug.style!=='none'&&groupDebug.dockStyle!=='none'&&
-  groupDebug.text.includes('已框选 1 台机器 / 0 条线路')&&
-  groupDebug.width>200&&
-  !groupDebug.moveDisabled&&!groupDebug.copyDisabled&&!groupDebug.deleteDisabled;
+  moveDisabled:$('groupMove').disabled,copyDisabled:$('groupCopy').disabled,
+  deleteDisabled:$('groupDelete').disabled,view:mobileActiveView};
+ const originalSlotPreserved=groupDebug.originalSlot&&
+  !document.querySelector('.canvaswrap #groupControls');
  mobileOpenView('tools');
- const groupToolsRestored=groupCard.parentNode.classList.contains('editor-tools')&&
-  getComputedStyle(groupCard).display!=='none';
+ const selectedPanelVisible=originalSlotPreserved&&groupCard.parentNode===groupHome&&
+  getComputedStyle(groupCard).display!=='none'&&
+  groupDebug.text.includes('已框选 1 台机器')&&
+  groupCard.getBoundingClientRect().width>200&&
+  !groupDebug.moveDisabled&&!groupDebug.copyDisabled&&!groupDebug.deleteDisabled;
+ const groupToolsRestored=selectedPanelVisible;
+ mobileOpenView('machines');
+ const selectedCardHiddenInMachineLibrary=groupCard.parentNode===groupHome&&
+  !$('stampControls').parentNode.contains(groupCard)&&groupCard.getBoundingClientRect().width===0&&
+  $('groupSelectionInfo').textContent.includes('已框选 1 台机器');
  mobileOpenView('map');
- const groupMapRestored=groupCard.parentNode===groupDock&&
-  getComputedStyle(groupCard).display!=='none';
+ const groupMapRestored=groupCard.parentNode===groupHome&&
+  groupCard.style.display==='block'&&groupCard.getBoundingClientRect().width===0;
  document.querySelector('.top .mobile-sim-tool[data-tool=select]').click();
  const cleanSelect=tool==='select'&&!selection&&!stampType&&!groupTransform&&
   getComputedStyle(groupCard).display==='none';
@@ -128,7 +162,7 @@ function mobileCase(){
  const wiring=tool==='belt';
  return {filterCardVisible,allOptions,cardScrollable,noDupButtons,topOK,rotateButtons,
   previewRotated,previewRestored,groupSafe,canceled,cleanSelect,wiring,
-  selectedPanelVisible,groupToolsRestored,groupMapRestored,groupDebug,textOnly,textSizeMatch};
+  selectedPanelVisible,groupToolsRestored,groupMapRestored,originalSlotPreserved,cancelHiddenForSelection,groupDebug,textOnly,textSizeMatch,minuteSymbolVisible,machineLibraryHasNoGroupPanel,libraryIsOriginal,cancelEscInline,pendingRotates,pendingRestores,mapHasNoGroupOverlay,selectedCardHiddenInMachineLibrary};
 }
 (async()=>{
  let ws;
@@ -163,6 +197,19 @@ function mobileCase(){
   if(desktop.baseSelectSupported)assert.notEqual(desktop.pickerBg,'rgb(255, 255, 255)','picker popup itself must be dark');
   console.log('PASS DESKTOP '+desktop.selectorCount+' global dark selectors, customizable picker '+desktop.baseSelectSupported+
    ', popup '+desktop.pickerBg+', splitter/warehouse filters and AST1');
+  const desktopPalette=await evalJS('(()=>{'+
+   'const b=[...document.querySelectorAll("#palette [data-stamp]")].find(x=>x.dataset.stamp==="分流");'+
+   'b.click();const card=$("groupControls"),info=$("groupSelectionInfo").textContent;'+
+   'const shown=getComputedStyle(card).display!=="none"&&'+
+   'card.parentNode.classList.contains("editor-tools")&&info.includes("已框选 1 台机器")&&'+
+   '!$("groupLeft").disabled&&!$("groupRight").disabled&&$("groupMove").disabled;'+
+   'const f=stampFace;$("groupRight").click();const rotated=stampFace!==f;'+
+   '$("groupCancel").click();const canceled=!stampType&&tool==="select"&&'+
+   'getComputedStyle($("stampControls")).display==="none"&&card.style.display==="none";'+
+   'return {shown,rotated,canceled};})()');
+  assert(desktopPalette.shown&&desktopPalette.rotated&&desktopPalette.canceled,
+   'desktop palette click must restore original group card, preview rotation and cancel');
+  console.log('PASS DESKTOP machine library click restores original selected-preview action menu');
   // Force a real Chromium :hover state on a dropdown option: its highlight
   // must follow the Factory Lab dark theme rather than the white OS palette.
   if(desktop.baseSelectSupported){
@@ -180,6 +227,75 @@ function mobileCase(){
    console.log('PASS DESKTOP picker option hover uses dark blue background and light text');
   }
 
+  // Base-select must retain the closed control's dimensions and one-line
+  // selected label. The old Inspector display:block caused 50px + two rows.
+  const selectMetrics=await evalJS('(()=>{'+
+   'state={name:"selector layout",machines:[{id:"s",type:"分流",face:"E",x:12,y:12,outFilters:{}}],routes:[]};'+
+   'selection={machineId:"s"};inspectorRefresh();setStampType("分流");'+
+   'return ["#simSpeed","#stampSplitFilter0","#inspector [data-out-filter]"].map(sel=>{'+
+   'let e=document.querySelector(sel),c=getComputedStyle(e),i=getComputedStyle(e,"::picker-icon");'+
+   'return {sel,width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height,'+
+   'display:c.display,align:c.alignItems,appearance:c.appearance,'+
+   'bg:c.backgroundColor,iconWidth:parseFloat(i.width)};});})()');
+  const bySel=Object.fromEntries(selectMetrics.map(x=>[x.sel,x]));
+  assert.equal(await evalJS('getComputedStyle(document.querySelector(".top .mobile-sim-tool")).display'),'none',
+   'Select/Belt quick actions must never appear on desktop');
+  assert.equal(bySel['#simSpeed'].height,30,'multiplier selected text must be vertically aligned in 30px');
+  assert.equal(bySel['#stampSplitFilter0'].height,34,'left machine dropdown must remain 34px');
+  assert.equal(bySel['#inspector [data-out-filter]'].height,35,
+   'right Inspector dropdown must not expand to 50px with a second-row chevron');
+  for(const m of selectMetrics){
+   assert.equal(m.display,'flex',m.sel+' needs one-line flex layout');
+   assert.equal(m.align,'center',m.sel+' selected label must be centered vertically');
+   assert(m.iconWidth<16,m.sel+' picker icon must be compact rather than full width');
+   assert.equal(m.bg,'rgb(22, 43, 61)',m.sel+' uses unified closed-box theme');
+  }
+  console.log('PASS DESKTOP closed dropdowns: speed 30px, left 34px, right 35px and centered labels; mobile quick tools hidden');
+  // Test a real mouse moving through the expanded right-hand picker, not just
+  // forcePseudoState on an unrelated option.
+  const point=await evalJS('(()=>{const e=document.querySelector("#inspector [data-out-filter]");'+
+   'e.scrollIntoView({block:"center"});const r=e.getBoundingClientRect();'+
+   'return{x:r.left+r.width/2,y:r.top+r.height/2};})()');
+  await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:point.x,y:point.y});
+  await send('Input.dispatchMouseEvent',{type:'mousePressed',x:point.x,y:point.y,button:'left',clickCount:1});
+  await send('Input.dispatchMouseEvent',{type:'mouseReleased',x:point.x,y:point.y,button:'left',clickCount:1});
+  assert(await evalJS('document.querySelector("#inspector [data-out-filter]").matches(":open")'),
+   'right Inspector popup must open');
+  await sleep(230);
+  const openMotion=await evalJS('(()=>{const e=document.querySelector("#inspector [data-out-filter]");window.__testSelect=e;'+
+   'const icon=getComputedStyle(e,"::picker-icon"),picker=getComputedStyle(e,"::picker(select)");'+
+   'return {open:e.matches(":open"),iconTransform:icon.transform,iconTransition:icon.transitionDuration,'+
+   'pickerOpacity:picker.opacity,pickerTransform:picker.transform,pickerTransition:picker.transition};})()');
+  assert(openMotion.open,'dropdown is in the open state');
+  assert.equal(openMotion.iconTransform,'matrix(-1, 0, 0, -1, 0, 0)',
+   'open dropdown chevron must rotate upward');
+  assert.equal(openMotion.iconTransition,'0.18s','chevron rotation must animate');
+  assert.equal(openMotion.pickerOpacity,'1','opened picker must finish its fade-in');
+  assert(openMotion.pickerTransition.includes('opacity 0.16s')&&
+   openMotion.pickerTransition.includes('transform 0.18s')&&
+   openMotion.pickerTransition.includes('allow-discrete'),
+   'picker must animate opacity/position and transition into the top layer');
+  console.log('PASS DESKTOP dropdown open animation: upward chevron + popup fade/slide');
+  const hoveredOption=await evalJS('(()=>{const o=document.querySelector("#inspector [data-out-filter] option:nth-child(3)");'+
+   'const r=o.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2};})()');
+  await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:hoveredOption.x,y:hoveredOption.y});
+  const realHover=await evalJS('(()=>{const o=document.querySelector("#inspector [data-out-filter] option:nth-child(3)");'+
+   'const c=getComputedStyle(o);return {hover:o.matches(":hover"),bg:c.backgroundColor,color:c.color};})()');
+  assert(realHover.hover,'actual mouse must hover right Inspector option');
+  assert.equal(realHover.bg,'rgb(43, 89, 113)','right Inspector hovered background must be dark blue');
+  assert.equal(realHover.color,'rgb(248, 255, 255)','right Inspector hovered text must be light');
+  // Click the same select to close its picker without clearing machine
+  // selection (Escape intentionally exits the editor's selection mode).
+  await send('Input.dispatchMouseEvent',{type:'mousePressed',x:point.x,y:point.y,button:'left',clickCount:1});
+  await send('Input.dispatchMouseEvent',{type:'mouseReleased',x:point.x,y:point.y,button:'left',clickCount:1});
+  await sleep(220);
+  const closeMotion=await evalJS('(()=>{const e=window.__testSelect,icon=getComputedStyle(e,"::picker-icon");'+
+   'return {open:e.matches(":open"),iconTransform:icon.transform};})()');
+  assert.equal(closeMotion.open,false,'closed dropdown must leave :open state');
+  assert(!closeMotion.iconTransform.includes('matrix(-1,'),'closed chevron must no longer point upward');
+  console.log('PASS DESKTOP dropdown close animation: chevron returns downward');
+
+  console.log('PASS DESKTOP real mouse hover in right-hand expanded picker stays themed');
   // Click an actually drawn machine with the real mouse event path; the
   // already-existing shared #groupControls card must appear immediately.
   const prepareMachineTap=()=>evalJS('(()=>{'+
@@ -206,17 +322,27 @@ function mobileCase(){
   const mobileTap=await prepareMachineTap();
   await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...mobileTap,id:93}]});
   await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-  const mobileClicked=await evalJS('({id:selection?.machineId,text:$("groupSelectionInfo").textContent,'+
-   'display:getComputedStyle($("groupControls")).display,'+
-   'dock:getComputedStyle($("mobileGroupDock")).display,'+
-   'width:$("groupControls").getBoundingClientRect().width})');
+  const mobileClicked=await evalJS('({id:selection?.machineId,text:$(\"groupSelectionInfo\").textContent,'+
+   'display:getComputedStyle($(\"groupControls\")).display,'+
+   'parent:$(\"groupControls\").parentNode.className,'+
+   'count:activeMachineSelectionIds().length,mapDock:!!$(\"mobileGroupDock\")})');
   assert.equal(mobileClicked.id,'actual-click','real phone finger tap selects existing machine');
-  assert(mobileClicked.text.includes('已框选 1 台机器 / 0 条线路')&&
-   mobileClicked.display!=='none'&&mobileClicked.dock!=='none'&&mobileClicked.width>170,
-   'real phone tap must show the original selected-machine card on map');
-  console.log('PASS MOBILE actual finger tap displays original selected-machine group card');
+  assert(mobileClicked.text.includes('已框选 1 台机器')&&
+   mobileClicked.display!=='none'&&mobileClicked.parent.includes('editor-tools')&&
+   mobileClicked.count===1&&!mobileClicked.mapDock,
+   'real phone tap must update original editor-tools selected-machine card without a map overlay');
+  await evalJS('mobileOpenView(\"tools\")');
+  const mobileOriginalMenu=await evalJS('({parent:$(\"groupControls\").parentNode.className,'+
+   'display:getComputedStyle($(\"groupControls\")).display,'+
+   'width:$(\"groupControls\").getBoundingClientRect().width,'+
+   'text:$(\"groupSelectionInfo\").textContent})');
+  assert(mobileOriginalMenu.parent.includes('editor-tools')&&mobileOriginalMenu.display!=='none'&&
+   mobileOriginalMenu.width>170&&mobileOriginalMenu.text.includes('已框选 1 台机器'),
+   'opening Tools after selecting a machine must reveal the original selected-machine menu');
+  await evalJS('mobileOpenView(\"map\")');
+  console.log('PASS MOBILE actual tap restores selected-machine menu in original Tools panel; no map overlay');
   const mobile=await evalJS('('+mobileCase.toString()+')()');
-  for(const key of ['filterCardVisible','allOptions','cardScrollable','noDupButtons','topOK','rotateButtons','previewRotated','previewRestored','groupSafe','canceled','cleanSelect','wiring','selectedPanelVisible','groupToolsRestored','groupMapRestored','textOnly','textSizeMatch'])
+  for(const key of ['filterCardVisible','allOptions','cardScrollable','noDupButtons','topOK','rotateButtons','previewRotated','previewRestored','groupSafe','canceled','cleanSelect','wiring','selectedPanelVisible','groupToolsRestored','groupMapRestored','originalSlotPreserved','cancelHiddenForSelection','textOnly','textSizeMatch','minuteSymbolVisible','machineLibraryHasNoGroupPanel','libraryIsOriginal','cancelEscInline','pendingRotates','pendingRestores','mapHasNoGroupOverlay','selectedCardHiddenInMachineLibrary'])
    assert(mobile[key], 'mobile '+key+' should be true');
   console.log('PASS MOBILE filter card, top Select/Belt, map rotation for stamp/group, no duplicate controls');
   assert.deepEqual(errors,[]);

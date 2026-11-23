@@ -41,17 +41,22 @@ function selectedGroupData(){
 }
 function updateGroupControls(){
  const panel=$('groupControls');if(!panel)return;
- const count=activeMachineSelectionIds().length,belts=multiSelection?.routeIds.length||0;
- panel.style.display=(count||belts||groupClipboard||groupTransform)?'block':'none';
- $('groupSelectionInfo').textContent=groupTransform
+ const stampSelected=Boolean(stampType&&tool==='stamp');
+ const count=stampSelected?0:activeMachineSelectionIds().length,belts=stampSelected?0:(multiSelection?.routeIds.length||0);
+ panel.style.display=(stampSelected||count||belts||groupClipboard||groupTransform)?'block':'none';
+ $('groupSelectionInfo').textContent=stampSelected?'已框选 1 台机器 / 0 条线路（待放置）':groupTransform
   ?`正在${groupTransform.mode==='move'?'移动':'复制'} · ${groupTransform.plan?.valid?'可放置':'位置无效'} · ${typeof mobileEditorActive==='function'&&mobileEditorActive()?'点中虚影确认 / 点「选择」取消':'左键放置 / Esc 取消'}`
   :count||belts?`已框选 ${count} 台机器 / ${belts} 条线路（含截取段）`:'已复制选区，可粘贴';
  $('groupMove').disabled=!count||!!groupTransform;
  $('groupCopy').disabled=!count||!!groupTransform;
  $('groupDuplicate').disabled=!count||!!groupTransform;
- $('groupPaste').disabled=!groupClipboard||!!groupTransform;
+ $('groupPaste').disabled=stampSelected||!groupClipboard||!!groupTransform;
  $('groupDelete').disabled=!(count||belts)||!!groupTransform;
- $('groupCancel').style.display=groupTransform?'block':'none';
+ $('groupLeft').disabled=!(stampSelected||count)||!!groupTransform;
+ $('groupRight').disabled=!(stampSelected||count)||!!groupTransform;
+ const cancelVisible=stampSelected||!!groupTransform;
+ $('groupCancel').style.display=cancelVisible?(typeof mobileEditorActive==='function'&&mobileEditorActive()?'flex':'block'):'none';
+ panel.classList?.toggle?.('stamp-selection',stampSelected);
 }
 function clearGroupSelection(){
  multiSelection=null;groupTransform=null;marquee=null;updateGroupControls();

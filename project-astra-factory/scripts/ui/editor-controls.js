@@ -1,5 +1,5 @@
 'use strict';
-function setTool(t){if(groupTransform)cancelGroupTransform();if(t!=='marquee'&&t!=='select')clearGroupSelection();tool=t;stampType=null;draft=null;beltTrim=null;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));document.querySelectorAll('#palette button').forEach(b=>b.classList.remove('active'));updateHint();draw();}
+function setTool(t){if(groupTransform)cancelGroupTransform();if(t!=='marquee'&&t!=='select')clearGroupSelection();tool=t;stampType=null;draft=null;beltTrim=null;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));document.querySelectorAll('#palette button').forEach(b=>b.classList.remove('active'));updateStampControls();updateGroupControls();updateHint();draw();}
 // Escape/right-click always return to an idle, unselected editor.
 // Never touch persistent layout, undo history, or the copied clipboard.
 function resetEditorMode(){

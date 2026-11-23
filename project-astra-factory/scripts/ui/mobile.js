@@ -49,22 +49,6 @@ function mobileUpdatePlacement(){
  else message='点按选择 · 单指滑动框选 · 双指移动/缩放地图';
  mobileSetMapStatus(message);
 }
-// Preserve the original shared groupControls card and all of its handlers.
-// On phones, render that SAME card over the map whenever the map is visible;
-// desktop and the mobile Tools tab keep the original slot in the editor panel.
-const mobileSharedGroupControls=$('groupControls');
-const mobileGroupHome=mobileSharedGroupControls?.parentNode&&typeof document.createComment==='function'
- ?document.createComment('shared group action card home'):null;
-if(mobileGroupHome)mobileSharedGroupControls.parentNode.insertBefore(mobileGroupHome,mobileSharedGroupControls);
-function mobileSyncGroupControls(){
- const dock=$('mobileGroupDock');
- if(!dock||!mobileSharedGroupControls||!mobileGroupHome)return;
- if(mobileEditorActive()&&mobileActiveView==='map'){
-  if(mobileSharedGroupControls.parentNode!==dock)dock.appendChild(mobileSharedGroupControls);
- }else if(mobileSharedGroupControls.parentNode!==mobileGroupHome.parentNode){
-  mobileGroupHome.parentNode.insertBefore(mobileSharedGroupControls,mobileGroupHome.nextSibling);
- }
-}
 function mobileOpenView(view){
  if(!mobileEditorActive())return;
  if(!['map','tools','machines','inspector','warehouse'].includes(view))return;
@@ -74,7 +58,7 @@ function mobileOpenView(view){
  if(view==='machines')mobileStampPreviewType=null;
  const main=document.querySelector('.main');
  main.dataset.mobileView=view;
- mobileSyncGroupControls();
+ updateGroupControls();
  for(const button of document.querySelectorAll('.mobile-nav [data-mobile-view]')){
   const selected=button.dataset.mobileView===view;
   button.classList.toggle('active',selected);
@@ -156,7 +140,6 @@ document.addEventListener('click',event=>{
 mobileLayoutMedia.addEventListener('change',()=>{
  if(mobileEditorActive())mobileOpenView('map');
  else{
-  mobileSyncGroupControls();
   document.querySelector('.main').removeAttribute('data-mobile-view');
   mobileUpdatePlacement();
  }

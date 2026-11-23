@@ -83,19 +83,6 @@
    return cell.x>=m.x&&cell.x<m.x+w&&cell.y>=m.y&&cell.y<m.y+h;
   });
  }
- // A tap on the canvas can reveal the selected-machine action card *under*
- // that same finger. Chromium may deliver a synthetic click to a newly
- // revealed button afterwards. Suppress only the same-gesture retarget;
- // separate deliberate taps on group buttons still work normally.
- let lastMapTapRelease=null;
- document.addEventListener?.('click',event=>{
-  const tap=lastMapTapRelease;
-  if(!tap)return;
-  if(Date.now()-tap.time>450){lastMapTapRelease=null;return;}
-  if(!event.target?.closest?.('#mobileGroupDock #groupControls button'))return;
-  if(Math.hypot((event.clientX||0)-tap.x,(event.clientY||0)-tap.y)>12)return;
-  event.preventDefault();event.stopImmediatePropagation();lastMapTapRelease=null;
- },true);
  function confirmStampPreview(s,e){
   if(!stampType||!hoverCell)return false;
   const finger=screenToCell(s.x,s.y);
@@ -226,8 +213,6 @@
    }
    single=null;
   }
-  if(!cancelled&&!wasPinching&&wasSingle&&!wasSingle.moved)
-   lastMapTapRelease={time:Date.now(),x:e.clientX,y:e.clientY};
   try{if(map.hasPointerCapture(e.pointerId))map.releasePointerCapture(e.pointerId);}catch(_){}
  }
  map.addEventListener('pointerup',e=>endPointer(e,false),{capture:true,passive:false});

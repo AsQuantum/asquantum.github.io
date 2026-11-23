@@ -21,6 +21,44 @@ select::-webkit-scrollbar-thumb{
    otherwise show a light-grey hover row with dark text, even in dark mode. */
 @supports (appearance:base-select){
  select:not([multiple]),::picker(select){appearance:base-select}
+ /* A base-select is a flex control. The old Inspector 'display:block'
+    placed its arrow on a second row and expanded 35px fields to 50px.
+    Keep all closed values and arrows in one line, using the same palette. */
+ select:not([multiple]){
+  display:inline-flex;align-items:center;justify-content:space-between;
+  box-sizing:border-box;min-width:0;vertical-align:middle;
+ }
+ #inspector .machine-properties select:not([multiple]),
+ .inspector-machine .machine-field select:not([multiple]){
+  display:flex;align-items:center;justify-content:space-between;
+  box-sizing:border-box;min-height:35px;height:35px;max-height:35px;
+  padding:5px 8px;border:1px solid #45647a;border-radius:7px;
+  background:#162b3d;color:#e7f3fb;font-size:12px;
+ }
+ .inspector-machine .machine-port-bottom select:not([multiple]){
+  display:flex;align-items:center;justify-content:space-between;
+  min-height:28px;height:28px;max-height:28px;
+  padding:3px 7px;background:#162b3d;border-color:#45647a;
+ }
+ .machine-library .machine-config-field select:not([multiple]){
+  display:flex;align-items:center;justify-content:space-between;
+  box-sizing:border-box;min-height:34px;height:34px;max-height:34px;
+  padding:5px 8px;background:#162b3d;color:#e7f3fb;
+  border:1px solid #45647a;border-radius:7px;font-size:12px;
+ }
+ .top .sim-toolbar .sim-speed select:not([multiple]){
+  display:inline-flex;align-items:center;justify-content:space-between;
+  box-sizing:border-box;min-height:30px;height:30px;max-height:30px;
+  padding:3px 6px;background:#162b3d;border-color:#45647a;
+  color:#e7f3fb;font-size:11.5px;line-height:1;
+ }
+ select:not([multiple])::picker-icon{
+  flex:0 0 auto;align-self:center;
+  margin-inline-start:auto;
+  transform:rotate(0deg);
+  transition:transform 180ms cubic-bezier(.2,.75,.25,1);
+ }
+ select:not([multiple]):open::picker-icon{transform:rotate(180deg)}
  ::picker(select){
   color-scheme:dark;
   color:#e5f2ff;
@@ -34,6 +72,25 @@ select::-webkit-scrollbar-thumb{
   overscroll-behavior:contain;
   scrollbar-width:thin;
   scrollbar-color:#648ba1 #112638;
+  opacity:0;
+  transform:translateY(-6px) scale(.985);
+  transform-origin:top center;
+  transition:
+   opacity 160ms ease,
+   transform 180ms cubic-bezier(.2,.75,.25,1),
+   display 180ms allow-discrete,
+   overlay 180ms allow-discrete;
+  transition-behavior:allow-discrete;
+ }
+ select:not([multiple]):open::picker(select){
+  opacity:1;
+  transform:translateY(0) scale(1);
+ }
+ @starting-style{
+  select:not([multiple]):open::picker(select){
+   opacity:0;
+   transform:translateY(-6px) scale(.985);
+  }
  }
  ::picker(select)::-webkit-scrollbar{width:9px}
  ::picker(select)::-webkit-scrollbar-track{background:#112638}

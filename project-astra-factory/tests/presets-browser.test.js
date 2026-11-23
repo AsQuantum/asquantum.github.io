@@ -87,6 +87,27 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   assert(Object.values(menuBehavior).every(Boolean),'dropdown open/close or delete cancel regression: '+JSON.stringify(menuBehavior));
   console.log('PASS: dropdown closes on Escape/outside click; canceled row deletion leaves scheme intact');
 
+  const schemeScrollbar=await evaluate(`(()=>{
+    const panel=document.getElementById('presetList'),wasHidden=panel.hidden;
+    const filler=document.createElement('div');filler.style.height='900px';panel.appendChild(filler);
+    panel.hidden=false;
+    const style=getComputedStyle(panel);
+    const thumb=getComputedStyle(panel,'::-webkit-scrollbar-thumb');
+    const track=getComputedStyle(panel,'::-webkit-scrollbar-track');
+    const result={overflow:style.overflowY,scrollable:panel.scrollHeight>panel.clientHeight,
+     width:style.scrollbarWidth,color:style.scrollbarColor,
+     thumb:thumb.backgroundColor,track:track.backgroundColor};
+    filler.remove();panel.hidden=wasHidden;
+    return result;
+   })()`);
+  assert(schemeScrollbar.overflow==='auto'&&schemeScrollbar.scrollable&&
+   schemeScrollbar.width==='thin'&&schemeScrollbar.color.includes('100, 139, 161')&&
+   schemeScrollbar.color.includes('17, 38, 56')&&
+   schemeScrollbar.thumb==='rgb(100, 139, 161)'&&
+   schemeScrollbar.track==='rgb(17, 38, 56)',
+   'scheme dropdown scrollbar must retain its dark track and blue-grey thumb: '+JSON.stringify(schemeScrollbar));
+  console.log('PASS: scheme dropdown overflow uses thin dark scrollbar with blue-grey thumb and dark track');
+
   const created=await evaluate(`(()=>{
    document.getElementById('preset').click();
    const expanded=document.getElementById('preset').getAttribute('aria-expanded')==='true';
