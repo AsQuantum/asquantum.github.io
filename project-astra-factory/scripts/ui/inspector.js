@@ -63,7 +63,7 @@ function machineLiveInventory(m){
   const total=Object.values(items).reduce((a,b)=>a+b,0);
   const cap=m.type==='分流'||m.type==='汇流'?` / 3`:' 件';
   const summary=Object.entries(items).filter(([,v])=>v>0).map(([item,n])=>`<span style="color:${materialColor(item)}">●</span> ${esc(item)}×${n}`).join('、');
-  return `<div class="tiny" style="padding:3px 0;border-bottom:1px solid #304153">入${p.index+1} (${p.side})：<b>${total}${cap}</b>${summary?` · ${summary}`:' · 空'}</div>`;
+  return `<div class="tiny" style="padding:3px 0;border-bottom:1px solid #304153">入${p.index+1} (${portDirectionArrow(p.side)})：<b>${total}${cap}</b>${summary?` · ${summary}`:' · 空'}</div>`;
  }).join('');
  const outputCounts={};for(const item of s.queue||[])outputCounts[item]=(outputCounts[item]||0)+1;
  const outputItems=rec?[rec.output]:Object.keys(outputCounts);
@@ -202,7 +202,7 @@ function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosure
  if(m.type==='仓入')machineProps.push(warehouseInFilterHTML(m));
  if(m.type==='分流')machineProps.push(`<div class="machine-filter-options">
   <div class="machine-field-caption">分流出口物品过滤</div>
-  ${ports.filter(p=>p.kind==='out').map(p=>`<label class="machine-field"><span>${esc(ast1FilterPortLabel(m,p.index))} · ${esc(p.side)}</span>
+  ${ports.filter(p=>p.kind==='out').map(p=>`<label class="machine-field"><span>${esc(ast1FilterPortLabel(m,p.index))} · ${esc(portDirectionArrow(p.side))}</span>
     <select data-out-filter="${p.index}" aria-label="${esc(ast1FilterPortLabel(m,p.index))} 输出物品">
      <option value="">任意</option>${importedUnknownItemOption(p.filter)}${MATERIALS.map(q=>`<option value="${esc(q)}" ${p.filter===q?'selected':''}>${esc(q)}</option>`).join('')}
     </select></label>`).join('')}

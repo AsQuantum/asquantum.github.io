@@ -48,7 +48,7 @@ function ast1FilterPortFromGame(m,filterIndex){
 }
 function ast1FilterPortLabel(m,portIndex){
  const index=[0,1,2].find(i=>ast1FilterPortFromGame(m,i)===portIndex);
- return ['前','右','左'][index]||'?';
+ return ['前侧','右侧','左侧'][index]||'?';
 }
 function ast1Decode(code){
  const raw=String(code||'').replace(/\s+/g,'');

@@ -72,6 +72,7 @@ function timeLabel(m){
  const dynamic=period===null?'待接线':fmtT(period)+'s';
  return fmtT(rec.seconds)+'s('+dynamic+')';
 }
+function portDirectionArrow(side){return ({N:'↑',S:'↓',W:'←',E:'→'})[side]||side;}
 function machineLabelLines(m){let r=getRecipe(m),result=[{text:def(m).name,color:'#f0f6ff',bold:true}];
  if(r){for(const [k,n] of Object.entries(r.inputs||{}))result.push({text:k+' ×'+n,color:'#60b5ff'});
  result.push({text:r.output+' ×'+r.qty,color:'#ffb16b'});
@@ -83,7 +84,7 @@ function machineLabelLines(m){let r=getRecipe(m),result=[{text:def(m).name,color
    const p=outPort(m,ast1FilterPortFromGame(m,slot));
    if(!p)continue;
    const filter=p.filter&&p.filter!=='任意'?p.filter:'any';
-   result.push({text:filter+' '+ast1FilterPortLabel(m,p.index)+'('+p.side+')',color:'#ffb16b'});
+   result.push({text:portDirectionArrow(p.side)+' '+filter,color:'#ffb16b'});
   }
  } else if(m.type==='仓入')result.push({text:m.inletItem||'any',color:'#60b5ff'});
  else if(m.type==='仓出')result.push({text:(m.item||'未指定')+' ×1',color:'#ffb16b'});

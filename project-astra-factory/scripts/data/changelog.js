@@ -3,6 +3,13 @@
 // the beginning and update the header version when publishing a release.
 const FACTORY_LAB_RELEASES=[
  {
+  version:'0.37',date:'2026-11-23',title:'端口方向标识优化',
+  items:[
+   '分流器 Canvas 标签仅显示“方向箭头 + 过滤物品”（如“↑ 物品#462”），不显示括号或前/右/左；属性面板明确使用前侧、右侧、左侧，并用箭头标出实际方向。',
+   '方向变更仅影响显示；端口位置、机器旋转、输送带方向、AST1/JSON 存档结构保持不变。'
+  ]
+ },
+ {
   version:'0.36',date:'2026-11-23',title:'版本记录与手机连线体验',
   items:[
    '新增桌面与手机版共用的版本记录入口；支持关闭按钮、点击遮罩和 Esc 退出。',

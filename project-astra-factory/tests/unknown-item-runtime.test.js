@@ -126,3 +126,39 @@ test('unknown splitter filter appears in property panel and prevents nonmatching
  assert.equal(out.filter==='物品#462',true);
  assert.equal(out.filter==='物品#26',false);
 }));
+
+test('direction labels use arrows in splitter canvas and inspector while AST1 port codes remain N/S/E/W',()=>run(function(){
+ const old=ast1Decode(fixture);
+ state=old;
+ const original=ast1Encode();
+ const m=state.machines.at(-1);
+ assert.equal(m.type,'分流');
+ const arrows={N:'↑',S:'↓',E:'→',W:'←'};
+ for(const [side,arrow] of Object.entries(arrows))
+  assert.equal(portDirectionArrow(side),arrow);
+ const ports=getPorts(m),out=ports.filter(p=>p.kind==='out');
+ assert.equal(out.length,3);
+ assert(ports.every(p=>arrows[p.side]),'underlying direction codes unchanged');
+ assert.equal(ast1FilterPortLabel(m,ast1FilterPortFromGame(m,0)),'前侧');
+ assert.equal(ast1FilterPortLabel(m,ast1FilterPortFromGame(m,1)),'右侧');
+ assert.equal(ast1FilterPortLabel(m,ast1FilterPortFromGame(m,2)),'左侧');
+ const labels=machineLabelLines(m).map(x=>x.text);
+ for(const p of out){
+  const label=labels.find(x=>x.startsWith(arrows[p.side]+' '));
+  assert(label,'splitter canvas label must display correct arrow for '+p.side);
+  assert(!labels.some(x=>/[（()）]/u.test(x)||/[前右左]/u.test(x)),
+   'canvas splitter output labels contain no parentheses, front/right/left');
+  assert(!labels.some(x=>x.endsWith('('+p.side+')')),'old letter is not visible');
+ }
+ selection={machineId:m.id};theoreticalBudget={inflow:{},outflow:{},routeFlows:{},machineCycles:{}};
+ inspectorRefresh();
+ const html=elements.get('inspector').innerHTML;
+ for(const side of ['前侧','右侧','左侧'])
+  assert(html.includes(side),'inspector should name machine-relative side '+side);
+ for(const p of out)assert(html.includes('· '+arrows[p.side]+'</span>'),'filter setting must display '+p.side+' as arrow');
+ sim={byMachine:{[m.id]:{inputs:{},received:{},sent:{},portItems:{},queue:[],busy:0}}};
+ simTime=0;
+ const live=machineLiveInventory(m),inp=ports.filter(p=>p.kind==='in');
+ for(const p of inp)assert(live.includes('入'+(p.index+1)+' ('+arrows[p.side]+')'));
+ assert.equal(ast1Encode(),original,'display-only change preserves exact AST1 bytes');
+}));
