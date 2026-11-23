@@ -203,6 +203,9 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    // including the rest of the red suffix, only cancels selection.
    // An open belt may additionally be extended by a legal off-route click.
    if(r||!draft||draft.routeId!==selected?.id){
+    // A click on another EXISTING belt can be a legal perpendicular crossing
+    // for an active open line, not necessarily a request to edit that belt.
+    if(r&&r.id!==selected?.id&&draft&&commitDraftAtCrossing(c,r))return;
     clearBeltTrimSelection();return;
    }
    const targetPort=hit?.p.kind==='in'?hit.p:null;
@@ -219,6 +222,14 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    return;
   }
   if(r){
+   // An unfinished route may END on another belt (or its own earlier straight
+   // strand) if it arrives perpendicularly. Keep the two routes unconnected.
+   if(draft&&commitDraftAtCrossing(c,r))return;
+   // An invalid attempt on someone else's belt cancels the active route edit;
+   // it must never silently switch to selecting or deleting the other route.
+   if(draft&&draft.routeId&&draft.routeId!==r.id){
+    clearBeltTrimSelection();return;
+   }
    // First click locks one exact grid cell, not the whole red interval.
    if(draft&&draft.routeId!==r.id)draft=null;
    beltTrim={routeId:r.id,index:idx,cell:[c.x,c.y],hoverOutside:false};

@@ -207,3 +207,114 @@ test('connected belt deletion requires the identical tile, including its last in
  assert.equal(route.path.length,cells.length-1);
  assert.equal(route.to,null,'click exact last belt tile disconnects inlet');
 }));
+
+test('an unfinished route can end ON a perpendicular existing belt without connecting to it',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const a={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0};
+ const op=outPort(a,0),cx=op.ex+4,cy=op.ey;
+ const b={id:'m2',type:'垃圾',x:42,y:26,face:'N',mode:0};
+ let bp=outPort(b,0);
+ b.x+=cx-bp.ex;b.y+=cy+3-bp.ey;bp=outPort(b,0);
+ assert.deepEqual([bp.ex,bp.ey],[cx,cy+3]);
+ const horizontal=[];for(let x=op.ex;x<=op.ex+7;x++)horizontal.push([x,cy]);
+ const vertical=[[cx,cy+3],[cx,cy+2],[cx,cy+1]];
+ const ra={id:'r1',from:{id:a.id,port:0},to:null,path:horizontal};
+ const rb={id:'r2',from:{id:b.id,port:0},to:null,path:vertical};
+ state={name:'cross target',machines:[a,b],routes:[ra,rb]};
+ assert.equal(checkPath(ra.path,ra.from,ra.to,ra.id),null);
+ assert.equal(checkPath(rb.path,rb.from,rb.to,rb.id),null);
+ tool='belt';
+ const click=(x,y)=>onPointerDown({button:0,pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ const move=(x,y)=>onPointerMove({pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ click(cx,cy+1);
+ assert.equal(beltTrim.routeId,'r2');
+ move(cx,cy);
+ assert(draft.preview&&draft.preview.at(-1)[1]===cy,'hover crossing line shows legal extension');
+ click(cx,cy);
+ assert.deepEqual(rb.path.at(-1),[cx,cy],'unfinished line now ENDS on the crossing');
+ assert.equal(rb.to,null,'crossing is never interpreted as machine connectivity');
+ assert.equal(routeTile(rb,rb.path.length-1).axis,'V');
+ assert.equal(routeTile(ra,ra.path.findIndex(p=>p[0]===cx&&p[1]===cy)).axis,'H');
+ assert.equal(checkPath(rb.path,rb.from,rb.to,rb.id),null);
+ assert.equal(draftSegment([cx+1,cy]),null,'cannot turn right in the crossing cell');
+ assert.equal(draftSegment([cx-1,cy]),null,'cannot turn left in the crossing cell');
+ assert.deepEqual(draftSegment([cx,cy-1]).at(-1),[cx,cy-1],'straight continuation is permitted');
+ click(cx,cy-1);
+ assert.deepEqual(rb.path.at(-1),[cx,cy-1]);
+ assert.equal(routeTile(rb,rb.path.length-2).axis,'V','crossing may not bend after extension');
+ assert.equal(checkPath(rb.path,rb.from,rb.to,rb.id),null);
+ const code=ast1Encode();
+ state=ast1Decode(code);
+ assert.equal(state.routes.length,2);
+ assert(state.routes.every(r=>r.to===null));
+ assert.equal(ast1Encode(),code);
+}));
+test('AST1 refuses to silently drop a final corner that JSON preserves',()=>run(function(){
+ const m={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},port=outPort(m,0);
+ const cells=[[port.ex,port.ey],[port.ex+1,port.ey],[port.ex+1,port.ey+1]];
+ state={name:'corner at open end',machines:[m],routes:[
+  {id:'r1',from:{id:m.id,port:0},to:null,path:cells,openEndSide:'E'}
+ ]};
+ const route=state.routes[0];
+ assert.equal(routeTile(route,2).type,'turn');
+ assert.equal(checkPath(route.path,route.from,route.to,route.id),null);
+ assert.equal(expandCompactFactoryLayout(compactFactoryLayout(state)).routes[0].openEndSide,'E');
+ assert.throws(()=>ast1Encode(),/最后一格是拐角/);
+ route.path.push([port.ex+2,port.ey+1]);
+ delete route.openEndSide;
+ assert.equal(checkPath(route.path,route.from,route.to,route.id),null);
+ const code=ast1Encode();
+ state=ast1Decode(code);
+ assert.equal(ast1Encode(),code);
+}));
+
+test('clicking a previous perpendicular straight tile of the same active route creates a legal self-cross endpoint',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const machine={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0};
+ const port=outPort(machine,0),x=port.ex,y=port.ey;
+ const cells=[[x,y],[x+1,y],[x+2,y],[x+3,y],[x+3,y+1],
+  [x+3,y+2],[x+2,y+2],[x+1,y+2],[x+1,y+1]];
+ const route={id:'r1',from:{id:machine.id,port:0},to:null,path:cells};
+ state={name:'self-cross terminal',machines:[machine],routes:[route]};
+ assert.equal(checkPath(route.path,route.from,route.to,route.id),null);
+ draft={from:copy(route.from),fromName:'self',routeId:route.id,path:copy(cells),history:[],preview:null};
+ beltTrim={routeId:route.id,index:-1,cell:null,hoverOutside:false};
+ tool='belt';
+ const click=(px,py)=>onPointerDown({button:0,pointerId:1,clientX:(px+.5)*10,clientY:(py+.5)*10});
+ const move=(px,py)=>onPointerMove({pointerId:1,clientX:(px+.5)*10,clientY:(py+.5)*10});
+ move(x+1,y);
+ assert(draft.preview&&draft.preview.at(-1)[0]===x+1&&draft.preview.at(-1)[1]===y);
+ click(x+1,y);
+ assert.equal(route.path.length,cells.length+1);
+ assert.deepEqual(route.path.at(-1),[x+1,y]);
+ assert.equal(route.to,null);
+ assert.equal(routeTile(route,1).axis,'H');
+ assert.equal(routeTile(route,route.path.length-1).axis,'V');
+ assert.equal(checkPath(route.path,route.from,null,route.id),null);
+}));
+
+test('fresh output route may click an existing perpendicular straight belt as a non-connected endpoint',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const a={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0};
+ const ap=outPort(a,0),cx=ap.ex+4,cy=ap.ey;
+ const b={id:'m2',type:'垃圾',x:40,y:25,face:'N',mode:0};
+ let bp=outPort(b,0);b.x+=cx-bp.ex;b.y+=cy+4-bp.ey;bp=outPort(b,0);
+ const r={id:'r1',from:{id:a.id,port:0},to:null,path:[]};
+ for(let x=ap.ex;x<=ap.ex+7;x++)r.path.push([x,cy]);
+ state={name:'new crossing',machines:[a,b],routes:[r]};
+ tool='belt';
+ const click=(x,y)=>onPointerDown({button:0,pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ click(bp.x,bp.y);
+ assert(draft&&draft.from.id===b.id);
+ click(cx,cy);
+ assert.equal(state.routes.length,2);
+ const newRoute=state.routes[1];
+ assert.equal(newRoute.from.id,b.id);
+ assert.equal(newRoute.to,null);
+ assert.deepEqual(newRoute.path.at(-1),[cx,cy]);
+ assert.equal(routeTile(newRoute,newRoute.path.length-1).axis,'V');
+ assert.equal(checkPath(newRoute.path,newRoute.from,null,newRoute.id),null);
+}));

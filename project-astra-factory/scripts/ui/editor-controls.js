@@ -84,6 +84,13 @@ function draftSegment(target,targetPort=null){
  const src=outPort(machineById(draft.from.id),draft.from.port);
  const startPrev=draft.path.length>1?draft.path.at(-2):src?[src.x,src.y]:null;
  const endNext=targetPort?[targetPort.x,targetPort.y]:null;
+ const moveX=target[0]-start[0],moveY=target[1]-start[1];
+ if(draft.path.length&&Math.abs(moveX)+Math.abs(moveY)===1){
+  const crossing=(occupiedRouteMap(draft.routeId).get(start.join(','))||[]).length>0||
+   draft.path.slice(0,-1).some(p=>p[0]===start[0]&&p[1]===start[1]);
+  if(crossing&&(!startPrev||moveX!==start[0]-startPrev[0]||
+     moveY!==start[1]-startPrev[1]))return null;
+ }
  const existing=draft.routeId&&state.routes.find(r=>r.id===draft.routeId);
  const segment=pathSearch(start,target,new Set(),{
   startPrev,endNext,allowOpenCrossingEnd:!endNext,excludeRouteId:draft.routeId,
@@ -92,7 +99,9 @@ function draftSegment(target,targetPort=null){
  if(!segment)return null;
  const combined=draft.path.length?[...draft.path,...segment.slice(1)]:segment;
  // Unlike same-axis overlap, one orthogonal self-crossing is a legal tile.
- if(checkPath(combined,draft.from,null,draft.routeId))return null;
+ // When aiming at a machine inlet, the inlet itself supplies the last tile's
+ // outgoing arm; validating as an open end would incorrectly reject corners.
+ if(!targetPort&&checkPath(combined,draft.from,null,draft.routeId))return null;
  return combined;
 }
 function draftTarget(cell){if(!cell||!inMap(cell.x,cell.y))return null;let hit=portAt(cell.x,cell.y);if(hit?.p.kind==='in')return [hit.p.ex,hit.p.ey];if(!cellMachine(cell.x,cell.y)&&!reserved(cell.x,cell.y))return [cell.x,cell.y];return null;}
@@ -100,10 +109,33 @@ function updateDraftPreview(){
  if(!draft)return;
  const onSameBelt=draft.routeId&&hoverCell&&cellRoutes(hoverCell.x,hoverCell.y)
   .some(r=>r.id===draft.routeId);
- if(onSameBelt){draft.preview=null;return;}
+ // A selected red tail always wins over drawing a new preview; otherwise an
+ // unfinished line may cross a PREVIOUS straight tile of itself at 90 degrees.
+ if(onSameBelt&&beltTrim?.index>=0){draft.preview=null;return;}
  const target=draftTarget(hoverCell);
  const port=hoverCell&&portAt(hoverCell.x,hoverCell.y)?.p;
  draft.preview=target?draftSegment(target,port?.kind==='in'?port:null):null;
+}
+function commitDraftAtCrossing(cell,route){
+ if(!draft||!route)return false;
+ const target=[cell.x,cell.y];
+ const candidate=draftSegment(target);
+ if(!candidate||candidate.length<=draft.path.length)return false;
+ const sm=machineById(draft.from.id),src=sm&&outPort(sm,draft.from.port);
+ if(!src)return false;
+ const terminal=tileShape(candidate,candidate.length-1,src,openRouteVirtualEnd(candidate,src));
+ // Crossing is legal only for two perpendicular straight sections, even when
+ // the existing strand belongs to this SAME route's earlier portion.
+ if(terminal?.type!=='straight')return false;
+ const matching=route.path.some((p,i)=>p[0]===cell.x&&p[1]===cell.y&&
+  routeTile(route,i)?.type==='straight'&&routeTile(route,i).axis!==terminal.axis);
+ if(!matching)return false;
+ const previous=copy(draft.path);
+ const existing=draft.routeId&&state.routes.find(r=>r.id===draft.routeId);
+ const historyEntry={path:previous,endSide:existing?.openEndSide||null};
+ if(!saveDraftRoute(candidate))return false;
+ if(draft)draft.history.push(historyEntry);
+ return true;
 }
 // When a crossing occupies one cell, select its horizontal/vertical strand
 // according to cursor position rather than arbitrarily trimming the wrong line.
@@ -130,7 +162,7 @@ function previewBeltTrim(cell,pt){
  beltTrim.hoverOutside=!onThisRoute;
  // Keep the click-confirmation coordinate FIXED across all hover movements.
  if(draft?.routeId===route.id){
-  if(onThisRoute)draft.preview=null;
+  if(onThisRoute&&beltTrim.index>=0)draft.preview=null;
   else updateDraftPreview();
  }
 }

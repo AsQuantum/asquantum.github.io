@@ -190,6 +190,12 @@ function ast1ToBytes(){
   if(!sp||(route.to&&!ep)||!Array.isArray(path)||!path.length||path.length>255)throw Error(`第${i}条线路的接口或长度无法用AST1编码（最多255格）`);
   if(path[0][0]!==sp.ex||path[0][1]!==sp.ey||(ep&&(path.at(-1)[0]!==ep.ex||path.at(-1)[1]!==ep.ey)))
    throw Error(`第${i}条线路首尾端口不匹配，无法导出游戏蓝图`);
+  if(!route.to&&route.openEndSide){
+   const last=path.at(-1),prev=path.length>1?path.at(-2):[sp.x,sp.y];
+   const out=V[route.openEndSide],dx=last[0]-prev[0],dy=last[1]-prev[1];
+   if(!out||out[0]!==dx||out[1]!==dy)
+    throw Error('第'+(i+1)+'条悬空传送带的最后一格是拐角：当前 AST1 格间路径格式无法无损保存终点出边方向。请改用 JSON 保存，或继续延长至少一格后再导出 AST1。');
+  }
   const fp=ast1PortToGame(sm,'out',route.from.port),tp=route.to?ast1PortToGame(tm,'in',route.to.port):0;
   ast1WriteU16(buf,fi);buf.push(fp);ast1WriteU16(buf,ti);buf.push(tp,path.length);
   let byte=0;
