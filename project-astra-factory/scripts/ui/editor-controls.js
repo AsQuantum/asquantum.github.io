@@ -35,6 +35,23 @@ function undoDraftBend(){
 // It must survive Escape, switching tools and JSON/AST1 export.
 function saveDraftRoute(path,to=null){
  if(!draft||!Array.isArray(path)||!path.length)return false;
+ if(to){
+  const source=machineById(draft.from.id),target=machineById(to.id);
+  const outlet=source&&outPort(source,draft.from.port);
+  if(!outlet||!target){notify('源或目标机器不存在','bad');return false;}
+  if(outlet.filter&&outlet.filter!=='任意'&&!acceptsMaterial(target,outlet.filter,to.port)){
+   notify('分流出口过滤物品不符合目标配方：'+outlet.filter,'bad');return false;
+  }
+  if(getRecipe(target)){
+   const incompatible=[...possibleSourceMaterials(source,new Set(),draft.from.port)]
+    .filter(item=>!acceptsMaterial(target,item,to.port));
+   if(incompatible.length){notify('目标入口不接收材料：'+incompatible.join('、'),'bad');return false;}
+  }
+  const item=recipeOutput(source);
+  if(item&&!acceptsMaterial(target,item,to.port)){
+   notify('材料不匹配：'+item+' 无法接入当前目标输入口','bad');return false;
+  }
+ }
  const existing=draft.routeId&&state.routes.find(r=>r.id===draft.routeId);
  const reason=checkPath(path,draft.from,to,existing?.id);
  if(reason){notify('线路验证失败：'+reason,'bad');return false;}
