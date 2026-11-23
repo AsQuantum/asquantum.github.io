@@ -15,15 +15,44 @@ function machineOutputWarning(m){
 // up to 60 times per second while simulating.
 let cachedMap=null,cachedMapCtx=null,staticReady=false,frameLastPaint=0;
 // Input/output ports are transparent squares: blue for input, orange for output.
-function paintPortSocket(port){
+function paintPortSocket(port,labelMasks=null){
+ ctx.save();
+ const x=port.x+.10,y=port.y+.10,w=.8,h=.8;
+ // The original port square is always drawn in full, with a transparent
+ // center. Repaint only the portions of its STROKE underneath material text.
+ // Never fill the square's interior or a rectangle behind the label.
  ctx.strokeStyle=port.kind==='in'?'#5baaff':'#ffae61';
  ctx.lineWidth=.13;
- ctx.strokeRect(port.x+.10,port.y+.10,.8,.8);
+ ctx.strokeRect(x,y,w,h);
+ if(labelMasks?.length&&typeof ctx.clip==='function'&&typeof ctx.rect==='function'){
+  // A single clip path is the UNION of all label rectangles. Paint the
+  // darkened outline ONCE, even if several material rows overlap this port.
+  // Repeated per-label strokes previously stacked alpha at intersections.
+  const half=ctx.lineWidth/2;
+  let overlaps=false;
+  ctx.beginPath();
+  for(const b of labelMasks){
+   const x0=Math.max(x-half,b.x),y0=Math.max(y-half,b.y);
+   const x1=Math.min(x+w+half,b.x+b.w),y1=Math.min(y+h+half,b.y+b.h);
+   if(x1<=x0||y1<=y0)continue;
+   ctx.rect(x0,y0,x1-x0,y1-y0);
+   overlaps=true;
+  }
+  if(overlaps){
+   ctx.save();
+   ctx.clip(); // overlapping same-winding rectangles form one region
+   ctx.strokeStyle='rgba(8,18,29,.70)';
+   ctx.strokeRect(x,y,w,h);
+   ctx.restore();
+  }
+ }
+ ctx.restore();
 }
 // Preview machines share the identical port appearance with placed machines.
 function paintPreviewPorts(m){
  ctx.save();ctx.globalAlpha=1;
- for(const port of getPorts(m))paintPortSocket(port);
+ const [w,h]=dims(m),labelMasks=typeof machineMaterialTextBounds==='function'?machineMaterialTextBounds(m,w,h):null;
+ for(const port of getPorts(m))paintPortSocket(port,labelMasks);
  ctx.restore();
 }
 // Compact machine markings, centered on their actual physical edges.
@@ -120,7 +149,8 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
   }
  }
  for(let m of state.machines){let[w,h]=dims(m),c=makeColor(m);ctx.fillStyle=hexAlpha(c,.18);ctx.fillRect(m.x+.08,m.y+.08,w-.16,h-.16);ctx.lineWidth=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id)) ? .29 : .14;ctx.strokeStyle=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id))?'#f5dc77':c;ctx.strokeRect(m.x+.08,m.y+.08,w-.16,h-.16);
- const ports=getPorts(m);for(let p of ports){paintPortSocket(p);if(draft&&draft.from.id===m.id&&draft.from.port===p.index&&p.kind==='out'){ctx.strokeStyle='#ffee88';ctx.lineWidth=.17;ctx.strokeRect(p.x-.06,p.y-.06,1.12,1.12);}}
+ const ports=getPorts(m),labelMasks=typeof machineMaterialTextBounds==='function'?machineMaterialTextBounds(m,w,h):null;
+  for(let p of ports){paintPortSocket(p,labelMasks);if(draft&&draft.from.id===m.id&&draft.from.port===p.index&&p.kind==='out'){ctx.strokeStyle='#ffee88';ctx.lineWidth=.17;ctx.strokeRect(p.x-.06,p.y-.06,1.12,1.12);}}
  // Compositing order: socket squares < always-visible facing/panel marks < text.
  paintMachineIndicators(m,w,h);
  paintMachineTextAtZoom(m,w,h,z);

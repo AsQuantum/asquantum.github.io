@@ -17,11 +17,11 @@
 <link rel="stylesheet" href="styles/mobile.css?v=20261123-schemepopup1"/>
 <link rel="stylesheet" href="styles/window-motion.css"/>
 <link rel="stylesheet" href="styles/ast1-dialog.css"/>
-<link rel="stylesheet" href="styles/changelog.css?v=20261123-037"/>
+<link rel="stylesheet" href="styles/changelog.css?v=20261123-038"/>
 </head>
 <body>
 <div class="app">
-<header class="top"><div class="brand"><img class="brand-mark" src="favicon.svg" alt="" aria-hidden="true"/> <span>Factory</span> Lab <button id="changelogOpen" class="changelog-trigger" type="button" aria-haspopup="dialog" aria-controls="changelogPanel" aria-label="查看 Factory Lab 版本更新记录" title="查看版本更新记录">v0.37 <span aria-hidden="true">▾</span></button></div>
+<header class="top"><div class="brand"><img class="brand-mark" src="favicon.svg" alt="" aria-hidden="true"/> <span>Factory</span> Lab <button id="changelogOpen" class="changelog-trigger" type="button" aria-haspopup="dialog" aria-controls="changelogPanel" aria-label="查看 Factory Lab 版本更新记录" title="查看版本更新记录">v0.38 <span aria-hidden="true">▾</span></button></div>
  <div class="preset-manager" id="presetDropdown" aria-label="求解器方案管理">
   <div class="preset-combo">
    <input id="presetName" type="text" maxlength="64" placeholder="方案名称" role="combobox" aria-label="方案名称，可编辑；点击显示方案列表" aria-haspopup="dialog" aria-expanded="false" aria-controls="presetList" autocomplete="off" title="点击显示方案列表，修改文字可重命名"/>
@@ -203,7 +203,7 @@
    </div>
    <label class="machine-config-field" id="stampModeRow"><span>生产配方</span><select id="stampMode" class="full"></select></label>
    <label class="machine-config-field" id="stampItemRow"><span>仓库取出物品</span><select id="stampItem" class="full"></select></label>
-   <label class="machine-config-field" id="stampPanelRow"><span>面板方向（相对输出朝向）</span><select id="stampPanel" class="full"><option value="0">左侧</option><option value="1">正面</option><option value="2">右侧</option><option value="3">背面</option></select></label>
+   <label class="machine-config-field" id="stampPanelRow"><span>面板方向（相对输出朝向）</span><select id="stampPanel" class="full" aria-label="面板方向"></select></label>
    <div id="stampRecipeText" class="machine-config-recipe"></div>
    <p id="stampHelp" class="machine-config-hint"></p>
   </div>
@@ -270,34 +270,34 @@
 </nav>
 <footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
 </div>
-<script src="scripts/data/warp-preset.js?v=20261123-037"></script>
-<script src="scripts/data/catalog.js?v=20261123-037"></script>
-<script src="scripts/core/state.js?v=20261123-037"></script>
-<script src="scripts/core/machines.js?v=20261123-037"></script>
-<script src="scripts/core/routing.js?v=20261123-037"></script>
-<script src="scripts/core/editor.js?v=20261123-037"></script>
-<script src="scripts/core/audit.js?v=20261123-037"></script>
-<script src="scripts/ui/inspector.js?v=20261123-037"></script>
-<script src="scripts/core/layout-io.js?v=20261123-037"></script>
-<script src="scripts/ui/editor-controls.js?v=20261123-037"></script>
-<script src="scripts/core/selection-transform.js?v=20261123-037"></script>
-<script src="scripts/ui/canvas.js?v=20261123-037"></script>
-<script src="scripts/engine/steady-flow.js?v=20261123-037"></script>
-<script src="scripts/ui/warehouse.js?v=20261123-037"></script>
-<script src="scripts/engine/simulation.js?v=20261123-037"></script>
-<script src="scripts/ui/stock-chart.js?v=20261123-037"></script>
-<script src="scripts/ui/actions.js?v=20261123-037"></script>
-<script src="scripts/blueprints/machine-ids.js?v=20261123-037"></script>
-<script src="scripts/blueprints/item-ids.js?v=20261123-037"></script>
-<script src="scripts/core/old.js?v=20261123-037"></script>
-<script src="scripts/core/compact-json.js?v=20261123-037"></script>
-<script src="scripts/blueprints/ast1-codec.js?v=20261123-037"></script>
-<script src="scripts/blueprints/ast1-ui.js?v=20261123-037"></script>
-<script src="scripts/ui/presets.js?v=20261123-037"></script>
-<script src="scripts/ui/edit-menu.js?v=20261123-037"></script>
-<script src="scripts/data/changelog.js?v=20261123-037"></script>
-<script src="scripts/ui/changelog.js?v=20261123-037"></script>
-<script src="scripts/ui/startup.js?v=20261123-037"></script>
-<script src="scripts/ui/mobile.js?v=20261123-037"></script>
-<script src="scripts/ui/touch-gestures.js?v=20261123-037"></script>
+<script src="scripts/data/warp-preset.js?v=20261123-038"></script>
+<script src="scripts/data/catalog.js?v=20261123-038"></script>
+<script src="scripts/core/state.js?v=20261123-038"></script>
+<script src="scripts/core/machines.js?v=20261123-038"></script>
+<script src="scripts/core/routing.js?v=20261123-038"></script>
+<script src="scripts/core/editor.js?v=20261123-038"></script>
+<script src="scripts/core/audit.js?v=20261123-038"></script>
+<script src="scripts/ui/inspector.js?v=20261123-038"></script>
+<script src="scripts/core/layout-io.js?v=20261123-038"></script>
+<script src="scripts/ui/editor-controls.js?v=20261123-038"></script>
+<script src="scripts/core/selection-transform.js?v=20261123-038"></script>
+<script src="scripts/ui/canvas.js?v=20261123-038"></script>
+<script src="scripts/engine/steady-flow.js?v=20261123-038"></script>
+<script src="scripts/ui/warehouse.js?v=20261123-038"></script>
+<script src="scripts/engine/simulation.js?v=20261123-038"></script>
+<script src="scripts/ui/stock-chart.js?v=20261123-038"></script>
+<script src="scripts/ui/actions.js?v=20261123-038"></script>
+<script src="scripts/blueprints/machine-ids.js?v=20261123-038"></script>
+<script src="scripts/blueprints/item-ids.js?v=20261123-038"></script>
+<script src="scripts/core/old.js?v=20261123-038"></script>
+<script src="scripts/core/compact-json.js?v=20261123-038"></script>
+<script src="scripts/blueprints/ast1-codec.js?v=20261123-038"></script>
+<script src="scripts/blueprints/ast1-ui.js?v=20261123-038"></script>
+<script src="scripts/ui/presets.js?v=20261123-038"></script>
+<script src="scripts/ui/edit-menu.js?v=20261123-038"></script>
+<script src="scripts/data/changelog.js?v=20261123-038"></script>
+<script src="scripts/ui/changelog.js?v=20261123-038"></script>
+<script src="scripts/ui/startup.js?v=20261123-038"></script>
+<script src="scripts/ui/mobile.js?v=20261123-038"></script>
+<script src="scripts/ui/touch-gestures.js?v=20261123-038"></script>
 </body></html>

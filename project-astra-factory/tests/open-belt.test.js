@@ -841,3 +841,33 @@ test('crossing marker is black X within belt overlap corners, composited below a
  assert.equal(strokes.filter(v=>v.color==='#9affd0').length,0,
   'no old green crossing border stroke');
 }));
+
+test('port squares retain transparent center; only crossing stroke pixels darken',()=>run(function(){
+ const calls=[],clipRects=[];
+ ctx.save=()=>calls.push('save');
+ ctx.restore=()=>calls.push('restore');
+ ctx.beginPath=()=>calls.push('beginPath');
+ ctx.rect=(x,y,w,h)=>{clipRects.push({x,y,w,h});calls.push('rect');};
+ ctx.clip=()=>calls.push('clip');
+ ctx.strokeRect=(x,y,w,h)=>calls.push({kind:'stroke',x,y,w,h,color:ctx.strokeStyle});
+ ctx.fillRect=()=>{throw Error('port centers must never receive a dark rectangle');};
+ const p={x:3,y:4,kind:'out'};
+ paintPortSocket(p,[{x:3.6,y:4.4,w:.5,h:.5},{x:3.7,y:4.3,w:.35,h:.6},{x:12,y:15,w:2,h:1}]);
+ const strokes=calls.filter(v=>v.kind==='stroke');
+ assert.equal(strokes.length,2,'original square and exactly ONE dark stroke despite overlapping label masks');
+ assert.equal(strokes[0].color,'#ffae61');
+ assert.equal(strokes[1].color,'rgba(8,18,29,.70)');
+ assert.deepEqual(strokes.slice(0,2).map(v=>[v.x,v.y,v.w,v.h]),
+  [[3.1,4.1,.8,.8],[3.1,4.1,.8,.8]],
+  'darkening redraws the original outline, not a new filled rectangle');
+ assert.equal(calls.filter(v=>v==='clip').length,1,'overlay is confined to overlap');
+ assert.equal(clipRects.length,2,'both overlapping text masks are included in ONE clip path');
+ for(const b of clipRects){
+  assert(b.x>=3.035&&b.y>=4.035&&b.x+b.w<=3.965+1e-9&&b.y+b.h<=4.965+1e-9);
+ }
+ calls.length=0;clipRects.length=0;
+ paintPortSocket({x:3,y:4,kind:'in'},[{x:22,y:22,w:3,h:1}]);
+ assert.equal(calls.filter(v=>v.kind==='stroke').length,1,'no repaint for nonoverlapping labels');
+ assert.equal(calls.filter(v=>v.kind==='stroke')[0].color,'#5baaff');
+ assert.equal(calls.filter(v=>v==='clip').length,0);
+}));

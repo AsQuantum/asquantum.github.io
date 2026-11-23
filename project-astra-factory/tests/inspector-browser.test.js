@@ -178,13 +178,22 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const selector=$('inspector').querySelector('#panelSelect');
    const defaultPanel=selector?.value==='0';
    const inspectorPanelNames=[...selector.options].map(o=>o.textContent.trim());
-   const hiddenPanelIds=JSON.stringify(inspectorPanelNames)===JSON.stringify(MACHINE_PANEL_LABELS)&&
-     JSON.stringify(inspectorPanelNames)===JSON.stringify(['左侧','正面','右侧','背面']);
+   const hiddenPanelIds=JSON.stringify(inspectorPanelNames)===
+     JSON.stringify([0,1,2,3].map(i=>machinePanelOptionLabel(m,i)))&&
+     inspectorPanelNames.every(name=>name.includes(' · '));
    const recipeBelowRate=!!recipe&&!!summary.querySelector('.machine-summary-metrics')&&
     !!(summary.querySelector('.machine-summary-metrics').compareDocumentPosition(recipe)&Node.DOCUMENT_POSITION_FOLLOWING);
    selector.value='3';selector.dispatchEvent(new Event('change',{bubbles:true}));
    const changedPanel=m.panel===3&&machinePanelFacing(m)==='W'&&
      $('inspector').querySelector('#panelSelect').value==='3';
+   const oldFacing=m.face;m.face='S';inspectorRefresh();
+   // Face S: the machine's right side points left (W) on the map.
+   const rightSideLeftArrow=machinePanelFacing({face:'S',panel:2})==='W'&&
+     $('inspector').querySelector('#panelSelect').options[2].textContent.trim()==='右侧 · ←';
+   const inspectorRotated=JSON.stringify([...$('inspector').querySelector('#panelSelect').options].map(o=>o.textContent.trim()))===
+     JSON.stringify([0,1,2,3].map(i=>machinePanelOptionLabel(m,i)))&&
+     $('inspector').querySelector('#panelSelect').value==='3';
+   m.face=oldFacing;inspectorRefresh();
    const encoded=ast1Encode(),bytes=Uint8Array.from(atob(encoded.slice(5)),c=>c.charCodeAt(0));
    const astByte=bytes[3+4];
    const roundtrip=ast1Decode(encoded).machines[0].panel;
@@ -205,10 +214,16 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
      $('stampPanelRow').style.display==='flex';
    $('stampPanel').value='2';$('stampPanel').dispatchEvent(new Event('change',{bubbles:true}));
    const stampEdited=stampPanel===2&&getStampMachine(8,8).panel===2&&stampPrefs['组装']?.panel===2;
+   const labelsBeforeRotation=[...$('stampPanel').options].map(o=>o.textContent.trim());
+   const stampFacingBefore=stampFace;rotateStamp(1);
+   const labelsAfterRotation=[...$('stampPanel').options].map(o=>o.textContent.trim());
+   const stampRotated=stampFace!==stampFacingBefore&&stampPanel===2&&$('stampPanel').value==='2'&&
+    JSON.stringify(labelsAfterRotation)===JSON.stringify([0,1,2,3].map(i=>machinePanelOptionLabel({face:stampFace},i)))&&
+    labelsAfterRotation.some((v,i)=>v!==labelsBeforeRotation[i]);
    setStampType('仓入');
    const logisticStamp=$('stampPanelRow').style.display==='none'&&getStampMachine(8,8).panel===0;
    const stampPanelNames=[...$('stampPanel').options].map(o=>o.textContent.trim());
-   const stampLabelsOnly=JSON.stringify(stampPanelNames)===JSON.stringify(['左侧','正面','右侧','背面']);
+   const stampLabelsOnly=JSON.stringify(stampPanelNames)===JSON.stringify([0,1,2,3].map(i=>machinePanelOptionLabel({face:stampFace},i)));
    const noEmptyPlacementCards=['仓入','分流','汇流','发电','电脑','空间锚点'].every(type=>{
     setStampType(type);
     const box=$('stampRecipeText');
@@ -272,7 +287,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    delete oldLayout.machines[0].panel;
    const oldDefault=machinePanelPosition(oldLayout.machines[0])===0;
    return {directions,expected,defaultPanel,recipeBelowRate,changedPanel,astByte,roundtrip,stampDefault,stampEdited,logisticStamp,hiddenPanelIds,stampLabelsOnly,noEmptyPlacementCards,warehouseOutputCard,producingRecipeCard,canvasTest,
-     jsonStored,expanded,modeChanged,priorMode,fixedRecipe,noPanelLogistics,oldDefault};
+     jsonStored,expanded,modeChanged,priorMode,fixedRecipe,noPanelLogistics,oldDefault,stampRotated,inspectorRotated,rightSideLeftArrow};
   })()`);
   console.log('AST1 PANEL EDIT AND RECIPE CARD',JSON.stringify(panels));
   assert.deepEqual(panels.directions,panels.expected,'panel side must follow machine facing across all four orientations');
@@ -281,7 +296,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   assert(panels.jsonStored===3&&panels.expanded===3&&panels.oldDefault,'JSON v12 round-trip must preserve the panel, older files default to zero');
   assert(panels.modeChanged&&panels.fixedRecipe,'multi-output recipe changes keep physical routes, single-output machine shows read-only recipe');
   assert(panels.noPanelLogistics&&panels.logisticStamp,'logistics machines must hide panel selection and default to zero');
-  assert(panels.hiddenPanelIds&&panels.stampLabelsOnly,'panel selectors must show natural language positions only, never encoded values');
+  assert(panels.hiddenPanelIds&&panels.stampLabelsOnly&&panels.inspectorRotated&&panels.stampRotated&&panels.rightSideLeftArrow,'panel options must show the correct actual arrow (e.g. 右侧 · ←) and update on rotation');
   assert(panels.noEmptyPlacementCards&&panels.warehouseOutputCard&&panels.producingRecipeCard,
    'placement recipe card must vanish for non-recipe devices and appear only when relevant');
   assert(panels.stampDefault&&panels.stampEdited,'new machine palette must save and preview the chosen panel position');

@@ -190,7 +190,7 @@ function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosure
  const machineProps=[];
  if(supportsMachinePanel(m))machineProps.push(`<label class="machine-field"><span>面板方向</span>
   <select id="panelSelect" class="full" aria-label="面板方向">
-   ${MACHINE_PANEL_LABELS.map((name,i)=>`<option value="${i}" ${machinePanelPosition(m)===i?'selected':''}>${esc(name)}</option>`).join('')}
+   ${MACHINE_PANEL_LABELS.map((name,i)=>`<option value="${i}" ${machinePanelPosition(m)===i?'selected':''}>${esc(machinePanelOptionLabel(m,i))}</option>`).join('')}
   </select></label>`);
 
  if(modes?.length>1)machineProps.push(`<label class="machine-field"><span>产物 / 配方</span>

@@ -20,12 +20,20 @@ function machinePanelPosition(m){
  const value=m.panel??m.ast1Meta?.record?.[4]??0;
  return Number.isInteger(value)&&value>=0&&value<=3?value:0;
 }
+// The panel index is relative to machine facing; exactly the same
+// world-facing side is used by Canvas and the two panel dropdowns.
+function machinePanelWorldSide(face,index){
+ const order=['E','S','W','N'],front=order.indexOf(face||'E');
+ return order[(Math.max(0,front)+[3,0,1,2][index]+4)%4];
+}
 function machinePanelFacing(m){
- const order=['E','S','W','N'],front=order.indexOf(m.face||'E');
- return order[(front+[3,0,1,2][machinePanelPosition(m)]+4)%4];
+ return machinePanelWorldSide(m.face,machinePanelPosition(m));
+}
+function machinePanelOptionLabel(m,index){
+ return MACHINE_PANEL_LABELS[index]+' · '+portDirectionArrow(machinePanelWorldSide(m.face,index));
 }
 function machinePanelDescription(m){
- return MACHINE_PANEL_LABELS[machinePanelPosition(m)];
+ return machinePanelOptionLabel(m,machinePanelPosition(m));
 }
 function setStampType(type){const previous=stampPrefs[type]||{};stampType=type;stampFace=previous.face||'E';const savedMode=previous.mode;stampMode=savedMode!==undefined&&savedMode!==null&&Object.prototype.hasOwnProperty.call(DEF[type].recipes||{},savedMode)?parseRecipeMode(type,savedMode):defaultModeFor(type);stampItem=previous.item||'钛合金锭';stampPanel=Number.isInteger(previous.panel)&&previous.panel>=0&&previous.panel<=3?previous.panel:0;updateStampControls();}
 function saveStampPreference(){if(!stampType)return;stampPrefs[stampType]={face:stampFace,mode:stampMode,item:stampItem,panel:stampPanel};try{localStorage.setItem('factory_lab_v3_stamp_prefs',JSON.stringify(stampPrefs));}catch(e){}}
@@ -40,7 +48,11 @@ function updateStampControls(){
  $('stampFacing').textContent=({E:'右 →',S:'下 ↓',W:'左 ←',N:'上 ↑'})[stampFace]||'—';
  $('stampModeRow').style.display=modes.length>1?'flex':'none';
  $('stampPanelRow').style.display=supportsMachinePanel({type:stampType})?'flex':'none';
- $('stampPanel').value=String(stampPanel);
+ const preview={type:stampType,face:stampFace,panel:stampPanel};
+  $('stampPanel').innerHTML=MACHINE_PANEL_LABELS.map((_,i)=>
+   '<option value="'+i+'"'+(stampPanel===i?' selected':'')+'>'+
+   machinePanelOptionLabel(preview,i)+'</option>').join('');
+  $('stampPanel').value=String(stampPanel);
  $('stampItemRow').style.display=stampType==='仓出'?'flex':'none';
  $('stampMode').innerHTML=modes.map(key=>`<option value="${esc(key)}" ${String(stampMode)===String(key)?'selected':''}>${esc(recipeOptionLabel(stampType,key))}</option>`).join('');
  $('stampItem').innerHTML=MATERIALS.map(mat=>`<option value="${esc(mat)}" ${stampItem===mat?'selected':''}>${esc(mat)}</option>`).join('');
@@ -73,9 +85,12 @@ function timeLabel(m){
  return fmtT(rec.seconds)+'s('+dynamic+')';
 }
 function portDirectionArrow(side){return ({N:'↑',S:'↓',W:'←',E:'→'})[side]||side;}
+// Fixed, softly whitened input/output text colors: no item-dependent hue.
+const MACHINE_INPUT_LABEL_COLOR='#60b5ff';
+const MACHINE_OUTPUT_LABEL_COLOR='#ffb16b';
 function machineLabelLines(m){let r=getRecipe(m),result=[{text:def(m).name,color:'#f0f6ff',bold:true}];
- if(r){for(const [k,n] of Object.entries(r.inputs||{}))result.push({text:k+' ×'+n,color:'#60b5ff'});
- result.push({text:r.output+' ×'+r.qty,color:'#ffb16b'});
+ if(r){for(const [k,n] of Object.entries(r.inputs||{}))result.push({text:k+' ×'+n,color:MACHINE_INPUT_LABEL_COLOR});
+ result.push({text:r.output+' ×'+r.qty,color:MACHINE_OUTPUT_LABEL_COLOR});
  result.push({text:timeLabel(m),color:'#d4f4e4'});
  } else if(m.type==='分流'){
  // 视觉上展示三个真实出口（不是抽象的输出口1/2/3）。
@@ -84,15 +99,47 @@ function machineLabelLines(m){let r=getRecipe(m),result=[{text:def(m).name,color
    const p=outPort(m,ast1FilterPortFromGame(m,slot));
    if(!p)continue;
    const filter=p.filter&&p.filter!=='任意'?p.filter:'any';
-   result.push({text:portDirectionArrow(p.side)+' '+filter,color:'#ffb16b'});
+   result.push({text:portDirectionArrow(p.side)+' '+filter,color:MACHINE_OUTPUT_LABEL_COLOR});
   }
- } else if(m.type==='仓入')result.push({text:m.inletItem||'any',color:'#60b5ff'});
- else if(m.type==='仓出')result.push({text:(m.item||'未指定')+' ×1',color:'#ffb16b'});
+ } else if(m.type==='仓入')result.push({text:m.inletItem||'any',color:MACHINE_INPUT_LABEL_COLOR});
+ else if(m.type==='仓出')result.push({text:(m.item||'未指定')+' ×1',color:MACHINE_OUTPUT_LABEL_COLOR});
  return result;
 }
 // Keep canvas glyphs proportional at every zoom level. Supplying fillText's
 // maxWidth compressed long Chinese machine names horizontally; measuring first
 // and scaling the FONT avoids that distortion. Split long headings when space permits.
+// Rectangles occupied by input/output text. Socket squares are clipped only
+// where their outlines would cross these labels; no opaque rectangle is ever
+// painted over the machine body, panel marks or belts.
+function machineMaterialTextBounds(m,w,h){
+ // The headless geometry-only test painter has no text metrics; browsers do.
+ if(typeof ctx.measureText!=='function')return [];
+ const lines=machineLabelLines(m);
+ if(!lines.length)return [];
+ const heightLimit=Math.max(.48,Math.min(.83,(h-.54)/lines.length));
+ const spacing=Math.min(1.04,(h-.5)/lines.length);
+ const base=m.y+h/2-(lines.length-1)*spacing/2;
+ const bounds=[];
+ ctx.save();
+ lines.forEach((line,i)=>{
+  if(i===0||(line.color!==MACHINE_INPUT_LABEL_COLOR&&line.color!==MACHINE_OUTPUT_LABEL_COLOR))return;
+  let size=heightLimit;
+  ctx.font=(line.bold?'bold ':'')+size+'px system-ui, "Microsoft YaHei", sans-serif';
+  let width=ctx.measureText(line.text).width;
+  const available=Math.max(.5,w-.42);
+  if(width>available){
+   size*=available/width;
+   ctx.font=(line.bold?'bold ':'')+size+'px system-ui, "Microsoft YaHei", sans-serif';
+   width=ctx.measureText(line.text).width;
+  }
+  const padding=.075;
+  bounds.push({x:m.x+w/2-width/2-padding,
+   y:base+i*spacing-size*.58-padding,
+   w:width+padding*2,h:size*1.16+padding*2});
+ });
+ ctx.restore();
+ return bounds;
+}
 function paintMachineText(m,w,h,preview=false){const lines=machineLabelLines(m);if(!lines.length)return;
  const heightLimit=Math.max(.48,Math.min(.83,(h-.54)/lines.length));
  const spacing=Math.min(1.04,(h-.5)/lines.length),base=m.y+h/2-(lines.length-1)*spacing/2;
@@ -102,6 +149,7 @@ function paintMachineText(m,w,h,preview=false){const lines=machineLabelLines(m);
   // horizontally compresses glyphs rather than scaling the typography.
   const textWidth=ctx.measureText(line.text).width,available=Math.max(.5,w-.42);
   if(textWidth>available){sz*=available/textWidth;ctx.font=(line.bold?'bold ':'')+sz+'px system-ui, "Microsoft YaHei", sans-serif';}
+  // Plain glyphs with no halo or shadow; original label colors remain.
   ctx.fillText(line.text,m.x+w/2,base+i*spacing);});
 }
 function label(m){let s=def(m)?.name||m.type; if(m.type==='仓出')s+=' · '+(m.item||'未设置');else if(getRecipe(m))s+=' · '+recipeOptionLabel(m.type,m.mode);return s}

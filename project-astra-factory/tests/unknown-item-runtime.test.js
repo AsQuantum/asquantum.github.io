@@ -162,3 +162,19 @@ test('direction labels use arrows in splitter canvas and inspector while AST1 po
  for(const p of inp)assert(live.includes('入'+(p.index+1)+' ('+arrows[p.side]+')'));
  assert.equal(ast1Encode(),original,'display-only change preserves exact AST1 bytes');
 }));
+
+test('Canvas input/output text uses fixed pale colors, never per-item randomized hue',()=>run(function(){
+ assert.equal(MACHINE_INPUT_LABEL_COLOR,'#60b5ff');
+ assert.equal(MACHINE_OUTPUT_LABEL_COLOR,'#ffb16b');
+ assert.notEqual(MACHINE_INPUT_LABEL_COLOR,MACHINE_OUTPUT_LABEL_COLOR);
+ const a=machineLabelLines({type:'仓出',face:'E',item:'物品#462'});
+ const b=machineLabelLines({type:'仓出',face:'E',item:'物品#26'});
+ assert.equal(a[1].color,MACHINE_OUTPUT_LABEL_COLOR);
+ assert.equal(b[1].color,MACHINE_OUTPUT_LABEL_COLOR,'output label color does not depend on item ID');
+ assert.equal(a[0].color,'#f0f6ff','machine name unchanged');
+ const splitter=ast1Decode(fixture).machines.at(-1);
+ assert(machineLabelLines(splitter).slice(1).every(x=>x.color===MACHINE_OUTPUT_LABEL_COLOR),
+  'all splitter output filters have one fixed pale orange');
+ const inputMachine={type:'仓入',face:'E',inletItem:'物品#462'};
+ assert.equal(machineLabelLines(inputMachine)[1].color,MACHINE_INPUT_LABEL_COLOR);
+}));

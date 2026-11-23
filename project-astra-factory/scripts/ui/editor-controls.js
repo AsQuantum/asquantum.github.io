@@ -15,7 +15,7 @@ function resetEditorMode(){
  updateGroupControls();
  inspectorRefresh();
 }
-function rotateStamp(steps=1){if(!stampType)return;const faces=['E','S','W','N'];stampFace=faces[(faces.indexOf(stampFace)+steps+4)%4];saveStampPreference();updateHint();draw();}
+function rotateStamp(steps=1){if(!stampType)return;const faces=['E','S','W','N'];stampFace=faces[(faces.indexOf(stampFace)+steps+4)%4];saveStampPreference();updateStampControls();updateHint();draw();}
 function cancelDraft(){if(!draft&&!beltTrim)return;draft=null;beltTrim=null;updateHint();notify('已退出线路编辑；已确认的传送带保留');draw();}
 // A placement is not an interaction with an already drawn route.
 // While placing, clicking the last confirmed tile FINISHES placement rather
