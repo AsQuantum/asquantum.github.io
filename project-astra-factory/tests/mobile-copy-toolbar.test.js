@@ -32,7 +32,7 @@ const document={
 };
 const window={PointerEvent:function(){},matchMedia:()=>media,addEventListener(){}};
 const appSource=String.raw`
-let tool='stamp',stampType='垃圾',groupTransform=null,marquee=null,drag=null,
+let beltTrim=null,tool='stamp',stampType='垃圾',groupTransform=null,marquee=null,drag=null,
  draft=null,state={machines:[],routes:[]},selection=null,multiSelection=null,
  idSeed=100,hoverCell=null,groupClipboard=null,spaceDown=false;
 const camera={x:20,y:30,z:8},pix={w:400,h:640},canvas=map;

@@ -1,389 +1,115 @@
 'use strict';
-// 理论产出取已连接产线的稳态产能上限，和小球动画的实际库存互不混用。
-// 上游未接齐则该配方的理论产能为0；仓库取出独立统计为支出，允许库存起始不为0。
+// Cached result shared by warehouse, inspector, and canvas on every refresh.
 let theoreticalBudget=null;
-// Offline, all-numeric steady-state throughput solver for Factory Lab.
-// No shadow simulation, no ticks, no inventory evolution.
-// Variables: machine cycle rate (/s), per-route-per-material flow (/s).
-// Constraints: exact recipe stoichiometry, 1 item/s per physical belt/port,
-// conservation at splitter/merger, global warehouse material balance.
-function factorySteadySimplex(inequalities, variableCount, objective){
- const m=inequalities.length,n=variableCount,eps=1e-9;
- if(n===0)return {ok:true,x:[],objective:0,pivots:0};
- // Every constraint has b>=0, so x=0 is an initial feasible basic solution.
- // This allows a single-phase revised tableau (no artificial production).
- const D=Array.from({length:m+1},()=>new Float64Array(n+2));
- const basic=new Int32Array(m),nonbasic=new Int32Array(n+1);
- for(let i=0;i<m;i++){
-  const row=inequalities[i];
-  for(const [k,v] of row.a)D[i][k]=v;
-  D[i][n]=-1;D[i][n+1]=row.b;
-  if(row.b < -1e-8)return {ok:false,error:'约束的初始可行性不满足'};
-  basic[i]=n+i;
- }
- for(let j=0;j<n;j++){D[m][j]=-objective[j];nonbasic[j]=j;}
- nonbasic[n]=-1;
- let pivots=0;const maxPivots=20000;
- const start=performance.now();
- while(pivots<maxPivots){
-  // Deterministic Bland tie-break prevents cycling at zero-flow vertices.
-  let col=-1,mostNegative=-eps;
-  for(let j=0;j<n;j++){
-   const v=D[m][j];
-   if(v<mostNegative-1e-10||(v<mostNegative+1e-10&&v<-eps&&(col<0||nonbasic[j]<nonbasic[col]))){col=j;mostNegative=v;}
-  }
-  if(col<0){
-   const x=new Float64Array(n);
-   for(let i=0;i<m;i++)if(basic[i]<n)x[basic[i]]=Math.max(0,D[i][n+1]);
-   return {ok:true,x,objective:D[m][n+1],pivots,elapsedMs:Math.round(performance.now()-start)};
-  }
-  let row=-1,minRatio=Infinity;
-  for(let i=0;i<m;i++){
-   const coef=D[i][col];if(coef<=eps)continue;
-   const ratio=D[i][n+1]/coef;
-   if(ratio<minRatio-1e-9||(Math.abs(ratio-minRatio)<=1e-9&&(row<0||basic[i]<basic[row]))){row=i;minRatio=ratio;}
-  }
-  if(row<0)return {ok:false,error:'稳态流量目标无界'};
-  const pivotRow=D[row],den=pivotRow[col],inv=1/den;
-  for(let i=0;i<=m;i++)if(i!==row){
-   const dest=D[i],factor=dest[col]*inv;
-   if(Math.abs(factor)>1e-12){
-    for(let j=0;j<n+2;j++)if(j!==col)dest[j]-=pivotRow[j]*factor;
-   }
-   dest[col]=-factor;
-  }
-  for(let j=0;j<n+2;j++)if(j!==col)pivotRow[j]*=inv;
-  pivotRow[col]=inv;
-  const old=basic[row];basic[row]=nonbasic[col];nonbasic[col]=old;
-  pivots++;
- }
- return {ok:false,error:'线性规划迭代上限（'+maxPivots+' 次）',pivots};
+// Shared exact rational arithmetic and the unified automatic supply/demand display entry.
+function steadyExactGcd(a,b){a=a<0n?-a:a;b=b<0n?-b:b;while(b){const t=a%b;a=b;b=t;}return a||1n;}
+function steadyExactFraction(a,b=1n){
+ a=BigInt(a);b=BigInt(b);if(!b)throw Error('zero denominator');
+ if(b<0n){a=-a;b=-b;}const g=steadyExactGcd(a,b);
+ return {n:a/g,d:b/g};
 }
-
-// Two-phase LP: supports lower bounds/negative RHS when adding non-idling constraints.
-
-function factorySteadyTwoPhase(ineq,n,c){
- const m=ineq.length,eps=1e-8,tab=Array.from({length:m+2},()=>new Float64Array(n+2));
- const B=new Int32Array(m),N=new Int32Array(n+1);
- for(let i=0;i<m;i++){
-  for(const [j,v] of ineq[i].a)tab[i][j]+=v;
-  tab[i][n]=-1;tab[i][n+1]=ineq[i].b;B[i]=n+i;
- }
- for(let j=0;j<n;j++){N[j]=j;tab[m][j]=-(c[j]||0);}
- N[n]=-1;tab[m+1][n]=1;
- let pivots=0;
- function pivot(r,s){
-  const inv=1/tab[r][s];
-  for(let i=0;i<m+2;i++){
-   if(i===r)continue;
-   for(let j=0;j<n+2;j++){
-    if(j===s)continue;
-    tab[i][j]-=tab[r][j]*tab[i][s]*inv;
-   }
-  }
-  for(let j=0;j<n+2;j++)if(j!==s)tab[r][j]*=inv;
-  for(let i=0;i<m+2;i++)if(i!==r)tab[i][s]*=-inv;
-  tab[r][s]=inv;
-  const v=B[r];B[r]=N[s];N[s]=v;pivots++;
- }
- function simplex(phase){
-  const row=phase===1?m+1:m;
-  for(let k=0;k<22000;k++){
-   let s=-1;
-   for(let j=0;j<=n;j++){
-    if(phase===2 && N[j]===-1)continue;
-    if(s===-1||tab[row][j]<tab[row][s]-eps||(Math.abs(tab[row][j]-tab[row][s])<eps && N[j]<N[s]))s=j;
-   }
-   if(s<0||tab[row][s]>=-eps)return true;
-   let r=-1;
-   for(let i=0;i<m;i++){
-    if(tab[i][s]<=eps)continue;
-    const z=tab[i][n+1]/tab[i][s];
-    if(r===-1||z<tab[r][n+1]/tab[r][s]-eps||(Math.abs(z-tab[r][n+1]/tab[r][s])<eps && B[i]<B[r]))r=i;
-   }
-   if(r<0)return false;
-   pivot(r,s);
-  }
-  return false;
- }
- if(m){
-  let r=0;for(let i=1;i<m;i++)if(tab[i][n+1]<tab[r][n+1])r=i;
-  if(tab[r][n+1]<-eps){
-   pivot(r,n);
-   if(!simplex(1)||tab[m+1][n+1]<-eps||Math.abs(tab[m+1][n+1])>eps)return {ok:false,error:'infeasible-phase1',pivots};
-   for(let i=0;i<m;i++)if(B[i]===-1){
-    let s=0;
-    for(let j=1;j<=n;j++)if(tab[i][j]<tab[i][s]-eps||(Math.abs(tab[i][j]-tab[i][s])<eps&&N[j]<N[s]))s=j;
-    if(Math.abs(tab[i][s])>eps)pivot(i,s);
-    break;
-   }
-  }
- }
- if(!simplex(2))return {ok:false,error:'unbounded-phase2',pivots};
- const x=new Float64Array(n);
- for(let i=0;i<m;i++)if(B[i]<n && B[i]>=0)x[B[i]]=Math.max(0,tab[i][n+1]);
- return {ok:true,x,objective:tab[m][n+1],pivots};
+function steadyExactQ(value){
+ if(value&&typeof value==='object'&&'n' in value&&'d' in value)return value;
+ const s=String(value),match=s.match(/^(-?)(\d+)(?:\.(\d+))?(?:e([+-]?\d+))?$/i);
+ if(!match)throw Error('invalid physical coefficient: '+s);
+ const decimals=(match[3]||'').length,exponent=Number(match[4]||0)-decimals;
+ if(Math.abs(exponent)>50)throw Error('unsupported decimal exponent');
+ let n=BigInt(match[2]+(match[3]||''));
+ if(match[1])n=-n;
+ return exponent>=0?steadyExactFraction(n*10n**BigInt(exponent)):steadyExactFraction(n,10n**BigInt(-exponent));
 }
-
+function steadyRegionQ(x){
+ if(typeof x==='string'&&/^-?\d+\/\d+$/.test(x)){
+  const [a,b]=x.split('/');return steadyExactFraction(BigInt(a),BigInt(b));
+ }
+ return steadyExactQ(x);
+}
+function steadyExactAdd(a,b){return steadyExactFraction(a.n*b.d+b.n*a.d,a.d*b.d);}
+function steadyExactSub(a,b){return steadyExactFraction(a.n*b.d-b.n*a.d,a.d*b.d);}
+function steadyExactMul(a,b){return steadyExactFraction(a.n*b.n,a.d*b.d);}
+function steadyExactDiv(a,b){return steadyExactFraction(a.n*b.d,a.d*b.n);}
+function steadyExactCmp(a,b){const diff=a.n*b.d-b.n*a.d;return diff<0n?-1:diff>0n?1:0;}
+function steadyExactMin(a,b){return steadyExactCmp(a,b)<=0?a:b;}
+function steadyExactText(a){return a.d===1n?String(a.n):String(a.n)+'/'+String(a.d);}
+function steadyExactNumber(a){return Number(a.n)/Number(a.d);}
+const STEADY_ZERO=steadyExactQ(0),STEADY_ONE=steadyExactQ(1);
+function steadyExactSum(xs){return xs.reduce((s,x)=>steadyExactAdd(s,x),STEADY_ZERO);}
+// No optimization objective and no fairness penalties. This is the exact
+// progressive-filling solution for a single resource with finite demand caps.
+function steadyExactWaterfill(supply,caps){
+ const total=steadyExactSum(caps),budget=steadyExactMin(supply,total);
+ if(steadyExactCmp(budget,STEADY_ZERO)<0||caps.some(c=>steadyExactCmp(c,STEADY_ZERO)<0))
+  throw Error('negative physical rate');
+ const sorted=caps.map((cap,i)=>({cap,i})).sort((a,b)=>steadyExactCmp(a.cap,b.cap)||a.i-b.i);
+ const result=caps.map(()=>STEADY_ZERO);
+ let remaining=budget;
+ for(let j=0;j<sorted.length;j++){
+  const share=steadyExactDiv(remaining,steadyExactQ(sorted.length-j));
+  if(steadyExactCmp(sorted[j].cap,share)<=0){
+   result[sorted[j].i]=sorted[j].cap;
+   remaining=steadyExactSub(remaining,sorted[j].cap);
+  }else{
+   for(let k=j;k<sorted.length;k++)result[sorted[k].i]=share;
+   remaining=STEADY_ZERO;break;
+  }
+ }
+ if(steadyExactCmp(remaining,STEADY_ZERO)!==0)throw Error('fairness conservation failure');
+ return result;
+}
 function warehouseTheory(targetItem=null){
- const byId=new Map(state.machines.map(m=>[m.id,m]));
- const validRoutes=state.routes.filter(r=>byId.has(r.from.id)&&r.to&&byId.has(r.to.id)&&!checkPath(r.path,r.from,r.to,r.id));
- const routesIn=new Map(),routesOut=new Map();
- const machineRecords=new Map();
- for(const m of state.machines)if(getRecipe(m))machineRecords.set(m.id,getRecipe(m));
- for(const r of validRoutes){
-  const ki=r.to.id+':'+r.to.port,ko=r.from.id+':'+r.from.port;
-  routesIn.set(ki,r);routesOut.set(ko,r);
+ const result={inflow:{},outflow:{},machineCycles:{},routeFlows:{},
+  status:'modelled-unresolved',diagnostics:{certified:false,exact:false,modelled:true,rateSolved:false}};
+ if(typeof factorySteadyAutomaticFluidBudget!=='function'||typeof factorySteadyBuildEquations!=='function'){
+  result.notice='数学模型未加载';
+  return result;
  }
- const labels=[],cycleVar=new Map(),routeVar=new Map(),routeItems=new Map();
- for(const [id] of machineRecords){cycleVar.set(id,labels.length);labels.push({type:'cycle',id});}
- for(const r of validRoutes){
-  const src=byId.get(r.from.id),dst=byId.get(r.to.id),srcPort=outPort(src,r.from.port);
-  const poss=[...streamMaterials(r)].filter(item=>{
-   if(!item||!acceptsMaterial(dst,item,r.to.port))return false;
-   if(src.type==='分流'&&srcPort?.filter&&srcPort.filter!=='任意'&&srcPort.filter!==item)return false;
-   if(getRecipe(src)&&getRecipe(src).output!==item)return false;
-   return true;
-  });
-  routeItems.set(r.id,poss);
-  for(const item of poss){
-   const key=r.id+'|'+item;routeVar.set(key,labels.length);labels.push({type:'route',id:r.id,item});
-  }
- }
- let n=labels.length;const rows=[];
- function add(entries,b=0){
-  const arr=[...entries].filter(([,v])=>Math.abs(v)>1e-12);
-  if(arr.length)rows.push({a:arr,b});
- }
- function equality(entries){add(entries);add(entries.map(([i,v])=>[i,-v]));}
- function rates(routes,item){const a=new Map();for(const r of routes){const j=routeVar.get(r.id+'|'+item);if(j!==undefined)a.set(j,(a.get(j)||0)+1);}return a;}
- const machineInputs=new Map(),machineOutputs=new Map();
- for(const m of state.machines){machineInputs.set(m.id,[]);machineOutputs.set(m.id,[]);}
- for(const r of validRoutes){machineInputs.get(r.to.id).push(r);machineOutputs.get(r.from.id).push(r);}
- for(const m of state.machines){
-  const ins=machineInputs.get(m.id),outs=machineOutputs.get(m.id),rec=machineRecords.get(m.id);
-  if(rec){
-   const v=cycleVar.get(m.id);
-   add([[v,1]],1/rec.seconds);
-   // Every produced item must have a real connected output route (no infinite output buffer).
-   const prod=[...rates(outs,rec.output)];prod.push([v,-rec.qty]);equality(prod);
-   for(const [item,quantity] of Object.entries(rec.inputs||{})){
-    const a=[...rates(ins,item)];a.push([v,-quantity]);equality(a);
-   }
-  }else if(m.type==='分流'||m.type==='汇流'){
-   const mats=new Set([...ins,...outs].flatMap(r=>routeItems.get(r.id)||[]));
-   for(const item of mats){
-    const totals=new Map(rates(ins,item));
-    for(const [j,c] of rates(outs,item))totals.set(j,(totals.get(j)||0)-c);
-    equality([...totals]);
+ try{
+  const model=factorySteadyBuildEquations();
+  const current=factorySteadyAutomaticFluidBudget(state,model);
+  result.conditionalBudget=current;
+  if(current.status==='conditional-fixed-point'){
+   result.status='conditional-fixed-point';
+   result.diagnostics.rateSolved=true;
+   result.notice='连续供需模型已求解；真实有限 FIFO / 轮询调度尚未完全证明。';
+  }else{
+   result.notice='当前布局的供需模型尚未求解：'+(current.reason||current.issues?.map(x=>x.machine+' '+x.reason).join('；')||'未知原因');
+   // Necessary bounds are useful only for an unresolved model. Do not
+   // substitute them for actual solved rates.
+   if(typeof factorySteadyProveRateBounds==='function'){
+    const bounds=factorySteadyProveRateBounds(model);
+    result.diagnostics.symbolicModel={provenUpperBounds:{
+     completed:bounds.completed,
+     machineCycleUpper:Object.fromEntries(Object.entries(bounds.upper).filter(([k])=>k.startsWith('cycles:')).map(([k,v])=>[k.slice(7),v])),
+     routeItemUpper:Object.fromEntries(Object.entries(bounds.upper).filter(([k])=>k.startsWith('flow:')).map(([k,v])=>[k.slice(5),v]))
+    }};
    }
   }
-  // Each physical input/output port has its own TOTAL bandwidth cap 1 item/s.
-  for(const which of [ins,outs]){
-   const portKey=which===ins?'to':'from',group=new Map();
-   for(const r of which){const p=r[portKey].port,items=group.get(p)||[];
-    for(const mat of routeItems.get(r.id)||[]){const j=routeVar.get(r.id+'|'+mat);items.push([j,1]);}
-    group.set(p,items);
-   }
-   for(const entries of group.values())add(entries,1);
+  if(!model.warehousePools.some(p=>p.withdrawalMachineOrder.length)){
+   if(current.status==='conditional-fixed-point')
+    result.overdraftNet=Object.fromEntries([...new Set([...Object.keys(current.inflow),...Object.keys(current.outflow)])].map(k=>[k,(current.inflow[k]||0)-(current.outflow[k]||0)]));
+  }else{
+   const unlimited=factorySteadyAutomaticFluidBudget(state,model,{unlimitedWarehouse:true});
+   result.unlimitedStockBudget=unlimited;
+   if(unlimited.status==='conditional-fixed-point')
+    result.overdraftNet=Object.fromEntries([...new Set([...Object.keys(unlimited.inflow),...Object.keys(unlimited.outflow)])].map(k=>[k,(unlimited.inflow[k]||0)-(unlimited.outflow[k]||0)]));
   }
- }
- for(const r of validRoutes){
-  const entries=(routeItems.get(r.id)||[]).map(item=>[routeVar.get(r.id+'|'+item),1]);
-  add(entries,1);
- }
-   // Round-robin: each eligible unblocked outlet receives a turn.
-  // In particular, if a splitter has a branch that is PROVABLY able to drain
-  // into the warehouse without output contention, that branch cannot
-  // receive less than any other eligible outlet of the same material.
-  // This is a necessary fairness bound, not a full min(cap_i,level) solver.
-  // Never give the warehouse a higher objective weight or force unconditional
-  // equal splitting: blocked/limited branches are supposed to be skipped.
-  const routeUpperCache=new Map();
-  function upstreamRateUpper(route,visiting=new Set()){
-   if(routeUpperCache.has(route.id))return routeUpperCache.get(route.id);
-   if(visiting.has(route.id))return 1; // cycle: do not claim safe capacity
-   const next=new Set(visiting);next.add(route.id);
-   const source=byId.get(route.from.id);
-   let bound=1;
-   const producer=source&&machineRecords.get(source.id);
-   if(producer)bound=Math.min(1,producer.qty/producer.seconds);
-   else if(source&&['分流','汇流'].includes(source.type)){
-    const inbound=machineInputs.get(source.id)||[];
-    bound=Math.min(1,inbound.reduce((sum,r)=>sum+upstreamRateUpper(r,next),0));
-   }
-   routeUpperCache.set(route.id,bound);
-   return bound;
-  }
-  function guaranteedWarehouseDrain(route,item,seen=new Set()){
-   if(seen.has(route.id))return false;
-   const dest=byId.get(route.to.id);
-   if(!dest)return false;
-   if(dest.type==='仓入'||dest.type==='电脑')return acceptsMaterial(dest,item,route.to.port);
-   if(dest.type!=='汇流')return false;
-   const incoming=machineInputs.get(dest.id)||[];
-   // Total worst-case input must fit the merger output (1 item/s).
-   // Otherwise competing materials may fill its buffer and block this path.
-   const upper=incoming.reduce((sum,r)=>sum+upstreamRateUpper(r),0);
-   if(upper>1-1e-7)return false;
-   const downstream=machineOutputs.get(dest.id)||[];
-   if(downstream.length!==1||!routeVar.has(downstream[0].id+'|'+item))return false;
-   const next=new Set(seen);next.add(route.id);
-   return guaranteedWarehouseDrain(downstream[0],item,next);
-  }
-  let fairSplitConstraints=0;
-  for(const splitter of state.machines)if(splitter.type==='分流'){
-   const outbound=machineOutputs.get(splitter.id)||[];
-   const items=new Set(outbound.flatMap(r=>routeItems.get(r.id)||[]));
-   for(const item of items){
-    const eligible=outbound.filter(r=>routeVar.has(r.id+'|'+item));
-    if(eligible.length<2)continue;
-    const drains=eligible.filter(r=>guaranteedWarehouseDrain(r,item));
-    if(!drains.length)continue;
-    // An always-available outlet gets at least as many successful sends
-    // as a blocked one. Two always-available outlets get equal turns.
-    for(const drain of drains)for(const rival of eligible){
-     if(drain.id===rival.id)continue;
-     add([[routeVar.get(rival.id+'|'+item),1],[routeVar.get(drain.id+'|'+item),-1]],0);
-     fairSplitConstraints++;
-    }
-   }
-  }
-const materials=new Set([...routeVar.keys()].map(k=>labels[routeVar.get(k)].item));
- for(const mat of materials){
-  const entries=new Map();
-  for(const r of validRoutes){
-   const idx=routeVar.get(r.id+'|'+mat);if(idx===undefined)continue;
-   if(byId.get(r.from.id).type==='仓出')entries.set(idx,(entries.get(idx)||0)+1);
-   if(byId.get(r.to.id).type==='仓入')entries.set(idx,(entries.get(idx)||0)-1);
-  }
-  // Cold-start sustainable throughput: inventory withdraw <= real deposit for each material.
-  add([...entries],0);
- }
-  // No product-specific ranking: all manufacturing output is valued equally per item.
-   // Fair service is measured in actual items/second, not arbitrary recipe
-  // importance ranks. This keeps the whole factory in one numerical solve.
-  // Each absolute branch-rate difference is represented by a nonnegative
-  // auxiliary LP variable; its penalty is expressed in items/second.
-  // The relaxation improves steady throughput estimates but does NOT
-  // exactly reproduce finite buffers and discrete round-robin scheduling.
-  const fairnessDevs=[];
-  for(const splitter of state.machines)if(splitter.type==='分流'){
-   const outs=machineOutputs.get(splitter.id)||[];
-   const materials=new Set(outs.flatMap(r=>routeItems.get(r.id)||[]));
-   for(const item of materials){
-    const eligible=outs.map(r=>routeVar.get(r.id+'|'+item)).filter(j=>j!==undefined);
-    for(let i=0;i<eligible.length;i++)for(let j=i+1;j<eligible.length;j++){
-     const dev=n++;fairnessDevs.push(dev);
-     add([[eligible[i],1],[eligible[j],-1],[dev,-1]],0);
-     add([[eligible[j],1],[eligible[i],-1],[dev,-1]],0);
-    }
-   }
-  }
-  // One unit of an excess two-way branch flow represents half of the
-  // absolute branch-rate gap. Both terms are now measured in items/second.
-  const FAIRNESS_TRANSFER_COST=targetItem?0:0.5;
-
-  const objective=new Float64Array(n);
- for(const [id,rec] of machineRecords)objective[cycleVar.get(id)]=(!targetItem||rec.output===targetItem)?rec.qty:0;
-  for(const j of fairnessDevs)objective[j]=-FAIRNESS_TRANSFER_COST;
- // Warehouse net surplus is secondary to genuinely producing items.
- // A tiny weight favors reusing excess supply rather than wasting it upstream.
- for(const r of validRoutes){
-  const src=byId.get(r.from.id),dst=byId.get(r.to.id);
-  for(const item of routeItems.get(r.id)||[]){
-   const j=routeVar.get(r.id+'|'+item);
-   if(dst.type==='仓入')objective[j]+=0.0002;
-   if(src.type==='仓出')objective[j]-=0.0002;
-  }
- }
-   // Stage 1: current all-commodity flow solution with splitter service balancing.
-  // Stage 2: an exact Pareto non-idling LP improvement. No machine may slow
-  // down compared with Stage 1; unused warehouse resources must be used
-  // wherever they can increase ANY useful manufacturing throughput.
-  // This is an algebraic LP, never a simulation or time-average.
-  // Numerical results are never trusted without checking every original
-  // recipe, warehouse, route and interface capacity inequality.
-  // In highly degenerate networks a floating-point tableau may return
-  // a mathematically impossible "optimal" result after many pivots.
-  function verifyPrimal(solution,constraints){
-   if(!solution.ok)return {ok:false,error:solution.error||'LP solver failed'};
-   if(!solution.x||solution.x.length!==n)return {ok:false,error:'LP variables missing'};
-   for(let j=0;j<n;j++)if(!Number.isFinite(solution.x[j])||solution.x[j]<-1e-6)
-    return {ok:false,error:'LP invalid variable #'+j};
-   for(let i=0;i<constraints.length;i++){
-    const r=constraints[i];let lhs=0;
-    for(const [j,a] of r.a)lhs+=a*solution.x[j];
-    if(!Number.isFinite(lhs)||lhs>r.b+1e-5*Math.max(1,Math.abs(r.b)))
-     return {ok:false,error:'LP constraint #'+i+' violated (lhs='+lhs+', rhs='+r.b+')'};
-   }
-   return {ok:true};
-  }
-  let result=factorySteadySimplex(rows,n,objective);
-  const stage1Check=verifyPrimal(result,rows);
-  if(!stage1Check.ok)
-   return {inflow:{},outflow:{},machineCycles:{},routeFlows:{},warnings:[stage1Check.error],
-    error:'稳态 LP 数值求解不可信：'+stage1Check.error,
-    diagnostics:{variables:n,constraints:rows.length,pivots:result.pivots||0,numericallyInvalid:true}};
-  let paretoAdditionalProductsPerMinute=0,paretoRefinementStatus='skipped';
-  if(result.ok && cycleVar.size){
-   const baseline=result,refineRows=rows.slice(),tol=1e-8;
-   for(const j of cycleVar.values())if(baseline.x[j]>tol)
-    refineRows.push({a:[[j,-1]],b:-baseline.x[j]+tol});
-   const workObjective=new Float64Array(n);
-   for(const [id,rec] of machineRecords)workObjective[cycleVar.get(id)]=rec.qty;
-   const better=factorySteadyTwoPhase(refineRows,n,workObjective);
-   if(verifyPrimal(better,refineRows).ok && [...cycleVar.values()].every(j=>better.x[j]+2e-6>=baseline.x[j])){
-    for(const [id,rec] of machineRecords){
-     const j=cycleVar.get(id);
-     paretoAdditionalProductsPerMinute+=60*Math.max(0,(better.x[j]-baseline.x[j])*rec.qty);
-    }
-    result=better;paretoRefinementStatus='optimal';
-   }else paretoRefinementStatus=better.error||'numerical-inconsistency';
-  }
- if(!result.ok)return {inflow:{},outflow:{},machineCycles:{},routeFlows:{},warnings:[result.error],error:result.error,diagnostics:{variables:n,constraints:rows.length,pivots:result.pivots||0}};
- const eps=1e-7,x=result.x,inflow={},outflow={},machineCycles={},routeFlows={},machineNeeds={},machineFeeds=new Map();
- const credit=(obj,item,v)=>{if(v>eps)obj[item]=(obj[item]||0)+v;};
- for(const [id,j] of cycleVar)machineCycles[id]=x[j]||0;
-  const machineDuty={},machineIdle={};
-  for(const [id,rec] of machineRecords){
-   const duty=Math.max(0,Math.min(1,(machineCycles[id]||0)*rec.seconds));
-   machineDuty[id]=duty;machineIdle[id]=1-duty;
-  }
- for(const r of validRoutes){
-  const src=byId.get(r.from.id),dst=byId.get(r.to.id),flows={};
-  for(const item of routeItems.get(r.id)||[]){
-   const j=routeVar.get(r.id+'|'+item),v=x[j];if(!(v>eps))continue;
-   flows[item]=v;
-   if(src.type==='仓出')credit(outflow,item,v);
-   if(dst.type==='仓入')credit(inflow,item,v);
-   if(machineRecords.has(dst.id)){
-    const feed=machineFeeds.get(dst.id)||{};credit(feed,item,v);machineFeeds.set(dst.id,feed);
-   }
-  }
-  routeFlows[r.id]=flows;
- }
- for(const [id,rec] of machineRecords){
-  const need={};for(const [item,qty] of Object.entries(rec.inputs||{}))need[item]=qty*machineCycles[id];
-  machineNeeds[id]=need;
- }
- const warnings=[];
- for(const [id,rec] of machineRecords){
-  for(const item of Object.keys(rec.inputs||{})){
-   const connected=(machineInputs.get(id)||[]).some(r=>(routeItems.get(r.id)||[]).includes(item));
-   if(!connected)warnings.push(id+' 缺少有效上游：'+item);
-  }
- }
- return {inflow,outflow,machineCycles,machineDuty,machineIdle,machineNeeds,machineFeeds:Object.fromEntries(machineFeeds),routeFlows,warnings,
-  diagnostics:{variables:n,constraints:rows.length,paretoRefinementStatus,paretoAdditionalProductsPerMinute,solverStages:2,fairSplitConstraints,fairnessVariables:fairnessDevs.length,splitterImbalancePerMinute:fairnessDevs.reduce((sum,j)=>sum+(x[j]||0),0)*60,approximate:true,pivots:result.pivots,elapsedMs:result.elapsedMs,objective:result.objective,method:'多物品联立线性规划 + Pareto 非空转优化（纯数字近似）'}};
+ }catch(error){result.notice='数学模型尚未求解：'+error.message;result.conditionalBudget={status:'unresolved',reason:error.message};}
+ return result;
 }
-
+function steadyDisplayRateBudget(budget){
+ if(budget?.diagnostics?.certified===true)return budget;
+ if(budget?.conditionalBudget?.status==='conditional-fixed-point')return budget.conditionalBudget;
+ // Legacy exact-rate callers and isolated geometry tests supply a budget
+ // without diagnostics; never accept a declared unresolved budget.
+ if(budget&&!budget.error&&!budget.diagnostics&&budget.machineCycles)return budget;
+ return null;
+}
 function portSteadyRate(m,port){
  const r=routeFor(m.id,port.kind==='in'?'in':'out',port.index);
  if(!r)return 0;
- return Object.values(theoreticalBudget?.routeFlows?.[r.id]||{}).reduce((sum,x)=>sum+x,0)*60;
+ return Object.values(steadyDisplayRateBudget(theoreticalBudget)?.routeFlows?.[r.id]||{}).reduce((sum,x)=>sum+x,0)*60;
 }
-// The LP stores per-route, per-item rates in items/s; show items/min in the inspector.
+// Certified route rates are kept in items/s and shown as items/min in the inspector.
 function steadyPortFlowDetails(m,p,theory){
  const route=routeFor(m.id,p.kind==='in'?'in':'out',p.index);
  const valid=!!route&&!!route.to&&!checkPath(route.path,route.from,route.to,route.id);
@@ -409,10 +135,7 @@ function steadyPortFlowDetails(m,p,theory){
 function steadyFlowTotal(flows){return Object.values(flows).reduce((total,n)=>total+n,0);}
 function steadyFlowMaterialRows(flows,materials){
  const all=new Set([...materials,...Object.keys(flows)]);
- const ordered=[...all].filter(Boolean).sort((a,b)=>{
-  const ai=MATERIALS.indexOf(a),bi=MATERIALS.indexOf(b);
-  return (ai<0?999:ai)-(bi<0?999:bi)||a.localeCompare(b,'zh-CN');
- });
+ const ordered=[...all].filter(Boolean).sort(factoryItemCompare);
  if(!ordered.length)return '<div class="tiny" style="padding:4px 0">\u65e0\u7269\u54c1\u6d41\uff080.00 \u4ef6/\u5206\uff09</div>';
  return ordered.map(item=>{
   const perMinute=Math.max(0,flows[item]||0)*60;
@@ -425,9 +148,10 @@ function steadyFlowPortLabel(m,p){
  return (p.kind==='in'?'\u8f93\u5165':'\u8f93\u51fa')+' '+(p.index+1)+' ('+p.side+')';
 }
 function machineSteadyPanel(m){
- const theory=theoreticalBudget;
- if(!theory||theory.error)
-  return `<div class="item machine-theory" id="inspectorTheory"><div class="machine-analysis-title"><strong>稳态理论</strong></div><div class="tiny">${esc(theory?.error||'尚未计算')}</div></div>`;
+ const theory=steadyDisplayRateBudget(theoreticalBudget);
+ if(!theory){
+  return `<div class="item machine-theory" id="inspectorTheory"><div class="machine-analysis-title"><strong>稳态理论</strong></div><div class="tiny">${esc(theoreticalBudget?.notice||theoreticalBudget?.error||'已建立流量方程，当前机器的唯一长期速率仍待证明')}</div>${machineSteadyDemandEquationsMarkup(m)}</div>`;
+ }
  const ports=getPorts(m),junction=m.type==='分流'||m.type==='汇流';
  const details=ports.map(p=>steadyPortFlowDetails(m,p,theory));
  const rate=v=>(Math.max(0,v)*60).toFixed(2);
@@ -468,11 +192,36 @@ function machineSteadyPanel(m){
   breakdown+=`<section class="machine-port-details-section"><div class="machine-port-details-heading">${heading}接口 · ${subset.length} 个</div>${rows}</section>`;
  }
  return `<div class="item machine-theory" id="inspectorTheory">
-  <div class="machine-analysis-title"><strong>稳态理论</strong><span class="analysis-unit">件/分钟</span></div>
+  <div class="machine-analysis-title"><strong>稳态理论</strong><span class="analysis-unit">${theory.status==='conditional-fixed-point'?'条件解 · ':''}件/分钟</span></div>
   <div class="machine-flow-summary">${tiles}</div>
   ${dutyInfo}
   <details class="machine-port-details"><summary>接口流量明细 · ${ports.length} 个接口</summary>
    <div class="machine-port-details-body">${breakdown}</div>
   </details>
  </div>`;
+}
+
+// Explain already proven conservation equations without presenting unknown
+// splitter arbitration or FIFO scheduling as an actual steady production rate.
+function machineSteadyDemandEquationsMarkup(m){
+ if(!getRecipe(m)||typeof factorySteadyRecipeDemandTrace!=='function')return '';
+ const trace=factorySteadyRecipeDemandTrace(m.id);
+ if(!trace)return '';
+ const rows=trace.inputRequirements.map(part=>{
+  const routes=part.routes.map(r=>r.route);
+  const sum=routes.length?routes.join(' + '):'∑输入线路';
+  const basic='<div class="kv"><span>'+esc(part.item)+'</span><b>'+esc(sum)+' = '+esc(part.neededPerCycle)+'ν</b></div>';
+  const upstream=part.routes.filter(r=>r.upstreamJunction).map(r=>{
+   const j=r.upstreamJunction;
+   const received=j.incomingRoutes.join(' + ')||'∑上游';
+   const sent=[r.route,...j.competingOutgoingRoutes].join(' + ');
+   return '<div class="tiny" style="padding-left:8px">上游'+esc(j.kind)+
+    ' '+esc(j.machine)+'：'+esc(received)+' = '+esc(sent)+
+    '（轮询分配待证明）</div>';
+  }).join('');
+  return basic+upstream;
+ }).join('');
+ return '<details class="machine-port-details"><summary>已建立的配方反压等式（非实际流量）</summary>'+
+  '<div class="machine-port-details-body"><div class="tiny" style="margin-bottom:7px">令 ν 为该机器每秒配方轮数；以下仅是必须成立的比例和守恒方程，不能据此声称已求出 ν。</div>'+
+  rows+'</div></details>';
 }

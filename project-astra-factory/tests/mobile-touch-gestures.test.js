@@ -21,6 +21,7 @@ const el={
  mobileZoomIn:{addEventListener(){}},mobileZoomOut:{addEventListener(){}}
 };
 const ctx={
+ beltTrim:null,draft:null,
  console,Map,Math,setTimeout:()=>1,clearTimeout(){},
  window:{PointerEvent:function(){},matchMedia:()=>media,addEventListener(){}},
  document:{

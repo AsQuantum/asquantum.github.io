@@ -19,15 +19,17 @@ function mobilePrepareStampPreview(){
 }
 
 function mobileEditorActive(){return mobileLayoutMedia.matches;}
-let mobileMapToastTimer=null;
-function mobileSetMapStatus(message){
+let mobileMapToastTimer=null,mobileMapStatusSticky=false;
+function mobileSetMapStatus(message,sticky=false){
  const status=$('mobileMapState');
- if(!status||status.textContent===message)return;
+ if(!status)return;
+ if(status.textContent===message&&mobileMapStatusSticky===sticky)return;
+ mobileMapStatusSticky=sticky;
  status.textContent=message;
  if(mobileMapToastTimer!==null)clearTimeout(mobileMapToastTimer);
  mobileMapToastTimer=null;
  status.classList.toggle('is-visible',Boolean(message));
- if(message)mobileMapToastTimer=setTimeout(()=>{
+ if(message&&!sticky)mobileMapToastTimer=setTimeout(()=>{
   status.classList.remove('is-visible');
   mobileMapToastTimer=null;
  },3000);
@@ -37,17 +39,20 @@ function mobileUpdatePlacement(){
  if(!bar)return;
  bar.hidden=!stampType;
  let message;
- if(stampType){
+ if(beltTrim?.index>=0){
+  message="红色是待删除的线路尾段；再次轻点原选中的同一格确认删除。拖动到其他位置可预览延长，点其他线路取消。";
+
+ }else if(stampType){
   const name=def({type:stampType})?.name||stampType;
   $('mobileStampName').textContent=name;
   message='放置：'+name+' · 拖动虚影定位，松手后再次点按放置';
- }else if(tool==='belt')message='接线：点橙色输出口 → 蓝色输入口';
+ }else if(tool==='belt')message='接线：按住橙色输出口拖动到拐点／蓝色输入口，松手确认；也可逐点轻触。点已存线段可进入编辑。';
  else if(tool==='pan')message='平移：单指拖动 · 双指缩放／平移';
  else if(groupTransform)message=groupTransform.mode==='copy'
   ?'连续复制：拖动虚影，点中机器确认；点外面不会放置'
   :'移动预览：拖动虚影，点中机器确认';
  else message='点按选择 · 单指滑动框选 · 双指移动/缩放地图';
- mobileSetMapStatus(message);
+ mobileSetMapStatus(message,Boolean(beltTrim?.index>=0));
 }
 function mobileOpenView(view){
  if(!mobileEditorActive())return;

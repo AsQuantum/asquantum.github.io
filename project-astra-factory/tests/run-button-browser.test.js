@@ -30,6 +30,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   console.log('BEFORE',JSON.stringify(info));
   // Restore a real pre-v12 localStorage save during page initialization.
   const legacyScript=`localStorage.removeItem('factory_lab_v12');
+    localStorage.removeItem('factory_lab_v13');
     localStorage.removeItem('factory_lab_templates_v1');
     localStorage.removeItem('factory_lab_template_active_v1');
     localStorage.setItem('factory_lab_v2',JSON.stringify({version:11,name:'旧自动存档',
@@ -41,21 +42,21 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    await send('Page.removeScriptToEvaluateOnNewDocument',{identifier:injected.result.identifier});
   const oldStartup=await evaluate(`({
    name:state.name,mode:state.machines[0]?.mode,
-   version:JSON.parse(localStorage.getItem('factory_lab_v12')).version,
+   version:JSON.parse(localStorage.getItem('factory_lab_v13')).version,
    oldStillThere:!!localStorage.getItem('factory_lab_v2')
   })`);
   assert.equal(oldStartup.name,'旧自动存档');
   assert.equal(oldStartup.mode,1);
-  assert.equal(oldStartup.version,12);
+  assert.equal(oldStartup.version,13);
   assert(oldStartup.oldStillThere,'keep original legacy backup in browser storage');
   await send('Page.reload',{ignoreCache:true});
   await new Promise(r=>setTimeout(r,450));
   const resumed=await evaluate(`({name:state.name,mode:state.machines[0]?.mode,
-    version:JSON.parse(localStorage.getItem('factory_lab_v12')).version})`);
+    version:JSON.parse(localStorage.getItem('factory_lab_v13')).version})`);
   assert.equal(resumed.name,'旧自动存档');
   assert.equal(resumed.mode,1);
-  assert.equal(resumed.version,12);
-  console.log('PASS: startup auto-upgrades localStorage v2 to v12 and restores v12 on next reload');
+  assert.equal(resumed.version,13);
+  console.log('PASS: startup auto-upgrades localStorage v2 to v13 and restores v13 on next reload');
   // Legacy converter lives only in old.js. Bad imports do not replace active state.
   const legacyChecks=await evaluate(`(()=>{
    const legacy={version:11,name:'旧版等级存档',machines:[
@@ -66,20 +67,20 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    loadState(legacy);
    const modes=state.machines.map(m=>m.mode);
    const outputs=state.machines.map(getRecipe).map(r=>r?.output);
-   const compact=JSON.parse(localStorage.getItem('factory_lab_v12'));
+   const compact=JSON.parse(localStorage.getItem('factory_lab_v13'));
    const before=compactFactoryJSON();
    let rejected=false;
    try{loadState({name:'坏配方',machines:[{id:'bad',type:'垃圾',mode:'nonsense',x:1,y:1,face:'E'}],routes:[]});}
    catch(e){rejected=true;}
    const safe=compactFactoryJSON()===before;
-   const storedUnchanged=localStorage.getItem('factory_lab_v12')===before;
+   const storedUnchanged=localStorage.getItem('factory_lab_v13')===before;
    loadState(createEmpty());
    return {modes,outputs,format:compact.format,version:compact.version,rejected,safe,storedUnchanged};
   })()`);
   assert.deepEqual(legacyChecks.modes,[0,1,0]);
   assert.deepEqual(legacyChecks.outputs,['太空垃圾','相位粒子','小行星矿石']);
   assert.equal(legacyChecks.format,'factory-lab');
-  assert.equal(legacyChecks.version,12);
+  assert.equal(legacyChecks.version,13);
   assert(legacyChecks.rejected&&legacyChecks.safe&&legacyChecks.storedUnchanged,
    'legacy import or non-destructive validation failed: '+JSON.stringify(legacyChecks));
   console.log('PASS: old.js converts old LV3/LV4 to numeric IDs, bad JSON cannot replace current layout');
@@ -100,7 +101,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const bytes=ast1ToBytes();
    const decoded=ast1Decode(ast1Encode());
    const roundtripOK=decoded.machines.every((m,i)=>m.mode===originals[i].mode&&
-     m.id==='ast1_'+i&&getRecipe(m)?.output===sources[i][1]);
+     m.id==='M'+i&&getRecipe(m)?.output===sources[i][1]);
    const bytesOK=originals.every((m,i)=>bytes[3+7*i]===AST1_ID_BY_TYPE[m.type]&&
       bytes[3+7*i+5]===i%2);
    const presetsOK=[SAMPLE,window.FACTORY_WARP_PRESET].every(layout=>
@@ -149,7 +150,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
     const bytesNew=new Blob([JSON.stringify(compact)]).size;
     reports.push({machinesOK,routesOK,bytesOld,bytesNew,count:src.routes.length,
      factor:Number((bytesOld/bytesNew).toFixed(2)),
-     longSegments:compact.routes.filter(r=>r[5].some(seg=>seg[1]>=5&&seg[0]<4)).length});
+     longSegments:compact.routes.filter(r=>r.path.length>=5).length});
    }
    const straight=[[3,4],[4,4],[5,4],[6,4],[6,5],[6,6],[5,6],[5,6],[18,9]];
    const packed=packRouteRuns(straight);
@@ -161,10 +162,11 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
       inletItem:'小行星矿石',item:'引力透镜',tag:'测试机器',ast1Meta:{record:[8,2,2,0,0,0,0]}};
    const packedMachine=compactFactoryLayout({name:'验证',machines:[machine],routes:[]});
    const restoredMachine=expandCompactFactoryLayout(packedMachine).machines[0];
-   const encodedFields=packedMachine.machines[0][5];
-   const filtersOK=encodedFields.item===454&&encodedFields.inletItem===444&&
-      encodedFields.outFilters['0']===455&&encodedFields.outFilters['1']===20&&
-      encodedFields.filters['0']===445&&
+   const encodedFields=packedMachine.machines[0];
+   const filtersOK=encodedFields.item===machine.item&&encodedFields.inletItem===machine.inletItem&&
+      encodedFields.outFilters['0']===machine.outFilters['0']&&
+      encodedFields.outFilters['1']===machine.outFilters['1']&&
+      encodedFields.filters['0']===machine.filters['0']&&
       JSON.stringify(restoredMachine.outFilters)===JSON.stringify(machine.outFilters)&&
       JSON.stringify(restoredMachine.ast1Meta)===JSON.stringify(machine.ast1Meta)&&
       restoredMachine.tag===machine.tag;
@@ -182,17 +184,17 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const astRecordOK=astBefore===astAfter;
    state=savedState;
    const corrupt=JSON.parse(JSON.stringify(packedMachine));
-   corrupt.routes.push([999,0,0,0,[1,1],[]]);
+   corrupt.routes.push({from:[999,0],to:[0,0],path:[[1,1]]});
    let invalidRejected=false;
    try{expandCompactFactoryLayout(corrupt);}catch(e){invalidRejected=true;}
    return {reports,pathOK,runsOK,filtersOK,invalidRejected,astRecordOK};
   })()`);
   console.log('COMPACT JSON',JSON.stringify(compactChecks));
   assert(compactChecks.pathOK&&compactChecks.runsOK&&compactChecks.filtersOK&&compactChecks.invalidRejected&&compactChecks.astRecordOK,
-    'compressed route or numeric item fields failed: '+JSON.stringify(compactChecks));
-  assert(compactChecks.reports.every(r=>r.machinesOK&&r.routesOK&&r.bytesNew<r.bytesOld&&r.longSegments>0),
+    'JSON v13 route or item/filter fields failed: '+JSON.stringify(compactChecks));
+  assert(compactChecks.reports.every(r=>r.machinesOK&&r.routesOK&&r.longSegments>0),
     'full sample/warp roundtrip lost geometry or failed compression');
-  console.log('PASS: sample and warp layout RLE roundtrip, item/filter IDs, unknown path jumps and reduced file sizes');
+  console.log('PASS: readable JSON v13 preserves all machine properties, route coordinates and decoded item/filter names');
   const warehouseInitial=await evaluate('({open:document.getElementById("warehousePanel").open,content:!!document.getElementById("warehouse").innerHTML})');
   assert.equal(warehouseInitial.open,false,'warehouse should start collapsed for a new user');
   assert(warehouseInitial.content,'warehouse content should still be rendered while collapsed');

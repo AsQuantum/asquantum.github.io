@@ -24,7 +24,9 @@
 - `scripts/core/editor.js` — 拖放、撤销、状态变更
 - `scripts/core/audit.js` — 线路和接口审计
 - `scripts/core/layout-io.js` — JSON 导入导出
-- `scripts/engine/steady-flow.js` — 不推进时间的稳态理论流量计算
+- `scripts/engine/steady-flow.js` — 通用稳态入口与有理数公共函数
+- `scripts/engine/steady-auto-fluid.js` — 自动供需平衡点求解（受限稳态、潜在净值、透支稳态）
+- `docs/generic-machine-rate-model.md` — 完整数学模型与验证
 - `scripts/engine/simulation.js` — 逐件物流模拟
 - `scripts/engine/acceptance.js` — 模拟验收
 - `scripts/blueprints/machine-ids.js` — AST1 机器类型 ID / 配方模式

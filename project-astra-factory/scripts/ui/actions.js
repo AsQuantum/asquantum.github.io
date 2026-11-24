@@ -4,7 +4,6 @@ const warehousePanel=$('warehousePanel');
 try{warehousePanel.open=localStorage.getItem('factory_lab_warehouse_expanded')==='true';}catch(e){}
 warehousePanel.addEventListener('toggle',()=>{
  try{localStorage.setItem('factory_lab_warehouse_expanded',String(warehousePanel.open));}catch(e){}
- if(warehousePanel.open&&$('warehouse').firstElementChild)warehouseRefreshLive();
 });
 $('map').addEventListener('pointerdown',onPointerDown);$('map').addEventListener('pointermove',onPointerMove);$('map').addEventListener('pointerleave',onPointerLeave);$('map').addEventListener('pointerup',onPointerUp);$('map').addEventListener('pointercancel',onPointerUp);$('map').addEventListener('contextmenu',e=>e.preventDefault());
 for(const [id,fn] of [['groupMove',()=>startGroupTransform('move')],['groupCopy',copyGroupSelection],['groupDuplicate',duplicateGroup],['groupPaste',pasteGroup],['groupLeft',()=>stampType&&tool==='stamp'?rotateStamp(-1):rotateGroup(-1)],['groupRight',()=>stampType&&tool==='stamp'?rotateStamp(1):rotateGroup(1)],['groupDelete',deleteGroupSelection],['groupCancel',()=>stampType&&tool==='stamp'?setTool('select'):cancelGroupTransform()]])$(id).onclick=fn;
@@ -61,6 +60,9 @@ $('fit').onclick=autoFit;$('clearRoutes').onclick=()=>{if(!state.routes.length)r
 
 // Simulation controls are independent of the removed acceptance/check panels.
 $('run').onclick=()=>{warehouseRefreshLive();running=!running;if(running)setTool('select');$('run').textContent=running?'❚❚ 暂停模拟':'▶ 继续模拟';$('run').classList.add('primary');$('run').classList.toggle('sim-running',running);notify(running?'模拟已开始：仓库每60秒保存一份真实收支记录':'模拟已暂停');};
-$('simSpeed').onchange=e=>{simulationSpeed=Number(e.target.value)||1;notify(`模拟速度已设为 ${simulationSpeed}×`);};
+$('simSpeed').onchange=e=>{simulationSpeed=Number(e.target.value)||1;updateStepMinuteButton();notify(`模拟速度已设为 ${simulationSpeed}×`);};
 $('stepMinute').onclick=advanceSimulationMinute;
+$('addTestStock').onclick=addWarehouseTestStock;
+$('warehouse').addEventListener('change',e=>{if(e.target?.id==='warehouseNetWindow')warehouseSetNetWindow(e.target.value);});
+updateStepMinuteButton();
 $('resetSim').onclick=()=>{resetSimulation();inspectorRefreshLive();notify('已清空模拟库存、生产队列和分钟统计记录');};

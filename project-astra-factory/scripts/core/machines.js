@@ -75,7 +75,7 @@ function getStampMachine(x=0,y=0){
 function updateStampControls(){
  const panel=$('stampControls');
  if(!stampType){panel.style.display='none';return;}
- const d=DEF[stampType],modes=recipeModes(stampType),rec=d.recipes?.[stampMode];
+ const d=DEF[stampType],modes=factoryRecipeModesByItem(stampType,recipeModes(stampType)),rec=d.recipes?.[stampMode];
  panel.style.display='block';
  $('configContext').textContent='放置设置';
  $('stampName').textContent=d.name;
@@ -107,7 +107,7 @@ function updateStampControls(){
  }
  $('stampRecipeText').style.display=rec||stampType==='仓出'?'block':'none';
  $('stampRecipeText').innerHTML=rec?
-  `<div class="machine-config-recipe-head"><span>配方</span><small>${rec.seconds} 秒/次</small></div><div class="machine-config-flow">${Object.entries(rec.inputs).map(([k,n])=>`<span class="machine-config-input">${esc(k)} ×${n}</span>`).join('')||'<span class="machine-config-none">无输入</span>'}<span class="machine-config-arrow">→</span><strong>${esc(rec.output)} ×${rec.qty}</strong></div>`
+  `<div class="machine-config-recipe-head"><span>配方</span><small>${rec.seconds} 秒/次</small></div><div class="machine-config-flow">${Object.entries(rec.inputs).sort(([a],[b])=>factoryItemCompare(a,b)).map(([k,n])=>`<span class="machine-config-input">${esc(k)} ×${n}</span>`).join('')||'<span class="machine-config-none">无输入</span>'}<span class="machine-config-arrow">→</span><strong>${esc(rec.output)} ×${rec.qty}</strong></div>`
   :stampType==='仓出'?`<span>从仓库取出：<strong>${esc(stampItem||'未选择')}</strong></span>`:'';
  $('stampHelp').textContent='单击地图放置；可继续放置同配置机器。按 Esc 结束。';
 }
@@ -118,27 +118,94 @@ function getRecipe(m){const d=def(m);if(!d?.recipes)return null;const mode=m.mod
 // 与逐件模拟的瞬时缓存/轮转结果不同，这是数学可行稳态的理论周期。
 function effectiveCycle(m){
  const rec=getRecipe(m);
- if(!rec)return null;
- if(!m.id||!state.machines.some(e=>e.id===m.id))return null;
- if(!theoreticalBudget||theoreticalBudget.error)return null;
- const cycles=theoreticalBudget.machineCycles?.[m.id]||0;
- if(!(cycles>1e-9))return Infinity;
- // 精确分数的浮点误差可能造成 (1/cycle) 略小于配方标称时间。
- return Math.max(rec.seconds,1/cycles);
+ if(!rec||!m.id||!state.machines.some(e=>e.id===m.id))return null;
+ const budget=typeof steadyDisplayRateBudget==='function'?steadyDisplayRateBudget(theoreticalBudget):theoreticalBudget;
+ if(!budget||budget.error)return null;
+ const cycles=budget.machineCycles;
+ if(!cycles||!Object.prototype.hasOwnProperty.call(cycles,m.id))return null;
+ const rate=cycles[m.id];
+ if(!(rate>0))return Infinity;
+ return Math.max(rec.seconds,1/rate);
 }
 function fmtT(n){return !Number.isFinite(n)?'∞':String(Math.round(n*100)/100).replace(/\.0+$/,'');}
+// Wiring is a TOPOLOGICAL fact. The global proof being unfinished never
+// turns an already connected machine into one that is 'waiting for wiring'.
+function machineWiredForTheory(m){
+ if(!m?.id||!state.machines.some(x=>x.id===m.id))return false;
+ const rec=getRecipe(m);
+ if(rec&&typeof missingMaterials==='function'&&missingMaterials(m).length)return false;
+ return state.routes.some(r=>r.from?.id===m.id&&r.to&&
+  (typeof checkPath!=='function'||!checkPath(r.path,r.from,r.to,r.id)));
+}
+// Read the BigInt rational certificates as exact fractions. rec.seconds is
+// first converted from the catalog DECIMAL STRING, not a floating division.
+function theoryRateUpperFraction(text){
+ if(text===undefined||text===null||typeof steadyExactFraction!=='function')return null;
+ const str=String(text);
+ const parts=str.split('/');
+ if(parts.length===2&&parts.every(p=>/^\d+$/.test(p)))
+  return steadyExactFraction(BigInt(parts[0]),BigInt(parts[1]));
+ return typeof steadyExactQ==='function'?steadyExactQ(str):null;
+}
+function theoryPeriodLowerText(rateText,nominalSeconds){
+ const rate=theoryRateUpperFraction(rateText);
+ if(!rate)return null;
+ if(rate.n===0n)return '∞';
+ if(rate.n<0n)return null;
+ const period=steadyExactFraction(rate.d,rate.n);
+ const nominal=steadyExactQ(String(nominalSeconds));
+ if(steadyExactCmp(period,nominal)<=0)return null;
+ // FLOOR, not rounding up: the displayed decimal remains a valid lower
+ // bound, even when the exact fraction is a recurring decimal.
+ const hundredths=period.n*100n/period.d;
+ const whole=hundredths/100n;
+ const cents=String(hundredths%100n).padStart(2,'0').replace(/0+$/,'');
+ return '≥'+whole.toString()+(cents?'.'+cents:'')+'s';
+}
+function theoryMachinePeriodHint(m){
+ const proof=theoreticalBudget?.diagnostics?.symbolicModel?.provenUpperBounds;
+ if(!proof?.completed)return null;
+ return theoryPeriodLowerText(proof.machineCycleUpper?.[m.id],getRecipe(m)?.seconds);
+}
 function timeLabel(m){
  const rec=getRecipe(m);if(!rec)return '';
+ const nominal=String(rec.seconds)+'s';
+ if(!machineWiredForTheory(m))return nominal+'(待接线)';
  const period=effectiveCycle(m);
- const dynamic=period===null?'待接线':fmtT(period)+'s';
- return fmtT(rec.seconds)+'s('+dynamic+')';
+ if(period!==null)return nominal+'('+(Number.isFinite(period)?fmtT(period)+'s':'∞')+')';
+ const hint=theoryMachinePeriodHint(m);
+ return nominal+'('+(hint||(!theoreticalBudget?'待计算':'待证明'))+')';
+}
+// The warehouse outlet's own rate must come from its actual route, NOT
+// aggregate shared-item warehouse withdrawals by other machines.
+function warehouseOutletTimeLabel(m){
+ const nominal=typeof PORT_INTERVAL==='number'?PORT_INTERVAL:1;
+ const label=String(nominal)+'s';
+ if(!machineWiredForTheory(m))return label+'(待接线)';
+ const connected=state.routes.filter(r=>r.from?.id===m.id&&r.from?.port===0&&r.to&&
+  (typeof checkPath!=='function'||!checkPath(r.path,r.from,r.to,r.id)));
+ const budget=typeof steadyDisplayRateBudget==='function'?steadyDisplayRateBudget(theoreticalBudget):theoreticalBudget;
+ if(budget&&!budget.error){
+  const flows=budget.routeFlows||{};
+  if(connected.length&&connected.every(r=>Object.prototype.hasOwnProperty.call(flows,r.id))){
+   const rate=connected.reduce((sum,r)=>sum+Number(flows[r.id]?.[m.item]||0),0);
+   return label+'('+(rate>0?fmtT(Math.max(nominal,1/rate))+'s':'∞')+')';
+  }
+ }
+ const upper=theoreticalBudget?.diagnostics?.symbolicModel?.provenUpperBounds?.routeItemUpper;
+ const hints=connected.map(r=>theoryRateUpperFraction(upper?.[r.id+'|'+m.item])).filter(Boolean);
+ if(hints.length===1){
+  const hint=theoryPeriodLowerText(upper[connected[0].id+'|'+m.item],nominal);
+  if(hint)return label+'('+hint+')';
+ }
+ return label+'('+(!theoreticalBudget?'待计算':'待证明')+')';
 }
 function portDirectionArrow(side){return ({N:'↑',S:'↓',W:'←',E:'→'})[side]||side;}
 // Fixed, softly whitened input/output text colors: no item-dependent hue.
 const MACHINE_INPUT_LABEL_COLOR='#60b5ff';
 const MACHINE_OUTPUT_LABEL_COLOR='#ffb16b';
 function machineLabelLines(m){let r=getRecipe(m),result=[{text:def(m).name,color:'#f0f6ff',bold:true}];
- if(r){for(const [k,n] of Object.entries(r.inputs||{}))result.push({text:k+' ×'+n,color:MACHINE_INPUT_LABEL_COLOR});
+ if(r){for(const [k,n] of Object.entries(r.inputs||{}).sort(([a],[b])=>factoryItemCompare(a,b)))result.push({text:k+' ×'+n,color:MACHINE_INPUT_LABEL_COLOR});
  result.push({text:r.output+' ×'+r.qty,color:MACHINE_OUTPUT_LABEL_COLOR});
  result.push({text:timeLabel(m),color:'#d4f4e4'});
  } else if(m.type==='分流'){
@@ -151,7 +218,10 @@ function machineLabelLines(m){let r=getRecipe(m),result=[{text:def(m).name,color
    result.push({text:portDirectionArrow(p.side)+' '+filter,color:MACHINE_OUTPUT_LABEL_COLOR});
   }
  } else if(m.type==='仓入')result.push({text:m.inletItem||'any',color:MACHINE_INPUT_LABEL_COLOR});
- else if(m.type==='仓出')result.push({text:(m.item||'未指定')+' ×1',color:MACHINE_OUTPUT_LABEL_COLOR});
+ else if(m.type==='仓出'){
+  result.push({text:(m.item||'未指定')+' ×1',color:MACHINE_OUTPUT_LABEL_COLOR});
+  result.push({text:warehouseOutletTimeLabel(m),color:'#d4f4e4'});
+ }
  return result;
 }
 // Keep canvas glyphs proportional at every zoom level. Supplying fillText's
@@ -267,3 +337,80 @@ function acceptsMaterial(m,item,idx){
 }
 function routeFor(id,kind,index){return state.routes.find(r=>{const p=r[kind==='out'?'from':'to'];return p?.id===id&&p.port===index;})}
 function routeTitle(r){let a=machineById(r.from.id),b=r.to&&machineById(r.to.id);return `${a?label(a):'?'} → ${r.to?(b?label(b):'?'):'悬空终点'}`}
+
+// Warehouse outputs competing for the same shared item reserve in MACHINE-ID
+// order, not insertion/DOM layout order. AST1 uses ast1_48 before ast1_114.
+// Use a numeric suffix (BigInt avoids precision loss for large IDs) and
+// lexical fallback for custom IDs without matching numeric namespaces.
+function warehouseMachinePriorityCompare(a,b){
+ const left=String(a.id||""),right=String(b.id||"");
+ const la=left.match(/^(.*?)(\d+)$/),lb=right.match(/^(.*?)(\d+)$/);
+ if(la&&lb&&la[1]===lb[1]){
+  const x=BigInt(la[2]),y=BigInt(lb[2]);
+  if(x!==y)return x<y?-1:1;
+ }
+ return left<right?-1:left>right?1:0;
+}
+
+
+// AST1 machine IDs represent current GAME BLUEPRINT RECORD INDICES. They
+// renumber after deletion; existing belts and editor references must follow.
+// Ordinary layouts using arbitrary JSON machine IDs remain untouched.
+// The machine array is authoritative for both game serialization and physical
+// warehouse-out priority. Movement must retain the original array slots.
+// Game record indices are canonical M0..M(n-1) and R0..R(n-1).
+// Existing AST1 JSONs may have ast1_N, m1 and r1 IDs; the imported
+// AST1 metadata identifies the game layout, and all references are remapped.
+function synchronizeAst1MachineRecords(){
+ const machines=state?.machines,routes=state?.routes;
+ if(!Array.isArray(machines)||!Array.isArray(routes)||!machines.length)return false;
+ const game=state.recordIndexed===true||machines.some(m=>m.ast1GamePorts===true||m.ast1Mirrored===true)||
+  machines.every(m=>/^(?:M|ast1_)\d+$/.test(String(m.id||'')));
+ if(!game)return false;
+ const machinesMap=new Map(),routesMap=new Map();
+ for(const [i,m] of machines.entries()){
+  if(machinesMap.has(m.id))throw Error('Duplicate game machine ID '+m.id);
+  machinesMap.set(m.id,'M'+i);
+ }
+ for(const [i,r] of routes.entries()){
+  if(routesMap.has(r.id))throw Error('Duplicate game route ID '+r.id);
+  routesMap.set(r.id,'R'+i);
+ }
+ const machineId=id=>machinesMap.get(id)??id,routeId=id=>routesMap.get(id)??id;
+ for(const r of routes){r.from.id=machineId(r.from.id);if(r.to)r.to.id=machineId(r.to.id);}
+ if(selection?.machineId)selection.machineId=machineId(selection.machineId);
+ if(selection?.routeId)selection.routeId=routeId(selection.routeId);
+ if(multiSelection?.machineIds)multiSelection.machineIds=multiSelection.machineIds.map(machineId);
+ if(multiSelection?.routeIds)multiSelection.routeIds=multiSelection.routeIds.map(routeId);
+ if(draft?.from?.id)draft.from.id=machineId(draft.from.id);
+ if(draft?.routeId)draft.routeId=routeId(draft.routeId);
+ if(beltTrim?.routeId)beltTrim.routeId=routeId(beltTrim.routeId);
+ if(hoverPort?.machineId)hoverPort.machineId=machineId(hoverPort.machineId);
+ if(drag?.machineId)drag.machineId=machineId(drag.machineId);
+ if(drag?.routeId)drag.routeId=routeId(drag.routeId);
+ for(const [i,m] of machines.entries())m.id='M'+i;
+ for(const [i,r] of routes.entries())r.id='R'+i;
+ state.recordIndexed=true;
+ return true;
+}
+
+// Record numbers visible to users always follow array positions.
+// Stable underlying arbitrary JSON IDs remain unchanged.
+function machineRecordDisplayId(m){
+ const i=state.machines.findIndex(x=>x.id===m?.id);
+ return i<0?String(m?.id||''):'M'+i;
+}
+function routeRecordDisplayId(r){
+ const i=state.routes.findIndex(x=>x.id===r?.id);
+ return i<0?String(r?.id||''):'R'+i;
+}
+function nextFactoryMachineId(){
+ return state.recordIndexed===true||!state.machines.length||
+  state.machines.every(m=>/^M\d+$/.test(String(m.id||'')))?
+  'M'+state.machines.length:'m'+(++idSeed);
+}
+function nextFactoryRouteId(){
+ return state.recordIndexed===true||
+  state.machines.every(m=>/^M\d+$/.test(String(m.id||'')))?
+  'R'+state.routes.length:'r'+(++idSeed);
+}

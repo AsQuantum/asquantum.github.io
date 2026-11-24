@@ -36,18 +36,19 @@ async function exportLayoutJson(){
 
 function download(filename,content,mime){const blob=new Blob([content],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);}
 function loadState(v){
- // v12 is decoded only by the current codec; old formats are isolated in old.js.
+ // Only v13 is read here. v12 and older layouts migrate via old.js.
  // A malformed input throws before touching the currently loaded layout.
- const compact=v?.format===FACTORY_JSON_FORMAT;
- const result=compact?{layout:expandCompactFactoryLayout(v),repair:{renamed:0,ambiguous:0}}:expandOldFactoryLayout(v);
+ const compact=v?.format===FACTORY_JSON_FORMAT&&v?.version===FACTORY_JSON_VERSION;
+ const result=compact?{layout:expandCompactFactoryLayout(v),repair:{renamed:0,ambiguous:0}}:expandLegacyFactoryLayout(v);
  const {layout,repair}=result;
  state=layout;
+ synchronizeAst1MachineRecords();
  idSeed=Math.max(900,...layout.machines.concat(layout.routes).map(e=>{
   const match=String(e.id||'').match(/(\d+)$/);
   return match?Number(match[1]):0;
  }));
  selection=null;draft=null;clearGroupSelection();undoStack=[];redoStack=[];
  afterChange('已加载 '+state.name+(repair.renamed?'，已修复'+repair.renamed+'个重复机器ID':'')+
-  (repair.ambiguous?'，移除'+repair.ambiguous+'条无法判定归属的旧线路':''));
+  (repair.ambiguous?'，移除'+repair.ambiguous+'条无法判定归属的旧线路':''),{resetRuntime:true});
 }
-function createEmpty(){return {name:'空白工厂',machines:[],routes:[]}}
+function createEmpty(){return {name:'空白工厂',recordIndexed:true,machines:[],routes:[]}}

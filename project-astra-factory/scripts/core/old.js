@@ -133,3 +133,39 @@ function expandOldFactoryLayout(v){
  }catch(err){idSeed=oldSeed;throw err;}
  return {layout:incoming,repair};
 }
+
+// All older factory-lab v12 RLE/array JSON parsing belongs in old.js.
+function expandLegacyCompactFactoryLayoutV12(source){
+ if(!source||source.format!==FACTORY_JSON_FORMAT||source.version!==12)
+  throw Error('不支持的 Factory Lab JSON 格式版本：'+source?.version);
+ if(!Array.isArray(source.machines)||!Array.isArray(source.routes)||
+    source.machines.length>10000||source.routes.length>20000)throw Error('JSON 机器/线路数组错误或过长');
+ const machines=source.machines.map((row,i)=>{
+  if(!Array.isArray(row)||(row.length!==5&&row.length!==6))throw Error('JSON 第'+i+'台机器数组格式错误');
+  const [typeId,x,y,faceId,modeId,extra]=row;
+  if(!Number.isInteger(typeId)||!AST1_TYPE_BY_ID[typeId]||!Number.isInteger(x)||!Number.isInteger(y)||
+     !Number.isInteger(faceId)||!FACTORY_JSON_FACES[faceId])throw Error('JSON 第'+i+'台机器类型/位置/方向无效');
+  const type=AST1_TYPE_BY_ID[typeId];
+  const props=expandOptionalFields(extra,FACTORY_JSON_BASE_MACHINE);
+  return {...props,id:'m'+(i+1),type,x,y,face:FACTORY_JSON_FACES[faceId],mode:expandModeId(type,modeId)};
+ });
+ const routes=source.routes.map((row,i)=>{
+  if(!Array.isArray(row)||(row.length!==6&&row.length!==7))throw Error('JSON 第'+i+'条线路数组格式错误');
+  const [fi,fp,ti,tp,start,runs,extra]=row;
+  if(fi===ti)throw Error('JSON 线路不能将机器输出口连接到自身输入口');
+  if(!Number.isInteger(fi)||!machines[fi]||!Number.isInteger(ti)||(ti!==-1&&!machines[ti])||
+     !Number.isInteger(fp)||fp<0||!Number.isInteger(tp)||tp<0)throw Error('JSON 第'+i+'条线路机器/接口索引无效');
+  const props=expandOptionalFields(extra,FACTORY_JSON_BASE_ROUTE);
+  return {...props,id:'r'+(i+1),from:{id:machines[fi].id,port:fp},to:ti===-1?null:{id:machines[ti].id,port:tp},path:unpackRouteRuns(start,runs)};
+ });
+ return {name:typeof source.name==='string'?source.name:'导入的工厂布局',...(source.recordIndexed===true?{recordIndexed:true}:{}),machines,routes};
+}
+
+
+function expandLegacyFactoryLayout(v){
+ if(v?.format===FACTORY_JSON_FORMAT){
+  if(v.version===12){const layout=expandLegacyCompactFactoryLayoutV12(v);layout.recordIndexed=true;return {layout,repair:{renamed:0,ambiguous:0}};}
+  throw Error("Unsupported legacy factory-lab JSON version "+String(v.version));
+ }
+ const old=expandOldFactoryLayout(v);old.layout.recordIndexed=true;return old;
+}

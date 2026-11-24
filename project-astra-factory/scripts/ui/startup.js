@@ -1,9 +1,18 @@
 'use strict';
+// Native text selections (even on the right panel) take precedence.
+function editorCanvasKeyboardActive(){
+ const sel=window.getSelection?.();
+ if(sel&&!sel.isCollapsed&&sel.toString().length)return false;
+ return !!document.getElementById('map')?.matches(':hover');
+}
 document.addEventListener('keydown',e=>{
  if(e.key==='Escape'){e.preventDefault();resetEditorMode();return;}
  const target=e.target;
  if(target?.closest?.('input,select,textarea,[contenteditable]'))return;
  if(e.key===' '){spaceDown=true;e.preventDefault();return;}
+ // Editor clipboard commands are active ONLY while hovering the canvas;
+ // browser-native text selection and clipboard actions always win elsewhere.
+ if((e.ctrlKey||e.metaKey)&&['c','v','d'].includes(e.key.toLowerCase())&&!editorCanvasKeyboardActive())return;
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c'&&activeMachineSelectionIds().length){e.preventDefault();copyGroupSelection();return;}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='v'&&groupClipboard){e.preventDefault();pasteGroup();return;}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='d'&&activeMachineSelectionIds().length){e.preventDefault();duplicateGroup();return;}
@@ -28,12 +37,13 @@ document.addEventListener('keydown',e=>{
  }
 });
 document.addEventListener('keyup',e=>{if(e.key===' ')spaceDown=false;});
-window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden){try{localStorage.setItem('factory_lab_v12',compactFactoryJSON());saveCurrentScheme();}catch(e){}}});
+window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden){try{localStorage.setItem('factory_lab_v13',compactFactoryJSON());saveCurrentScheme();}catch(e){}}});
 try{stampPrefs=JSON.parse(localStorage.getItem('factory_lab_v3_stamp_prefs')||'{}')||{};}catch(e){stampPrefs={};}
 let savedLayout=null,storageKey=null;
 try{
  // Current compact format takes precedence. Older raw JSON is imported only by old.js.
- storageKey=localStorage.getItem('factory_lab_v12')?'factory_lab_v12':'factory_lab_v2';
+ storageKey=localStorage.getItem('factory_lab_v13')?'factory_lab_v13':
+  localStorage.getItem('factory_lab_v12')?'factory_lab_v12':'factory_lab_v2';
  savedLayout=localStorage.getItem(storageKey);
  loadState(savedLayout?JSON.parse(savedLayout):createEmpty());
 }catch(err){

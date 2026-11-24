@@ -54,9 +54,9 @@ test('unknown IDs embedded in warehouse and splitter raw AST1 survive all roundt
  assert(Object.values(filters).includes('物品#668'));
  assert.equal(ast1Encode(),injected,'unchanged AST1 with unknown item IDs must be byte-for-byte exact');
  const compact=compactFactoryLayout(state);
- assert.equal(compact.machines[0][5].item,666);
- assert.equal(compact.machines[1][5].inletItem,667);
- assert(Object.values(compact.machines[2][5].outFilters).includes(668));
+ assert.equal(compact.machines[0].item,'物品#666');
+ assert.equal(compact.machines[1].inletItem,'物品#667');
+ assert(Object.values(compact.machines[2].outFilters).includes('物品#668'));
  state=expandCompactFactoryLayout(compact);
  assert.equal(ast1Encode(),injected,'compact JSON cannot lose unknown material IDs');
  state.machines[0].item='物品670';

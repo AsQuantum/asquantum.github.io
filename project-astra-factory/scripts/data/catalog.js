@@ -1,7 +1,14 @@
 'use strict';
 const W=72,H=72, CENTER={x:29,y:29,w:14,h:14};
 const V={E:[1,0],W:[-1,0],S:[0,1],N:[0,-1]}, OPP={E:'W',W:'E',N:'S',S:'N'};
-const MATERIALS=['太空垃圾','遐想物质','星尘粒子','相位粒子','小行星矿石','废金属','合金板','钛合金锭','硅晶圆','燃料罐','能量电池','导线线圈','齿轮组','古代芯片','复合装甲板','框架模块','电动机','隔热泡沫','共鸣水晶','量子处理器','等离子电池','引力透镜','曲速线圈'];
+const MATERIALS=["古代芯片","能量电池","共鸣水晶","废金属","燃料罐","合金板","复合装甲板","太空垃圾","星尘粒子","遐想物质","相位粒子","小行星矿石","钛合金锭","硅晶圆","齿轮组","导线线圈","隔热泡沫","电动机","框架模块","等离子电池","量子处理器","引力透镜","曲速线圈"];
+// Numeric game item ID order; also sort imported unknown numeric IDs.
+function factoryItemCompare(a,b){
+ const id=x=>{if(typeof ast1ItemNumber==='function'){const n=ast1ItemNumber(x);if(n!==undefined)return n;}const i=MATERIALS.indexOf(x);return i<0?Infinity:i;};
+ const ai=id(a),bi=id(b);return (ai<bi?-1:ai>bi?1:0)||String(a).localeCompare(String(b),'zh-CN');
+}
+function factoryRecipeModesByItem(type,modes){return [...modes].sort((a,b)=>factoryItemCompare(DEF[type]?.recipes?.[a]?.output||a,DEF[type]?.recipes?.[b]?.output||b));}
+
 const mk=(output,qty,seconds,inputs={})=>({output,qty,seconds,inputs});
 const DEF={
  '垃圾':{name:'太空垃圾回收器',w:5,h:5,ins:0,outs:1,cat:'基础采集',color:'#64bca0',recipes:{0:mk('太空垃圾',3,3),1:mk('遐想物质',1,7.5)}},

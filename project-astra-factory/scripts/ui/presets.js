@@ -47,12 +47,13 @@ function schemeCanUseAST(src,decoded){
   }
  }
  const sourceIndices=new Map(src.machines.map((m,i)=>[m.id,i]));
+ const decodedIndices=new Map(decoded.machines.map((m,i)=>[m.id,i]));
  for(let i=0;i<src.routes.length;i++){
   const a=src.routes[i],b=decoded.routes[i];
   if(Object.keys(a).some(k=>!['id','from','to','path'].includes(k)))return false;
   const aTarget=a.to?sourceIndices.get(a.to.id):-1;
-  const bTarget=b.to?Number(String(b.to.id).slice(5)):-1;
-  if(sourceIndices.get(a.from.id)!==Number(String(b.from.id).slice(5))||
+  const bTarget=b.to?decodedIndices.get(b.to.id):-1;
+  if(sourceIndices.get(a.from.id)!==decodedIndices.get(b.from.id)||
      aTarget!==bTarget||
      a.from.port!==b.from.port||(a.to&&a.to.port!==b.to.port)||
      JSON.stringify(a.path)!==JSON.stringify(b.path))return false;
@@ -61,7 +62,7 @@ function schemeCanUseAST(src,decoded){
 }
 function encodeScheme(layout=state){
  const json=compactFactoryJSON(layout);
- // AST1 uses the live state and cannot encode arbitrary custom attributes.
+ // AST1 stores the current state only when no information would be lost.
  if(layout!==state||!layout.machines.length)return {json};
  try{
   const ast=ast1Encode();
@@ -140,7 +141,7 @@ function activateScheme(id,fit=true){
   solverSchemeId=id;
   loadState(parsed);
   state.name=next.name;
-  try{localStorage.setItem('factory_lab_v12',compactFactoryJSON());}catch(e){}
+  try{localStorage.setItem('factory_lab_v13',compactFactoryJSON());}catch(e){}
   schemeSaveRegistry();
   renderSchemeSelector();
   if(fit)autoFit();
@@ -195,9 +196,9 @@ function importNewScheme(input,{kind='json',filename='',astCode=''}={}){
    if(!Array.isArray(parsed.machines)||!Array.isArray(parsed.routes))throw Error('AST1 线路或机器数据无效');
    entry={id:freshSchemeId(),name:nextSchemeName('游戏蓝图'),ast:astCode};
   }else if(kind==='json'){
-   const parsed=input?.format===FACTORY_JSON_FORMAT
+   const parsed=input?.format===FACTORY_JSON_FORMAT&&input?.version===FACTORY_JSON_VERSION
     ?expandCompactFactoryLayout(input)
-    :expandOldFactoryLayout(input).layout;
+    :expandLegacyFactoryLayout(input).layout;
    const json=compactFactoryJSON(parsed);
    entry={id:freshSchemeId(),name:jsonImportedSchemeName(input,filename),json};
   }else throw Error('不支持的导入格式：'+kind);
@@ -233,8 +234,8 @@ function importOverwriteScheme(input,{kind='json',astCode=''}={}){
    if(typeof astCode!=='string'||!astCode.startsWith('AST1:'))throw Error('缺少有效 AST1 蓝图');
    parsed=ast1Decode(astCode);
   }else if(kind==='json'){
-   parsed=input?.format===FACTORY_JSON_FORMAT
-    ?expandCompactFactoryLayout(input):expandOldFactoryLayout(input).layout;
+   parsed=input?.format===FACTORY_JSON_FORMAT&&input?.version===FACTORY_JSON_VERSION
+    ?expandCompactFactoryLayout(input):expandLegacyFactoryLayout(input).layout;
   }else throw Error('不支持的导入格式：'+kind);
   // Full strict v12 encode check before asking to overwrite; no partial imports.
   compactFactoryJSON(parsed);
@@ -305,7 +306,7 @@ function renameCurrentScheme(text){
  }
  schemeSaveRegistry();
  // Also update the current workspace cache without resetting simulation.
- try{localStorage.setItem('factory_lab_v12',compactFactoryJSON());}catch(e){}
+ try{localStorage.setItem('factory_lab_v13',compactFactoryJSON());}catch(e){}
 }
 function initSchemes(hadSavedWorkspace=false){
  let stored=null,loaded=false;

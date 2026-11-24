@@ -177,4 +177,4 @@ function connect(from,to,waypoints=[],manualPath=null){if(from.id===to.id)return
   if(j)segment.shift();path.push(...segment);
  }
  if(!manualPath&&checkpoints.length===2&&p.ex===q.ex&&p.ey===q.ey)path=[[p.ex,p.ey]];
- let reason=checkPath(path,from,to);if(reason)return notify('线路验证失败：'+reason,'bad');snapshot();state.routes.push({id:'r'+(++idSeed),from,to,path});draft=null;selection={routeId:state.routes.at(-1).id};afterChange('已连接 '+label(a)+' → '+label(b));}
+ let reason=checkPath(path,from,to);if(reason)return notify('线路验证失败：'+reason,'bad');snapshot();state.routes.push({id:nextFactoryRouteId(),from,to,path});draft=null;selection={routeId:state.routes.at(-1).id};afterChange('已连接 '+label(a)+' → '+label(b));}

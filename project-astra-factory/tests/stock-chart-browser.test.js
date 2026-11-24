@@ -250,6 +250,46 @@ async function poll(fn){for(let i=0;i<120;i++){try{const result=await fn();if(re
   assert(compact.legendScrollHeight>compact.legendClientHeight+4,'legend must remain vertically scrollable');
   assert(compact.legendScrollbarColor!=='auto'&&compact.legendScrollbarWidth==='thin','dark custom scrollbar should override native Windows white');
   assert.equal(compact.footerDisplay,'none','minimum-height panel prioritizes plot and legend');
+  // +100 replenishes displayed warehouse items but not actual receipts,
+  // and the inventory trend must reflect the separate manual adjustment.
+  const stockAid=await evaluate(`(()=>{
+   resetSimulation();
+   const beforeRun=addWarehouseTestStock()===false;
+   state={name:'stock test',machines:[{id:'ingot-source',type:'仓出',item:'钛合金锭',x:1,y:1,face:'E'}],routes:[]};
+   theoreticalBudget={inflow:{},outflow:{},machineCycles:{},routeFlows:{}};
+   simTime=60;
+   sim.inbound={'硅晶圆':12,'导线线圈':8};
+   sim.outbound={'硅晶圆':12,'导线线圈':8};
+   sim.minuteBuckets=[{inbound:{'硅晶圆':12,'导线线圈':8},
+    outbound:{'硅晶圆':12,'导线线圈':8}}];
+   const beforeMovements={inbound:{...sim.inbound},outbound:{...sim.outbound}};
+   const button=$('addTestStock'),step=$('stepMinute');
+   const rightOfStep=button.getBoundingClientRect().left>=step.getBoundingClientRect().right-2;
+   button.click();
+   const firstStock={...ware},firstHistory=stockChartHistory(),
+    firstLast=firstHistory.points.at(-1).stocks;
+   button.click();
+   const afterSecond={...ware},afterHistory=stockChartHistory(),
+    secondLast=afterHistory.points.at(-1).stocks;
+   const unchangedMovements=JSON.stringify(beforeMovements.inbound)===JSON.stringify(sim.inbound)&&
+    JSON.stringify(beforeMovements.outbound)===JSON.stringify(sim.outbound)&&
+    sim.minuteBuckets[0].inbound['硅晶圆']===12&&
+    sim.minuteBuckets[0].outbound['导线线圈']===8;
+   const manual=sim.minuteBuckets[0].manualStock;
+   resetSimulation();
+   return {beforeRun,rightOfStep,firstStock,firstLast,afterSecond,secondLast,
+    unchangedMovements,manual,cleared:sim.minuteBuckets.length===0&&Object.keys(ware).length===0};
+  })()`);
+  assert(stockAid.beforeRun&&stockAid.rightOfStep&&stockAid.unchangedMovements&&stockAid.cleared,
+   '+100 requires running first, sits right of +time, and does not change actual warehouse accounting');
+  for(const item of ['硅晶圆','导线线圈','钛合金锭']){
+   assert.equal(stockAid.firstStock[item],100,'first click gives 100 '+item);
+   assert.equal(stockAid.firstLast[item],100,'stock chart includes first +100 for '+item);
+   assert.equal(stockAid.afterSecond[item],200,'second click gives another 100 '+item);
+   assert.equal(stockAid.secondLast[item],200,'stock chart includes repeated +100 for '+item);
+   assert.equal(stockAid.manual[item],200,'manual stock must not enter actual income for '+item);
+  }
+  console.log('PASS: +100 replenishes empty sources and real warehouse materials, preserves actual accounting, and appears in inventory trend');
   assert.deepEqual(errors,[]);
   console.log('PASS: chart title dragging, all four resize corners, responsive SVG size, bounds, close/reopen and reload persistence; existing chart and simulation controls unchanged');
  }finally{

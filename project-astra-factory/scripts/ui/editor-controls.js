@@ -1,5 +1,10 @@
 'use strict';
-function setTool(t){if(groupTransform)cancelGroupTransform();if(t!=='marquee'&&t!=='select')clearGroupSelection();tool=t;stampType=null;draft=null;beltTrim=null;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));document.querySelectorAll('#palette button').forEach(b=>b.classList.remove('active'));updateStampControls();updateGroupControls();updateHint();draw();}
+// A blank click only arms the SECOND blank-click exit after an existing
+// route edit has just been deselected. New-belt placement never arms it.
+let beltEditExitPending=false;
+// A shortened existing route stays selected until its new tip is explicitly tapped.
+let beltPostTrimRouteId=null;
+function setTool(t){beltEditExitPending=false;beltPostTrimRouteId=null;if(groupTransform)cancelGroupTransform();if(t!=='marquee'&&t!=='select')clearGroupSelection();tool=t;stampType=null;draft=null;beltTrim=null;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));document.querySelectorAll('#palette button').forEach(b=>b.classList.remove('active'));updateStampControls();updateGroupControls();updateHint();draw();}
 // Escape/right-click always return to an idle, unselected editor.
 // Never touch persistent layout, undo history, or the copied clipboard.
 function resetEditorMode(){
@@ -16,7 +21,7 @@ function resetEditorMode(){
  inspectorRefresh();
 }
 function rotateStamp(steps=1){if(!stampType)return;const faces=['E','S','W','N'];stampFace=faces[(faces.indexOf(stampFace)+steps+4)%4];saveStampPreference();updateStampControls();updateHint();draw();}
-function cancelDraft(){if(!draft&&!beltTrim)return;draft=null;beltTrim=null;updateHint();notify('已退出线路编辑；已确认的传送带保留');draw();}
+function cancelDraft(){if(!draft&&!beltTrim)return;beltEditExitPending=false;beltPostTrimRouteId=null;draft=null;beltTrim=null;selection=null;inspectorRefresh();updateHint();notify('已退出线路编辑；已确认的传送带保留');draw();}
 // A placement is not an interaction with an already drawn route.
 // While placing, clicking the last confirmed tile FINISHES placement rather
 // than arming a destructive red-tail edit. Belt tool remains selected.
@@ -73,7 +78,7 @@ function saveDraftRoute(path,to=null){
  snapshot();
  if(existing){existing.path=copy(path);existing.to=to?copy(to):null;delete existing.openEndSide;}
  else{
-  const route={id:'r'+(++idSeed),from:copy(draft.from),to:to?copy(to):null,path:copy(path)};
+  const route={id:nextFactoryRouteId(),from:copy(draft.from),to:to?copy(to):null,path:copy(path)};
   state.routes.push(route);draft.routeId=route.id;
  }
  draft.path=copy(path);
@@ -81,6 +86,7 @@ function saveDraftRoute(path,to=null){
  // It is no longer an edit selection: clicking its last confirmed tile
  // finishes placing, and no red deletion preview is armed. Escape only exits
  // the editor, never removes already saved route cells.
+ beltEditExitPending=false;beltPostTrimRouteId=null;
  if(to){draft=null;beltTrim=null;}
  else{
   // Every successfully confirmed waypoint begins a NEW placement leg, even
@@ -88,6 +94,9 @@ function saveDraftRoute(path,to=null){
   draft.phase='placing';
   beltTrim={routeId:draft.routeId,index:-1,cell:null,hoverOutside:false};
  }
+ // Connected or open route remains selected and highlighted; no record is
+ // renumbered when only its unfinished tail is updated in-place.
+ selection={routeId:draft?.routeId||existing?.id||state.routes.at(-1).id};
  afterChange(to?'已连接线路到输入口':'已确认放置悬空线路；可继续延长或连接蓝色输入口');
  if(draft)updateDraftPreview();
  updateHint();draw();return true;
@@ -191,8 +200,9 @@ function previewBeltTrim(cell,pt){
  // Red is a confirmation cue, not a persistent selection: it is visible
  // ONLY while hovering the exact grid tile (and crossing strand) first clicked.
  // The confirmation cell itself never changes when the pointer moves.
- beltTrim.hoverAnchor=!!(beltTrim.index>=0&&onThisRoute&&
-  hit.index===beltTrim.index&&beltTrim.cell?.[0]===cell.x&&beltTrim.cell?.[1]===cell.y);
+ beltTrim.hoverAnchor=Boolean((typeof mobileEditorActive==="function"&&mobileEditorActive()&&beltTrim.index>=0)||
+  (beltTrim.index>=0&&onThisRoute&&
+  hit.index===beltTrim.index&&beltTrim.cell?.[0]===cell.x&&beltTrim.cell?.[1]===cell.y));
  if(draft?.routeId===route.id){
   if(onThisRoute&&beltTrim.index>=0)draft.preview=null;
   else updateDraftPreview();
@@ -203,18 +213,23 @@ function previewBeltTrim(cell,pt){
 // a further same-tile tap is required to confirm deletion.
 function beginExistingRouteEdit(route,index,cell){
  setTool('belt');
- selection=null;
+ selection={routeId:route.id};
  beltTrim={routeId:route.id,index,cell:[cell.x,cell.y],
   hoverOutside:false,hoverAnchor:true};
  draft=route.to?null:{
   from:copy(route.from),fromName:routeTitle(route),
   path:copy(route.path),routeId:route.id,history:[],preview:null,phase:'editing'
  };
- updateHint();updateDraftPreview();draw();
+ updateHint();updateDraftPreview();inspectorRefresh();draw();
+ if(typeof mobileEditorActive==='function'&&mobileEditorActive())mobileUpdatePlacement();
  notify('已进入线路编辑；再次点击原格才会删除尾段，移到其他位置可继续未完成线路');
 }
-function clearBeltTrimSelection(){
- beltTrim=null;draft=null;updateHint();draw();
+function clearBeltTrimSelection({awaitExit=false}={}){
+ beltPostTrimRouteId=null;
+ beltTrim=null;draft=null;selection=null;
+ beltEditExitPending=Boolean(awaitExit&&tool==='belt');
+ inspectorRefresh();updateHint();draw();
+ if(typeof mobileEditorActive==="function"&&mobileEditorActive())mobileUpdatePlacement();
 }
 
 function updateHint(){

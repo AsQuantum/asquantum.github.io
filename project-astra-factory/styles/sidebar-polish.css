@@ -710,3 +710,11 @@
 #inspector .machine-summary .machine-recipe-flow{
  font-size:11.5px;line-height:1.6;overflow-wrap:anywhere;
 }
+
+/* Warehouse ledger: configurable rolling net window and persistent bottom totals. */
+.side.right #warehouse .warehouse-net-window{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#bad2de;white-space:nowrap}
+.side.right #warehouse .warehouse-net-window select{max-width:60px;min-width:48px;padding:3px 4px;border:1px solid #50748a;border-radius:5px;background:#172d40;color:#e6f3fc;font-size:11px;cursor:pointer}
+.side.right #warehouse .ledger-table tr.ledger-total td{border-top:1px solid #648499;background:rgba(45,75,91,.45);font-weight:650;color:#ebf9fc;font-variant-numeric:tabular-nums}
+.side.right #warehouse .ledger-table tr.ledger-total td.positive{color:#7ce8b3}.side.right #warehouse .ledger-table tr.ledger-total td.negative{color:#ff9d9c}
+
+.side.right #warehouse .warehouse-net-window-row{display:flex;justify-content:flex-start;align-items:center;margin:5px 0 8px;min-height:22px}

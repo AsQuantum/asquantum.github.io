@@ -24,6 +24,9 @@
  function beginPinch(){
   // Cancel any preview started by a single-finger edit drag; never commit it.
   if(single?.forwarded){
+   // A second finger cancels an uncommitted new belt draft, but preserves
+   // a pre-existing editing session. No touch pinch may create a belt.
+   if(single.beltGesture&&!single.hadDraft){draft=null;beltTrim=null;updateHint();}
    drag=null;marquee=null;
    if(!single.hadGroupTransform&&groupTransform){groupTransform=null;updateGroupControls();}
    queuePaint();
@@ -119,9 +122,16 @@
   single={pointerId:e.pointerId,startX:p.x,startY:p.y,x:p.x,y:p.y,
    clientX:e.clientX,clientY:e.clientY,cameraX:camera.x,cameraY:camera.y,
    forwarded:false,continuation:false,moved:false,hadGroupTransform:!!groupTransform,
-   startCell,selectedMachineId,
+   startCell,selectedMachineId,hadDraft:!!draft,
    previewStart:stampType&&hoverCell?{...hoverCell}:null,
    groupStart:groupTransform?{x:groupTransform.x,y:groupTransform.y}:null};
+  // The touch recognizer owns all real pointer events. Explicitly forward
+  // single-finger BELT gestures from this capture phase, not the bubbling
+  // canvas listener; otherwise dragging a belt would silently do nothing.
+  if(tool==="belt"&&!stampType&&!groupTransform){
+   single.beltGesture=true;single.forwarded=true;
+   onPointerDown(e);
+  }
  },{capture:true,passive:false});
  map.addEventListener('pointermove',e=>{
   if(!touches.has(e.pointerId))return;
@@ -188,7 +198,7 @@
     single.forwarded=true;
    }
    onPointerMove(e);
-  }else if(single.forwarded&&drag?.kind==='marquee'){onPointerMove(e);}
+  }else if(single.forwarded&&['marquee','mobile-belt-gesture'].includes(drag?.kind)){onPointerMove(e);}
  },{capture:true,passive:false});
  function endPointer(e,cancelled){
   if(!touches.has(e.pointerId))return;
@@ -203,7 +213,10 @@
    else {pinch=null;single=null;usedMulti=false;}
   }else if(wasSingle){
    if(wasSingle.forwarded){
-    if(cancelled){drag=null;marquee=null;draw();}
+    if(cancelled){
+     if(wasSingle.beltGesture&&!wasSingle.hadDraft){draft=null;beltTrim=null;updateHint();}
+     drag=null;marquee=null;draw();
+    }
     else onPointerUp(e);
    }else if(!cancelled&&!wasSingle.moved){
     if(stampType)confirmStampPreview(wasSingle,e);

@@ -71,7 +71,7 @@ function ast1Decode(code){
   const face=ast1Rotations(t)[rot],known=AST1_MODE[t];
   if(known&&(modeId>=known.length||known[modeId]===undefined))throw Error(`第${i}台${t}存在未知游戏配方序号 ${modeId}`);
   const mode=known?known[modeId]:(['废料','浇筑','燃料','电池','共鸣'].includes(t)?'标准':'');
-  const m={id:'ast1_'+i,type:t,x,y,face:ast1MirrorFace(face),mode,panel:record[4],ast1GamePorts:true,ast1Mirrored:true,
+  const m={id:'M'+i,type:t,x,y,face:ast1MirrorFace(face),mode,panel:record[4],ast1GamePorts:true,ast1Mirrored:true,
    ast1Meta:{record,extensionItems:ast1ExtraItems(record),originalType:typeId,originalMode:mode,originalItem:null,originalInletItem:null,originalOutFilters:null,filterOrderVersion:3}};
   if(t==='仓出'){
    if(extend!==1)throw Error(`第${i}台仓库取出口配置结构暂不支持`);
@@ -119,15 +119,34 @@ function ast1Decode(code){
    path.push([v[0]+(sm.ast1Mirrored?-vec[0]:vec[0]),v[1]+vec[1]]);
   }
   if(ep&&(path.at(-1)[0]!==ep.ex||path.at(-1)[1]!==ep.ey))throw Error(`第${ri}条线路解码后未命中游戏接口 ${path.at(-1)}≠${[ep.ex,ep.ey]}`);
-  routes.push({id:'ast1_r'+ri,from:{id:sm.id,port:outidx},to:tm?{id:tm.id,port:inidx}:null,path});
+  routes.push({id:'R'+ri,from:{id:sm.id,port:outidx},to:tm?{id:tm.id,port:inidx}:null,path});
   off+=7+np;
  }
  if(off!==data.length)throw Error(`蓝图尾部还有${data.length-off}字节未解析，可能是另一个格式版本`);
- return {name:`AST1 游戏蓝图 · ${machines.length}台机器 · ${routes.length}条线路`,machines,routes};
+ return {name:`AST1 游戏蓝图 · ${machines.length}台机器 · ${routes.length}条线路`,recordIndexed:true,machines,routes};
 }
 function ast1WriteU16(out,x){if(x<0||x>65535||!Number.isInteger(x))throw Error('蓝图字段超出16位');out.push(x&255,x>>8);}
+// Game record IDs are M0..M(n-1) and R0..R(n-1).
+// Old saved AST1 layouts with ast1_N / ast1_rN are still readable.
+// Only one recognized game-number namespace is sortable; generic JSON
+// machines and routes retain their array/placement order.
+function ast1SortedGameRecords(records,pattern){
+ const matches=records.map(x=>String(x.id||"").match(pattern));
+ if(!matches.every(Boolean))return records;
+ return [...records].sort((a,b)=>{
+  const n=BigInt(String(a.id).match(pattern)[1]);
+  const m=BigInt(String(b.id).match(pattern)[1]);
+  return n<m?-1:n>m?1:0;
+ });
+}
+function ast1MachinesInRecordOrder(){
+ return ast1SortedGameRecords(state.machines,/^(?:M|ast1_)(\d+)$/);
+}
+function ast1RoutesInRecordOrder(){
+ return ast1SortedGameRecords(state.routes,/^(?:R|ast1_r)(\d+)$/);
+}
 function ast1ToBytes(){
- const ms=state.machines,rs=state.routes,buf=[4];
+ const ms=ast1MachinesInRecordOrder(),rs=ast1RoutesInRecordOrder(),buf=[4];
  if(ms.length>65535||rs.length>65535)throw Error('机器或线路数量超过游戏 AST1 限制');
  ast1WriteU16(buf,ms.length);
  const ids=new Map();

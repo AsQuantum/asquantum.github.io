@@ -11,14 +11,15 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <meta name="apple-mobile-web-app-title" content="Factory Lab"/>
 <meta name="theme-color" content="#0b111c"/>
-<link rel="stylesheet" href="styles/main.css?v=20261123-039&ui=selection-menu-3"/>
-<link rel="stylesheet" href="styles/sidebar-polish.css"/>
+<link rel="stylesheet" href="styles/main.css?v=20261124-mr-mobile-priority-1"/>
+<link rel="stylesheet" href="styles/sidebar-polish.css?v=20261124-net-left-clean-banner-1"/>
 <link rel="stylesheet" href="styles/stock-chart.css"/>
-<link rel="stylesheet" href="styles/mobile.css?v=20261123-039&ui=selection-menu-3"/>
+<link rel="stylesheet" href="styles/mobile.css?v=20261123-039&ui=stock-toolbar-compact-1&ui=selection-menu-3"/>
 <link rel="stylesheet" href="styles/window-motion.css"/>
 <link rel="stylesheet" href="styles/ast1-dialog.css"/>
 <link rel="stylesheet" href="styles/changelog.css?v=20261123-039"/>
 <link rel="stylesheet" href="styles/select-theme.css?v=20261123-039&ui=selection-menu-3"/>
+<link rel="stylesheet" href="styles/sidebar-resize.css?v=20261124-1"/>
 </head>
 <body>
 <div class="app">
@@ -72,6 +73,7 @@
   <button id="run" class="primary sim-run" title="开始或暂停逐件生产与物流模拟">▶ 运行模拟</button>
   <label class="sim-speed" for="simSpeed"><span>倍率</span><select id="simSpeed" title="模拟速度（游戏时间 / 真实时间）"><option value="1">1×</option><option value="2">2×</option><option value="5">5×</option><option value="10">10×</option><option value="20">20×</option><option value="60">60×</option></select></label>
   <button id="stepMinute" class="sim-step" title="立即推进60秒，逐件模拟物流收支">⏩ +1分钟</button>
+   <button id="addTestStock" class="sim-step sim-stock-test" title="模拟开始后，为当前实际收支表中的每种材料补充100件库存；不计入入库收入">+100</button>
   <button id="resetSim" class="sim-reset" title="清空模拟库存、队列与分钟统计；不删除机器">↻ 重置</button>
  </div>
 </header>
@@ -120,8 +122,8 @@
  <div id="groupControls" class="group-controls" style="display:none;margin:9px 0"><div class="group-controls-heading"><span class="group-mark">▧</span><b id="groupSelectionInfo"></b></div>
  <div class="group-buttons">
   <button id="groupMove" title="移动选中机器（G）">移动<small>G</small></button>
-  <button id="groupCopy" title="复制选中机器（Ctrl+C）">复制<small>Ctrl+C</small></button>
-  <button id="groupPaste" title="粘贴机器（Ctrl+V）">粘贴<small>Ctrl+V</small></button>
+  <button id="groupCopy" title="复制画布中选中的机器（鼠标位于画布时 Ctrl+C）">复制<small>Ctrl+C</small></button>
+  <button id="groupPaste" title="在画布中粘贴机器（鼠标位于画布时 Ctrl+V）">粘贴<small>Ctrl+V</small></button>
   <button id="groupDuplicate" title="复制并进入放置预览（Ctrl+D）">复制放置<small>Ctrl+D</small></button>
   <button id="groupLeft" title="逆时针旋转选中机器（Q）">左转<small>Q</small></button>
   <button id="groupRight" title="顺时针旋转选中机器（E）">右转<small>E</small></button>
@@ -149,6 +151,7 @@
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>E</kbd></span><span class="shortcut-desc">顺时针旋转 90°</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd><span class="key-plus">+</span><kbd>C</kbd></span><span class="shortcut-desc">复制选中的机器</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd><span class="key-plus">+</span><kbd>V</kbd></span><span class="shortcut-desc">粘贴已复制的机器</span></div>
+     <p class="tiny">Ctrl+C / Ctrl+V / Ctrl+D 仅在鼠标位于画布时操作机器；在右侧面板等其他区域使用浏览器原生复制粘贴。</p>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>Ctrl</kbd><span class="key-plus">+</span><kbd>D</kbd></span><span class="shortcut-desc">复制并放置</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>Delete</kbd></span><span class="shortcut-desc">删除所选机器或线路</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>Backspace</kbd></span><span class="shortcut-desc">删除选中／撤销接线拐点</span></div>
@@ -230,6 +233,7 @@
   <button id="mobilePlaceButton" type="button">返回地图放置 <span aria-hidden="true">→</span></button>
  </div>
 </aside>
+<div class="sidebar-divider" data-sidebar-resize="left" role="separator" aria-orientation="vertical" aria-label="调整左侧栏宽度" tabindex="0" title="拖动调整左侧栏宽度，双击恢复默认"></div>
 <section class="canvaswrap"><canvas id="map"></canvas>
  <div class="mobile-map-tools" role="toolbar" aria-label="地图快捷工具">
   <button type="button" id="mobileRotateLeft" title="逆时针旋转放置中的或选中的机器">左转</button>
@@ -261,6 +265,7 @@
   <div class="stock-chart-resize stock-chart-resize-sw" data-stock-resize="sw" title="拖动左下角缩放" aria-label="左下角缩放图表"></div>
   <div class="stock-chart-resize stock-chart-resize-se" data-stock-resize="se" title="拖动右下角缩放" aria-label="右下角缩放图表"></div>
 </div></section>
+<div class="sidebar-divider" data-sidebar-resize="right" role="separator" aria-orientation="vertical" aria-label="调整右侧栏宽度" tabindex="0" title="拖动调整右侧栏宽度，双击恢复默认"></div>
 <aside class="side right"><details id="warehousePanel" class="warehouse-panel"><summary>仓库材料 · 每分钟收支</summary><div class="block" id="warehouse"></div></details><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><details class="right-extra-panel" id="auditPanel">
  <summary>线路检查</summary><div class="block" id="audit"></div>
  </details><details class="right-extra-panel" id="logsPanel">
@@ -277,33 +282,38 @@
 <footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
 </div>
 <script src="scripts/data/warp-preset.js?v=20261123-039"></script>
-<script src="scripts/data/catalog.js?v=20261123-039"></script>
+<script src="scripts/data/catalog.js?v=20261124-live-edit-stock-id-2"></script>
 <script src="scripts/core/state.js?v=20261123-039"></script>
-<script src="scripts/core/machines.js?v=20261123-039"></script>
-<script src="scripts/core/routing.js?v=20261123-039"></script>
-<script src="scripts/core/editor.js?v=20261123-039"></script>
+<script src="scripts/core/machines.js?v=20261124-final-theory-1"></script>
+<script src="scripts/core/routing.js?v=20261124-mr-mobile-priority-1"></script>
+<script src="scripts/core/editor.js?v=20261124-live-edit-stock-id-2"></script>
 <script src="scripts/core/audit.js?v=20261123-039"></script>
-<script src="scripts/ui/inspector.js?v=20261123-039"></script>
-<script src="scripts/core/layout-io.js?v=20261123-039"></script>
-<script src="scripts/ui/editor-controls.js?v=20261123-039&ui=selection-menu-3"></script>
-<script src="scripts/core/selection-transform.js?v=20261123-039&ui=selection-menu-3"></script>
-<script src="scripts/ui/canvas.js?v=20261123-039"></script>
-<script src="scripts/engine/steady-flow.js?v=20261123-039"></script>
-<script src="scripts/ui/warehouse.js?v=20261123-039"></script>
-<script src="scripts/engine/simulation.js?v=20261123-039"></script>
-<script src="scripts/ui/stock-chart.js?v=20261123-039"></script>
-<script src="scripts/ui/actions.js?v=20261123-039&ui=selection-menu-3"></script>
+<script src="scripts/ui/inspector.js?v=20261124-overdraft-period-1"></script>
+<script src="scripts/core/layout-io.js?v=20261124-live-edit-stock-id-2"></script>
+<script src="scripts/ui/editor-controls.js?v=20261124-posttrim-select-only-1"></script>
+<script src="scripts/core/selection-transform.js?v=20261124-mr-mobile-priority-1"></script>
+<script src="scripts/ui/canvas.js?v=20261124-posttrim-select-only-1"></script>
+<script src="scripts/engine/steady-flow.js?v=20261124-final-theory-1"></script>
+<script src="scripts/engine/steady-equations.js?v=20261124-simulator-contract-1"></script>
+<script src="scripts/engine/steady-generic-network.js?v=20261124-general-terminal-1"></script>
+<script src="scripts/engine/steady-bounds.js?v=20261124-rational-upper-1"></script>
+<script src="scripts/engine/steady-auto-fluid.js?v=20261124-overdraft-period-1"></script>
+<script src="scripts/ui/warehouse.js?v=20261124-final-theory-1"></script>
+<script src="scripts/engine/simulation.js?v=20261124-live-edit-stock-id-2"></script>
+<script src="scripts/ui/stock-chart.js?v=20261124-live-edit-stock-id-2"></script>
+<script src="scripts/ui/actions.js?v=20261124-warehouse-window-totals-1"></script>
 <script src="scripts/blueprints/machine-ids.js?v=20261123-039"></script>
-<script src="scripts/blueprints/item-ids.js?v=20261123-039"></script>
-<script src="scripts/core/old.js?v=20261123-039"></script>
-<script src="scripts/core/compact-json.js?v=20261123-039"></script>
-<script src="scripts/blueprints/ast1-codec.js?v=20261123-039"></script>
+<script src="scripts/blueprints/item-ids.js?v=20261124-live-edit-stock-id-2"></script>
+<script src="scripts/core/old.js?v=20261124-json13-route-select-1"></script>
+<script src="scripts/core/compact-json.js?v=20261124-json13-route-select-1"></script>
+<script src="scripts/blueprints/ast1-codec.js?v=20261124-mr-mobile-priority-1"></script>
 <script src="scripts/blueprints/ast1-ui.js?v=20261123-039"></script>
-<script src="scripts/ui/presets.js?v=20261123-039"></script>
+<script src="scripts/ui/presets.js?v=20261124-json13-route-select-1"></script>
 <script src="scripts/ui/edit-menu.js?v=20261123-039"></script>
 <script src="scripts/data/changelog.js?v=20261123-039&ui=selection-menu-3"></script>
 <script src="scripts/ui/changelog.js?v=20261123-039"></script>
-<script src="scripts/ui/startup.js?v=20261123-039"></script>
-<script src="scripts/ui/mobile.js?v=20261123-039&ui=selection-menu-3"></script>
-<script src="scripts/ui/touch-gestures.js?v=20261123-039&ui=selection-menu-3"></script>
+<script src="scripts/ui/startup.js?v=20261124-json13-route-select-1"></script>
+<script src="scripts/ui/sidebar-resize.js?v=20261124-1"></script>
+<script src="scripts/ui/mobile.js?v=20261124-final-theory-1"></script>
+<script src="scripts/ui/touch-gestures.js?v=20261124-mr-native-touch-2"></script>
 </body></html>

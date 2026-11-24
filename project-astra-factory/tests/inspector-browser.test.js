@@ -197,7 +197,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const encoded=ast1Encode(),bytes=Uint8Array.from(atob(encoded.slice(5)),c=>c.charCodeAt(0));
    const astByte=bytes[3+4];
    const roundtrip=ast1Decode(encoded).machines[0].panel;
-   const rawJSON=compactFactoryJSON(),jsonStored=JSON.parse(rawJSON).machines[0][5]?.panel;
+   const rawJSON=compactFactoryJSON(),jsonStored=JSON.parse(rawJSON).machines[0]?.panel;
    const expanded=expandCompactFactoryLayout(JSON.parse(rawJSON)).machines[0].panel;
    const selectMode=$('inspector').querySelector('#modeSelect');
    selectMode.value='1';selectMode.dispatchEvent(new Event('change',{bubbles:true}));

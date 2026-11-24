@@ -4,10 +4,14 @@ function importedUnknownItemOption(item){
  if(!item||MATERIALS.includes(item)||item==='任意')return '';
  return '<option value="'+esc(item)+'" selected disabled data-imported-unknown="true">'+esc(item)+'</option>';
 }
+function factoryItemSelectOptions(selected){
+ const items=[...MATERIALS];
+ if(selected&&selected!=='任意'&&!items.includes(selected))items.push(selected);
+ return items.sort(factoryItemCompare).map(q=>MATERIALS.includes(q)?'<option value="'+esc(q)+'" '+(selected===q?'selected':'')+'>'+esc(q)+'</option>':importedUnknownItemOption(q)).join('');
+}
 function warehouseInFilterHTML(m){
- const options=MATERIALS.map(q=>'<option value="'+esc(q)+'" '+(m.inletItem===q?'selected':'')+'>'+esc(q)+'</option>').join('');
- const unknown=importedUnknownItemOption(m.inletItem);
- return '<label class="machine-field"><span>入仓物品过滤（全部输入口）</span><select id="warehouseInFilterSelect" class="full"><option value="">任意</option>'+unknown+options+'</select></label>';
+ const options=factoryItemSelectOptions(m.inletItem);
+ return '<label class="machine-field"><span>入仓物品过滤（全部输入口）</span><select id="warehouseInFilterSelect" class="full"><option value="">任意</option>'+options+'</select></label>';
 }
 // A disclosure is a view preference, not a machine attribute. Preserve its
 // open state when switching machines or rebuilding the inspector after edits.
@@ -50,7 +54,7 @@ function machineLiveInventory(m){
  }
  const rec=getRecipe(m),inPorts=getPorts(m).filter(p=>p.kind==='in');
  const outCap=rec?rec.qty*20:0;
- const entries=rec?Object.keys(rec.inputs):[...new Set([...Object.keys(s.inputs||{}),...Object.keys(s.received||{})])];
+ const entries=(rec?Object.keys(rec.inputs):[...new Set([...Object.keys(s.inputs||{}),...Object.keys(s.received||{})])]).sort(factoryItemCompare);
  const itemRow=(item,current,capacity)=>`<div class="kv"><span><span style="color:${materialColor(item)}">●</span> ${esc(item)}</span><b>${current} / ${capacity}</b></div>`;
  let inputRows=entries.map(item=>{
   const current=s.inputs[item]||0;
@@ -62,7 +66,7 @@ function machineLiveInventory(m){
   const items=s.portItems?.[p.index]||{};
   const total=Object.values(items).reduce((a,b)=>a+b,0);
   const cap=m.type==='分流'||m.type==='汇流'?` / 3`:' 件';
-  const summary=Object.entries(items).filter(([,v])=>v>0).map(([item,n])=>`<span style="color:${materialColor(item)}">●</span> ${esc(item)}×${n}`).join('、');
+  const summary=Object.entries(items).filter(([,v])=>v>0).sort(([a],[b])=>factoryItemCompare(a,b)).map(([item,n])=>`<span style="color:${materialColor(item)}">●</span> ${esc(item)}×${n}`).join('、');
   return `<div class="tiny" style="padding:3px 0;border-bottom:1px solid #304153">入${p.index+1} (${portDirectionArrow(p.side)})：<b>${total}${cap}</b>${summary?` · ${summary}`:' · 空'}</div>`;
  }).join('');
  const outputCounts={};for(const item of s.queue||[])outputCounts[item]=(outputCounts[item]||0)+1;
@@ -165,11 +169,12 @@ function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosure
  let r=state.routes.find(r=>r.id===selection.routeId);if(!r){selection=null;return inspectorRefresh()}
  root.dataset.inspectorKey='route:'+r.id;
  const packets=sim?.routes?.[r.id]||[],length=routeLength(r);
- const rtFlows=theoreticalBudget?.routeFlows?.[r.id]||{};
+ const rateBudget=typeof steadyDisplayRateBudget==='function'?steadyDisplayRateBudget(theoreticalBudget):theoreticalBudget;
+ const rtFlows=rateBudget?.routeFlows?.[r.id]||{};
  const rtFlowRows=Object.entries(rtFlows).filter(([,v])=>v>1e-7).map(([mat,v])=>`<div class="kv"><span>${esc(mat)}</span><b>${(v*60).toFixed(2)} /分钟</b></div>`).join('');
  const crossHere=selection?.crossAt?cellRoutes(...selection.crossAt).filter(q=>q.id!==r.id):[];
  const items=routePacketsHTML(r,packets,length);
- root.innerHTML=`<div class="item"><strong>传送带 #${esc(r.id)}</strong><div class="tiny">${esc(routeTitle(r))}</div>
+ root.innerHTML=`<div class="inspector-machine inspector-route"><section class="machine-summary route-summary" style="--machine-accent:#4ee09b"><div class="machine-summary-eyebrow"><span>传送带</span><code title="线路记录编号">${esc(routeRecordDisplayId(r))}</code></div><div class="machine-summary-name">物流线路</div><div class="machine-summary-location">${esc(routeTitle(r))}</div></section><div class="item">
  <div class="kv"><span>长度</span><b>${length}米</b></div>
  <div class="kv"><span>模拟时间</span><b data-live-route-time>${simTime.toFixed(1)}秒</b></div>
  <div class="kv"><span>线上物品</span><b data-live-route-count>${packets.length}件</b></div>
@@ -179,14 +184,14 @@ function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosure
  <div class="tiny" style="margin:3px 0 8px">实时读取该条线路中的逐件运输队列，含堵塞停留物品；快进后也会更新。</div>
  <div class="route-packet-list" id="inspectorRoutePackets">${items||'<div class="tiny" style="padding:8px 0">当前线路没有物品。运行模拟后即可查看。</div>'}</div></div>
  ${crossHere.length?`<div class="tiny">这里是十字交叉；另有一条独立传送带：</div>${crossHere.map(q=>`<button class="full smallbtn" data-select-route="${esc(q.id)}" style="margin:4px 0">切换查看 #${esc(q.id)} · ${esc(routeTitle(q))}</button>`).join('')}`:''}
- <button class="full" data-delete-route="${esc(r.id)}">删除这条线路</button>`;
+ <button class="full" data-delete-route="${esc(r.id)}">删除这条线路</button></div>`;
  return;}
  let m=machineById(selection?.machineId);if(!m){root.dataset.inspectorKey='none';root.replaceChildren();return;}
  root.dataset.inspectorKey='machine:'+m.id;
- let d=def(m),[w,h]=dims(m),rec=getRecipe(m),ports=getPorts(m),modes=d.recipes?recipeModes(m.type):null;
+ let d=def(m),[w,h]=dims(m),rec=getRecipe(m),ports=getPorts(m),modes=d.recipes?factoryRecipeModesByItem(m.type,recipeModes(m.type)):null;
  const faceName=({E:'右',W:'左',N:'上',S:'下'})[m.face]||m.face;
  const maxRate=rec?(rec.qty/rec.seconds*60).toFixed(2):null;
- const inputRecipe=rec?Object.entries(rec.inputs).map(([name,count])=>`<span class="machine-flow-input">${esc(name)} ×${count}</span>`).join(''):'';
+ const inputRecipe=rec?Object.entries(rec.inputs).sort(([a],[b])=>factoryItemCompare(a,b)).map(([name,count])=>`<span class="machine-flow-input">${esc(name)} ×${count}</span>`).join(''):'';
  const machineProps=[];
  if(supportsMachinePanel(m))machineProps.push(`<label class="machine-field"><span>面板方向</span>
   <select id="panelSelect" class="full" aria-label="面板方向">
@@ -197,19 +202,19 @@ function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosure
   <select id="modeSelect" class="full">${modes.map(q=>`<option value="${esc(q)}" ${String(m.mode)===String(q)?'selected':''}>${esc(recipeOptionLabel(m.type,q))}</option>`).join('')}</select>
  </label>`);
  if(m.type==='仓出')machineProps.push(`<label class="machine-field"><span>仓库取出物品</span>
-  <select id="itemSelect" class="full">${importedUnknownItemOption(m.item)}${MATERIALS.map(q=>`<option value="${esc(q)}" ${m.item===q?'selected':''}>${esc(q)}</option>`).join('')}</select>
+  <select id="itemSelect" class="full">${factoryItemSelectOptions(m.item)}</select>
  </label>`);
  if(m.type==='仓入')machineProps.push(warehouseInFilterHTML(m));
  if(m.type==='分流')machineProps.push(`<div class="machine-filter-options">
   <div class="machine-field-caption">分流出口物品过滤</div>
   ${ports.filter(p=>p.kind==='out').map(p=>`<label class="machine-field"><span>${esc(ast1FilterPortLabel(m,p.index))} · ${esc(portDirectionArrow(p.side))}</span>
     <select data-out-filter="${p.index}" aria-label="${esc(ast1FilterPortLabel(m,p.index))} 输出物品">
-     <option value="">任意</option>${importedUnknownItemOption(p.filter)}${MATERIALS.map(q=>`<option value="${esc(q)}" ${p.filter===q?'selected':''}>${esc(q)}</option>`).join('')}
+     <option value="">任意</option>${factoryItemSelectOptions(p.filter)}
     </select></label>`).join('')}
   </div>`);
  root.innerHTML=`<div class="inspector-machine">
   <section class="machine-summary" style="--machine-accent:${d.color}">
-   <div class="machine-summary-eyebrow"><span>机器详情</span><code title="机器布局 ID">${esc(m.id)}</code></div>
+   <div class="machine-summary-eyebrow"><span>机器详情</span><code title="机器记录编号">${esc(machineRecordDisplayId(m))}</code></div>
    <div class="machine-summary-name">${esc(d.name)}</div>
    <div class="machine-summary-location">${m.tag?`<span class="machine-tag">${esc(m.tag)}</span>`:''}<span>${w} × ${h} 格</span><span>坐标 (${m.x}, ${m.y})</span></div>
    <div class="machine-summary-metrics">

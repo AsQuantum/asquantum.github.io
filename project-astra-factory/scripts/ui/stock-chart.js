@@ -132,11 +132,9 @@ function stockChartHistory(){
  for(const b of buckets)if(b){
   for(const key of Object.keys(b.inbound||{}))names.add(key);
   for(const key of Object.keys(b.outbound||{}))names.add(key);
+  for(const key of Object.keys(b.manualStock||{}))names.add(key);
  }
- const items=[...names].filter(Boolean).sort((a,b)=>{
-  const ai=MATERIALS.indexOf(a),bi=MATERIALS.indexOf(b);
-  return (ai<0?999:ai)-(bi<0?999:bi)||a.localeCompare(b,'zh-CN');
- });
+ const items=[...names].filter(Boolean).sort(factoryItemCompare);
  const current=Object.fromEntries(items.map(item=>[item,0]));
  const points=[{minute:0,stocks:{...current}}];
  const minute=simTime/60,completed=Math.floor(minute+1e-8);
@@ -144,6 +142,7 @@ function stockChartHistory(){
   if(!b)return;
   for(const [item,n] of Object.entries(b.inbound||{}))current[item]=(current[item]||0)+n;
   for(const [item,n] of Object.entries(b.outbound||{}))current[item]=(current[item]||0)-n;
+  for(const [item,n] of Object.entries(b.manualStock||{}))current[item]=(current[item]||0)+n;
  };
  for(let i=0;i<completed;i++){
   apply(buckets[i]);
@@ -297,7 +296,7 @@ function stockChartPointerMove(event){
  for(const p of data.points)if(Math.abs(p.minute-target)<Math.abs(closest.minute-target))closest=p;
  const gx=data.margin.left+(closest.minute-data.from)/data.span*data.plotW;
  guide.setAttribute('x1',gx);guide.setAttribute('x2',gx);guide.setAttribute('visibility','visible');
- const sorted=data.items.slice().sort((a,b)=>(closest.stocks[b]||0)-(closest.stocks[a]||0));
+ const sorted=data.items.slice().sort(factoryItemCompare);
  const lines=sorted.slice(0,7).map(item=>'<div><span><i style="background:'+materialColor(item)+'"></i>'+esc(item)+'</span><b>'+(closest.stocks[item]||0).toLocaleString('zh-CN')+'</b></div>').join('');
  tip.innerHTML='<strong>第 '+closest.minute.toFixed(1)+' 分钟</strong>'+lines+(sorted.length>7?'<small>另有 '+(sorted.length-7)+' 种物品，可在下方图例筛选</small>':'');
  tip.hidden=false;

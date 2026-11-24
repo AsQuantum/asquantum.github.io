@@ -148,8 +148,8 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    afterChange('新增测试机器');
    const t=currentScheme();
    const obj=decodeScheme(t);
-   return {count:obj.machines.length,tag:obj.machines[0][5]?.tag||obj.machines[0]?.tag,
-    mode:obj.machines[0][4]??obj.machines[0]?.mode,
+   return {count:obj.machines.length,tag:obj.machines[0]?.tag,
+    mode:obj.machines[0]?.mode,
     format:t.ast?'ast':'json'};
   })()`);
   assert(afterEdit.count===1&&afterEdit.tag==='保留机器注释'&&afterEdit.mode===1,
@@ -197,7 +197,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    state.machines[0].tag='自定义注释不能丢失';
    afterChange('修改 AST1 无法表示的注释');
    const t=currentScheme();
-   return {usesJSON:!!t.json,usesAST:!!t.ast,tag:decodeScheme(t).machines[0][5]?.tag};
+   return {usesJSON:!!t.json,usesAST:!!t.ast,tag:decodeScheme(t).machines[0]?.tag};
   })()`);
   assert(withCustom.usesJSON&&!withCustom.usesAST&&withCustom.tag==='自定义注释不能丢失',
    'custom fields must trigger lossless JSON fallback');
@@ -251,7 +251,8 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
     deleteLast.machines===0&&deleteLast.stored===1,
     'delete last scheme must leave a new usable blank template');
   // New multi-template version must not discard an existing user layout.
-  const oldWorkspaceSeed=`localStorage.removeItem('factory_lab_templates_v1');
+  const oldWorkspaceSeed=`localStorage.removeItem('factory_lab_v13');
+    localStorage.removeItem('factory_lab_templates_v1');
     localStorage.removeItem('factory_lab_template_active_v1');
     localStorage.setItem('factory_lab_v12',JSON.stringify({
      format:'factory-lab',version:12,name:'我的旧布局',

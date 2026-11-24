@@ -124,8 +124,10 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const speed60=[...$('simSpeed').options].some(o=>o.value==='60');
    $('simSpeed').value='60';$('simSpeed').dispatchEvent(new Event('change',{bubbles:true}));
    const speedWorking=simulationSpeed===60;
+   const stepLabelAt60=$('stepMinute').textContent.includes('+60分钟');
    $('simSpeed').value='1';$('simSpeed').dispatchEvent(new Event('change',{bubbles:true}));
    const speedRestored=simulationSpeed===1;
+   const stepLabelAt1=$('stepMinute').textContent.includes('+1分钟');
    const projectTitle=document.title==='Factory Lab · Project:Astra';
    const duplicateHintGone=!document.querySelector('.editor-quicktip');
    const alternatives=rows.filter(row=>row.querySelector('.key-or')).length===1;
@@ -140,11 +142,12 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
       cssBorder:getComputedStyle(caret).borderBottomStyle};
    });
    return {count:rows.length,allAligned,allCommands,missingCommands:need.filter(n=>!names.some(label=>label.includes(n))),
-    speed60,speedWorking,speedRestored,projectTitle,duplicateHintGone,alternatives,grouped,undoInMenu,caretPositions};
+    speed60,speedWorking,speedRestored,stepLabelAt60,stepLabelAt1,projectTitle,duplicateHintGone,alternatives,grouped,undoInMenu,caretPositions};
   })()`);
   console.log('SHORTCUTS AND SIM TOOLBAR',JSON.stringify(shortcutAndToolbar));
   assert(shortcutAndToolbar.count>=19&&shortcutAndToolbar.allAligned&&shortcutAndToolbar.allCommands&&
     shortcutAndToolbar.speed60&&shortcutAndToolbar.speedWorking&&shortcutAndToolbar.speedRestored&&
+    shortcutAndToolbar.stepLabelAt60&&shortcutAndToolbar.stepLabelAt1&&
     shortcutAndToolbar.projectTitle&&shortcutAndToolbar.duplicateHintGone&&shortcutAndToolbar.alternatives&&
     shortcutAndToolbar.grouped&&shortcutAndToolbar.undoInMenu&&
     shortcutAndToolbar.caretPositions.every(c=>c.errorY<4&&c.cssBorder==='solid'),
@@ -326,6 +329,42 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   })`);
   assert(afterReload.count===7&&afterReload.active==='方案来自内部 (2)'&&
     afterReload.mode===1&&afterReload.original.includes('49条线路'));
+  // Clipboard shortcut intentionally requires pointer hover over the canvas.
+  // Move the real browser pointer there before dispatching the keyboard event.
+  const canvasPoint=await evaluate("(()=>{const r=$('map').getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()");
+  await send('Input.dispatchMouseEvent',{type:'mouseMoved',x:canvasPoint.x,y:canvasPoint.y,button:'none'});
+  const copyInspector=await evaluate(`(()=>{
+   const original={state,selection,multiSelection,groupTransform,hoverCell,tool};
+   try{
+    state={name:'duplicate inspector regression',machines:[
+     {id:'dup-original',type:'垃圾',mode:0,x:6,y:12,face:'E'}],routes:[]};
+    selection={machineId:'dup-original'};multiSelection=null;
+    groupTransform=null;hoverCell={x:45,y:12};tool='select';
+    inspectorRefresh();
+    document.dispatchEvent(new KeyboardEvent('keydown',{
+     key:'d',ctrlKey:true,bubbles:true,cancelable:true}));
+    const preview=groupTransform?.mode==='copy';
+    if(!preview)return {preview:false};
+    groupTransform.x=48;groupTransform.y=12;updateGroupPreview();
+    const valid=groupTransform.plan?.valid;
+    const placed=valid&&commitGroupTransform();
+    const inserted=state.machines.find(m=>m.id!=='dup-original');
+    const content=$('inspector').textContent;
+    return {preview,valid,placed,newId:inserted?.id,
+     selected:selection?.machineId===inserted?.id,
+     inspector:content.includes('太空垃圾回收器'),
+     title:content.slice(0,100),machineCount:state.machines.length};
+   }finally{
+    state=original.state;selection=original.selection;
+    multiSelection=original.multiSelection;groupTransform=original.groupTransform;
+    hoverCell=original.hoverCell;tool=original.tool;
+    afterChange();
+   }
+  })()`);
+  assert(copyInspector.preview&&copyInspector.valid&&copyInspector.placed&&
+   copyInspector.selected&&copyInspector.inspector&&copyInspector.machineCount===2,
+   'Ctrl+D copied machine highlights but Inspector has no attributes: '+JSON.stringify(copyInspector));
+  console.log('PASS: Ctrl+D placed single copy is selected and its Inspector shows machine properties');
   assert.equal(exceptions.length,0,'uncaught browser exceptions: '+exceptions.join(' | '));
   console.log('PASS: Edit menu three flyouts, new/overwrite JSON+AST1, export JSON+AST1, safe cancel and reload');
   ws.close();

@@ -1,8 +1,8 @@
 'use strict';
-// Factory Lab JSON v12: compact, versioned, independent of the AST1 binary format.
+// Factory Lab JSON v13: readable AST1-like machine and route records, without saved IDs.
 // Machine and item types use AST1 IDs; internal instance IDs are recreated from
 // machine indices, just as AST1 line endpoints refer to machine indices.
-const FACTORY_JSON_VERSION=12;
+const FACTORY_JSON_VERSION=13;
 const FACTORY_JSON_FORMAT='factory-lab';
 const FACTORY_JSON_FACES=['E','N','W','S'];
 const FACTORY_JSON_STEPS=[[1,0],[0,1],[-1,0],[0,-1]]; // E, S, W, N
@@ -109,57 +109,100 @@ function unpackRouteRuns(start,runs){
  }
  return path;
 }
+// v13 is a readable decoded AST1-like record layout. No instance IDs are
+// serialized. Machine/route array position is its game record index.
 function compactFactoryLayout(layout=state){
- if(!layout||!Array.isArray(layout.machines)||!Array.isArray(layout.routes))throw Error('布局缺少机器或线路数组');
- const indices=new Map();
- const machines=layout.machines.map((m,index)=>{
-  if(!m||!Number.isInteger(m.x)||!Number.isInteger(m.y))throw Error('第'+index+'台设备坐标无效');
-  if(indices.has(m.id))throw Error('布局存在重复机器 ID：'+m.id);
-  indices.set(m.id,index);
-  const typeId=AST1_ID_BY_TYPE[m.type],face=FACTORY_JSON_FACES.indexOf(m.face||'E');
-  if(typeId===undefined||face<0)throw Error('无法编码设备 '+m.id+' 的类型或方向');
-  const row=[typeId,m.x,m.y,face,compactModeId(m)];
-  const extra=compactOptionalFields(m,FACTORY_JSON_BASE_MACHINE);
-  if(extra)row.push(extra);
+ if(!layout||!Array.isArray(layout.machines)||!Array.isArray(layout.routes))
+  throw Error('JSON layout requires machines and routes arrays');
+ if(layout.machines.length>10000||layout.routes.length>20000)
+  throw Error('JSON layout too large');
+ const ids=new Map();
+ const machines=layout.machines.map((m,i)=>{
+  if(!m||!DEF[m.type]||!Number.isInteger(m.x)||!Number.isInteger(m.y))
+   throw Error('Invalid machine record '+i);
+  if(ids.has(m.id))throw Error('Duplicate machine ID in source layout');
+  ids.set(m.id,i);
+  const face=m.face||'E';
+  if(!FACTORY_JSON_FACES.includes(face))throw Error('Invalid machine facing '+i);
+  compactModeId(m);
+  const row={type:m.type,x:m.x,y:m.y,face,mode:m.mode??defaultModeFor(m.type)};
+  for(const [key,value] of Object.entries(m)){
+   if(FACTORY_JSON_BASE_MACHINE.has(key)||FACTORY_JSON_DANGEROUS.has(key)||value===undefined)continue;
+   row[key]=value;
+  }
   return row;
  });
- const routes=layout.routes.map((r,index)=>{
-  const from=indices.get(r?.from?.id),to=r?.to===null?-1:indices.get(r?.to?.id);
-  if(r?.to&&r.from?.id===r.to.id)throw Error('JSON 不能将机器输出口连接到自身输入口');
-  if(from===undefined||to===undefined)throw Error('第'+index+'条线路引用了不存在的机器');
-  if(!Number.isInteger(r.from.port)||r.from.port<0||(to!==-1&&(!Number.isInteger(r.to.port)||r.to.port<0)))
-   throw Error('第'+index+'条线路接口编号无效');
-  const [start,runs]=packRouteRuns(r.path);
-  const row=[from,r.from.port,to,to===-1?0:r.to.port,start,runs];
-  const extra=compactOptionalFields(r,FACTORY_JSON_BASE_ROUTE);
-  if(extra)row.push(extra);
+ const routes=layout.routes.map((r,i)=>{
+  if(!r||!r.from||!Number.isInteger(r.from.port)||r.from.port<0)
+   throw Error('Invalid route source '+i);
+  const fi=ids.get(r.from.id),ti=r.to?ids.get(r.to.id):null;
+  if(fi===undefined||r.to&&ti===undefined)throw Error('Route '+i+' machine index missing');
+  if(ti!==null&&fi===ti)throw Error('JSON 线路不能连接自身输入口');
+  if(r.to&&(!Number.isInteger(r.to.port)||r.to.port<0))throw Error('Invalid destination port '+i);
+  if(!Array.isArray(r.path)||!r.path.length||r.path.length>10000||
+      r.path.some(p=>!Array.isArray(p)||p.length!==2||!p.every(Number.isInteger)))
+   throw Error('Invalid route path '+i);
+  const row={from:[fi,r.from.port],to:r.to?[ti,r.to.port]:null,
+   path:r.path.map(p=>p.slice())};
+  for(const [key,value] of Object.entries(r)){
+   if(FACTORY_JSON_BASE_ROUTE.has(key)||FACTORY_JSON_DANGEROUS.has(key)||value===undefined)continue;
+   row[key]=value;
+  }
   return row;
  });
- return {format:FACTORY_JSON_FORMAT,version:FACTORY_JSON_VERSION,name:layout.name||'工厂布局',machines,routes};
+ return {format:FACTORY_JSON_FORMAT,version:FACTORY_JSON_VERSION,
+  name:layout.name||'工厂布局',machines,routes};
 }
 function expandCompactFactoryLayout(source){
- if(!source||source.format!==FACTORY_JSON_FORMAT||source.version!==FACTORY_JSON_VERSION)
-  throw Error('不支持的 Factory Lab JSON 格式版本：'+source?.version);
+ if(!source||source.format!==FACTORY_JSON_FORMAT||
+    source.version!==FACTORY_JSON_VERSION)
+  throw Error('Unsupported JSON format or version '+String(source?.version));
  if(!Array.isArray(source.machines)||!Array.isArray(source.routes)||
-    source.machines.length>10000||source.routes.length>20000)throw Error('JSON 机器/线路数组错误或过长');
+  source.machines.length>10000||source.routes.length>20000)
+  throw Error('JSON machines/routes arrays are invalid');
  const machines=source.machines.map((row,i)=>{
-  if(!Array.isArray(row)||(row.length!==5&&row.length!==6))throw Error('JSON 第'+i+'台机器数组格式错误');
-  const [typeId,x,y,faceId,modeId,extra]=row;
-  if(!Number.isInteger(typeId)||!AST1_TYPE_BY_ID[typeId]||!Number.isInteger(x)||!Number.isInteger(y)||
-     !Number.isInteger(faceId)||!FACTORY_JSON_FACES[faceId])throw Error('JSON 第'+i+'台机器类型/位置/方向无效');
-  const type=AST1_TYPE_BY_ID[typeId];
-  const props=expandOptionalFields(extra,FACTORY_JSON_BASE_MACHINE);
-  return {...props,id:'m'+(i+1),type,x,y,face:FACTORY_JSON_FACES[faceId],mode:expandModeId(type,modeId)};
+  if(!row||Array.isArray(row)||typeof row!=='object'||!DEF[row.type]||
+   !Number.isInteger(row.x)||!Number.isInteger(row.y)||
+   !FACTORY_JSON_FACES.includes(row.face))
+   throw Error('Invalid machine record '+i);
+  const props={};
+  for(const [key,value] of Object.entries(row)){
+   // Legacy IDs are intentionally never read in the v13 importer.
+   if(FACTORY_JSON_BASE_MACHINE.has(key)||FACTORY_JSON_DANGEROUS.has(key))continue;
+   props[key]=value;
+  }
+  const mode=row.mode??defaultModeFor(row.type),parsed=parseRecipeMode(row.type,mode);
+  if(DEF[row.type].recipes&&
+     !Object.prototype.hasOwnProperty.call(DEF[row.type].recipes,parsed))
+   throw Error('Invalid recipe mode '+i);
+  const m={...props,id:'M'+i,type:row.type,x:row.x,y:row.y,
+   face:row.face,mode:parsed};
+  compactModeId(m);
+  return m;
  });
- const routes=source.routes.map((row,i)=>{
-  if(!Array.isArray(row)||(row.length!==6&&row.length!==7))throw Error('JSON 第'+i+'条线路数组格式错误');
-  const [fi,fp,ti,tp,start,runs,extra]=row;
-  if(fi===ti)throw Error('JSON 线路不能将机器输出口连接到自身输入口');
-  if(!Number.isInteger(fi)||!machines[fi]||!Number.isInteger(ti)||(ti!==-1&&!machines[ti])||
-     !Number.isInteger(fp)||fp<0||!Number.isInteger(tp)||tp<0)throw Error('JSON 第'+i+'条线路机器/接口索引无效');
-  const props=expandOptionalFields(extra,FACTORY_JSON_BASE_ROUTE);
-  return {...props,id:'r'+(i+1),from:{id:machines[fi].id,port:fp},to:ti===-1?null:{id:machines[ti].id,port:tp},path:unpackRouteRuns(start,runs)};
+ const routes=source.routes.map((r,i)=>{
+  if(!r||Array.isArray(r)||typeof r!=='object')throw Error('Invalid route '+i);
+  const pair=(value,required)=>{
+   if(value===null&&!required)return null;
+   if(!Array.isArray(value)||value.length!==2||
+      !Number.isInteger(value[0])||value[0]<0||value[0]>=machines.length||
+      !Number.isInteger(value[1])||value[1]<0)
+    throw Error('Invalid route endpoint '+i);
+   return {id:machines[value[0]].id,port:value[1]};
+  };
+  const from=pair(r.from,true),to=pair(r.to,false);
+  if(to&&to.id===from.id)throw Error('Route cannot return to source machine');
+  if(!Array.isArray(r.path)||!r.path.length||r.path.length>10000||
+     r.path.some(p=>!Array.isArray(p)||p.length!==2||!p.every(Number.isInteger)))
+   throw Error('Invalid route geometry '+i);
+  const props={};
+  for(const [key,value] of Object.entries(r)){
+   if(FACTORY_JSON_BASE_ROUTE.has(key)||FACTORY_JSON_DANGEROUS.has(key))continue;
+   props[key]=value;
+  }
+  return {...props,id:'R'+i,from,to,path:r.path.map(p=>p.slice())};
  });
- return {name:typeof source.name==='string'?source.name:'导入的工厂布局',machines,routes};
+ return {name:typeof source.name==='string'?source.name:'导入的工厂布局',
+  recordIndexed:true,machines,routes};
 }
 function compactFactoryJSON(layout=state){return JSON.stringify(compactFactoryLayout(layout));}

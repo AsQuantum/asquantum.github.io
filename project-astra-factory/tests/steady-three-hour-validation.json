@@ -1,0 +1,872 @@
+[
+  {
+    "removed": null,
+    "theoretical": {
+      "inflow": {
+        "合金板": 0.6666666666666666,
+        "共鸣水晶": 0.04583333333333333,
+        "框架模块": 0.015277777777777777,
+        "电动机": 0.058333333333333334,
+        "引力透镜": 0.007638888888888889,
+        "等离子电池": 0.06944444444444445,
+        "量子处理器": 0.05138888888888889,
+        "曲速线圈": 0.007638888888888889,
+        "钛合金锭": 1.3333333333333333,
+        "硅晶圆": 0.5,
+        "齿轮组": 0.5,
+        "导线线圈": 0.6666666666666666,
+        "能量电池": 0.3333333333333333,
+        "燃料罐": 0.2
+      },
+      "outflow": {
+        "合金板": 0.6666666666666666,
+        "共鸣水晶": 0,
+        "框架模块": 0,
+        "电动机": 0,
+        "引力透镜": 0,
+        "等离子电池": 0,
+        "量子处理器": 0,
+        "曲速线圈": 0,
+        "钛合金锭": 1.1833333333333333,
+        "硅晶圆": 0.4666666666666667,
+        "齿轮组": 0.2388888888888889,
+        "导线线圈": 0.6666666666666666,
+        "能量电池": 0.25555555555555554,
+        "燃料罐": 0
+      }
+    },
+    "windows": [
+      {
+        "hour": 1,
+        "rows": [
+          {
+            "item": "合金板",
+            "theoryIn": 40,
+            "theoryOut": 40,
+            "actualIn": 39.8,
+            "actualOut": 39.766666666666666,
+            "netDelta": 0.03333333333333144,
+            "stock": 2
+          },
+          {
+            "item": "共鸣水晶",
+            "theoryIn": 2.75,
+            "theoryOut": 0,
+            "actualIn": 2.4166666666666665,
+            "actualOut": 0,
+            "netDelta": -0.3333333333333335,
+            "stock": 145
+          },
+          {
+            "item": "框架模块",
+            "theoryIn": 0.9166666666666666,
+            "theoryOut": 0,
+            "actualIn": 0.9,
+            "actualOut": 0,
+            "netDelta": -0.016666666666666607,
+            "stock": 54
+          },
+          {
+            "item": "电动机",
+            "theoryIn": 3.5,
+            "theoryOut": 0,
+            "actualIn": 2.716666666666667,
+            "actualOut": 0,
+            "netDelta": -0.7833333333333332,
+            "stock": 163
+          },
+          {
+            "item": "引力透镜",
+            "theoryIn": 0.4583333333333333,
+            "theoryOut": 0,
+            "actualIn": 0.45,
+            "actualOut": 0,
+            "netDelta": -0.008333333333333304,
+            "stock": 27
+          },
+          {
+            "item": "等离子电池",
+            "theoryIn": 4.166666666666667,
+            "theoryOut": 0,
+            "actualIn": 3.3666666666666667,
+            "actualOut": 0,
+            "netDelta": -0.8000000000000003,
+            "stock": 202
+          },
+          {
+            "item": "量子处理器",
+            "theoryIn": 3.083333333333333,
+            "theoryOut": 0,
+            "actualIn": 2.65,
+            "actualOut": 0,
+            "netDelta": -0.4333333333333331,
+            "stock": 159
+          },
+          {
+            "item": "曲速线圈",
+            "theoryIn": 0.4583333333333333,
+            "theoryOut": 0,
+            "actualIn": 0.43333333333333335,
+            "actualOut": 0,
+            "netDelta": -0.024999999999999967,
+            "stock": 26
+          },
+          {
+            "item": "钛合金锭",
+            "theoryIn": 80,
+            "theoryOut": 71,
+            "actualIn": 79.76666666666667,
+            "actualOut": 71.03333333333333,
+            "netDelta": -0.2666666666666657,
+            "stock": 524
+          },
+          {
+            "item": "硅晶圆",
+            "theoryIn": 30,
+            "theoryOut": 28,
+            "actualIn": 29.9,
+            "actualOut": 29.383333333333333,
+            "netDelta": -1.4833333333333343,
+            "stock": 31
+          },
+          {
+            "item": "齿轮组",
+            "theoryIn": 30,
+            "theoryOut": 14.333333333333334,
+            "actualIn": 29.866666666666667,
+            "actualOut": 14.583333333333334,
+            "netDelta": -0.38333333333333286,
+            "stock": 917
+          },
+          {
+            "item": "导线线圈",
+            "theoryIn": 40,
+            "theoryOut": 40,
+            "actualIn": 39.666666666666664,
+            "actualOut": 39.666666666666664,
+            "netDelta": 0,
+            "stock": 0
+          },
+          {
+            "item": "能量电池",
+            "theoryIn": 20,
+            "theoryOut": 15.333333333333332,
+            "actualIn": 19.9,
+            "actualOut": 16.933333333333334,
+            "netDelta": -1.7000000000000028,
+            "stock": 178
+          },
+          {
+            "item": "燃料罐",
+            "theoryIn": 12,
+            "theoryOut": 0,
+            "actualIn": 11.966666666666667,
+            "actualOut": 0,
+            "netDelta": -0.033333333333333215,
+            "stock": 718
+          }
+        ],
+        "maxAbsoluteRateError": 1.6000000000000014
+      },
+      {
+        "hour": 2,
+        "rows": [
+          {
+            "item": "合金板",
+            "theoryIn": 40,
+            "theoryOut": 40,
+            "actualIn": 40,
+            "actualOut": 40,
+            "netDelta": 0,
+            "stock": 2
+          },
+          {
+            "item": "共鸣水晶",
+            "theoryIn": 2.75,
+            "theoryOut": 0,
+            "actualIn": 2.75,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 310
+          },
+          {
+            "item": "框架模块",
+            "theoryIn": 0.9166666666666666,
+            "theoryOut": 0,
+            "actualIn": 0.9166666666666666,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 109
+          },
+          {
+            "item": "电动机",
+            "theoryIn": 3.5,
+            "theoryOut": 0,
+            "actualIn": 3.4833333333333334,
+            "actualOut": 0,
+            "netDelta": -0.016666666666666607,
+            "stock": 372
+          },
+          {
+            "item": "引力透镜",
+            "theoryIn": 0.4583333333333333,
+            "theoryOut": 0,
+            "actualIn": 0.45,
+            "actualOut": 0,
+            "netDelta": -0.008333333333333304,
+            "stock": 54
+          },
+          {
+            "item": "等离子电池",
+            "theoryIn": 4.166666666666667,
+            "theoryOut": 0,
+            "actualIn": 4.166666666666667,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 452
+          },
+          {
+            "item": "量子处理器",
+            "theoryIn": 3.083333333333333,
+            "theoryOut": 0,
+            "actualIn": 3.0833333333333335,
+            "actualOut": 0,
+            "netDelta": 4.440892098500626e-16,
+            "stock": 344
+          },
+          {
+            "item": "曲速线圈",
+            "theoryIn": 0.4583333333333333,
+            "theoryOut": 0,
+            "actualIn": 0.4666666666666667,
+            "actualOut": 0,
+            "netDelta": 0.00833333333333336,
+            "stock": 54
+          },
+          {
+            "item": "钛合金锭",
+            "theoryIn": 80,
+            "theoryOut": 71,
+            "actualIn": 80,
+            "actualOut": 71,
+            "netDelta": 0,
+            "stock": 1064
+          },
+          {
+            "item": "硅晶圆",
+            "theoryIn": 30,
+            "theoryOut": 28,
+            "actualIn": 30,
+            "actualOut": 28,
+            "netDelta": 0,
+            "stock": 151
+          },
+          {
+            "item": "齿轮组",
+            "theoryIn": 30,
+            "theoryOut": 14.333333333333334,
+            "actualIn": 30,
+            "actualOut": 14.333333333333334,
+            "netDelta": 0,
+            "stock": 1857
+          },
+          {
+            "item": "导线线圈",
+            "theoryIn": 40,
+            "theoryOut": 40,
+            "actualIn": 40,
+            "actualOut": 40,
+            "netDelta": 0,
+            "stock": 0
+          },
+          {
+            "item": "能量电池",
+            "theoryIn": 20,
+            "theoryOut": 15.333333333333332,
+            "actualIn": 20,
+            "actualOut": 15.333333333333334,
+            "netDelta": -1.7763568394002505e-15,
+            "stock": 458
+          },
+          {
+            "item": "燃料罐",
+            "theoryIn": 12,
+            "theoryOut": 0,
+            "actualIn": 12,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 1438
+          }
+        ],
+        "maxAbsoluteRateError": 0.016666666666666607
+      },
+      {
+        "hour": 3,
+        "rows": [
+          {
+            "item": "合金板",
+            "theoryIn": 40,
+            "theoryOut": 40,
+            "actualIn": 40,
+            "actualOut": 40,
+            "netDelta": 0,
+            "stock": 2
+          },
+          {
+            "item": "共鸣水晶",
+            "theoryIn": 2.75,
+            "theoryOut": 0,
+            "actualIn": 2.75,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 475
+          },
+          {
+            "item": "框架模块",
+            "theoryIn": 0.9166666666666666,
+            "theoryOut": 0,
+            "actualIn": 0.9166666666666666,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 164
+          },
+          {
+            "item": "电动机",
+            "theoryIn": 3.5,
+            "theoryOut": 0,
+            "actualIn": 3.5166666666666666,
+            "actualOut": 0,
+            "netDelta": 0.016666666666666607,
+            "stock": 583
+          },
+          {
+            "item": "引力透镜",
+            "theoryIn": 0.4583333333333333,
+            "theoryOut": 0,
+            "actualIn": 0.4666666666666667,
+            "actualOut": 0,
+            "netDelta": 0.00833333333333336,
+            "stock": 82
+          },
+          {
+            "item": "等离子电池",
+            "theoryIn": 4.166666666666667,
+            "theoryOut": 0,
+            "actualIn": 4.166666666666667,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 702
+          },
+          {
+            "item": "量子处理器",
+            "theoryIn": 3.083333333333333,
+            "theoryOut": 0,
+            "actualIn": 3.0833333333333335,
+            "actualOut": 0,
+            "netDelta": 4.440892098500626e-16,
+            "stock": 529
+          },
+          {
+            "item": "曲速线圈",
+            "theoryIn": 0.4583333333333333,
+            "theoryOut": 0,
+            "actualIn": 0.45,
+            "actualOut": 0,
+            "netDelta": -0.008333333333333304,
+            "stock": 81
+          },
+          {
+            "item": "钛合金锭",
+            "theoryIn": 80,
+            "theoryOut": 71,
+            "actualIn": 80,
+            "actualOut": 71,
+            "netDelta": 0,
+            "stock": 1604
+          },
+          {
+            "item": "硅晶圆",
+            "theoryIn": 30,
+            "theoryOut": 28,
+            "actualIn": 30,
+            "actualOut": 28,
+            "netDelta": 0,
+            "stock": 271
+          },
+          {
+            "item": "齿轮组",
+            "theoryIn": 30,
+            "theoryOut": 14.333333333333334,
+            "actualIn": 30,
+            "actualOut": 14.333333333333334,
+            "netDelta": 0,
+            "stock": 2797
+          },
+          {
+            "item": "导线线圈",
+            "theoryIn": 40,
+            "theoryOut": 40,
+            "actualIn": 40,
+            "actualOut": 40,
+            "netDelta": 0,
+            "stock": 0
+          },
+          {
+            "item": "能量电池",
+            "theoryIn": 20,
+            "theoryOut": 15.333333333333332,
+            "actualIn": 20,
+            "actualOut": 15.333333333333334,
+            "netDelta": -1.7763568394002505e-15,
+            "stock": 738
+          },
+          {
+            "item": "燃料罐",
+            "theoryIn": 12,
+            "theoryOut": 0,
+            "actualIn": 12,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 2158
+          }
+        ],
+        "maxAbsoluteRateError": 0.016666666666666607
+      }
+    ]
+  },
+  {
+    "removed": "M89",
+    "theoretical": {
+      "inflow": {
+        "合金板": 0.4444444444444444,
+        "共鸣水晶": 0.013888888888888888,
+        "框架模块": 0.004629629629629629,
+        "电动机": 0.027777777777777776,
+        "引力透镜": 0.0023148148148148147,
+        "等离子电池": 0.09074074074074075,
+        "量子处理器": 0.0667989417989418,
+        "曲速线圈": 0.0023148148148148147,
+        "钛合金锭": 1.3333333333333333,
+        "硅晶圆": 0.5,
+        "齿轮组": 0.5,
+        "导线线圈": 0.6666666666666666,
+        "能量电池": 0.3333333333333333,
+        "燃料罐": 0.2
+      },
+      "outflow": {
+        "合金板": 0.4444444444444444,
+        "共鸣水晶": 0,
+        "框架模块": 0,
+        "电动机": 0,
+        "引力透镜": 0,
+        "等离子电池": 0,
+        "量子处理器": 0,
+        "曲速线圈": 0,
+        "钛合金锭": 1.0555555555555556,
+        "硅晶圆": 0.5,
+        "齿轮组": 0.09259259259259259,
+        "导线线圈": 0.5396825396825397,
+        "能量电池": 0.17989417989417988,
+        "燃料罐": 0
+      }
+    },
+    "windows": [
+      {
+        "hour": 1,
+        "rows": [
+          {
+            "item": "合金板",
+            "theoryIn": 26.666666666666664,
+            "theoryOut": 26.666666666666664,
+            "actualIn": 26.55,
+            "actualOut": 26.516666666666666,
+            "netDelta": 0.03333333333333499,
+            "stock": 2
+          },
+          {
+            "item": "共鸣水晶",
+            "theoryIn": 0.8333333333333333,
+            "theoryOut": 0,
+            "actualIn": 0.5333333333333333,
+            "actualOut": 0,
+            "netDelta": -0.29999999999999993,
+            "stock": 32
+          },
+          {
+            "item": "框架模块",
+            "theoryIn": 0.2777777777777778,
+            "theoryOut": 0,
+            "actualIn": 0.26666666666666666,
+            "actualOut": 0,
+            "netDelta": -0.011111111111111127,
+            "stock": 16
+          },
+          {
+            "item": "电动机",
+            "theoryIn": 1.6666666666666665,
+            "theoryOut": 0,
+            "actualIn": 1.0666666666666667,
+            "actualOut": 0,
+            "netDelta": -0.5999999999999999,
+            "stock": 64
+          },
+          {
+            "item": "引力透镜",
+            "theoryIn": 0.1388888888888889,
+            "theoryOut": 0,
+            "actualIn": 0.13333333333333333,
+            "actualOut": 0,
+            "netDelta": -0.005555555555555564,
+            "stock": 8
+          },
+          {
+            "item": "等离子电池",
+            "theoryIn": 5.444444444444445,
+            "theoryOut": 0,
+            "actualIn": 4.616666666666666,
+            "actualOut": 0,
+            "netDelta": -0.8277777777777784,
+            "stock": 277
+          },
+          {
+            "item": "量子处理器",
+            "theoryIn": 4.007936507936508,
+            "theoryOut": 0,
+            "actualIn": 3.433333333333333,
+            "actualOut": 0,
+            "netDelta": -0.5746031746031748,
+            "stock": 206
+          },
+          {
+            "item": "曲速线圈",
+            "theoryIn": 0.1388888888888889,
+            "theoryOut": 0,
+            "actualIn": 0.13333333333333333,
+            "actualOut": 0,
+            "netDelta": -0.005555555555555564,
+            "stock": 8
+          },
+          {
+            "item": "钛合金锭",
+            "theoryIn": 80,
+            "theoryOut": 63.333333333333336,
+            "actualIn": 79.76666666666667,
+            "actualOut": 63.38333333333333,
+            "netDelta": -0.28333333333333144,
+            "stock": 983
+          },
+          {
+            "item": "硅晶圆",
+            "theoryIn": 30,
+            "theoryOut": 30,
+            "actualIn": 29.9,
+            "actualOut": 29.9,
+            "netDelta": 0,
+            "stock": 0
+          },
+          {
+            "item": "齿轮组",
+            "theoryIn": 30,
+            "theoryOut": 5.555555555555555,
+            "actualIn": 29.866666666666667,
+            "actualOut": 6.183333333333334,
+            "netDelta": -0.7611111111111093,
+            "stock": 1421
+          },
+          {
+            "item": "导线线圈",
+            "theoryIn": 40,
+            "theoryOut": 32.38095238095238,
+            "actualIn": 39.666666666666664,
+            "actualOut": 32.96666666666667,
+            "netDelta": -0.9190476190476247,
+            "stock": 402
+          },
+          {
+            "item": "能量电池",
+            "theoryIn": 20,
+            "theoryOut": 10.793650793650793,
+            "actualIn": 19.9,
+            "actualOut": 12.183333333333334,
+            "netDelta": -1.4896825396825424,
+            "stock": 463
+          },
+          {
+            "item": "燃料罐",
+            "theoryIn": 12,
+            "theoryOut": 0,
+            "actualIn": 11.966666666666667,
+            "actualOut": 0,
+            "netDelta": -0.033333333333333215,
+            "stock": 718
+          }
+        ],
+        "maxAbsoluteRateError": 1.389682539682541
+      },
+      {
+        "hour": 2,
+        "rows": [
+          {
+            "item": "合金板",
+            "theoryIn": 26.666666666666664,
+            "theoryOut": 26.666666666666664,
+            "actualIn": 26.666666666666668,
+            "actualOut": 26.666666666666668,
+            "netDelta": 0,
+            "stock": 2
+          },
+          {
+            "item": "共鸣水晶",
+            "theoryIn": 0.8333333333333333,
+            "theoryOut": 0,
+            "actualIn": 0.8166666666666667,
+            "actualOut": 0,
+            "netDelta": -0.016666666666666607,
+            "stock": 81
+          },
+          {
+            "item": "框架模块",
+            "theoryIn": 0.2777777777777778,
+            "theoryOut": 0,
+            "actualIn": 0.2833333333333333,
+            "actualOut": 0,
+            "netDelta": 0.005555555555555536,
+            "stock": 33
+          },
+          {
+            "item": "电动机",
+            "theoryIn": 1.6666666666666665,
+            "theoryOut": 0,
+            "actualIn": 1.6333333333333333,
+            "actualOut": 0,
+            "netDelta": -0.033333333333333215,
+            "stock": 162
+          },
+          {
+            "item": "引力透镜",
+            "theoryIn": 0.1388888888888889,
+            "theoryOut": 0,
+            "actualIn": 0.13333333333333333,
+            "actualOut": 0,
+            "netDelta": -0.005555555555555564,
+            "stock": 16
+          },
+          {
+            "item": "等离子电池",
+            "theoryIn": 5.444444444444445,
+            "theoryOut": 0,
+            "actualIn": 5.466666666666667,
+            "actualOut": 0,
+            "netDelta": 0.022222222222222143,
+            "stock": 605
+          },
+          {
+            "item": "量子处理器",
+            "theoryIn": 4.007936507936508,
+            "theoryOut": 0,
+            "actualIn": 4,
+            "actualOut": 0,
+            "netDelta": -0.007936507936507908,
+            "stock": 446
+          },
+          {
+            "item": "曲速线圈",
+            "theoryIn": 0.1388888888888889,
+            "theoryOut": 0,
+            "actualIn": 0.13333333333333333,
+            "actualOut": 0,
+            "netDelta": -0.005555555555555564,
+            "stock": 16
+          },
+          {
+            "item": "钛合金锭",
+            "theoryIn": 80,
+            "theoryOut": 63.333333333333336,
+            "actualIn": 80,
+            "actualOut": 63.4,
+            "netDelta": -0.06666666666666288,
+            "stock": 1979
+          },
+          {
+            "item": "硅晶圆",
+            "theoryIn": 30,
+            "theoryOut": 30,
+            "actualIn": 30,
+            "actualOut": 30,
+            "netDelta": 0,
+            "stock": 0
+          },
+          {
+            "item": "齿轮组",
+            "theoryIn": 30,
+            "theoryOut": 5.555555555555555,
+            "actualIn": 30,
+            "actualOut": 5.566666666666666,
+            "netDelta": -0.011111111111109295,
+            "stock": 2887
+          },
+          {
+            "item": "导线线圈",
+            "theoryIn": 40,
+            "theoryOut": 32.38095238095238,
+            "actualIn": 40,
+            "actualOut": 32.35,
+            "netDelta": 0.030952380952378178,
+            "stock": 861
+          },
+          {
+            "item": "能量电池",
+            "theoryIn": 20,
+            "theoryOut": 10.793650793650793,
+            "actualIn": 20,
+            "actualOut": 10.8,
+            "netDelta": -0.006349206349208103,
+            "stock": 1015
+          },
+          {
+            "item": "燃料罐",
+            "theoryIn": 12,
+            "theoryOut": 0,
+            "actualIn": 12,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 1438
+          }
+        ],
+        "maxAbsoluteRateError": 0.06666666666666288
+      },
+      {
+        "hour": 3,
+        "rows": [
+          {
+            "item": "合金板",
+            "theoryIn": 26.666666666666664,
+            "theoryOut": 26.666666666666664,
+            "actualIn": 26.666666666666668,
+            "actualOut": 26.666666666666668,
+            "netDelta": 0,
+            "stock": 2
+          },
+          {
+            "item": "共鸣水晶",
+            "theoryIn": 0.8333333333333333,
+            "theoryOut": 0,
+            "actualIn": 0.8333333333333334,
+            "actualOut": 0,
+            "netDelta": 1.1102230246251565e-16,
+            "stock": 131
+          },
+          {
+            "item": "框架模块",
+            "theoryIn": 0.2777777777777778,
+            "theoryOut": 0,
+            "actualIn": 0.2833333333333333,
+            "actualOut": 0,
+            "netDelta": 0.005555555555555536,
+            "stock": 50
+          },
+          {
+            "item": "电动机",
+            "theoryIn": 1.6666666666666665,
+            "theoryOut": 0,
+            "actualIn": 1.6833333333333333,
+            "actualOut": 0,
+            "netDelta": 0.01666666666666683,
+            "stock": 263
+          },
+          {
+            "item": "引力透镜",
+            "theoryIn": 0.1388888888888889,
+            "theoryOut": 0,
+            "actualIn": 0.15,
+            "actualOut": 0,
+            "netDelta": 0.0111111111111111,
+            "stock": 25
+          },
+          {
+            "item": "等离子电池",
+            "theoryIn": 5.444444444444445,
+            "theoryOut": 0,
+            "actualIn": 5.433333333333334,
+            "actualOut": 0,
+            "netDelta": -0.011111111111111072,
+            "stock": 931
+          },
+          {
+            "item": "量子处理器",
+            "theoryIn": 4.007936507936508,
+            "theoryOut": 0,
+            "actualIn": 4.016666666666667,
+            "actualOut": 0,
+            "netDelta": 0.0087301587301587,
+            "stock": 687
+          },
+          {
+            "item": "曲速线圈",
+            "theoryIn": 0.1388888888888889,
+            "theoryOut": 0,
+            "actualIn": 0.13333333333333333,
+            "actualOut": 0,
+            "netDelta": -0.005555555555555564,
+            "stock": 24
+          },
+          {
+            "item": "钛合金锭",
+            "theoryIn": 80,
+            "theoryOut": 63.333333333333336,
+            "actualIn": 80,
+            "actualOut": 63.3,
+            "netDelta": 0.033333333333338544,
+            "stock": 2981
+          },
+          {
+            "item": "硅晶圆",
+            "theoryIn": 30,
+            "theoryOut": 30,
+            "actualIn": 30,
+            "actualOut": 30,
+            "netDelta": 0,
+            "stock": 0
+          },
+          {
+            "item": "齿轮组",
+            "theoryIn": 30,
+            "theoryOut": 5.555555555555555,
+            "actualIn": 30,
+            "actualOut": 5.566666666666666,
+            "netDelta": -0.011111111111109295,
+            "stock": 4353
+          },
+          {
+            "item": "导线线圈",
+            "theoryIn": 40,
+            "theoryOut": 32.38095238095238,
+            "actualIn": 40,
+            "actualOut": 32.4,
+            "netDelta": -0.01904761904761898,
+            "stock": 1317
+          },
+          {
+            "item": "能量电池",
+            "theoryIn": 20,
+            "theoryOut": 10.793650793650793,
+            "actualIn": 20,
+            "actualOut": 10.766666666666667,
+            "netDelta": 0.026984126984125112,
+            "stock": 1569
+          },
+          {
+            "item": "燃料罐",
+            "theoryIn": 12,
+            "theoryOut": 0,
+            "actualIn": 12,
+            "actualOut": 0,
+            "netDelta": 0,
+            "stock": 2158
+          }
+        ],
+        "maxAbsoluteRateError": 0.033333333333338544
+      }
+    ]
+  }
+]

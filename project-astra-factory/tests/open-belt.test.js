@@ -23,7 +23,7 @@ test('0xffff open AST1 and JSON -1 roundtrips',()=>run(function(){
  assert.equal(ast1Encode(),code);
  state.routes[0].openEndSide='N';
  const compact=compactFactoryLayout(state);
- assert.equal(compact.routes[0][2],-1);
+ assert.equal(compact.routes[0].to,null);
  const restored=expandCompactFactoryLayout(compact);
  assert.equal(restored.routes[0].to,null);
  assert.equal(restored.routes[0].openEndSide,'N');
@@ -93,10 +93,20 @@ test('hover red tail, move outside to extend, clipping retains corner orientatio
  assert.equal(routeTile(r,2).type,'turn');
  assert.equal(checkPath(r.path,r.from,r.to,r.id),null);
  assert.equal(expandCompactFactoryLayout(compactFactoryLayout(state)).routes[0].openEndSide,'S');
+ // Confirming a middle trim is only a saved, selected state.
+ assert.equal(draft,null,'trim must not automatically start placement');
+ assert.equal(selection.routeId,r.id,'yellow selected belt remains visible');
+ assert.equal(beltPostTrimRouteId,r.id);
+ const cutLength=r.path.length;
+ move(p.ex+2,p.ey+3);
+ assert.equal(draft,null,'mouse movement after cut must not draw a ghost');
+ click(...r.path.at(-1));
+ assert.equal(draft.phase,'placing','explicit new-tip tap resumes placement');
  move(p.ex+2,p.ey+3);
  assert(draft.preview&&draft.preview.length>r.path.length);
  click(p.ex+2,p.ey+3);
  assert.equal(r.to,null);
+ assert(r.path.length>cutLength);
  assert.equal(r.openEndSide,undefined);
 }));
 
@@ -357,8 +367,12 @@ test('deleting a destination machine preserves incoming belt and final corner as
  click(...last);click(...last);
  assert.equal(r.path.length,cells.length-1,'player must delete last belt tile first');
  assert.equal(r.to,null);
+ assert.equal(draft,null,'cut does not auto-enter placement');
+ assert.equal(selection.routeId,r.id);
  assert.doesNotThrow(()=>ast1Encode(),'after trimming final corner AST1 can export');
- // Deliberately connect to actual input port, not the adjacent outside tile.
+ // Explicitly tap the new open tip before connecting to an input port.
+ click(...r.path.at(-1));
+ assert.equal(draft.phase,'placing');
  click(ip.x,ip.y);
  assert.equal(r.to.id,replacement.id);
  assert.equal(checkPath(r.path,r.from,r.to,r.id),null);
@@ -420,7 +434,7 @@ test('clicking the already adjacent inlet after selecting open-end tile connects
  assert.equal(checkPath(route.path,route.from,route.to,route.id),null);
  assert.equal(draft,null);
  assert.equal(beltTrim,null);
- assert.equal(ast1Decode(ast1Encode()).routes[0].to.id,'ast1_1');
+ assert.equal(ast1Decode(ast1Encode()).routes[0].to.id,'M1');
 }));
 
 test('machine output status distinguishes no belt, dangling yellow belt and connected green belt',()=>run(function(){
@@ -497,7 +511,7 @@ test('inlet hover previews a last-tile turn, not a center-ending line, and conne
  assert.equal(route.path.length,cells.length,'rotating a final tile never adds a belt cell');
  assert.equal(route.openEndSide,undefined,'new connected direction overrides saved open direction');
  assert.equal(routeTile(route,cells.length-1).type,'turn');
- assert.equal(ast1Decode(ast1Encode()).routes[0].to.id,'ast1_1');
+ assert.equal(ast1Decode(ast1Encode()).routes[0].to.id,'M1');
 }));
 test('hover preview ends at the outward edge, even with no machine target',()=>run(function(){
  const a={id:'source',type:'垃圾',x:10,y:10,face:'E',mode:0};
@@ -650,7 +664,12 @@ test('editing an old open belt then adding one tile switches to placing and next
  assert.equal(draft.phase,'editing','a later independent click starts editing');
  click(...r.path.at(-1));
  assert.equal(r.path.length,2,'only a separate deliberate editing double click trims the tail');
- assert.equal(draft.phase,'placing','cutting the tail begins a new continuation placement');
+ assert.equal(draft,null,'cutting the middle does not immediately restart placement');
+ assert.equal(selection.routeId,r.id);
+ assert.equal(beltTrim,null);
+ assert.equal(beltPostTrimRouteId,r.id);
+ click(...r.path.at(-1));
+ assert.equal(draft.phase,'placing','deliberate tap on the new open tip starts placement');
 }));
 test('a rotated confirmed last tile renders solid while only newly proposed tiles are dashed',()=>run(function(){
  // Spy on the actual canvas painter, not merely preview path geometry.
@@ -677,7 +696,7 @@ test('a rotated confirmed last tile renders solid while only newly proposed tile
  draft={from:copy(r.from),routeId:r.id,path:copy(cells),preview:copy(extended),
   previewTo:null,phase:'placing'};
  drawStaticScene();
- const solid=logs.filter(x=>x.color==='#f2bf4b'&&x.width===.29);
+ const solid=logs.filter(x=>x.color==='#f3d875'&&x.width===.29);
  const dashed=logs.filter(x=>x.color==='#ffd176'&&x.width===.29);
  assert.equal(solid.length,1,'already placed final tile has exactly one solid preview stroke');
  assert.deepEqual(solid[0].dash,[],'confirmed final tile is NEVER dashed');
@@ -686,7 +705,7 @@ test('a rotated confirmed last tile renders solid while only newly proposed tile
  logs.length=0;
  draft.preview=copy(cells);
  drawStaticScene();
- const solidTurn=logs.filter(x=>x.color==='#f2bf4b'&&x.width===.29);
+ const solidTurn=logs.filter(x=>x.color==='#f3d875'&&x.width===.29);
  assert.equal(solidTurn.length,1,'already confirmed tile remains solid when only its orientation is previewed');
  assert.deepEqual(solidTurn[0].dash,[]);
  assert.equal(logs.filter(x=>x.color==='#ffd176'&&x.width===.29).length,0,
@@ -782,7 +801,7 @@ test('select mode second click on selected belt opens editing; third same-tile c
  assert.equal(beltTrim,null);
  tap(2);
  assert.equal(tool,'belt','second selected route click enters edit mode');
- assert.equal(selection,null);
+ assert.equal(selection.routeId,'r1','editing keeps the selected route highlighted');
  assert.equal(beltTrim.index,2,'second click arms exactly that tile but does not cut');
  assert.equal(draft.phase,'editing','open belt remains extendable');
  assert.equal(r.path.length,path.length);
@@ -790,7 +809,9 @@ test('select mode second click on selected belt opens editing; third same-tile c
  onPointerUp({pointerId:3});
  assert.equal(r.path.length,2,'third same-tile click confirms tail deletion');
  assert.equal(r.to,null);
- assert.equal(draft.phase,'placing');
+ assert.equal(draft,null,'no automatic placement after a partial cut');
+ assert.equal(selection.routeId,r.id);
+ assert.equal(beltPostTrimRouteId,r.id);
 }));
 test('crossing marker is black X within belt overlap corners, composited below animated item dots',()=>run(function(){
  const strokes=[],calls=[],points=[];
@@ -870,4 +891,118 @@ test('port squares retain transparent center; only crossing stroke pixels darken
  assert.equal(calls.filter(v=>v.kind==='stroke').length,1,'no repaint for nonoverlapping labels');
  assert.equal(calls.filter(v=>v.kind==='stroke')[0].color,'#5baaff');
  assert.equal(calls.filter(v=>v==='clip').length,0);
+}));
+
+test('selected connected route exits via two non-route clicks, including machine body',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};
+ updateGroupControls=function(){};camera={x:0,y:0,z:10};
+ const src={id:'M0',type:'垃圾',x:4,y:10,face:'E',mode:0};
+ const dst={id:'M1',type:'仓入',x:27,y:10,face:'E',mode:''};
+ const p=outPort(src,0),d0=inPort(dst,0);
+ dst.y+=p.ey-d0.ey;
+ const q=inPort(dst,0),path=[];
+ for(let x=p.ex;x<=q.ex;x++)path.push([x,p.ey]);
+ const route={id:'R0',from:{id:src.id,port:0},to:{id:dst.id,port:0},path};
+ state={name:'two-stage edit cancel',recordIndexed:true,machines:[src,dst],routes:[route]};
+ tool='select';selection=null;multiSelection=null;draft=null;beltTrim=null;beltEditExitPending=false;
+ const touch=(x,y,id=1)=>{onPointerDown({button:0,pointerId:id,clientX:(x+.5)*10,clientY:(y+.5)*10});onPointerUp({pointerId:id,clientX:(x+.5)*10,clientY:(y+.5)*10});};
+ touch(path[4][0],path[4][1],1);
+ assert.equal(selection.routeId,'R0','first route tap inspects and highlights');
+ assert.equal(tool,'select');
+ touch(path[4][0],path[4][1],2);
+ assert.equal(tool,'belt','second route tap enters belt editing');
+ assert.equal(selection.routeId,'R0','editing keeps yellow selection');
+ assert.equal(beltTrim.index,4,'middle tail is now red preview');
+ assert.equal(beltEditExitPending,false);
+ touch(src.x+2,src.y+1,3);
+ assert.equal(tool,'belt','first machine-body tap must NOT leave Belt');
+ assert.equal(selection,null,'first machine-body tap deselects the route');
+ assert.equal(beltTrim,null);
+ assert.equal(draft,null);
+ assert.equal(beltEditExitPending,true,'now await the second non-route tap');
+ touch(src.x+2,src.y+1,4);
+ assert.equal(tool,'select','second machine-body tap leaves Belt for Select');
+ assert.equal(selection,null);
+ assert.equal(beltEditExitPending,false);
+ assert.equal(state.routes[0].path.length,path.length,'cancel does not trim or delete');
+}));
+test('open route extension and manually selected new Belt tool do not trigger the two-stage edit exit',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};
+ updateGroupControls=function(){};camera={x:0,y:0,z:10};
+ const src={id:'M0',type:'垃圾',x:4,y:12,face:'E',mode:0};
+ const port=outPort(src,0),path=[[port.ex,port.ey],[port.ex+1,port.ey],[port.ex+2,port.ey]];
+ state={name:'edit and new belt',recordIndexed:true,machines:[src],
+  routes:[{id:'R0',from:{id:'M0',port:0},to:null,path}]};
+ tool='select';selection=null;multiSelection=null;draft=null;beltTrim=null;beltEditExitPending=false;
+ const touch=(x,y,id=1)=>{onPointerDown({button:0,pointerId:id,clientX:(x+.5)*10,clientY:(y+.5)*10});onPointerUp({pointerId:id,clientX:(x+.5)*10,clientY:(y+.5)*10});};
+ touch(path[1][0],path[1][1]);touch(path[1][0],path[1][1]);
+ assert.equal(tool,'belt');
+ assert.equal(draft.phase,'editing');
+ touch(2,4);
+ assert.equal(tool,'belt');assert.equal(selection?.routeId,'R0','open route may extend into a blank tile');
+ assert.equal(beltEditExitPending,false,'a valid open-route extension is creation, not deselection');
+ // A manually selected belt tool is not a partially exited EDIT.
+ setTool('belt');
+ touch(2,4);touch(3,4);
+ assert.equal(tool,'belt','manual Belt has no pending edit exit');
+ assert.equal(beltEditExitPending,false);
+ // New source route: tapping an unconnected outlet starts a live draft,
+ // and clicking away is still part of that creation flow.
+ state.routes=[];selection=null;setTool('belt');
+ touch(port.x,port.y);
+ assert(draft,'tap output starts a new line');
+ assert.equal(draft.phase,'placing');
+ assert.equal(beltEditExitPending,false);
+ touch(port.ex+2,port.ey+2);
+ assert.equal(tool,'belt');
+ assert.equal(beltEditExitPending,false,'new placement never arms edit-exit');
+}));
+
+test('trimming an existing route keeps only a yellow selection until new tip is deliberately tapped',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const a={id:'M0',type:'垃圾',x:6,y:10,face:'E',mode:0},b={id:'M1',type:'垃圾',x:6,y:25,face:'E',mode:0};
+ const p=outPort(a,0),q=outPort(b,0);
+ const ra={id:'R0',from:{id:'M0',port:0},to:null,path:[[p.ex,p.ey],[p.ex+1,p.ey],[p.ex+2,p.ey],[p.ex+3,p.ey],[p.ex+4,p.ey]]};
+ const rb={id:'R1',from:{id:'M1',port:0},to:null,path:[[q.ex,q.ey],[q.ex+1,q.ey],[q.ex+2,q.ey]]};
+ state={name:'post-cut',recordIndexed:true,machines:[a,b],routes:[ra,rb]};
+ tool='belt';selection={routeId:'R0'};draft=null;beltTrim=null;beltPostTrimRouteId=null;beltEditExitPending=false;
+ const click=(x,y)=>onPointerDown({button:0,pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ const move=(x,y)=>onPointerMove({pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ click(...ra.path[3]);assert.equal(beltTrim.index,3);
+ click(...ra.path[3]);
+ assert.equal(ra.path.length,3);
+ assert.equal(ra.id,'R0');assert.equal(rb.id,'R1');
+ assert.equal(ra.to,null);assert.equal(draft,null);assert.equal(beltTrim,null);
+ assert.equal(selection.routeId,'R0');assert.equal(beltPostTrimRouteId,'R0');
+ move(p.ex+7,p.ey+2);assert.equal(draft,null,'hover must not automatically extend');
+ const restored=expandCompactFactoryLayout(compactFactoryLayout(state));
+ assert.equal(restored.routes[0].id,'R0');assert.equal(restored.routes[1].id,'R1');
+ click(...ra.path[1]);
+ assert.equal(beltTrim.index,1,'tapping middle re-arms trim');
+ assert.equal(draft.phase,'editing');
+ click(...ra.path[1]);
+ assert.equal(ra.path.length,1);assert.equal(draft,null);
+ click(...ra.path.at(-1));
+ assert.equal(draft.phase,'placing','only explicit new-tip tap starts placement');
+ assert.equal(ra.path.length,1);assert.equal(beltTrim.index,-1);
+ click(p.ex+3,p.ey);assert(ra.path.length>1);
+ assert.equal(rb.id,'R1');
+}));
+test('after partial trim, first machine click deselects and second blank click exits belt tool',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const m={id:'M0',type:'垃圾',x:6,y:10,face:'E',mode:0},p=outPort(m,0);
+ state={name:'trim and exit',recordIndexed:true,machines:[m],routes:[
+  {id:'R0',from:{id:'M0',port:0},to:null,path:[[p.ex,p.ey],[p.ex+1,p.ey],[p.ex+2,p.ey],[p.ex+3,p.ey]]}]};
+ tool='belt';selection={routeId:'R0'};draft=null;beltTrim=null;beltPostTrimRouteId=null;beltEditExitPending=false;
+ const click=(x,y)=>onPointerDown({button:0,pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});
+ click(p.ex+2,p.ey);click(p.ex+2,p.ey);
+ assert.equal(draft,null);assert.equal(selection.routeId,'R0');
+ click(m.x+1,m.y+1);
+ assert.equal(tool,'belt');assert.equal(selection,null);
+ assert.equal(beltPostTrimRouteId,null);assert.equal(beltEditExitPending,true);
+ click(2,5);
+ assert.equal(tool,'select');assert.equal(beltEditExitPending,false);
+ assert.equal(state.routes[0].path.length,2);
 }));

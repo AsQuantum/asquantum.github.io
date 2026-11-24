@@ -197,7 +197,10 @@ function createGroupPlan(transform){
  // Any route crossing a moved-group boundary is deliberately disconnected.
  const removedRoutes=state.routes.filter(r=>moving.has(r.from.id)||moving.has(r.to?.id));
  const keptRoutes=state.routes.filter(r=>!moving.has(r.from.id)&&!moving.has(r.to?.id));
- const candidate={...state,machines:[...keptMachines,...machines],routes:[...keptRoutes,...routes]};
+ // Moving/rotating the group must not change AST1 machine-number priority.
+ const movedById=new Map(machines.map(m=>[m.id,m]));
+ const orderedMachines=mode==='move'?state.machines.map(m=>movedById.get(m.id)||m):[...keptMachines,...machines];
+ const candidate={...state,machines:orderedMachines,routes:[...keptRoutes,...routes]};
  let error=null;
  const original=state;
  try{
@@ -250,8 +253,10 @@ function commitGroupTransform(){
  // Mobile group copy remains in preview mode for repeated placement.
  // Desktop keeps the original one-shot copy behavior.
  const keepMobileCopy=t.mode==='copy'&&typeof mobileEditorActive==='function'&&mobileEditorActive();
- snapshot();state=result;selection=null;marquee=null;groupTransform=null;
- multiSelection={machineIds:placed,routeIds:finalRoutes};
+ snapshot();state=result;selection=placed.length===1?{machineId:placed[0]}:null;
+ marquee=null;groupTransform=null;
+ // Make the newly placed single machine the active Inspector target too.
+ multiSelection=placed.length>1||finalRoutes.length?{machineIds:placed,routeIds:finalRoutes}:null;
  afterChange(t.mode==='copy'?`已放置 ${placed.length} 台复制机器及 ${plan.routes.length} 条内部线路`
   :`已移动 ${placed.length} 台机器及 ${plan.routes.length} 条内部线路，断开 ${Math.max(0,plan.disconnected)} 条外部线路`);
  if(keepMobileCopy){

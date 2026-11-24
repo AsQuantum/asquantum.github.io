@@ -102,7 +102,8 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  // Its two arms reach the TILE EDGES, including the first and final belt cells.
  // No extra line is drawn inside machine ports.
  for(let r of state.routes){
-  let selected=selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id);
+  let selected=selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id)||
+  draft?.routeId===r.id||beltTrim?.routeId===r.id;
   ctx.strokeStyle=selected?'#f3d875':r.to?'#50e0a0':'#f2bf4b';ctx.lineWidth=selected?.44:.32;
   ctx.lineCap='butt';ctx.lineJoin='round';ctx.beginPath();
   const previewReplacesEnd=draft?.routeId===r.id&&draft.preview?.length>=r.path.length;
@@ -127,7 +128,8 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
   const horizontal=entries.find(a=>orientation(a.r,a.i)==='H');
   if(!vertical||!horizontal)continue;
   const [x,y]=vertical.r.path[vertical.i],cx=x+.5,cy=y+.5;
-  const beltWidth=r=>(selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id))?.44:.32;
+  const beltWidth=r=>(selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id)||
+   draft?.routeId===r.id||beltTrim?.routeId===r.id)?.44:.32;
   const half=Math.min(beltWidth(vertical.r),beltWidth(horizontal.r))*.5;
   ctx.strokeStyle='#080e17';ctx.lineWidth=.075;ctx.lineCap='butt';
   ctx.beginPath();
@@ -197,7 +199,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  if(draft.preview){
   if(persisted&&locked.length){
    const lastConfirmed=locked.length-1;
-   drawCells(all,'#f2bf4b',false,lastConfirmed,draft.previewTo,locked.length);
+   drawCells(all,'#f3d875',false,lastConfirmed,draft.previewTo,locked.length);
    if(all.length>locked.length)
     drawCells(all,'#ffd176',true,locked.length,draft.previewTo);
   }else drawCells(all,'#ffd176',true,0,draft.previewTo);
@@ -259,14 +261,28 @@ function renderMaterialLegend(){
 }
 
 function interpolate(path,pos){if(!path.length)return null;let p=Math.max(0,Math.min(path.length-1.00001,pos*(path.length-1))),i=Math.floor(p),j=Math.min(path.length-1,i+1),t=p-i;return [path[i][0]*(1-t)+path[j][0]*t,path[i][1]*(1-t)+path[j][1]*t]}
-function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTransform){if(e.button===0){commitGroupTransform();return;}}const pt=eventCoords(e),c=screenToCell(pt.x,pt.y);canvas.setPointerCapture(e.pointerId);
+function onPointerDown(e){
+ // Touch-only belt drag: keep the real path-search preview under the finger;
+ // nothing is committed until pointerup (except arming the output port).
+ if(!e._mobileCommit&&e.button===0&&tool==="belt"&&
+    typeof mobileEditorActive==="function"&&mobileEditorActive()){
+  const p=eventCoords(e),c=screenToCell(p.x,p.y),hit=portAt(c.x,c.y);
+  const sourceStart=!draft&&!selection?.routeId&&!beltEditExitPending&&hit?.p.kind==="out";
+  if(sourceStart)onPointerDown({button:0,pointerId:e.pointerId,clientX:e.clientX,clientY:e.clientY,pointerType:e.pointerType,_mobileCommit:true});
+  drag={kind:"mobile-belt-gesture",pointerId:e.pointerId,startCell:c,sourceStart};
+  hoverCell=c;
+  if(draft)updateDraftPreview();
+  if(typeof mobileUpdatePlacement==="function")mobileUpdatePlacement();
+  draw();return;
+ }
+ if(e.button===2){resetEditorMode();return;}if(groupTransform){if(e.button===0){commitGroupTransform();return;}}const pt=eventCoords(e),c=screenToCell(pt.x,pt.y);canvas.setPointerCapture(e.pointerId);
  if(e.button===1||tool==='pan'||spaceDown){drag={kind:'pan',x:pt.x,y:pt.y,sx:camera.x,sy:camera.y};return;}
  if(tool==='marquee'||(tool==='select'&&e.shiftKey)){
   const w={x:(pt.x-camera.x)/camera.z,y:(pt.y-camera.y)/camera.z};
   marquee={from:c,to:c,fromWorld:w,toWorld:{...w}};
   drag={kind:'marquee'};draw();return;
  }
- if(stampType){let m={...getStampMachine(c.x,c.y),id:'m'+(++idSeed)};if(!canPlace(m))return notify('不能放这里：与障碍物、机器或传送带重叠','bad');snapshot();state.machines.push(m);selection={machineId:m.id};afterChange('放置 '+label(m)+'；可继续放置');return;}
+ if(stampType){let m={...getStampMachine(c.x,c.y),id:nextFactoryMachineId()};if(!canPlace(m))return notify('不能放这里：与障碍物、机器或传送带重叠','bad');snapshot();state.machines.push(m);selection={machineId:m.id};afterChange('放置 '+label(m)+'；可继续放置');return;}
  if(tool==='erase'){let r=cellRoutes(c.x,c.y).at(-1);if(r)deleteRoute(r.id);else notify('点绿色传送带删除整条线路');return;}
  if(tool==='belt'){
   // A tap may occur without a preceding pointermove (notably on mobile).
@@ -279,20 +295,27 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
     beltTrim.cell?.[0]===c.x&&beltTrim.cell?.[1]===c.y;
    if(sameCell){
     snapshot();
-    if(idx===0){state.routes=state.routes.filter(q=>q.id!==selected.id);draft=null;}
-    else{
+    if(idx===0){
+     state.routes=state.routes.filter(q=>q.id!==selected.id);
+     selection=null;draft=null;beltPostTrimRouteId=null;
+     beltEditExitPending=true;
+    }else{
      const lastKept=routeTile(selected,idx-1);
      selected.path=selected.path.slice(0,idx);selected.to=null;
      if(lastKept?.type==='turn')selected.openEndSide=lastKept.outgoing;
      else delete selected.openEndSide;
-     draft={from:copy(selected.from),fromName:routeTitle(selected),
-      path:copy(selected.path),routeId:selected.id,history:[],preview:null,phase:'placing'};
-     // Do not instantly paint the just-deleted tail as a new ghost preview.
-     // It becomes extendable after the pointer moves to another cell.
+     // A partial cut keeps the actual route and its yellow selection.
+     // Placement is started ONLY by a later deliberate tap on the open tip.
+     draft=null;selection={routeId:selected.id};
+     beltPostTrimRouteId=selected.id;beltEditExitPending=false;
     }
     beltTrim=null;
     afterChange(idx===0?'已删除整条传送带':'已删除从选中格开始的尾段；可从保留终点继续接线');
-    updateHint();draw();return;
+    updateHint();draw();
+    if(idx>0&&typeof mobileEditorActive==='function'&&mobileEditorActive()){
+     mobileSetMapStatus('已裁剪并选中：点新线头继续接线；点中间格重新预览裁剪；点非线路区域取消选中',true);
+    }
+    return;
    }
    // Only the SAME selected tile confirms deletion. Another belt tile,
    // including the rest of the red suffix, only cancels selection.
@@ -301,14 +324,14 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
     // A click on another EXISTING belt can be a legal perpendicular crossing
     // for an active open line, not necessarily a request to edit that belt.
     if(r&&r.id!==selected?.id&&draft&&commitDraftAtCrossing(c,r))return;
-    clearBeltTrimSelection();return;
+    clearBeltTrimSelection({awaitExit:!r});return;
    }
    const targetPort=hit?.p.kind==='in'?hit.p:null;
    const target=targetPort?[targetPort.ex,targetPort.ey]:
     inMap(c.x,c.y)&&!cellMachine(c.x,c.y)&&!reserved(c.x,c.y)?[c.x,c.y]:null;
    const candidate=target?draftSegment(target,targetPort):null;
    if(!candidate||candidate.length<draft.path.length||(!targetPort&&candidate.length===draft.path.length)){
-    clearBeltTrimSelection();return;
+    clearBeltTrimSelection({awaitExit:true});return;
    }
    const previous=copy(draft.path);
    const historyEntry={path:previous,endSide:selected?.openEndSide||null};
@@ -317,6 +340,20 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
    return;
   }
   if(r){
+   // After a partial cut, the new tip explicitly starts placement.
+   // A middle tile instead re-arms a non-destructive trim preview.
+   if(beltPostTrimRouteId===r.id&&r.to===null&&idx===r.path.length-1){
+    beltPostTrimRouteId=null;beltEditExitPending=false;
+    draft={from:copy(r.from),fromName:routeTitle(r),path:copy(r.path),
+     routeId:r.id,history:[],preview:null,phase:'placing'};
+    beltTrim={routeId:r.id,index:-1,cell:null,hoverOutside:false};
+    selection={routeId:r.id};
+    updateDraftPreview();updateHint();inspectorRefresh();draw();
+    if(typeof mobileEditorActive==='function'&&mobileEditorActive())mobileUpdatePlacement();
+    return;
+   }
+   // Clicking an actual belt is never a blank-space exit gesture.
+   beltPostTrimRouteId=null;beltEditExitPending=false;
    // During continuous placement a click on the LAST confirmed tile means
    // finish, not select that tile for a destructive second click.
    if(draft?.phase==='placing'&&draft.routeId===r.id&&
@@ -337,6 +374,15 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
   }
   if(!draft){
    beltTrim=null;
+   // Existing-route editing exits in TWO deliberate non-route taps.
+   // A machine (including its output port) counts as non-route space.
+   // First tap cancels route selection/trim; second returns to Select.
+   if(beltEditExitPending){
+    selection=null;setTool('select');inspectorRefresh();draw();return;
+   }
+   if(selection?.routeId){
+    clearBeltTrimSelection({awaitExit:true});return;
+   }
    if(hit?.p.kind==='out'){
     if(routeFor(hit.m.id,'out',hit.p.index))
      return notify('该输出口已有线路；请点击对应传送带进行编辑','bad');
@@ -393,6 +439,13 @@ function onPointerDown(e){if(e.button===2){resetEditorMode();return;}if(groupTra
   startX:pt.x,startY:pt.y,startCell:{...c}};
 }
 function onPointerMove(e){
+ if(drag?.kind==="mobile-belt-gesture"){
+  const p=eventCoords(e),cell=screenToCell(p.x,p.y);
+  hoverCell=cell;
+  if(beltTrim)previewBeltTrim(cell,p);
+  else if(draft)updateDraftPreview();
+  draw();return;
+ }
  const p=eventCoords(e),oldCell=hoverCell;
  hoverCell=screenToCell(p.x,p.y);
  const cellChanged=!oldCell||oldCell.x!==hoverCell.x||oldCell.y!==hoverCell.y;
@@ -441,12 +494,26 @@ function onPointerMove(e){
     drag?.kind==='pan'||drag?.kind==='marquee'||(wasPress&&drag?.kind==='machine-preview'))draw();
 }
 function onPointerLeave(){
+ // Touch screens have no hover. Keep the selected red tail until
+ // the second confirmation tap or an explicit cancellation.
+ if(typeof mobileEditorActive==="function"&&mobileEditorActive())return;
  // The deletion cue must disappear as soon as the pointer leaves the map.
  if(typeof beltTrim!=='undefined'&&beltTrim?.hoverAnchor){
   beltTrim.hoverAnchor=false;draw();
  }
 }
 function onPointerUp(e){
+ if(drag?.kind==="mobile-belt-gesture"){
+  const gesture=drag;drag=null;
+  const p=eventCoords(e),cell=screenToCell(p.x,p.y);
+  hoverCell=cell;
+  // A source-port tap starts routing; dragging that same touch to a
+  // different cell also places the first segment when released.
+  if(!gesture.sourceStart||cell.x!==gesture.startCell.x||cell.y!==gesture.startCell.y)
+   onPointerDown({button:0,pointerId:e.pointerId,clientX:e.clientX,clientY:e.clientY,pointerType:e.pointerType,_mobileCommit:true});
+  if(typeof mobileUpdatePlacement==="function")mobileUpdatePlacement();
+  draw();return;
+ }
  if(drag?.kind==='route-select-press'){
   const {routeId,crossAt,wasSelected,startCell}=drag;drag=null;
   const route=state.routes.find(r=>r.id===routeId);
@@ -458,7 +525,11 @@ function onPointerUp(e){
    }
   }
   clearGroupSelection();selection={routeId,crossAt};
-  inspectorRefresh();draw();return;
+  inspectorRefresh();draw();
+  if(typeof mobileEditorActive==="function"&&mobileEditorActive()&&
+     typeof mobileSetMapStatus==="function")
+   mobileSetMapStatus("已选 "+routeId+"；在选中的传送带某一格再轻点，可预览并确认删除该格之后的尾段。");
+  return;
  }
  if(drag?.kind==='machine-select-press'){
   const id=drag.machineId;drag=null;
