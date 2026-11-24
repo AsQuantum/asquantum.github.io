@@ -185,11 +185,12 @@ function factorySteadyAutomaticFluidModel(layout=state,model=null,{unlimitedWare
   }
   throw Error('fixed point not reconstructible as bounded rational');
  }
- function solve({maxIterations=2500,tolerance=1e-11,high=false}={}){
+ function solve({maxIterations=12000,tolerance=1e-11,high=false,deadline=Infinity}={}){
   let s=lines.map((_,i)=>disabled[i]?0:high?1:0),d=lines.map((_,i)=>noMaterial[i]?0:1);
   let residual=Infinity,iterations=0;
   try{
    for(;iterations<maxIterations;iterations++){
+    if(deadline!==Infinity&&iterations%32===0&&performance.now()>=deadline)return {status:'unresolved',reason:'fluid fixed point time budget exceeded',retryable:true,iterations,residual};
     const next=evaluate(s,d,F);
     residual=0;
     for(let i=0;i<lines.length;i++){
@@ -199,7 +200,7 @@ function factorySteadyAutomaticFluidModel(layout=state,model=null,{unlimitedWare
     s=s.map((v,i)=>(v+next.s[i])/2);
     d=d.map((v,i)=>(v+next.d[i])/2);
    }
-   if(residual>=tolerance)return {status:'unresolved',reason:'fluid fixed point did not converge',iterations,residual};
+   if(residual>=tolerance)return {status:'unresolved',reason:'fluid fixed point did not converge',retryable:true,iterations,residual};
    const sq=s.map(rational),dq=d.map(rational);
    const exact=evaluate(sq,dq,Q);
    if(sq.some((v,i)=>steadyExactCmp(v,exact.s[i])||steadyExactCmp(dq[i],exact.d[i])))
@@ -254,8 +255,10 @@ function factorySteadyAutomaticFluidModel(layout=state,model=null,{unlimitedWare
 function factorySteadyAutomaticFluidBudget(layout=state,model=null,options={}){
  const compiled=factorySteadyAutomaticFluidModel(layout,model,options);
  if(compiled.status!=='compiled')return compiled;
- const low=compiled.solve(),high=compiled.solve({high:true});
+ const solveOptions={maxIterations:options.maxIterations??12000,deadline:options.deadline??Infinity};
+ const low=compiled.solve(solveOptions);
  if(low.status!=='conditional-fixed-point')return low;
+ const high=compiled.solve({...solveOptions,high:true});
  if(high.status!=='conditional-fixed-point')return high;
  for(const [id,value] of low.point)
   if(steadyExactCmp(value,high.point.get(id)||STEADY_ZERO))

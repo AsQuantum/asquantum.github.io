@@ -118,9 +118,24 @@ function ast1Decode(code){
    const d=(data[off+7+Math.floor(j/4)]>>((j%4)*2))&3,vec=AST1_DIRECTIONS[d],v=path[path.length-1];
    path.push([v[0]+(sm.ast1Mirrored?-vec[0]:vec[0]),v[1]+vec[1]]);
   }
-  if(ep&&(path.at(-1)[0]!==ep.ex||path.at(-1)[1]!==ep.ey))throw Error(`第${ri}条线路解码后未命中游戏接口 ${path.at(-1)}≠${[ep.ex,ep.ey]}`);
+  if(ep&&(path.at(-1)[0]!==ep.ex||path.at(-1)[1]!==ep.ey)){
+   // Both observed game port profiles occur in valid saved blueprints.
+   // Select an alternate profile only if the encoded port index AND
+   // the complete belt endpoint agree; never move or trim the belt.
+   const alternative={...tm,ast1PortProfile:'standard'};
+   const ap=ast1GetPort(alternative,'in',inidx);
+   if(tm.ast1PortProfile!=='standard'&&ap&&ap.ex===path.at(-1)[0]&&ap.ey===path.at(-1)[1])
+    tm.ast1PortProfile='standard';
+   else throw Error(`第${ri}条线路解码后未命中游戏接口 ${path.at(-1)}≠${[ep.ex,ep.ey]}`);
+  }
   routes.push({id:'R'+ri,from:{id:sm.id,port:outidx},to:tm?{id:tm.id,port:inidx}:null,path});
   off+=7+np;
+ }
+ // A profile applies to the entire machine, not to individual routes.
+ for(const r of routes){
+  if(!r.to)continue;
+  const m=machines[Number(r.to.id.slice(1))],p=ast1GetPort(m,'in',r.to.port),end=r.path.at(-1);
+  if(!p||p.ex!==end[0]||p.ey!==end[1])throw Error('线路 '+r.id+' 的输入端口几何不一致');
  }
  if(off!==data.length)throw Error(`蓝图尾部还有${data.length-off}字节未解析，可能是另一个格式版本`);
  return {name:`AST1 游戏蓝图 · ${machines.length}台机器 · ${routes.length}条线路`,recordIndexed:true,machines,routes};

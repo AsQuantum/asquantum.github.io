@@ -56,7 +56,7 @@ function steadyExactWaterfill(supply,caps){
  if(steadyExactCmp(remaining,STEADY_ZERO)!==0)throw Error('fairness conservation failure');
  return result;
 }
-function warehouseTheory(targetItem=null){
+function warehouseTheory(targetItem=null,solveOptions={}){
  const result={inflow:{},outflow:{},machineCycles:{},routeFlows:{},
   status:'modelled-unresolved',diagnostics:{certified:false,exact:false,modelled:true,rateSolved:false}};
  if(typeof factorySteadyAutomaticFluidBudget!=='function'||typeof factorySteadyBuildEquations!=='function'){
@@ -65,7 +65,8 @@ function warehouseTheory(targetItem=null){
  }
  try{
   const model=factorySteadyBuildEquations();
-  const current=factorySteadyAutomaticFluidBudget(state,model);
+  result.warehouseItems=Object.keys(model.warehouseFlow);
+  const current=factorySteadyAutomaticFluidBudget(state,model,solveOptions);
   result.conditionalBudget=current;
   if(current.status==='conditional-fixed-point'){
    result.status='conditional-fixed-point';
@@ -75,7 +76,7 @@ function warehouseTheory(targetItem=null){
    result.notice='当前布局的供需模型尚未求解：'+(current.reason||current.issues?.map(x=>x.machine+' '+x.reason).join('；')||'未知原因');
    // Necessary bounds are useful only for an unresolved model. Do not
    // substitute them for actual solved rates.
-   if(typeof factorySteadyProveRateBounds==='function'){
+   if(!current.retryable&&typeof factorySteadyProveRateBounds==='function'){
     const bounds=factorySteadyProveRateBounds(model);
     result.diagnostics.symbolicModel={provenUpperBounds:{
      completed:bounds.completed,
@@ -88,7 +89,7 @@ function warehouseTheory(targetItem=null){
    if(current.status==='conditional-fixed-point')
     result.overdraftNet=Object.fromEntries([...new Set([...Object.keys(current.inflow),...Object.keys(current.outflow)])].map(k=>[k,(current.inflow[k]||0)-(current.outflow[k]||0)]));
   }else{
-   const unlimited=factorySteadyAutomaticFluidBudget(state,model,{unlimitedWarehouse:true});
+   const unlimited=factorySteadyAutomaticFluidBudget(state,model,{...solveOptions,unlimitedWarehouse:true});
    result.unlimitedStockBudget=unlimited;
    if(unlimited.status==='conditional-fixed-point')
     result.overdraftNet=Object.fromEntries([...new Set([...Object.keys(unlimited.inflow),...Object.keys(unlimited.outflow)])].map(k=>[k,(unlimited.inflow[k]||0)-(unlimited.outflow[k]||0)]));

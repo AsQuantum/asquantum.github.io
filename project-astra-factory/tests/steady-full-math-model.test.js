@@ -46,5 +46,17 @@ test('index loads only the unified supply/demand solver and necessary mathematic
  for(const old of ['steady-active-regimes','steady-recipe-exact','steady-merge-exact','steady-feedforward-islands','steady-warehouse-node','steady-rate-region','legacy-rate-reference'])assert(!html.includes(old+'.js'),old);
  const source=fs.readFileSync(path.join(root,'scripts/engine/steady-flow.js'),'utf8');
  assert(!source.includes('warehouseTheoryCertifiedOrDiagnostic'));assert(!source.includes('legacyReferenceWarehouseTheory'));
- assert(source.includes('factorySteadyAutomaticFluidBudget(state,model)'));
+ assert(source.includes('factorySteadyAutomaticFluidBudget(state,model,solveOptions)'));
+});
+
+test('72-machine warp-only blueprint roundtrips and converges past the former iteration limit',()=>{
+ const c=context();c.code=fs.readFileSync(path.join(root,'tests/fixtures/ast1-warp-coil-only.txt'),'utf8').trim();
+ const x=vm.runInContext("(()=>{state=ast1Decode(code);const model=factorySteadyBuildEquations(),short=factorySteadyAutomaticFluidBudget(state,model,{maxIterations:2500}),expired=factorySteadyAutomaticFluidBudget(state,model,{maxIterations:Infinity,deadline:0}),full=warehouseTheory();return {machines:state.machines.length,routes:state.routes.length,invalid:state.routes.filter(r=>checkPath(r.path,r.from,r.to,r.id)).length,roundtrip:ast1Encode()===code,short,expired,full,period:(1/full.conditionalBudget.machineCycles.M1)}})()",c);
+ assert.equal(x.machines,72);assert.equal(x.routes,49);assert.equal(x.invalid,0);assert(x.roundtrip);
+ assert.equal(x.short.retryable,true);assert.equal(x.expired.retryable,true);
+ assert.equal(x.full.status,'conditional-fixed-point');
+ assert.equal(x.full.conditionalBudget.fractions.inflow['曲速线圈'],'1/128');
+ assert.equal(x.full.conditionalBudget.fractions.machineCycles.M1,'1/128');
+ assert.equal(x.period,128);assert(x.full.warehouseItems.includes('曲速线圈'));
+ assert(x.full.conditionalBudget.iterations.every(n=>n>2500));
 });

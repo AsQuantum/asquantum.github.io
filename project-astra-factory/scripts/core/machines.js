@@ -174,7 +174,7 @@ function timeLabel(m){
  const period=effectiveCycle(m);
  if(period!==null)return nominal+'('+(Number.isFinite(period)?fmtT(period)+'s':'∞')+')';
  const hint=theoryMachinePeriodHint(m);
- return nominal+'('+(hint||(!theoreticalBudget?'待计算':'待证明'))+')';
+ return nominal+'('+(hint||(!theoreticalBudget||theoreticalBudget.calculating?'计算中':theoreticalBudget.calculationTimedOut?'超时':'待证明'))+')';
 }
 // The warehouse outlet's own rate must come from its actual route, NOT
 // aggregate shared-item warehouse withdrawals by other machines.
@@ -287,8 +287,8 @@ function getPorts(m){
  if((m.type==='冶炼'||m.type==='共鸣')&&(f==='E'||f==='N'))offsets=offsets.map(off=>off+1);
  // AST1 原游戏中这些旋向的端口相对坐标与旧 HTML 有1格差异，
  // 仅对 AST1 导入的机器应用，不影响现有 JSON 工厂。
- if(m.ast1GamePorts&&m.type==='冶炼'&&f==='N')offsets=offsets.map(off=>off-1);
- if(m.ast1GamePorts&&m.type==='共鸣'&&f==='S')offsets=offsets.map(off=>off+1);
+ if(m.ast1GamePorts&&m.ast1PortProfile!=='standard'&&m.type==='冶炼'&&f==='N')offsets=offsets.map(off=>off-1);
+ if(m.ast1GamePorts&&m.ast1PortProfile!=='standard'&&m.type==='共鸣'&&f==='S')offsets=offsets.map(off=>off+1);
  offsets.forEach((off,i)=>ports.push(one(back,off,'in',i)));if(no)ports.push(one(f,Math.floor(sideLength(f)/2),'out',0));}return ports;}
 // 配方机器的所有输入口均自动接收配方所需材料；输入口手动过滤已停用。
 function inPort(m,i){return getPorts(m).find(p=>p.kind==='in'&&p.index===i)}function outPort(m,i){return getPorts(m).find(p=>p.kind==='out'&&p.index===i)}

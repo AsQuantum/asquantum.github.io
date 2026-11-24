@@ -27,12 +27,12 @@ function warehouseTotalRow(income,expense,netCell,stock=null){
   '</td><td>'+expense+'</td>'+netCell+(stock===null?'':'<td>'+stock+'</td>')+'</tr>';
 }
 function warehouseView(theoryRows=false){
- if(theoreticalBudget===null)theoreticalBudget=warehouseTheory();
+ if(theoreticalBudget===null)theoreticalBudget=typeof requestTheoryBudget==='function'?requestTheoryBudget():warehouseTheory();
  const budget=theoreticalBudget||{inflow:{},outflow:{}};
  const conditional=budget.diagnostics?.certified!==true&&budget.conditionalBudget?.status==='conditional-fixed-point';
  const displayBudget=conditional?budget.conditionalBudget:budget;
  const potentialNet=displayBudget.potentialNet??null,overdraftNet=budget.overdraftNet??null;
- const materialSet=new Set([...Object.keys(displayBudget.inflow||{}),...Object.keys(displayBudget.outflow||{}),
+ const materialSet=new Set([...Object.keys(displayBudget.inflow||{}),...Object.keys(displayBudget.outflow||{}),...(budget.warehouseItems||[]),
   ...Object.keys(potentialNet||{}),...Object.keys(overdraftNet||{}),
   ...Object.keys(ware||{}),
   ...Object.keys(sim?.inbound||{}),...Object.keys(sim?.outbound||{}),
@@ -137,7 +137,7 @@ function warehouseActualMarkup(v){
 }
 function warehouseRefresh(){
  const v=warehouseView(true),budget=v.budget;
- $('warehouse').innerHTML=warehouseSummaryMarkup(v)+`<div class="ledger-panel"><div class="ledger-head"><strong>理论收支</strong><span class="ledger-chip">${v.conditional?"条件解 · 件/分钟":"件/分钟"}</span></div>
+ $('warehouse').innerHTML=warehouseSummaryMarkup(v)+`<div class="ledger-panel"><div class="ledger-head"><strong>理论收支</strong><span class="ledger-chip">${budget.calculating?"计算中…":budget.calculationTimedOut?(v.conditional?"条件解 · 透支超时":"计算超时"):v.conditional?"条件解 · 件/分钟":budget.status==="modelled-unresolved"&&v.materials.length?"未求解 · 件/分钟":"件/分钟"}</span></div>
  <div class="ledger-table-scroll" tabindex="0" aria-label="理论收支表，可横向滚动"><table class="ledger-table"><thead><tr><th>材料</th><th>收入</th><th>支出</th><th>净值</th><th title="保持当前稳态收入及其他供需不变，收入减去各仓出的下游需求（解除仓库缺货限制，可为负）">潜在净值</th><th title="所有仓出不限库存，重新联立求解整个生产网络的新平衡点：收入减支出">透支净值</th></tr></thead><tbody>${v.tRows||'<tr><td colspan="6">暂无有效仓库物流</td></tr>'}${v.theoryTotal}</tbody></table></div>
  </div>`+warehouseActualMarkup(v);
 }

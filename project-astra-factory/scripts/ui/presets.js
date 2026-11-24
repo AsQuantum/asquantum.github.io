@@ -26,7 +26,7 @@ function schemePortsEqual(a,b){
 function schemeCanUseAST(src,decoded){
  if(src.machines.length!==decoded.machines.length||src.routes.length!==decoded.routes.length)return false;
  const allowed=new Set(['id','type','x','y','face','mode','item','inletItem',
-  'outFilters','filters','ast1Meta','ast1Mirrored','ast1GamePorts','w','h','panel']);
+  'outFilters','filters','ast1Meta','ast1Mirrored','ast1GamePorts','ast1PortProfile','w','h','panel']);
  for(let i=0;i<src.machines.length;i++){
   const a=src.machines[i],b=decoded.machines[i];
   if(a.type!==b.type||a.x!==b.x||a.y!==b.y||(a.face||'E')!==b.face||

@@ -47,12 +47,12 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    return result;
   })()`);
   assert.equal(brandAndLedger.pageTitle,'Factory Lab · Project:Astra');
-  assert.equal(brandAndLedger.brandText,'Factory Lab v0.39 ▾');
+  assert.equal(brandAndLedger.brandText,'Factory Lab v0.40 ▾');
   assert.equal(brandAndLedger.favicon,'favicon.svg');
   assert.equal(brandAndLedger.faviconType,'image/svg+xml');
   assert(brandAndLedger.sameIcon&&brandAndLedger.iconLoaded,'header icon and favicon should use the same transparent SVG');
   assert.equal(brandAndLedger.theoreticalTitle,'理论收支');
-  assert.equal(brandAndLedger.unit,'件/分钟');
+  assert.match(brandAndLedger.unit,/(?:^| · )件\/分钟$/);
   console.log('PASS: V0.35 header, transparent SVG hexagon favicon, shorter warehouse headings');
 
   const ui=await evaluate(`(()=>{
