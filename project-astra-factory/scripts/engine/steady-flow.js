@@ -65,7 +65,8 @@ function warehouseTheory(targetItem=null,solveOptions={}){
  }
  try{
   const model=factorySteadyBuildEquations();
-  result.warehouseItems=Object.keys(model.warehouseFlow);
+  const frozen=typeof activeFrozenFactories==='function'?activeFrozenFactories(state):[];
+  result.warehouseItems=[...new Set([...Object.keys(model.warehouseFlow),...frozen.flatMap(f=>Object.keys(f.rates))])];
   const current=factorySteadyAutomaticFluidBudget(state,model,solveOptions);
   result.conditionalBudget=current;
   if(current.status==='conditional-fixed-point'){
@@ -76,7 +77,7 @@ function warehouseTheory(targetItem=null,solveOptions={}){
    result.notice='当前布局的供需模型尚未求解：'+(current.reason||current.issues?.map(x=>x.machine+' '+x.reason).join('；')||'未知原因');
    // Necessary bounds are useful only for an unresolved model. Do not
    // substitute them for actual solved rates.
-   if(!current.retryable&&typeof factorySteadyProveRateBounds==='function'){
+   if(!frozen.length&&!current.retryable&&typeof factorySteadyProveRateBounds==='function'){
     const bounds=factorySteadyProveRateBounds(model);
     result.diagnostics.symbolicModel={provenUpperBounds:{
      completed:bounds.completed,
@@ -85,7 +86,7 @@ function warehouseTheory(targetItem=null,solveOptions={}){
     }};
    }
   }
-  if(!model.warehousePools.some(p=>p.withdrawalMachineOrder.length)){
+  if(!frozen.length&&!model.warehousePools.some(p=>p.withdrawalMachineOrder.length)){
    if(current.status==='conditional-fixed-point')
     result.overdraftNet=Object.fromEntries([...new Set([...Object.keys(current.inflow),...Object.keys(current.outflow)])].map(k=>[k,(current.inflow[k]||0)-(current.outflow[k]||0)]));
   }else{

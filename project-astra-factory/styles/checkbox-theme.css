@@ -1,0 +1,19 @@
+/* Shared Factory Lab checkbox palette; preserve native input semantics. */
+input[type="checkbox"]{
+ appearance:none;-webkit-appearance:none;color-scheme:dark;
+ display:inline-grid;place-content:center;flex:0 0 auto;
+ width:16px;height:16px;margin:0;vertical-align:middle;
+ border:1px solid var(--ui-control-border);border-radius:4px;background:var(--ui-field);
+ cursor:pointer;transition:background-color .12s,border-color .12s;
+}
+input[type="checkbox"]::before{
+ content:"";width:8px;height:5px;box-sizing:border-box;
+ border-left:2px solid var(--ui-heading);border-bottom:2px solid var(--ui-heading);
+ transform:translateY(-1px) rotate(-45deg) scale(0);
+}
+input[type="checkbox"]:checked{background:#385c83;border-color:var(--ui-accent)}
+input[type="checkbox"]:checked::before{transform:translateY(-1px) rotate(-45deg) scale(1)}
+input[type="checkbox"]:not(:disabled):hover{border-color:var(--ui-accent)}
+input[type="checkbox"]:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+input[type="checkbox"]:disabled{opacity:.45;cursor:not-allowed}
+@media(forced-colors:active){input[type="checkbox"]{appearance:auto;-webkit-appearance:auto}input[type="checkbox"]::before{display:none}}

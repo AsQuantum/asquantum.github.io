@@ -23,9 +23,9 @@
  .main{--sidebar-left-default:205px;--sidebar-right-default:248px}
 }
 /* The table, not its entire card or sidebar, is the horizontal scroller. */
-#warehouse,.ledger-panel,.ledger-head,.ledger-table-scroll{min-width:0;max-width:100%}
+#warehouse,:is(.ledger-panel,.frozen-panel),.ledger-head,.ledger-table-scroll{min-width:0;max-width:100%}
 .ledger-head{flex-wrap:wrap}
-.ledger-panel{width:100%}
+:is(.ledger-panel,.frozen-panel){width:100%}
 .ledger-table-scroll{display:block;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#4d6c83 transparent}
 .ledger-table-scroll:focus-visible{outline:1px solid #70b5cf;outline-offset:1px;border-radius:3px}
 .ledger-table-scroll>.ledger-table{width:max-content;min-width:100%;max-width:none}

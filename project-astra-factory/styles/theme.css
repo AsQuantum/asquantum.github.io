@@ -1,0 +1,311 @@
+/* Factory Lab — semantic dark palette.
+ * Layout/behavior remains in the component stylesheets. Keep neutral UI
+ * surfaces, text, and controls here; machine/item/status colors stay semantic.
+ */
+:root{
+ color-scheme:dark;
+ --ui-canvas:#0a1220;
+ --ui-shell:#121d2b;
+ --ui-sidebar:#141e2b;
+ --ui-card:#1b293b;
+ --ui-subcard:#202f42;
+ --ui-field:#172538;
+ --ui-button:#223348;
+ --ui-hover:#2b4058;
+ --ui-border:#35495f;
+ --ui-control-border:#47617b;
+ --ui-heading:#f4f6f9;
+ --ui-heading1:#d5e5f1;
+ --ui-heading2:#c9daeb;
+ --ui-heading3:#a9bfd5;
+ --ui-text:#dde4ec;
+ --ui-label:#c6d0dd;
+ --ui-muted:#a5b3c4;
+ --ui-faint:#94a4b7;
+ --ui-accent:#8bbcf0;
+ --ui-positive:#82dbac;
+ --ui-negative:#ffa3a9;
+ --ui-warn:#efc88b;
+ --ui-focus:#8bbcf0;
+ --ui-selection:#24463c;
+ --ui-selection-border:#62b89a;
+ --bg:var(--ui-canvas);--panel:var(--ui-sidebar);--panel2:var(--ui-card);
+ --edge:var(--ui-border);--text:var(--ui-text);--muted:var(--ui-muted);
+ --blue:var(--ui-accent);--green:var(--ui-positive);--danger:var(--ui-negative);
+}
+body{background:var(--ui-canvas);color:var(--ui-text);font-weight:450}
+.top,.bottom,footer{background:var(--ui-shell);border-color:var(--ui-border)}
+.top .brand{color:var(--ui-heading)}
+.top small,.sim-toolbar-caption,.sim-speed>span,.top .counter{color:var(--ui-muted)}
+.canvaswrap{background:var(--ui-canvas)}
+.side.left,.side.right{background:var(--ui-sidebar);color:var(--ui-text);border-color:var(--ui-border);scrollbar-color:var(--ui-control-border) transparent}
+.side.right{
+ --right-heading:var(--ui-heading2);--right-subheading:var(--ui-heading3);--right-meta:var(--ui-muted);
+ --right-level1:var(--ui-heading1);--right-level2:var(--ui-heading2);--right-level3:var(--ui-heading3);
+}
+.side.left>h3,.side.left>.library-reference>summary,
+.side.right>h3,.side.right>details.warehouse-panel>summary,
+.side.right>details.right-extra-panel>summary{
+ color:var(--ui-heading1);font-size:15px;font-weight:700;letter-spacing:.1px;
+}
+.side.left>h3:not(:first-child),.side.left>.library-reference,.side.right>h3,
+.side.right .right-extra-panel{border-color:var(--ui-border)}
+.side.right>details.warehouse-panel>summary::before,
+.side.right>details.right-extra-panel>summary::before,
+.side.left>.library-reference>summary::before{color:var(--ui-muted)}
+/* One primary surface across machine details, settings, theory and warehouse. */
+.side.right :is(.ledger-panel,.frozen-panel),
+#inspector .inspector-machine .machine-summary,
+#inspector .machine-summary,#inspector .machine-properties,
+#inspector .machine-analysis-panel,.side.right #audit .audit-card,
+.item,.boxnotice,.machine-library .machine-config{
+ background:var(--ui-card);border-color:var(--ui-border);color:var(--ui-text);
+}
+.side.right #warehouse .ledger-head strong,
+.side.right #inspector .machine-summary-eyebrow,
+.side.right #inspector .machine-analysis-panel>.machine-analysis-heading,
+#inspector .machine-edit-heading,.side.right #audit .audit-card-title{
+ color:var(--ui-heading2);font-size:13.5px;font-weight:600;
+}
+#inspector .machine-summary-name{font-size:17px;font-weight:700;filter:none}
+#inspector .machine-summary-location,#inspector .machine-summary-eyebrow code,
+#inspector .machine-ast1-meta{color:var(--ui-muted);font-size:11.5px}
+#inspector .machine-summary-metrics span,
+#inspector .machine-properties .machine-field-caption,
+#inspector .machine-properties .machine-field>span,
+#inspector .machine-flow-summary .tile-label,#inspector .machine-duty-grid span,
+#inspector .machine-live-summary span,#inspector .machine-live-detail .kv span:first-child,
+#inspector .machine-analysis-panel .kv span:first-child{color:var(--ui-label);font-size:12.5px}
+#inspector .machine-summary-metrics strong,#inspector .machine-flow-summary .tile-value,
+#inspector .machine-duty-grid b,#inspector .machine-live-summary b,
+#inspector .machine-live-detail .kv b,#inspector .machine-analysis-panel .kv b{
+ color:var(--ui-heading);font-size:13px;font-weight:600;
+}
+#inspector .machine-summary-metrics strong small,#inspector .machine-flow-summary .tile-value small,
+#inspector .machine-live-summary b small{color:var(--ui-muted);font-size:11px;font-weight:450}
+#inspector .machine-flow-summary>.machine-flow-tile.in .tile-value{color:var(--ui-accent)}
+#inspector .machine-flow-summary>.machine-flow-tile.out .tile-value{color:var(--ui-warn)}
+#inspector .machine-summary-metrics,#inspector .machine-recipe-in-summary,
+#inspector .machine-edit-heading,#inspector .machine-analysis-heading,
+#inspector .machine-flow-summary>.machine-flow-tile,#inspector .machine-duty-grid>div,
+#inspector .machine-live-summary>div,#inspector .machine-port-details,
+#inspector .machine-live-detail,#inspector .machine-port-details-section,
+#inspector .machine-port-detail-row,#inspector .machine-live-detail .kv,
+#inspector .machine-live-history{border-color:var(--ui-border)}
+#inspector .machine-analysis-panel>.item+.item{border-top-color:var(--ui-border)!important}
+.side.right #inspector .machine-analysis-title strong,
+.side.right #inspector .machine-live-head strong,
+#inspector .machine-summary .machine-recipe-heading,
+#inspector .machine-port-details-heading,#inspector .machine-live-subhead,
+.side.right #audit .audit-section-heading{
+ color:var(--ui-heading3);font-size:12px;font-weight:550;
+}
+#inspector .machine-port-details>summary,#inspector .machine-live-detail>summary,
+#inspector .machine-live-history>summary,#warehouse .warehouse-recent-history>summary{
+ color:var(--ui-label);font-size:12px;font-weight:550;
+}
+#inspector .machine-analysis-title .analysis-unit,#inspector .machine-live-head small,
+#inspector .machine-summary .machine-recipe-heading small,
+#inspector .machine-port-detail-row .port-muted,#inspector .machine-live-meta,
+#inspector .machine-analysis-panel .tiny,.tiny,.muted,
+.side.right #audit .audit-section-meta{color:var(--ui-muted);font-size:11.5px}
+#inspector .machine-flow-input{color:var(--ui-accent)}
+#inspector .machine-flow-output{color:var(--ui-warn)}
+/* A nested card is visibly elevated, not another copy of the primary card. */
+#warehouse .frozen-source{
+ background:var(--ui-subcard);border:1px solid var(--ui-border);border-radius:7px;
+}
+#warehouse .ledger-mini>div{background:var(--ui-field);border:1px solid var(--ui-border);border-radius:6px}
+#warehouse .ledger-mini span{color:var(--ui-muted);font-size:11.5px}
+#warehouse .ledger-mini b{color:var(--ui-text);font-weight:600}
+#warehouse .frozen-source-name{color:var(--ui-heading3);font-size:12px;font-weight:550}
+#warehouse .frozen-source-status,#warehouse .frozen-tools .tiny{color:var(--ui-muted);font-size:11.5px}
+#warehouse .frozen-enabled{color:var(--ui-label);font-size:11.5px}
+#warehouse .ledger-collapse,#warehouse .frozen-source-name{
+ background:transparent;border:0;box-shadow:none;border-radius:4px;
+}
+#warehouse .ledger-collapse:hover,#warehouse .frozen-source-name:hover{
+ color:var(--ui-heading2);background:transparent;
+}
+.side.right #warehouse .ledger-table th{
+ background:var(--ui-field);color:var(--ui-label);font-weight:650;font-size:11.5px;
+}
+.side.right #warehouse .ledger-table td,.side.right #warehouse .ledger-table .ledger-name{
+ color:var(--ui-text);border-color:var(--ui-border);font-size:12px;
+}
+.side.right #warehouse .ledger-table tr.ledger-total td{
+ background:var(--ui-subcard);border-top-color:var(--ui-control-border);color:var(--ui-heading);
+}
+.side.right #warehouse .ledger-table td.positive,.side.right #warehouse .ledger-table tr.ledger-total td.positive{color:var(--ui-positive)}
+.side.right #warehouse .ledger-table td.negative,.side.right #warehouse .ledger-table tr.ledger-total td.negative{color:var(--ui-negative)}
+#warehouse .ledger-chip{
+ background:transparent;border-color:#3b5b67;color:#95d7bb;
+ font-size:10px;font-weight:500;
+}
+#warehouse .warehouse-net-window{color:var(--ui-label)}
+/* Common interactive controls. The field is recessed; buttons are raised. */
+button,select,input,textarea{font-family:inherit}
+button:not(.primary),select{
+ color:var(--ui-text);border-color:var(--ui-control-border);
+}
+button:not(.primary){background:var(--ui-button)}
+button:not(.primary):hover:not(:disabled){background:var(--ui-hover)}
+input:is([type=text],[type=number],[type=search]),textarea,select,
+#inspector .machine-properties select:not([multiple]),
+.inspector-machine .machine-field select:not([multiple]),
+.inspector-machine .machine-port-bottom select:not([multiple]),
+.machine-library .machine-config-field select:not([multiple]),
+.top .sim-toolbar .sim-speed select:not([multiple]),
+#warehouse .frozen-source input[type=text],#warehouse .frozen-source select,
+#warehouse .frozen-import-row select,.side.right #warehouse .warehouse-net-window select{
+ background:var(--ui-field);border-color:var(--ui-control-border);color:var(--ui-text);
+}
+input::placeholder,textarea::placeholder{color:var(--ui-faint);opacity:1}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,
+summary:focus-visible{outline:2px solid var(--ui-focus);outline-offset:2px}
+#warehouse .frozen-tools button,#warehouse .frozen-import-row button,
+#warehouse .frozen-add-row button,#warehouse .frozen-rate-table button,
+#warehouse .frozen-source-head .frozen-delete,
+.editor-tools .editor-tool-grid [data-tool],
+.editor-tools .editor-erase,.editor-tools .editor-canvas-actions button,
+.editor-tools .group-buttons button{
+ background:var(--ui-button);border-color:var(--ui-control-border);color:var(--ui-text);
+}
+#warehouse .frozen-tools button:hover:not(:disabled),
+#warehouse .frozen-import-row button:hover:not(:disabled),
+#warehouse .frozen-add-row button:hover:not(:disabled),
+.editor-tools .editor-tool-grid [data-tool]:hover,.editor-tools .group-buttons button:hover:not(:disabled){
+ background:var(--ui-hover);border-color:var(--ui-accent);
+}
+#warehouse .frozen-source-head .frozen-delete,#warehouse .frozen-rate-table button,
+.editor-tools .group-buttons #groupDelete,.editor-tools .editor-canvas-actions .editor-danger{
+ color:var(--ui-negative);border-color:#93606b;
+}
+#warehouse .frozen-source-head .frozen-delete:hover,#warehouse .frozen-rate-table button:hover:not(:disabled),
+.editor-tools .group-buttons #groupDelete:hover{background:#50323a;border-color:var(--ui-negative)}
+#warehouse .frozen-source-head .frozen-delete:focus-visible{outline-color:var(--ui-focus)}
+.editor-tools .editor-tool-grid [data-tool].active,
+.machine-library .machine-palette button[data-stamp].active{
+ background:var(--ui-selection)!important;border-color:var(--ui-selection-border)!important;color:var(--ui-heading)!important
+}
+.editor-tools .group-buttons #groupDuplicate{background:var(--ui-selection);border-color:var(--ui-selection-border);color:var(--ui-heading)}
+.editor-tools #groupControls{background:var(--ui-card);border-color:var(--ui-border)}
+.editor-tools .editor-tool-label,.machine-palette-heading,.library-reference-heading{
+ color:var(--ui-label);font-size:12px;font-weight:650;border-color:var(--ui-border);
+}
+.editor-tools .editor-tool-grid .editor-tool-name{color:var(--ui-heading);font-weight:600}
+.editor-tools .editor-tool-grid .editor-tool-icon{color:var(--ui-label)}
+.editor-tools .editor-help-disclosure>summary,.editor-tools .group-guide summary,
+.editor-tools .group-guide small,.editor-tools .group-buttons button small,
+.machine-library .machine-palette button[data-stamp]>small,.machine-palette-heading small,
+.library-reference-body{color:var(--ui-muted)}
+.machine-library #search{background:var(--ui-field);border-color:var(--ui-control-border)}
+.machine-library .machine-palette button[data-stamp]{
+ background:var(--ui-card);border-color:var(--ui-border);border-left-color:var(--palette-machine-color,var(--ui-accent));
+}
+.machine-library .machine-palette button[data-stamp]:hover{background:var(--ui-subcard);border-color:var(--ui-control-border);border-left-color:var(--palette-machine-color,var(--ui-accent))}
+.machine-library .machine-palette button[data-stamp] .machine-palette-label span{
+ color:var(--palette-machine-color,var(--ui-heading));text-shadow:none;font-weight:600;
+}
+.machine-library .machine-palette button[data-stamp].active .machine-palette-label span{color:var(--palette-machine-color,var(--ui-heading))}
+/* Menus and dialogs use the same surfaces rather than a separate blue palette. */
+.top .preset-combo{background:var(--ui-field);border-color:var(--ui-control-border)}
+.top .preset-combo #presetName{color:var(--ui-text)}
+.top .preset-arrow,.top .edit-menu-trigger{background:var(--ui-button);border-color:var(--ui-control-border);color:var(--ui-text)}
+.preset-list,.top #editMenu,.top #editMenu .edit-submenu,.changelog-dialog,
+#ast1Panel.ast1-dialog,.stock-chart-panel{background:var(--ui-card);border-color:var(--ui-control-border);color:var(--ui-text)}
+.top #editMenu .edit-menu-command,.top #editMenu .edit-menu-parent,
+.top #editMenu .edit-menu-parent-button,.top #editMenu .edit-submenu button,
+.preset-row-choice,.preset-new{
+ background:var(--ui-button);border-color:var(--ui-border);color:var(--ui-text)
+}
+.top #editMenu .edit-menu-command:hover:not(:disabled),
+.top #editMenu .edit-menu-parent-button:hover,.top #editMenu .edit-submenu button:hover,
+.preset-row-choice:hover,.preset-new:hover{background:var(--ui-hover)}
+.top #editMenu .edit-menu-command kbd,.top #editMenu .edit-submenu small,
+.top #editMenu .edit-menu-note,.mobile-edit-head small,.changelog-head p,
+.changelog-release-top time,#ast1PanelHint,.stock-chart-head p,.stock-chart-footer{color:var(--ui-muted)}
+.changelog-head h2,.changelog-release h3,#ast1PanelTitle,.stock-chart-head h3,
+.stock-chart-legend-head strong,.mobile-edit-head strong{color:var(--ui-heading)}
+.changelog-release li,.stock-legend-item,.stock-chart-legend-head span{color:var(--ui-label)}
+#ast1Text,.stock-chart-tooltip,.stock-chart-stats,.stock-chart-legend{background:var(--ui-field);border-color:var(--ui-border);color:var(--ui-text)}
+.stock-chart-views button,.stock-chart-close,.changelog-close,#ast1Panel .ast1-dialog-close{background:var(--ui-button);border-color:var(--ui-control-border);color:var(--ui-text)}
+.stock-chart-views button.selected{background:var(--ui-selection);border-color:var(--ui-selection-border);color:var(--ui-heading)}
+@media(max-width:900px){
+ .top #editMenu .mobile-edit-head{background:var(--ui-card);border-color:var(--ui-border)}
+ .top #editMenu .edit-menu-parent.submenu-open>.edit-menu-parent-button{background:var(--ui-selection)}
+}
+
+/* Compact inner editor: one material list, no second filled header band.
+   Use borders only for actual editable controls, not every action. */
+#warehouse .frozen-source{padding:9px}
+#warehouse .frozen-source-head{flex-wrap:nowrap;gap:7px}
+#warehouse .frozen-source-name{flex:1 1 0;line-height:1.45;text-align:left;overflow-wrap:anywhere}
+#warehouse .frozen-source-status{margin:4px 0 0;color:var(--ui-muted)}
+#warehouse .frozen-source-body{margin-top:8px;gap:7px;border-top:1px solid var(--ui-border);padding-top:7px}
+#warehouse .frozen-rate-table{table-layout:fixed;width:100%;min-width:0}
+.side.right #warehouse .frozen-rate-table th{background:transparent;font-size:11.5px;font-weight:550;color:var(--ui-muted)}
+#warehouse .frozen-rate-table th:first-child{width:auto;text-align:left}
+#warehouse .frozen-rate-table th:nth-child(2){width:100px;text-align:right;white-space:nowrap}
+#warehouse .frozen-rate-table th:last-child{width:27px}
+#warehouse .frozen-rate-table td:first-child{text-align:left;overflow-wrap:anywhere}
+#warehouse .frozen-rate-table td:nth-child(2){text-align:right}
+#warehouse .frozen-rate-table td:last-child{text-align:right}
+#warehouse .frozen-rate-table input{width:100%;text-align:right;font-variant-numeric:tabular-nums;padding:4px 6px}
+#warehouse .frozen-rate-table button,#warehouse .frozen-source-head .frozen-delete{
+ background:transparent;border-color:transparent;color:var(--ui-negative);padding:3px 5px;min-width:23px
+}
+#warehouse .frozen-rate-table button:hover:not(:disabled),#warehouse .frozen-source-head .frozen-delete:hover{background:#50323a;border-color:#93606b}
+#warehouse .frozen-source-tools{gap:5px}
+#warehouse .frozen-tool-spacer{flex:1}
+#warehouse .frozen-source-tools .tiny{flex:0 0 auto}
+#warehouse .frozen-source-tools button[data-frozen-action=rename]{background:transparent;border-color:transparent;color:var(--ui-label);padding:3px 2px}
+#warehouse .frozen-source-tools button[data-frozen-action=rename]:hover{color:var(--ui-heading);background:transparent;text-decoration:underline}
+#warehouse .frozen-source-tools button:is([data-frozen-action=up],[data-frozen-action=down]){padding:2px 6px}
+#warehouse .frozen-add-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(65px,.8fr) auto;gap:5px}
+#warehouse .frozen-add-row select,#warehouse .frozen-add-row input{width:100%;min-width:0}
+#warehouse .frozen-add-row input,#warehouse .frozen-add-row select,#warehouse .frozen-add-row button{height:31px;font-size:12px;padding:4px 6px}
+#warehouse .frozen-import-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px}
+#warehouse .frozen-import-row select,#warehouse .frozen-import-row button{height:32px;font-size:12px;padding:5px 7px}
+#warehouse .frozen-body>.frozen-tools button{font-size:12px;padding:5px 8px}
+#warehouse .ledger-collapse:focus-visible,#warehouse .frozen-source-name:focus-visible{outline-offset:2px}
+
+/* The compact editor has a fixed three-column grid; only ledger data tables
+   need intrinsic-width scrolling. */
+#warehouse .frozen-source .ledger-table-scroll>.frozen-rate-table{width:100%;min-width:0;max-width:100%}
+#warehouse .frozen-rate-table th,#warehouse .frozen-rate-table td{padding-inline:4px}
+#warehouse .frozen-rate-table th:last-child,#warehouse .frozen-rate-table td:last-child{padding-inline:0}
+#warehouse .frozen-rate-table td:first-child{white-space:normal}
+#warehouse .frozen-source-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Secondary actions and runtime metadata never outrank their section titles. */
+#warehouse .ledger-collapse{flex:0 0 auto}
+/* Stock chart action keeps its established green accent; runtime chips remain visible when folded. */
+.side.right #warehouseLiveActual .warehouse-stock-toggle{
+ background:#21483f;border-color:#478d84;color:#a6e6d4;font-weight:600;
+}
+.side.right #warehouseLiveActual .warehouse-stock-toggle:hover{background:#2a6053;color:#a6e6d4}
+#warehouse .frozen-source-name:hover{color:var(--ui-heading3);text-decoration:underline}
+#warehouse .frozen-source-status{font-size:11px}
+#warehouse .frozen-source-tools button[data-frozen-action=rename]{color:var(--ui-muted);font-size:11px}
+#warehouse .frozen-source-head .frozen-delete{color:#d9a8af}
+
+/* Stock-path list is a third-level disclosure, not a permanent long table. */
+.side.right #audit .audit-stock-paths{border-top:1px solid var(--ui-border);margin-top:9px;min-width:0}
+.side.right #audit .audit-stock-paths>.audit-section-heading{
+ display:flex;align-items:center;gap:5px 9px;justify-content:space-between;
+ border:0;margin:0;padding:10px 0 6px;cursor:pointer;list-style:none;
+ color:var(--ui-heading3);font-size:12px;font-weight:550;
+}
+.side.right #audit .audit-stock-paths>.audit-section-heading::-webkit-details-marker{display:none}
+.side.right #audit .audit-stock-title::before{content:'▸';color:var(--ui-muted);margin-right:6px}
+.side.right #audit .audit-stock-paths[open] .audit-stock-title::before{content:'▾'}
+.side.right #audit .audit-stock-paths .audit-section-meta{font-size:10.5px;color:var(--ui-muted);font-weight:400}
+.side.right #audit .audit-stock-paths:not([open])>.audit-section-heading{padding-bottom:5px}
+.side.right #audit .audit-label{color:var(--ui-label)}
+.side.right #audit .audit-value:not(.good):not(.warn):not(.bad){color:var(--ui-text)}
+.side.right #audit .audit-hint{color:var(--ui-muted)}
+
+.side.right #audit .audit-stock-paths:not([open])>:not(summary){display:none}
+
+.side.right #audit .audit-card+.audit-card{margin-top:10px}

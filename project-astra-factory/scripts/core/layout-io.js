@@ -41,6 +41,7 @@ function loadState(v){
  const compact=v?.format===FACTORY_JSON_FORMAT&&v?.version===FACTORY_JSON_VERSION;
  const result=compact?{layout:expandCompactFactoryLayout(v),repair:{renamed:0,ambiguous:0}}:expandLegacyFactoryLayout(v);
  const {layout,repair}=result;
+ if(layout.frozenFactories!==undefined)layout.frozenFactories=normalizeFrozenFactories(layout.frozenFactories);
  state=layout;
  synchronizeAst1MachineRecords();
  idSeed=Math.max(900,...layout.machines.concat(layout.routes).map(e=>{

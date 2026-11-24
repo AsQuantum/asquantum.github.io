@@ -26,7 +26,7 @@ const getBeltCount=()=>0,getPorts=()=>[],getRecipe=()=>null,outPort=()=>null,
  missingMaterials=()=>[],dims=m=>[m.w,m.h],supportsMachinePanel=()=>true,
  machinePanelFacing=()=>'N',def=m=>DEF[m.type],
  getStampMachine=(x,y)=>({type:'测试',x,y,w:3,h:3,face:'E'}),
- canPlace=()=>true,
+ canPlace=()=>true,placementPortWarningCount=()=>0,
  machineLabelLines=()=>[{text:'测试机',color:'#f0f6ff',bold:true}],
  paintMachineText=()=>ctx.fillText('完整文字'),
  $=()=>({textContent:''});

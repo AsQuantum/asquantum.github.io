@@ -34,7 +34,7 @@ function dedicatedPortItem(m,idx){
 function mixedInputWarnings(){
  const problems=[];
  for(const m of state.machines){
-  if(!getRecipe(m))continue;
+  if(!getRecipe(m)&&!['仓入','电脑'].includes(m.type))continue;
   for(const p of getPorts(m).filter(p=>p.kind==='in')){
    const mats=inletMaterials(m,p.index);
    for(const mat of mats)if(!acceptsMaterial(m,mat,p.index))
@@ -59,26 +59,62 @@ function missingMaterials(m){
   for(const mat of inletMaterials(m,p.index))if(acceptsMaterial(m,mat,p.index))materials.add(mat);
  return Object.keys(r.inputs).filter(item=>!materials.has(item));
 }
-function blockedPorts(){
+function blockedPortIssues(){
  const items=[];
  for(const m of state.machines)for(const p of getPorts(m)){
   // Unused splitter outputs and merger inputs are optional contact edges.
   if(!needsClearOutside(m,p))continue;
   const other=cellMachine(p.ex,p.ey,m.id);
-  if(other)items.push(`${label(m)} [${m.id}] ${p.kind==='in'?'输入':'输出'}口${p.index+1}：被 ${label(other)} [${other.id}] 占住了外侧接线格 (${p.ex},${p.ey})`);
-  else if(!inMap(p.ex,p.ey)||reserved(p.ex,p.ey))items.push(`${label(m)} [${m.id}] ${p.kind==='in'?'输入':'输出'}口${p.index+1}：朝向地图外或中央禁区`);
+  if(other)items.push({id:m.id,key:m.id+':'+p.kind+':'+p.index,message:`${label(m)} [${m.id}] ${p.kind==='in'?'输入':'输出'}口${p.index+1}：被 ${label(other)} [${other.id}] 占住了外侧接线格 (${p.ex},${p.ey})`});
+  else if(!inMap(p.ex,p.ey)||reserved(p.ex,p.ey))items.push({id:m.id,key:m.id+':'+p.kind+':'+p.index,message:`${label(m)} [${m.id}] ${p.kind==='in'?'输入':'输出'}口${p.index+1}：朝向地图外或中央禁区`});
  }
  return items;
 }
+function blockedPorts(){return blockedPortIssues().map(x=>x.message);}
+// Audit existing layouts without enforcing editor placement restrictions on import.
+function machinePlacementIssues(){
+ const geometry=new Map(),occupied=new Map();
+ const issue=(id,reason)=>{if(!geometry.has(id))geometry.set(id,new Set());geometry.get(id).add(reason);};
+ for(const m of state.machines){
+  const [w,h]=dims(m);
+  if(![m.x,m.y,w,h].every(Number.isInteger)||w<=0||h<=0){issue(m.id,'机器坐标或尺寸无效');continue;}
+  if(m.x<0||m.y<0||m.x+w>W||m.y+h>H)issue(m.id,'机器超出地图范围');
+  for(let y=Math.max(0,m.y);y<Math.min(H,m.y+h);y++)for(let x=Math.max(0,m.x);x<Math.min(W,m.x+w);x++){
+   if(reserved(x,y))issue(m.id,'机器占用中央禁区');
+   const k=x+','+y,prior=occupied.get(k)||[];
+   for(const id of prior){issue(m.id,'与机器 '+id+' 重叠');issue(id,'与机器 '+m.id+' 重叠');}
+   prior.push(m.id);occupied.set(k,prior);
+  }
+ }
+ const ports=blockedPortIssues(),invalidIds=new Set([...geometry.keys(),...ports.map(p=>p.id)]),blockedByMachine=new Map();
+ for(const p of ports)blockedByMachine.set(p.id,(blockedByMachine.get(p.id)||0)+1);
+ const geometryMessages=state.machines.filter(m=>geometry.has(m.id)).map(m=>`${label(m)} [${m.id}]：${[...geometry.get(m.id)].join('；')}`);
+ return {invalidIds,geometryIds:new Set(geometry.keys()),geometryMessages,blockedByMachine,blocked:ports.map(p=>p.message),blockedMachineCount:blockedByMachine.size};
+}
 function warnings(){
- const unconnected=[],invalid=[],unservedOutputs=[];
+ const unconnected=[],invalid=[],unservedOutputs=[],noOutputLine=[],openEnds=[],noSourceMaterial=[];
+ let connectedRoutes=0;
  for(const m of state.machines){
   if(['仓入','仓出','分流','汇流','发电','电脑','空间锚点'].includes(m.type))continue;
   for(const mat of missingMaterials(m))unconnected.push(`${label(m)} [${m.id}]：缺 ${mat}`);
-  if(outPort(m,0)&&!routeFor(m.id,'out',0)?.to)unservedOutputs.push(`${label(m)} [${m.id}]`);
+  if(outPort(m,0)){
+   const r=routeFor(m.id,'out',0),name=`${label(m)} [${m.id}]`;
+   if(!r?.to)unservedOutputs.push(name);
+   if(!r)noOutputLine.push(name);
+  }
  }
- for(const r of state.routes){const error=checkPath(r.path,r.from,r.to,r.id);if(error)invalid.push(`${r.label||r.id}: ${error}`);}
- return {unconnected,invalid,unservedOutputs,blocked:blockedPorts()};
+ for(const r of state.routes){
+  const error=checkPath(r.path,r.from,r.to,r.id),name=r.label||r.id;
+  if(error){invalid.push(`${name}: ${error}`);continue;}
+  if(!r.to){
+   const end=r.path.at(-1);
+   openEnds.push(`${name}：${routeTitle(r)} · 末端 (${end.join(', ')})`);
+   continue;
+  }
+  connectedRoutes++;
+  if(streamMaterials(r).size===0)noSourceMaterial.push(`${name}：${routeTitle(r)}`);
+ }
+ return {unconnected,invalid,unservedOutputs,noOutputLine,openEnds,noSourceMaterial,connectedRoutes,blocked:blockedPorts()};
 }
 // Hard-condition precheck. It only proves necessary structural properties;
 // the external fixed-layout LP is the authoritative steady-state feasibility test.
@@ -99,8 +135,23 @@ function hasProducerWarehousePath(mat){
  }
  return false;
 }
+function auditItemList(){
+ const items=new Set(MATERIALS);
+ const add=item=>{if(typeof item==='string'&&item&&item!=='任意')items.add(item);};
+ for(const m of state.machines){
+  const rec=getRecipe(m);
+  if(rec){add(rec.output);for(const item of Object.keys(rec.inputs||{}))add(item);}
+  if(m.type==='仓出')add(m.item);
+  if(m.type==='仓入'||m.type==='电脑')add(m.inletItem);
+  if(m.type==='分流')for(const item of Object.values(m.outFilters||{}))add(item);
+ }
+ for(const f of state.frozenFactories||[])for(const item of Object.keys(f.rates||{}))add(item);
+ return [...items].sort(factoryItemCompare);
+}
 function auditRefresh(){
- const {unconnected,invalid,unservedOutputs,blocked}=warnings();
+ const previous=$('audit').querySelector?.('.audit-stock-paths'),stockOpen=!!previous?.open;
+ const {unconnected,invalid,noOutputLine,openEnds,noSourceMaterial,connectedRoutes}=warnings();
+ const placement=machinePlacementIssues(),blocked=placement.blocked;
  const mixed=mixedInputWarnings(),legalMixed=validMixedInlets();
  let crossings=0;
  for(const entries of occupiedRouteMap().values())if(entries.length===2)crossings++;
@@ -109,39 +160,55 @@ function auditRefresh(){
  // Inspect ALL required stock types on every layout change, not just one
  // representative. This is structural reachability, not a throughput claim.
  // MATERIALS is the complete game item registry, not the historic 13-item subset.
- const auditItems=[...new Set(MATERIALS)];
+ const auditItems=auditItemList();
  const stockPaths=auditItems.map(mat=>({mat,path:hasProducerWarehousePath(mat)}));
  const foundPaths=stockPaths.filter(v=>v.path).length;
- const summaryRows=[
-  ['已绘制的线路',state.routes.length],
+ const machineRows=[
+  ['机器总数',state.machines.length+' 台'],
+  ['存在位置或接口问题的机器',placement.invalidIds.size+' 台',placement.invalidIds.size?'bad':'good'],
+  ['机器位置错误',placement.geometryMessages.length+' 台',placement.geometryMessages.length?'bad':'good'],
+  ['被堵塞的必要接口',blocked.length+' 个',blocked.length?'bad':'good'],
   ['有原料需求的机器',complete+' / '+required+' 台已连齐'],
   ['尚未接入的材料',unconnected.length+' 项',unconnected.length?'bad':'good'],
-  ['生产机器没有出线',unservedOutputs.length+' 台',unservedOutputs.length?'warn':'good'],
+  ['生产机器没有出线',noOutputLine.length+' 台',noOutputLine.length?'warn':'good']
+ ];
+ const summaryRows=[
+  ['已绘制的线路',state.routes.length],
+  ['已连接终点',connectedRoutes+' 条'],
+  ['未连接终点（悬空）',openEnds.length+' 条',openEnds.length?'warn':'good'],
+  ['无可识别上游物料',noSourceMaterial.length+' 条',noSourceMaterial.length?'warn':'good'],
   ['占用传送带格',getBeltCount()],
   ['合法十字形',crossings],
   ['线路几何错误',invalid.length,invalid.length?'bad':'good'],
-  ['被邻居封死的接口',blocked.length,blocked.length?'bad':'good'],
   ['合法混料入口',legalMixed.length,'good'],
   ['不兼容输入材料',mixed.length,mixed.length?'bad':'good']
  ];
- const rows=summaryRows.map(([title,value,status])=>
+ const renderRows=items=>items.map(([title,value,status])=>
   `<div class="audit-row"><span class="audit-label">${esc(title)}</span><span class="audit-value ${status||''}">${esc(value)}</span></div>`).join('');
  const materialRows=stockPaths.map(({mat,path})=>
   `<div class="audit-row audit-material-row"><span class="audit-label">${esc(mat)}</span><span class="audit-value ${path?'good':'bad'}">${path?'有入库路径':'无入库路径'}</span></div>`).join('');
  const diagnostic=(title,items,state='')=>items.length?
   `<details class="audit-diagnostic" ${state?'open':''}><summary class="${state}">${esc(title)} · ${items.length} 项</summary><div class="audit-diagnostic-body">${items.map(item=>`<div>${esc(item)}</div>`).join('')}</div></details>`:'';
- $('audit').innerHTML=`<section class="audit-card">
+ $('audit').innerHTML=`<section class="audit-card audit-machine-card">
+  <div class="audit-card-title">机器概览</div>
+  <div class="audit-stat-list">${renderRows(machineRows)}</div>
+  ${diagnostic('机器位置错误',placement.geometryMessages,'bad')}
+  ${diagnostic('必要接口被堵塞',blocked,'bad')}
+  ${diagnostic('尚未连到机器的原料',unconnected,'warn')}
+  ${diagnostic('生产机器没有出线',noOutputLine)}
+  ${placement.invalidIds.size?'<div class="audit-hint">接口堵塞不限制放置或导入，但需清理后才能接线。</div>':''}
+ </section><section class="audit-card audit-route-card">
   <div class="audit-card-title">线路概览</div>
-  <div class="audit-stat-list">${rows}</div>
-  <div class="audit-section-heading"><span>物品入库路径预检</span><span class="audit-section-meta">已检查 ${stockPaths.length}/${auditItems.length} · 有路径 ${foundPaths}/${stockPaths.length}</span></div>
-  <div class="audit-material-list">${materialRows}</div>
-  <div class="audit-hint">按照完整物品目录逐项检查生产机 → 有效传送带 → 仓库入口的可达性；未找到路径不代表无法作为原料使用，也不代表产能不足。</div>
+  <div class="audit-stat-list">${renderRows(summaryRows)}</div>
+  <details class="audit-stock-paths" ${stockOpen?'open':''}>
+   <summary class="audit-section-heading"><span class="audit-stock-title">物品入库路径预检</span><span class="audit-section-meta">已检查 ${stockPaths.length}/${auditItems.length} · 有路径 ${foundPaths}/${stockPaths.length}</span></summary>
+   <div class="audit-material-list">${materialRows}</div>
+   <div class="audit-hint">按物品 ID 检查当前地图的生产机 → 传送带 → 仓库入口。未找到路径不代表不能作为原料使用；冻结工厂直接增减库存，不需要入库线路。</div>
+  </details>
   ${diagnostic('混合原料输入口',legalMixed)}
   ${diagnostic('材料不兼容',mixed,'bad')}
-  ${diagnostic('接口被挡住',blocked,'bad')}
-  ${diagnostic('尚未连到机器的原料',unconnected,'warn')}
-  ${diagnostic('未连接下游的产出机器',unservedOutputs)}
+  ${diagnostic('未连接终点的线路',openEnds)}
+  ${diagnostic('无可识别上游物料的线路',noSourceMaterial)}
   ${diagnostic('错误线路',invalid,'bad')}
-  <div class="audit-hint audit-footer-hint">红色表示缺失或错误，橙色表示未连接产出。几何与路径合法，不等于工厂能持续生产。</div>
  </section>`;
 }

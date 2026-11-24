@@ -9,6 +9,33 @@ function factoryItemCompare(a,b){
 }
 function factoryRecipeModesByItem(type,modes){return [...modes].sort((a,b)=>factoryItemCompare(DEF[type]?.recipes?.[a]?.output||a,DEF[type]?.recipes?.[b]?.output||b));}
 
+
+// Frozen factories are scheme metadata, not physical machines or AST1 records.
+// Rates are exact decimal/fraction strings in items per second.
+function frozenRateNumber(value){
+ const s=String(value),p=s.split('/');
+ return p.length===2?Number(p[0])/Number(p[1]):Number(s);
+}
+function normalizeFrozenFactories(value){
+ if(value==null)return [];
+ if(!Array.isArray(value)||value.length>100)throw Error('冻结工厂列表无效或过长');
+ const ids=new Set();
+ return value.map((f,i)=>{
+  if(!f||typeof f!=='object'||Array.isArray(f)||!f.rates||typeof f.rates!=='object'||Array.isArray(f.rates))throw Error('冻结工厂配置无效');
+  let id=String(f.id||'f'+(i+1));if(!/^[A-Za-z0-9_-]{1,80}$/.test(id)||['__proto__','constructor','prototype'].includes(id))throw Error('冻结工厂编号无效');if(ids.has(id))throw Error('冻结工厂编号重复');ids.add(id);
+  const rates=Object.create(null);
+  if(Object.keys(f.rates).length>1000)throw Error('冻结工厂物品过多');
+  for(const [item,value] of Object.entries(f.rates)){
+   const key=typeof ast1CanonicalItem==='function'?ast1CanonicalItem(item):item,s=String(value).trim();
+   if(!key||key==='任意'||['__proto__','constructor','prototype'].includes(key)||!/^[-+]?(?:\d+(?:\.\d+)?(?:e[-+]?\d+)?|\d+\/[1-9]\d*)$/i.test(s)||s.length>100||!Number.isFinite(frozenRateNumber(s))||Math.abs(frozenRateNumber(s))>1e9)throw Error('冻结工厂流速无效：'+item);
+   if(Object.hasOwn(rates,key))throw Error('冻结工厂物品重复：'+key);
+   if(frozenRateNumber(s)!==0){const rate=s.replace(/^\+/,'');if(typeof steadyRegionQ==='function')steadyRegionQ(rate);rates[key]=rate;}
+  }
+  return {id,name:String(f.name||'冻结工厂 '+(i+1)).slice(0,80),enabled:f.enabled!==false,rates};
+ });
+}
+function activeFrozenFactories(layout){return normalizeFrozenFactories(layout?.frozenFactories).filter(f=>f.enabled&&Object.keys(f.rates).length);}
+
 const mk=(output,qty,seconds,inputs={})=>({output,qty,seconds,inputs});
 const DEF={
  '垃圾':{name:'太空垃圾回收器',w:5,h:5,ins:0,outs:1,cat:'基础采集',color:'#64bca0',recipes:{0:mk('太空垃圾',3,3),1:mk('遐想物质',1,7.5)}},

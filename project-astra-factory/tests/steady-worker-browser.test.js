@@ -32,7 +32,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
 
 
   const fixture=fs.readFileSync(path.join(__dirname,'fixtures/ast1-warp-coil-only.txt'),'utf8').trim();
-  const pendingResult=await evaluate(`(()=>{state=ast1Decode(${JSON.stringify(fixture)});theoreticalBudget=null;
+  const pendingResult=await evaluate(`(()=>{warehouseCardOpen.theory=true;warehouseCardOpen.actual=true;state=ast1Decode(${JSON.stringify(fixture)});theoreticalBudget=null;
    theoreticalBudget=requestTheoryBudget({quickIterations:1,backgroundMs:60000});warehouseRefresh();
    return {pending:theoreticalBudget.calculating,text:$('warehouse').innerText,roundtrip:ast1Encode()===${JSON.stringify(fixture)}};})()`);
   assert(pendingResult.pending,JSON.stringify(pendingResult));assert(pendingResult.roundtrip);assert(pendingResult.text.includes('计算中'));assert(pendingResult.text.includes('曲速线圈'));assert(!pendingResult.text.includes('暂无有效仓库物流'));

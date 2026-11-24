@@ -45,7 +45,7 @@ function updateGroupControls(){
  const count=stampSelected?0:activeMachineSelectionIds().length,belts=stampSelected?0:(multiSelection?.routeIds.length||0);
  panel.style.display=(stampSelected||count||belts||groupClipboard||groupTransform)?'block':'none';
  $('groupSelectionInfo').textContent=stampSelected?'已框选 1 台机器 / 0 条线路（待放置）':groupTransform
-  ?`正在${groupTransform.mode==='move'?'移动':'复制'} · ${groupTransform.plan?.valid?'可放置':'位置无效'} · ${typeof mobileEditorActive==='function'&&mobileEditorActive()?'点中虚影确认 / 点「选择」取消':'左键放置 / Esc 取消'}`
+  ?`正在${groupTransform.mode==='move'?'移动':'复制'} · ${groupTransform.plan?.valid?(groupTransform.plan.blockedPortsAdded?'可放置 · 堵塞 '+groupTransform.plan.blockedPortsAdded+' 个接口':'可放置'):'位置无效'} · ${typeof mobileEditorActive==='function'&&mobileEditorActive()?'点中虚影确认 / 点「选择」取消':'左键放置 / Esc 取消'}`
   :count||belts?`已框选 ${count} 台机器 / ${belts} 条线路（含截取段）`:'已复制选区，可粘贴';
  $('groupMove').disabled=!count||!!groupTransform;
  $('groupCopy').disabled=!count||!!groupTransform;
@@ -201,14 +201,16 @@ function createGroupPlan(transform){
  const movedById=new Map(machines.map(m=>[m.id,m]));
  const orderedMachines=mode==='move'?state.machines.map(m=>movedById.get(m.id)||m):[...keptMachines,...machines];
  const candidate={...state,machines:orderedMachines,routes:[...keptRoutes,...routes]};
- let error=null;
+ let error=null,blockedPortsAdded=0;
  const original=state;
+ const priorBlocked=new Set(typeof blockedPortIssues==='function'?blockedPortIssues().map(p=>p.key):[]);
  try{
   state=candidate;
-  for(const m of machines)if(!canPlace(m)){error='机器、线路、端口或禁建区域发生冲突';break;}
+  for(const m of machines)if(!canPlace(m)){error='机器、线路或禁建区域发生冲突';break;}
   if(!error)for(const r of routes){error=checkPath(r.path,r.from,r.to,r.id);if(error)break;}
+  if(!error&&typeof blockedPortIssues==='function')blockedPortsAdded=blockedPortIssues().filter(p=>!priorBlocked.has(p.key)).length;
  }finally{state=original;}
- return {valid:!error,error,machines,routes,candidate,disconnected:removedRoutes.length-source.routes.length};
+ return {valid:!error,error,blockedPortsAdded,machines,routes,candidate,disconnected:removedRoutes.length-source.routes.length};
 }
 function updateGroupPreview(){
  if(!groupTransform)return;
@@ -257,8 +259,9 @@ function commitGroupTransform(){
  marquee=null;groupTransform=null;
  // Make the newly placed single machine the active Inspector target too.
  multiSelection=placed.length>1||finalRoutes.length?{machineIds:placed,routeIds:finalRoutes}:null;
- afterChange(t.mode==='copy'?`已放置 ${placed.length} 台复制机器及 ${plan.routes.length} 条内部线路`
-  :`已移动 ${placed.length} 台机器及 ${plan.routes.length} 条内部线路，断开 ${Math.max(0,plan.disconnected)} 条外部线路`);
+ const message=t.mode==='copy'?`已放置 ${placed.length} 台复制机器及 ${plan.routes.length} 条内部线路`
+  :`已移动 ${placed.length} 台机器及 ${plan.routes.length} 条内部线路，断开 ${Math.max(0,plan.disconnected)} 条外部线路`;
+ afterChange(message+(plan.blockedPortsAdded?`；新增 ${plan.blockedPortsAdded} 个堵塞接口，详见工厂检查`:''),{messageStyle:plan.blockedPortsAdded?'warn':'good'});
  if(keepMobileCopy){
   // A fresh red (occupied) ghost appears at the last copied coordinates.
   // The user can drag it elsewhere, then tap ON a ghost machine to duplicate

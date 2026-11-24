@@ -11,19 +11,22 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
 <meta name="apple-mobile-web-app-title" content="Factory Lab"/>
 <meta name="theme-color" content="#0b111c"/>
-<link rel="stylesheet" href="styles/main.css?v=20261124-mr-mobile-priority-1"/>
-<link rel="stylesheet" href="styles/sidebar-polish.css?v=20261124-net-left-clean-banner-1"/>
+<link rel="stylesheet" href="styles/main.css?v=20261124-frozen-041-ui2"/>
+<link rel="stylesheet" href="styles/sidebar-polish.css?v=20261124-frozen-041-ui2"/>
 <link rel="stylesheet" href="styles/stock-chart.css"/>
 <link rel="stylesheet" href="styles/mobile.css?v=20261123-039&ui=stock-toolbar-compact-1&ui=selection-menu-3"/>
 <link rel="stylesheet" href="styles/window-motion.css"/>
 <link rel="stylesheet" href="styles/ast1-dialog.css"/>
 <link rel="stylesheet" href="styles/changelog.css?v=20261123-039"/>
-<link rel="stylesheet" href="styles/select-theme.css?v=20261123-039&ui=selection-menu-3"/>
-<link rel="stylesheet" href="styles/sidebar-resize.css?v=20261124-1"/>
+<link rel="stylesheet" href="styles/select-theme.css?v=20261124-theme-1"/>
+<link rel="stylesheet" href="styles/sidebar-resize.css?v=20261124-frozen-041-ui2"/>
+<link rel="stylesheet" href="styles/frozen-factories.css?v=20261124-import-fix"/>
+<link rel="stylesheet" href="styles/checkbox-theme.css?v=20261124-theme-1"/>
+<link rel="stylesheet" href="styles/theme.css?v=20261124-factory-audit-041"/>
 </head>
 <body>
 <div class="app">
-<header class="top"><div class="brand"><img class="brand-mark" src="favicon.svg" alt="" aria-hidden="true"/> <span>Factory</span> Lab <button id="changelogOpen" class="changelog-trigger" type="button" aria-haspopup="dialog" aria-controls="changelogPanel" aria-label="查看 Factory Lab 版本更新记录" title="查看版本更新记录">v0.40 <span aria-hidden="true">▾</span></button></div>
+<header class="top"><div class="brand"><img class="brand-mark" src="favicon.svg" alt="" aria-hidden="true"/> <span>Factory</span> Lab <button id="changelogOpen" class="changelog-trigger" type="button" aria-haspopup="dialog" aria-controls="changelogPanel" aria-label="查看 Factory Lab 版本更新记录" title="查看版本更新记录">v0.41 <span aria-hidden="true">▾</span></button></div>
  <div class="preset-manager" id="presetDropdown" aria-label="求解器方案管理">
   <div class="preset-combo">
    <input id="presetName" type="text" maxlength="64" placeholder="方案名称" role="combobox" aria-label="方案名称，可编辑；点击显示方案列表" aria-haspopup="dialog" aria-expanded="false" aria-controls="presetList" autocomplete="off" title="点击显示方案列表，修改文字可重命名"/>
@@ -266,8 +269,8 @@
   <div class="stock-chart-resize stock-chart-resize-se" data-stock-resize="se" title="拖动右下角缩放" aria-label="右下角缩放图表"></div>
 </div></section>
 <div class="sidebar-divider" data-sidebar-resize="right" role="separator" aria-orientation="vertical" aria-label="调整右侧栏宽度" tabindex="0" title="拖动调整右侧栏宽度，双击恢复默认"></div>
-<aside class="side right"><details id="warehousePanel" class="warehouse-panel"><summary>仓库材料 · 每分钟收支</summary><div class="block" id="warehouse"></div></details><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><details class="right-extra-panel" id="auditPanel">
- <summary>线路检查</summary><div class="block" id="audit"></div>
+<aside class="side right"><details id="warehousePanel" class="warehouse-panel"><summary>仓库材料</summary><div class="block" id="warehouse"></div></details><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><details class="right-extra-panel" id="auditPanel">
+ <summary>工厂检查</summary><div class="block" id="audit"></div>
  </details><details class="right-extra-panel" id="logsPanel">
  <summary>操作记录</summary><div class="block logs" id="logs"></div>
  </details></aside>
@@ -282,36 +285,37 @@
 <footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
 </div>
 <script src="scripts/data/warp-preset.js?v=20261123-039"></script>
-<script src="scripts/data/catalog.js?v=20261124-live-edit-stock-id-2"></script>
+<script src="scripts/data/catalog.js?v=20261124-frozen-041-ui2"></script>
 <script src="scripts/core/state.js?v=20261123-039"></script>
-<script src="scripts/core/machines.js?v=20261124-warp-040"></script>
+<script src="scripts/core/machines.js?v=20261124-hint-layout-041"></script>
 <script src="scripts/core/routing.js?v=20261124-mr-mobile-priority-1"></script>
-<script src="scripts/core/editor.js?v=20261124-warp-040"></script>
-<script src="scripts/core/audit.js?v=20261123-039"></script>
+<script src="scripts/core/editor.js?v=20261124-port-warn-041"></script>
+<script src="scripts/core/audit.js?v=20261124-release-041-final"></script>
 <script src="scripts/ui/inspector.js?v=20261124-overdraft-period-1"></script>
-<script src="scripts/core/layout-io.js?v=20261124-live-edit-stock-id-2"></script>
+<script src="scripts/core/layout-io.js?v=20261124-frozen-041-ui2"></script>
 <script src="scripts/ui/editor-controls.js?v=20261124-posttrim-select-only-1"></script>
-<script src="scripts/core/selection-transform.js?v=20261124-mr-mobile-priority-1"></script>
-<script src="scripts/ui/canvas.js?v=20261124-posttrim-select-only-1"></script>
-<script src="scripts/engine/steady-flow.js?v=20261124-warp-040"></script>
+<script src="scripts/core/selection-transform.js?v=20261124-port-warn-041"></script>
+<script src="scripts/ui/canvas.js?v=20261124-hint-layout-041"></script>
+<script src="scripts/engine/steady-flow.js?v=20261124-frozen-041-ui2"></script>
 <script src="scripts/engine/steady-equations.js?v=20261124-simulator-contract-1"></script>
-<script src="scripts/engine/steady-generic-network.js?v=20261124-general-terminal-1"></script>
+<script src="scripts/engine/steady-generic-network.js?v=20261124-frozen-041-ui2"></script>
 <script src="scripts/engine/steady-bounds.js?v=20261124-rational-upper-1"></script>
-<script src="scripts/engine/steady-auto-fluid.js?v=20261124-warp-040"></script>
-<script src="scripts/ui/theory-worker.js?v=20261124-warp-040"></script>
-<script src="scripts/ui/warehouse.js?v=20261124-warp-040"></script>
-<script src="scripts/engine/simulation.js?v=20261124-live-edit-stock-id-2"></script>
+<script src="scripts/engine/steady-auto-fluid.js?v=20261124-frozen-041-ui2"></script>
+<script src="scripts/ui/theory-worker.js?v=20261124-frozen-041-ui2"></script>
+<script src="scripts/ui/warehouse.js?v=20261124-frozen-041-ui2"></script>
+<script src="scripts/ui/frozen-factories.js?v=20261124-import-fix"></script>
+<script src="scripts/engine/simulation.js?v=20261124-frozen-041-ui2"></script>
 <script src="scripts/ui/stock-chart.js?v=20261124-live-edit-stock-id-2"></script>
 <script src="scripts/ui/actions.js?v=20261124-warehouse-window-totals-1"></script>
 <script src="scripts/blueprints/machine-ids.js?v=20261123-039"></script>
 <script src="scripts/blueprints/item-ids.js?v=20261124-live-edit-stock-id-2"></script>
 <script src="scripts/core/old.js?v=20261124-json13-route-select-1"></script>
-<script src="scripts/core/compact-json.js?v=20261124-json13-route-select-1"></script>
+<script src="scripts/core/compact-json.js?v=20261124-frozen-041-ui2"></script>
 <script src="scripts/blueprints/ast1-codec.js?v=20261124-warp-040"></script>
 <script src="scripts/blueprints/ast1-ui.js?v=20261123-039"></script>
-<script src="scripts/ui/presets.js?v=20261124-warp-040"></script>
+<script src="scripts/ui/presets.js?v=20261124-frozen-041-ui2"></script>
 <script src="scripts/ui/edit-menu.js?v=20261123-039"></script>
-<script src="scripts/data/changelog.js?v=20261124-warp-040"></script>
+<script src="scripts/data/changelog.js?v=20261124-release-041-final"></script>
 <script src="scripts/ui/changelog.js?v=20261123-039"></script>
 <script src="scripts/ui/startup.js?v=20261124-json13-route-select-1"></script>
 <script src="scripts/ui/sidebar-resize.js?v=20261124-1"></script>

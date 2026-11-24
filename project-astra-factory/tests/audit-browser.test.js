@@ -31,8 +31,11 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const auditPanel=$('auditPanel');
    auditPanel.open=true;
    auditRefresh();
-   const auditRoot=$('audit'),card=auditRoot.querySelector('.audit-card');
+   const auditRoot=$('audit'),card=auditRoot.querySelector('.audit-route-card'),machineCard=auditRoot.querySelector('.audit-machine-card');
    const rows=[...card.querySelector('.audit-stat-list').querySelectorAll('.audit-row')];
+   const disclosure=card.querySelector('.audit-stock-paths');
+   const defaultCollapsed=!disclosure.open&&disclosure.querySelector('.audit-material-list').getBoundingClientRect().height===0;
+   disclosure.querySelector('summary').click();
    const stocks=[...card.querySelectorAll('.audit-material-row')];
    const materialNames=stocks.map(x=>x.querySelector('.audit-label')?.textContent);
    const computed=el=>getComputedStyle(el);
@@ -78,7 +81,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const rates=[...card.querySelectorAll('.audit-section-heading')];
    const details=[...card.querySelectorAll('.audit-diagnostic')];
    const summary=card.querySelector('.audit-section-meta')?.textContent;
-   return {count:stocks.length,materialNames,allChecked:stocks.length===MATERIALS.length&&
+   return {machineHeading:machineCard.querySelector('.audit-card-title').textContent,machineFirst:machineCard===auditRoot.firstElementChild,machineRows:[...machineCard.querySelectorAll('.audit-row')].map(r=>r.querySelector('.audit-label').textContent),panelTitle:auditPanel.querySelector('summary').textContent,defaultCollapsed,sorted:materialNames.every((m,i)=>i===0||factoryItemCompare(materialNames[i-1],m)<=0),count:stocks.length,materialNames,allChecked:stocks.length===MATERIALS.length&&
      MATERIALS.every(x=>materialNames.includes(x)),
     matchState:stocks.every(row=>{
      const found=row.querySelector('.audit-value').textContent==='有入库路径';
@@ -98,23 +101,26 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
     detailsCount:details.length,sections:rates.map(x=>x.textContent.trim())};
   })()`);
   console.log('ROUTE AUDIT AND LEDGER UI',JSON.stringify(visual));
-  assert(visual.allChecked&&visual.matchState&&visual.allResultsVisible&&visual.allInsideCard&&
-   visual.consistentFonts&&visual.normals&&visual.statCount===10&&visual.cardVisible,
+  assert(visual.defaultCollapsed&&visual.sorted&&visual.allChecked&&visual.matchState&&visual.allResultsVisible&&visual.allInsideCard&&
+   visual.consistentFonts&&visual.normals&&visual.statCount===9&&visual.cardVisible,
    'every catalog item and route counter must appear together in one uniform card');
   assert(visual.summary.includes('已检查 23/23')&&visual.summary.includes('有路径 '),
    'distinguish total inspected materials from routes actually found');
+  assert.equal(visual.panelTitle,'工厂检查');assert.equal(visual.machineHeading,'机器概览');assert(visual.machineFirst&&visual.machineRows.length===7&&visual.machineRows.includes('被堵塞的必要接口')&&visual.machineRows.includes('存在位置或接口问题的机器'));
+  assert(visual.statLabels.includes('已连接终点')&&visual.statLabels.includes('未连接终点（悬空）')&&visual.statLabels.includes('无可识别上游物料'));
+  assert(await evaluate("(()=>{auditRefresh();const d=$('audit').querySelector('.audit-stock-paths');if(!d.open)return false;d.querySelector('summary').click();auditRefresh();return !$('audit').querySelector('.audit-stock-paths').open})()"));
   assert(visual.noLegacyUpperBound,'gear/coil upper-bound text should be fully removed');
   assert.equal(visual.firstLevel.length,4);
-  assert(visual.firstLevel.every(x=>x.size===14&&x.weight===650&&x.color==='rgb(213, 229, 241)'),
-   'all four main headings need the same high-contrast 14px typographic level');
-  assert(visual.secondLevel.every(x=>x.size===12.5&&x.weight===560),
+  assert(visual.firstLevel.every(x=>x.size===15&&x.weight===700&&x.color==='rgb(213, 229, 241)'),
+   'all four main headings need the same high-contrast 15px typographic level');
+  assert(visual.secondLevel.every(x=>x.size===13.5&&x.weight===600&&x.color==='rgb(201, 218, 235)'),
    'card headings must be subordinate to the main sidebar headings');
-  assert(visual.thirdLevel.every(x=>x.size<12.5&&x.weight===500),
+  assert(visual.thirdLevel.every(x=>x.size===12&&x.weight===550),
    'inner steady/live headings must be subordinate to card headings');
   assert(visual.warehouseKpis.length===2&&visual.warehouseKpis.every(x=>x.weight==='700'&&x.size===16),
    'only the two simulation summary numbers must be bold 16px');
-  assert.equal(visual.headingWeight,'560','ledger heading should be moderate, not bold');
-  assert.equal(visual.headingColor,'rgb(182, 205, 221)','ledger heading should be muted blue, not bright white');
+  assert.equal(visual.headingWeight,'600','ledger heading should be moderate, not bold');
+  assert.equal(visual.headingColor,'rgb(201, 218, 235)','ledger heading should be muted blue, not bright white');
   assert.equal(exceptions.length,0,'uncaught Edge exceptions: '+exceptions.join(' | '));
   console.log('PASS: all 23 materials checked, no obsolete upper-bound block, four readable primary headings and two bold warehouse KPIs');
   ws.close();

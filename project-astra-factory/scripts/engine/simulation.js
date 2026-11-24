@@ -240,7 +240,7 @@ function warehouseFillOutputQueue(m,s){
  // An unwired output cannot claim the shared warehouse inventory.
  if(!item||!routeFor(m.id,'out',0))return;
  const reserved=sim.warehouseReserved??=(Object.create(null));
- while(q.length<3&&(ware[item]||0)>(reserved[item]||0)){
+ while(q.length<3&&(ware[item]||0)>(reserved[item]||0)+(sim.frozenReserved?.[item]||0)){
   q.push(item);
   reserved[item]=(reserved[item]||0)+1;
  }
@@ -253,6 +253,56 @@ function warehouseDequeueOne(m,s){
  sim.outbound[head]=(sim.outbound[head]||0)+1;
  recordWarehouseMovement('outbound',head);
  return true;
+}
+
+
+// Frozen factories use one shared service clock each. All configured rates
+// advance together; no credit accumulates during a blocked interval.
+// A tick's whole-item debits are checked atomically before any credit is paid.
+// Existing warehouse reservations remain protected.
+let frozenSimCache=null;
+function simulateFrozenFactories(dt){
+ sim.frozenReserved={};
+ if(!state.frozenFactories?.length){if(sim.frozenRuntime)sim.frozenRuntime={};return;}
+ if(!frozenSimCache||frozenSimCache.list!==state.frozenFactories){
+  frozenSimCache={list:state.frozenFactories,configs:normalizeFrozenFactories(state.frozenFactories).map(f=>({
+   ...f,signature:JSON.stringify(f.rates),entries:Object.entries(f.rates).map(([item,v])=>[item,frozenRateNumber(v)])
+  }))};
+ }
+ const previous=sim.frozenRuntime||{},next={};
+ for(const f of frozenSimCache.configs){
+  let r=previous[f.id];
+  if(!r||r.signature!==f.signature)r={signature:f.signature,phase:{},activeTime:0,totalTime:0,blocked:[],running:false};
+  next[f.id]=r;r.totalTime+=dt;r.running=false;r.blocked=[];
+  if(!f.enabled||!f.entries.length)continue;
+  const inputs=f.entries.filter(([,v])=>v<0);
+  const available=item=>Math.max(0,(ware[item]||0)-(sim.warehouseReserved?.[item]||0)-(sim.frozenReserved[item]||0));
+  r.blocked=inputs.filter(([item])=>available(item)<1).map(([item])=>item);
+  if(r.blocked.length)continue;
+  // Limit common elapsed service time when a high-rate source consumes
+  // more than the available stock in one simulator tick.
+  let service=dt;
+  for(const [item,v] of inputs)service=Math.min(service,Math.max(0,(available(item)-(r.phase[item]||0))/-v));
+  if(service<=0)continue;
+  const moves=f.entries.map(([item,v])=>{
+   const acc=(r.phase[item]||0)+Math.abs(v)*service,n=Math.floor(acc+1e-9);
+   return {item,v,n,phase:Math.max(0,acc-n)};
+  });
+  if(moves.some(m=>m.v<0&&m.n>available(m.item)))continue;
+  r.running=true;r.activeTime+=service;
+  for(const m of moves){
+   r.phase[m.item]=m.phase;if(!m.n)continue;
+   const direction=m.v>0?'inbound':'outbound';
+   ware[m.item]=(ware[m.item]||0)+(m.v>0?m.n:-m.n);
+   sim[direction][m.item]=(sim[direction][m.item]||0)+m.n;
+   recordWarehouseMovement(direction,m.item,m.n);
+  }
+  // Retain one next input item per ingredient only while all are present.
+  // This stops lower-priority consumers from stealing a fractional-rate
+  // source's next whole item while its common service clock is advancing.
+  if(inputs.every(([item])=>available(item)>=1))for(const [item] of inputs)sim.frozenReserved[item]=(sim.frozenReserved[item]||0)+1;
+ }
+ sim.frozenRuntime=next;
 }
 
 function simulate(dt){simTime+=dt;
@@ -273,6 +323,7 @@ function simulate(dt){simTime+=dt;
    }
   }
  }
+ simulateFrozenFactories(dt);
  // All warehouse outlets reserve from the SAME per-item stock in numeric
  // machine-ID order. Layout insertion order must not change priority.
  // Do this after belt deliveries and BEFORE any warehouse dispatch;

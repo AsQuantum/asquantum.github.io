@@ -15,7 +15,7 @@ function requestTheoryBudget({quickMs=600,quickIterations=12000,backgroundMs=THE
  const initial=warehouseTheory(null,{maxIterations:quickIterations,deadline:started+quickMs});
  if(!initial.conditionalBudget?.retryable&&!initial.unlimitedStockBudget?.retryable)return initial;
  let worker;
- try{worker=new Worker('scripts/engine/steady-worker.js?v=20261124-warp-040');}
+ try{worker=new Worker('scripts/engine/steady-worker.js?v=20261124-frozen-041-ui2');}
  catch(error){return initial;}
  const pending={...initial,calculating:true};
  const layout=state;

@@ -31,7 +31,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   await send('Emulation.setDeviceMetricsOverride',{width:1470,height:1000,deviceScaleFactor:1,mobile:false});
   await waitFrame();
   const initial=await evaluate(`(()=>{
-   $('warehousePanel').open=true;
+   $('warehousePanel').open=true;warehouseCardOpen.theory=true;warehouseCardOpen.actual=true;
    ware={'曲速线圈':123456789012345,'古代芯片':10,'合金板':40,'硅晶圆':20};warehouseRefresh();
    const l=document.querySelector('.side.left'),r=document.querySelector('.side.right'),c=document.querySelector('.canvaswrap');
    return {left:l.getBoundingClientRect().width,right:r.getBoundingClientRect().width,center:c.getBoundingClientRect().width,

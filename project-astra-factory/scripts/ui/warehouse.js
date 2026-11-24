@@ -1,10 +1,10 @@
 'use strict';
 // 以事件计数记录真实逐件入库/出库，而不是以物料路径推断实际收入。
-function recordWarehouseMovement(direction,item){
+function recordWarehouseMovement(direction,item,count=1){
  if(!sim)return;
  const bucketIndex=Math.max(0,Math.floor((simTime-1e-7)/60));
  const bucket=sim.minuteBuckets[bucketIndex]||(sim.minuteBuckets[bucketIndex]={inbound:{},outbound:{}});
- bucket[direction][item]=(bucket[direction][item]||0)+1;
+ bucket[direction][item]=(bucket[direction][item]||0)+count;
 }
 function ledgerNumber(v,decimals=2){return Number(v||0).toFixed(decimals);}
 function ledgerMaterialLabel(item){
@@ -34,6 +34,7 @@ function warehouseView(theoryRows=false){
  const potentialNet=displayBudget.potentialNet??null,overdraftNet=budget.overdraftNet??null;
  const materialSet=new Set([...Object.keys(displayBudget.inflow||{}),...Object.keys(displayBudget.outflow||{}),...(budget.warehouseItems||[]),
   ...Object.keys(potentialNet||{}),...Object.keys(overdraftNet||{}),
+  ...(state.frozenFactories||[]).flatMap(f=>Object.keys(f.rates||{})),
   ...Object.keys(ware||{}),
   ...Object.keys(sim?.inbound||{}),...Object.keys(sim?.outbound||{}),
   ...(budget?.diagnostics?.symbolicModel?.warehouseSupernodes?.nodes||[]).map(x=>x.item),
@@ -47,7 +48,8 @@ function warehouseView(theoryRows=false){
   const overdraft=overdraftNet?ledgerNetCell((overdraftNet[mat]||0)*60):'<td>—</td>';
   if(!theoryCertified&&!conditional)return '<tr>'+name+'<td>—</td><td>—</td><td>—</td>'+unrestricted+overdraft+'</tr>';
   const inc=(displayBudget.inflow[mat]||0)*60,out=(displayBudget.outflow[mat]||0)*60;
-  return '<tr>'+name+'<td>'+ledgerNumber(inc)+'</td><td>'+ledgerNumber(out)+'</td>'+ledgerNetCell(inc-out)+unrestricted+overdraft+'</tr>';
+  const breakdown=(direction)=>{const local=direction==='inflow'?displayBudget.localInflow:displayBudget.localOutflow,frozen=direction==='inflow'?displayBudget.frozenInflow:displayBudget.frozenOutflow;if(!frozen||!state.frozenFactories?.length)return '';return ' title="当前工厂 '+ledgerNumber((local?.[mat]||0)*60)+'；冻结工厂 '+ledgerNumber((frozen[mat]||0)*60)+' 件/分钟"';};
+  return '<tr>'+name+'<td'+breakdown('inflow')+'>'+ledgerNumber(inc)+'</td><td'+breakdown('outflow')+'>'+ledgerNumber(out)+'</td>'+ledgerNetCell(inc-out)+unrestricted+overdraft+'</tr>';
  }).join(''):'';
  let theoryTotal=warehouseTotalRow('—','—','<td>—</td>');
  if(theoryCertified||conditional){
@@ -121,11 +123,11 @@ function warehouseActualMarkup(v){
  const windowOptions=WAREHOUSE_NET_WINDOWS.map(n=>'<option value="'+n+'"'+
   (n===v.windowMinutes?' selected':'')+'>'+n+'m</option>').join('');
  return '<div id="warehouseLiveActual" class="ledger-panel">'+
-  '<div class="ledger-head"><strong>实际收支</strong>'+
+  '<div class="ledger-head">'+(typeof ledgerCollapseButton==='function'?ledgerCollapseButton('actual','实际收支'):'<strong>实际收支</strong>')+
   '<button type="button" class="warehouse-stock-toggle" data-stock-chart-open title="查看仓库存量随模拟时间变化">▤ 库存趋势</button>'+
   '<span class="ledger-chip">'+(v.windowReady?'近'+v.windowMinutes+'分钟':v.elapsedMinutes>0?
     '已完成'+v.elapsedMinutes+'/'+v.windowMinutes+'分钟':'等待首个完整分钟')+'</span></div>'+
-  '<div class="warehouse-net-window-row"><label class="warehouse-net-window" for="warehouseNetWindow">净值窗口 <select id="warehouseNetWindow" aria-label="实际收支净值计算窗口">'+windowOptions+'</select></label></div>'+
+  '<div class="ledger-card-body"'+(typeof warehouseCardOpen!=='undefined'&&!warehouseCardOpen.actual?' hidden':'')+'><div class="warehouse-net-window-row"><label class="warehouse-net-window" for="warehouseNetWindow">净值窗口 <select id="warehouseNetWindow" aria-label="实际收支净值计算窗口">'+windowOptions+'</select></label></div>'+
   '<div class="ledger-table-scroll" tabindex="0" aria-label="实际收支表，可横向滚动"><table class="ledger-table"><thead><tr><th>物品</th><th title="上一完整分钟入库量">收入</th>'+
   '<th title="上一完整分钟出库量">支出</th><th title="最近'+v.windowMinutes+
   '个完整分钟的平均每分钟净收支（件/分钟）">净值</th><th>库存</th></tr></thead>'+
@@ -133,13 +135,13 @@ function warehouseActualMarkup(v){
   total+'</tbody></table></div>'+
   (history?'<details class="warehouse-recent-history"><summary class="tiny">最近'+v.recentBuckets.length+'分钟记录</summary>'+
    '<div class="ledger-table-scroll" tabindex="0" aria-label="分钟记录，可横向滚动"><table class="ledger-table"><thead><tr><th>分钟</th><th>收入</th><th>支出</th><th>净值</th></tr></thead><tbody>'+
-   history+'</tbody></table></div></details>':'')+'</div>';
+   history+'</tbody></table></div></details>':'')+'</div></div>';
 }
 function warehouseRefresh(){
  const v=warehouseView(true),budget=v.budget;
- $('warehouse').innerHTML=warehouseSummaryMarkup(v)+`<div class="ledger-panel"><div class="ledger-head"><strong>理论收支</strong><span class="ledger-chip">${budget.calculating?"计算中…":budget.calculationTimedOut?(v.conditional?"条件解 · 透支超时":"计算超时"):v.conditional?"条件解 · 件/分钟":budget.status==="modelled-unresolved"&&v.materials.length?"未求解 · 件/分钟":"件/分钟"}</span></div>
- <div class="ledger-table-scroll" tabindex="0" aria-label="理论收支表，可横向滚动"><table class="ledger-table"><thead><tr><th>材料</th><th>收入</th><th>支出</th><th>净值</th><th title="保持当前稳态收入及其他供需不变，收入减去各仓出的下游需求（解除仓库缺货限制，可为负）">潜在净值</th><th title="所有仓出不限库存，重新联立求解整个生产网络的新平衡点：收入减支出">透支净值</th></tr></thead><tbody>${v.tRows||'<tr><td colspan="6">暂无有效仓库物流</td></tr>'}${v.theoryTotal}</tbody></table></div>
- </div>`+warehouseActualMarkup(v);
+ $('warehouse').innerHTML=warehouseSummaryMarkup(v)+(typeof frozenFactoriesMarkup==='function'?frozenFactoriesMarkup(v):'')+`<div class="ledger-panel"><div class="ledger-head">${typeof ledgerCollapseButton==='function'?ledgerCollapseButton('theory','理论收支'):'<strong>理论收支</strong>'}<span class="ledger-chip">${budget.calculating?"计算中…":budget.calculationTimedOut?(v.conditional?"条件解 · 透支超时":"计算超时"):v.conditional?"条件解 · 件/分钟":budget.status==="modelled-unresolved"&&v.materials.length?"未求解 · 件/分钟":"件/分钟"}</span></div>
+ <div class="ledger-card-body"${typeof warehouseCardOpen!=='undefined'&&!warehouseCardOpen.theory?' hidden':''}><div class="ledger-table-scroll" tabindex="0" aria-label="理论收支表，可横向滚动"><table class="ledger-table"><thead><tr><th>材料</th><th>收入</th><th>支出</th><th>净值</th><th title="保持当前稳态收入及其他供需不变，收入减去各仓出的下游需求（解除仓库缺货限制，可为负）">潜在净值</th><th title="所有仓出不限库存，重新联立求解整个生产网络的新平衡点：收入减支出">透支净值</th></tr></thead><tbody>${v.tRows||'<tr><td colspan="6">暂无有效仓库物流</td></tr>'}${v.theoryTotal}</tbody></table></div>
+ </div></div>`+warehouseActualMarkup(v);
 }
 // When folded, skip both DOM work and formatting until the panel is opened.
 function warehouseRefreshLive(){
@@ -149,5 +151,6 @@ function warehouseRefreshLive(){
  if(!summary||!actual){warehouseRefresh();return;}
  const v=warehouseView(false);
  syncLiveMarkup(summary,warehouseSummaryMarkup(v));
- syncLiveMarkup(actual,warehouseActualMarkup(v));
+ if(typeof warehouseCardOpen==='undefined'||warehouseCardOpen.actual)syncLiveMarkup(actual,warehouseActualMarkup(v));
+ if(typeof frozenRefreshLive==='function'&&warehouseCardOpen.frozen)frozenRefreshLive(v);
 }

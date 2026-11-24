@@ -134,8 +134,8 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
     rulesStillVisibleAfterListScroll:rulesRect.top>=leftRect.top&&rulesRect.bottom<=leftRect.bottom};
   })()`);
   console.log('UNIFIED MAIN HEADINGS',JSON.stringify(headings));
-  assert(headings.styles.length===7&&headings.styles.every(h=>h.visible&&h.fontSize===14&&
-   h.weight===650&&h.color==='rgb(213, 229, 241)'),'main left/right sidebar headings must share the same typography');
+  assert(headings.styles.length===7&&headings.styles.every(h=>h.visible&&h.fontSize===15&&
+   h.weight===700&&h.color==='rgb(213, 229, 241)'),'main left/right sidebar headings must share the same typography');
   assert(headings.propertyDivider&&headings.machineDivider&&headings.rulesDivider,
    'Property Editing and left sections need a consistent top separator');
   assert(headings.rulesVisible&&headings.rulesOutsideScroll&&headings.rulesStillVisibleAfterListScroll,

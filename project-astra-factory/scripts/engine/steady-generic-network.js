@@ -171,6 +171,7 @@ function factorySteadyGenericStartupReachability(layout=state,options={}){
   outbound.get(r.from.id).push(r);
  }
  const stocked=new Set(initialItems),made=new Set();
+ const frozen=options.frozenFactories||[];
  const eligible=(m,item,port)=>{
   if(typeof acceptsMaterial==='function')return acceptsMaterial(m,item,port);
   return true;
@@ -191,6 +192,10 @@ function factorySteadyGenericStartupReachability(layout=state,options={}){
  let passes=0,changed=true;
  while(changed){
   changed=false;passes++;
+  for(const f of frozen){
+   if(Object.entries(f.rates).every(([item,rate])=>frozenRateNumber(rate)>=0||stocked.has(item)))
+    for(const [item,rate] of Object.entries(f.rates))if(frozenRateNumber(rate)>0&&!stocked.has(item)){stocked.add(item);changed=true;}
+  }
   for(const m of layout.machines){
    const rec=getRecipe(m);
    if(!rec||made.has(m.id))continue;

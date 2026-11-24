@@ -54,7 +54,7 @@ function unwrapOldLayoutJSON(v){
 function expandOldFactoryLayout(v){
  // Validate and repair a COPY first. A failed import must not overwrite current work.
  const source=unwrapOldLayoutJSON(v);
- const incoming={name:source.name||'导入的工厂布局',machines:copy(source.machines),routes:copy(source.routes)};
+ const incoming={name:source.name||'导入的工厂布局',machines:copy(source.machines),routes:copy(source.routes),...(source.frozenFactories!==undefined?{frozenFactories:normalizeFrozenFactories(source.frozenFactories)}:{})};
   // Convert older unmirrored AST1 autosaves exactly once, including route tiles.
   if(incoming.machines.some(m=>m.ast1Meta?.record&&!m.ast1Mirrored)){
    for(const m of incoming.machines){

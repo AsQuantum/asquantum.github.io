@@ -29,7 +29,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
 
 
   const fixture=fs.readFileSync(path.join(__dirname,'fixtures/ast1-warehouse-port-balance-v1.txt'),'utf8').trim();
-  const result=await evaluate(`(()=>{state=ast1Decode(${JSON.stringify(fixture)});theoreticalBudget=null;resetSimulation();warehouseRefresh();
+  const result=await evaluate(`(()=>{warehouseCardOpen.theory=true;state=ast1Decode(${JSON.stringify(fixture)});theoreticalBudget=null;resetSimulation();warehouseRefresh();
    const b=theoreticalBudget,c=b.conditionalBudget;
    const label=timeLabel(machineById('M24'));
    selection={machineId:'M24'};inspectorRefresh();

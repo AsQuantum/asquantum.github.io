@@ -10,6 +10,27 @@ function machineOutputWarning(m){
  if(dangling)return '出线悬空';
  return getRecipe(m)&&ports.length&&!routeFor(m.id,'out',ports[0].index)?'无出线':null;
 }
+// Share the same machine placement diagnostics as the factory audit.
+function machineWarningHints(m,placement){
+ const errors=[],miss=missingMaterials(m),blocked=placement?.blockedByMachine?.get(m.id)||0;
+ if(placement?.geometryIds?.has(m.id))errors.push('位置错误');
+ if(blocked)errors.push('接口堵塞'+blocked);
+ if(miss.length)errors.push('缺料'+miss.length);
+ const warning=machineOutputWarning(m);
+ return {errors,warning,lines:[...errors.map(text=>({text,color:'#ff657d'})),...(warning?[{text:warning,color:'#ffd16e'}]:[])]};
+}
+// Reserve vertical space for separate warning rows. Fit the actual font, never
+// pass a maxWidth to fillText (which would squeeze glyphs horizontally).
+function machineHintLayout(hints,w,h,z){
+ if(z<5||!hints.lines.length)return {rows:[],inset:0};
+ const rows=hints.lines,available=Math.max(.1,w-.50),font='system-ui, "Microsoft YaHei", sans-serif';
+ let size=Math.min(.84,Math.max(.1,(h-.5)*.45/rows.length/1.2));
+ ctx.save();
+ for(const row of rows){ctx.font='bold '+size+'px '+font;const width=ctx.measureText(row.text).width;if(width>available)size*=available/width;}
+ ctx.restore();
+ const step=size*1.2;
+ return {rows,font:'bold '+size+'px '+font,step,inset:rows.length*step+.12};
+}
 // The factory geometry rarely changes. Cache the static canvas in device pixels and
 // overlay only moving packages; this avoids redrawing all machines and 1300+ belt tiles
 // up to 60 times per second while simulating.
@@ -89,8 +110,8 @@ function paintMachineIndicators(m,w,h){
 }
 // Never gate machine text on zoom. Canvas will clip naturally at the physical
 // pixel limit, but a zoom threshold must never replace the full name/recipe.
-function paintMachineTextAtZoom(m,w,h,z,preview=false){
- paintMachineText(m,w,h,preview);
+function paintMachineTextAtZoom(m,w,h,z,preview=false,topInset=0){
+ paintMachineText(m,w,h,preview,topInset);
 }
 function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRect(0,0,pix.w,pix.h);ctx.fillStyle='#0c1622';ctx.fillRect(0,0,pix.w,pix.h);ctx.save();ctx.translate(camera.x,camera.y);ctx.scale(camera.z,camera.z);const z=camera.z;
  ctx.fillStyle='#142434';ctx.fillRect(0,0,72,72);ctx.fillStyle='#344255';ctx.fillRect(CENTER.x,CENTER.y,CENTER.w,CENTER.h);
@@ -150,29 +171,24 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
    ctx.stroke();
   }
  }
+ const placement=typeof machinePlacementIssues==='function'?machinePlacementIssues():null;
  for(let m of state.machines){let[w,h]=dims(m),c=makeColor(m);ctx.fillStyle=hexAlpha(c,.18);ctx.fillRect(m.x+.08,m.y+.08,w-.16,h-.16);ctx.lineWidth=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id)) ? .29 : .14;ctx.strokeStyle=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id))?'#f5dc77':c;ctx.strokeRect(m.x+.08,m.y+.08,w-.16,h-.16);
- const ports=getPorts(m),labelMasks=typeof machineMaterialTextBounds==='function'?machineMaterialTextBounds(m,w,h):null;
+ const hints=machineWarningHints(m,placement),hintLayout=machineHintLayout(hints,w,h,z);
+ const ports=getPorts(m),labelMasks=typeof machineMaterialTextBounds==='function'?machineMaterialTextBounds(m,w,h,hintLayout.inset):null;
   for(let p of ports){paintPortSocket(p,labelMasks);if(draft&&draft.from.id===m.id&&draft.from.port===p.index&&p.kind==='out'){ctx.strokeStyle='#ffee88';ctx.lineWidth=.17;ctx.strokeRect(p.x-.06,p.y-.06,1.12,1.12);}}
  // Compositing order: socket squares < always-visible facing/panel marks < text.
  paintMachineIndicators(m,w,h);
- paintMachineTextAtZoom(m,w,h,z);
- // Connectivity warnings are drawn on the machine itself; they are not hidden behind the audit panel.
- const miss=missingMaterials(m),outputWarning=machineOutputWarning(m);
- if(miss.length||outputWarning){ctx.save();ctx.strokeStyle=miss.length?'#ff657d':'#ffd16e';ctx.lineWidth=.18;ctx.setLineDash([.4,.18]);ctx.strokeRect(m.x+.16,m.y+.16,w-.32,h-.32);ctx.setLineDash([]);
- if(z>=5){
-   ctx.font='bold .84px system-ui';ctx.textAlign='left';ctx.textBaseline='top';
-   if(miss.length){
-    ctx.fillStyle='#ff657d';ctx.fillText('缺料'+miss.length,m.x+.25,m.y+.22,w-.4);
-   }
-   if(outputWarning){
-    ctx.fillStyle='#ffd16e';
-    ctx.fillText(outputWarning,m.x+.25,m.y+(miss.length?1.15:.22),w-.4);
-   }
-  }ctx.restore();}
+ paintMachineTextAtZoom(m,w,h,z,false,hintLayout.inset);
+ // All diagnostics share one border (red takes priority) but each gets its own row.
+ if(hints.lines.length){ctx.save();ctx.strokeStyle=hints.errors.length?'#ff657d':'#ffd16e';ctx.lineWidth=.18;ctx.setLineDash([.4,.18]);ctx.strokeRect(m.x+.16,m.y+.16,w-.32,h-.32);ctx.setLineDash([]);
+ if(hintLayout.rows.length){
+  ctx.font=hintLayout.font;ctx.textAlign='left';ctx.textBaseline='top';
+  hintLayout.rows.forEach((row,i)=>{ctx.fillStyle=row.color;ctx.fillText(row.text,m.x+.25,m.y+.22+i*hintLayout.step);});
+ }ctx.restore();}
  }
  // Machine port squares already indicate the contacts. Never add a separate green port stub.
  // The belt shape in its first outer cell already starts at the appropriate grid edge.
- if(stampType&&hoverCell){let d=DEF[stampType],m=getStampMachine(hoverCell.x,hoverCell.y),[w,h]=dims(m),ok=canPlace(m);ctx.fillStyle=ok?'#4ce4a34b':'#fe547755';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.2;ctx.strokeRect(m.x,m.y,w,h);
+ if(stampType&&hoverCell){let d=DEF[stampType],m=getStampMachine(hoverCell.x,hoverCell.y),[w,h]=dims(m),ok=canPlace(m),warn=ok&&placementPortWarningCount(m)>0;ctx.fillStyle=ok?(warn?'#f3d87540':'#4ce4a34b'):'#fe547755';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?(warn?'#f3d875':'#6ef5b0'):'#ff8f91';ctx.lineWidth=.2;ctx.strokeRect(m.x,m.y,w,h);
  paintPreviewPorts(m);
  paintMachineIndicators(m,w,h);
  paintMachineTextAtZoom(m,w,h,z,true);}
@@ -207,7 +223,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  if(!persisted&&!draft.preview)drawCells(locked,'#f2bf4b',false);
  }
  if(marquee){const m=marquee,a=m.fromWorld||m.from,b=m.toWorld||m.to,x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),w=Math.abs(b.x-a.x),h=Math.abs(b.y-a.y);ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
- if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=r.to&&plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?'rgba(76,228,163,.3)':'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?'#6ef5b0':'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
+ if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=r.to&&plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?(plan.blockedPortsAdded?'rgba(243,216,117,.25)':'rgba(76,228,163,.3)'):'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?(plan.blockedPortsAdded?'#f3d875':'#6ef5b0'):'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
  ctx.strokeStyle='#637991';ctx.lineWidth=.1;ctx.strokeRect(0,0,72,72);ctx.restore();$('beltText').textContent=`${getBeltCount()}格传送带`;}
 function drawMovingPackets(){
  if(!sim)return;
@@ -282,7 +298,7 @@ function onPointerDown(e){
   marquee={from:c,to:c,fromWorld:w,toWorld:{...w}};
   drag={kind:'marquee'};draw();return;
  }
- if(stampType){let m={...getStampMachine(c.x,c.y),id:nextFactoryMachineId()};if(!canPlace(m))return notify('不能放这里：与障碍物、机器或传送带重叠','bad');snapshot();state.machines.push(m);selection={machineId:m.id};afterChange('放置 '+label(m)+'；可继续放置');return;}
+ if(stampType){let m={...getStampMachine(c.x,c.y),id:nextFactoryMachineId()};if(!canPlace(m))return notify('不能放这里：与障碍物、机器或传送带重叠','bad');const blocked=placementPortWarningCount(m);snapshot();state.machines.push(m);selection={machineId:m.id};afterChange('放置 '+label(m)+(blocked?'；新增 '+blocked+' 个堵塞接口，详见工厂检查':'；可继续放置'),{messageStyle:blocked?'warn':'good'});return;}
  if(tool==='erase'){let r=cellRoutes(c.x,c.y).at(-1);if(r)deleteRoute(r.id);else notify('点绿色传送带删除整条线路');return;}
  if(tool==='belt'){
   // A tap may occur without a preceding pointermove (notably on mobile).

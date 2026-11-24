@@ -1,0 +1,60 @@
+
+.ledger-collapse,.frozen-source-name{background:transparent;border:0;color:inherit;cursor:pointer;padding:0;text-align:left;min-width:0}
+.ledger-collapse:hover,.frozen-source-name:hover{color:#91c7e9}
+.frozen-panel,.frozen-source,.frozen-source-body,.frozen-body{min-width:0;max-width:100%;box-sizing:border-box}
+.frozen-body,.frozen-source-body{display:flex;flex-direction:column;gap:7px}
+.frozen-source{padding:7px;border:1px solid #36516b;border-radius:7px;background:#203446}
+.frozen-source-head,.frozen-tools,.frozen-import-row,.frozen-add-row{display:flex;gap:5px;align-items:center;min-width:0;flex-wrap:wrap}
+.frozen-source-name{flex:1;overflow-wrap:anywhere;font-weight:600}
+.frozen-enabled{display:flex;gap:4px;align-items:center;font-size:11px;white-space:nowrap}
+.frozen-source-status{overflow-wrap:anywhere;margin:4px 0}
+.frozen-tools .tiny{flex:1}
+.frozen-source input[type=text],.frozen-source select,.frozen-import-row select{min-width:0;max-width:100%;box-sizing:border-box}
+.frozen-add-row select,.frozen-import-row select{flex:1 1 90px}
+.frozen-add-row input{flex:1 1 65px;width:65px}
+.frozen-rate-table input{width:83px;max-width:100%;padding:3px;font-size:12px}
+.frozen-rate-table th,.frozen-rate-table td{padding:4px}
+.frozen-tools button,.frozen-import-row button,.frozen-add-row button{font-size:11px;white-space:nowrap}
+.ledger-card-body[hidden]{display:none!important}
+
+#warehouse .ledger-head:has(.ledger-collapse[aria-expanded="false"]){margin-bottom:0}
+
+.frozen-source-name{flex:1 1 70px}
+.frozen-enabled{flex:0 0 auto;color:var(--text);cursor:pointer}
+.frozen-source-head .frozen-delete{flex:0 0 auto;padding:3px 7px;font-size:11px;color:var(--danger);background:#1c2a3b;border:1px solid #45566a;border-radius:6px;line-height:1.45}
+.frozen-source-head .frozen-delete:hover{background:#432f3e;border-color:var(--danger)}
+.frozen-source-head .frozen-delete:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* Match the existing inspector's nested flow tiles and editor buttons. */
+#warehouse .frozen-source{
+ background:#203446;border-color:#36516b;border-radius:7px;
+}
+#warehouse .frozen-source-name{
+ color:#b6cddd;font-size:12px;font-weight:560;
+}
+#warehouse .frozen-source-name:hover{color:#e7f3fb;background:transparent}
+#warehouse .frozen-tools button,#warehouse .frozen-import-row button,
+#warehouse .frozen-add-row button,#warehouse .frozen-rate-table button,
+#warehouse .frozen-source-head .frozen-delete{
+ background:#203246;border:1px solid #374e66;color:#cadfeb;
+}
+#warehouse .frozen-tools button:hover:not(:disabled),
+#warehouse .frozen-import-row button:hover:not(:disabled),
+#warehouse .frozen-add-row button:hover:not(:disabled),
+#warehouse .frozen-rate-table button:hover:not(:disabled){
+ background:#2b4358;
+}
+#warehouse .frozen-source-head .frozen-delete,
+#warehouse .frozen-rate-table button{color:#d9a8af;border-color:#634650}
+#warehouse .frozen-source-head .frozen-delete:hover,
+#warehouse .frozen-rate-table button:hover:not(:disabled){background:#432f3e;border-color:#a86876}
+#warehouse .frozen-source input[type=text],
+#warehouse .frozen-source select,#warehouse .frozen-import-row select{
+ background:#162b3d;border-color:#45647a;color:#e7f3fb;
+}
+
+#warehouse .frozen-source-status:empty{display:none}
+
+#warehouse .frozen-import-status{font-size:11px;line-height:1.5;color:var(--ui-muted);overflow-wrap:anywhere}
+#warehouse .frozen-import-status:empty{display:none}
+#warehouse .frozen-import-status.is-error{color:var(--ui-negative)}

@@ -1006,3 +1006,65 @@ test('after partial trim, first machine click deselects and second blank click e
  assert.equal(tool,'select');assert.equal(beltEditExitPending,false);
  assert.equal(state.routes[0].path.length,2);
 }));
+
+test('audit distinguishes valid open ends, connected routes and invalid geometry, and counts missing output separately',()=>run(function(){
+ const src={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},dst={id:'m2',type:'废料',x:18,y:9,face:'E',mode:'标准'};
+ const spare={id:'m3',type:'垃圾',x:35,y:10,face:'E',mode:0};
+ const p=outPort(src,0),q=inPort(dst,0),cells=[[p.ex,p.ey],[p.ex+1,p.ey],[p.ex+2,p.ey]];
+ const r={id:'r1',from:{id:src.id,port:0},to:null,path:cells};
+ state={name:'audit',machines:[src,dst,spare],routes:[r]};
+ let w=warnings();assert.equal(w.openEnds.length,1);assert.equal(w.connectedRoutes,0);assert.equal(w.invalid.length,0);
+ assert(w.noOutputLine.some(x=>x.includes('[m3]')));assert(!w.noOutputLine.some(x=>x.includes('[m1]')));
+ assert(w.openEnds[0].includes('r1'));assert(w.openEnds[0].includes('末端'));
+ r.to={id:dst.id,port:0};assert.deepEqual(cells.at(-1),[q.ex,q.ey]);
+ w=warnings();assert.equal(w.openEnds.length,0);assert.equal(w.connectedRoutes,1);assert.equal(w.invalid.length,0);
+ r.path=[[0,0]];w=warnings();assert.equal(w.invalid.length,1);assert.equal(w.openEnds.length,0);assert.equal(w.connectedRoutes,0);
+}));
+test('audit item registry sorts by numeric game ID and includes unknown imported and frozen items',()=>run(function(){
+ state={name:'audit',machines:[{id:'m1',type:'仓出',x:10,y:10,face:'E',item:'物品#600'},{id:'m2',type:'仓入',x:30,y:10,face:'E',inletItem:'物品#3'}],routes:[],frozenFactories:[{id:'f1',rates:{'物品#443':'1'}}]};
+ const items=auditItemList(),ids=items.map(ast1ItemNumber);assert.deepEqual(ids,[...ids].sort((a,b)=>a-b));assert.equal(items.length,MATERIALS.length+3);assert(items.includes('物品#3')&&items.includes('物品#443')&&items.includes('物品#600'));assert(!items.includes('任意'));
+}));
+
+test('AST1 preserves blocked ports; editor permits placement but audits and warns',()=>run(function(){
+ const a={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},p=outPort(a,0);
+ const b={id:'m2',type:'垃圾',x:p.ex,y:10,face:'E',mode:0};
+ state={name:'blocked game blueprint',machines:[a],routes:[]};
+ assert.equal(canPlace(b),true,'a free exterior port tile is not a physical obstacle');
+ assert.equal(placementPortWarningCount(b),1);
+ assert.equal(canPlace({...b,x:a.x,y:a.y}),false,'machine bodies cannot overlap');
+ const source={machines:[b],routes:[],bounds:{x:b.x,y:b.y,w:dims(b)[0],h:dims(b)[1]}};
+ const plan=createGroupPlan({source,rotation:0,mode:'copy',x:b.x,y:b.y});
+ assert(plan.valid,plan.error);assert.equal(plan.blockedPortsAdded,1);
+ state.machines.push(b);
+ const code=ast1Encode();state=ast1Decode(code);
+ assert.equal(state.machines.length,2);assert.equal(ast1Encode(),code);
+ const result=machinePlacementIssues();
+ assert.equal(result.invalidIds.size,1);assert.equal(result.geometryMessages.length,0);
+ assert.equal(result.blocked.length,1);assert.equal(result.blockedMachineCount,1);
+ assert(result.blocked[0].includes('输出'));assert(result.blocked[0].includes('占住'));
+ state.routes.push({id:'test',from:{id:state.machines[0].id,port:0},to:null,path:[[p.ex,p.ey]]});
+ assert(checkPath(state.routes[0].path,state.routes[0].from,null,'test'),'blocked port cannot be connected through a machine');
+}));
+test('machine audit identifies overlap and central forbidden area separately',()=>run(function(){
+ state={name:'geometry',machines:[{id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},{id:'m2',type:'垃圾',x:11,y:10,face:'E',mode:0},{id:'m3',type:'垃圾',x:30,y:30,face:'E',mode:0}],routes:[]};
+ const result=machinePlacementIssues();assert.equal(result.geometryMessages.length,3);assert.equal(result.invalidIds.size,3);
+ assert(result.geometryMessages.some(x=>x.includes('中央禁区')));assert(result.geometryMessages.some(x=>x.includes('重叠')));
+}));
+
+test('placed machine hint uses red for blocked ports and retains yellow output warning; clearing obstruction removes red hint',()=>run(function(){
+ const a={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},p=outPort(a,0);
+ const b={id:'m2',type:'垃圾',x:p.ex,y:10,face:'E',mode:0};
+ state={name:'blocked hint',machines:[a,b],routes:[]};
+ const events=[];Object.setPrototypeOf(ctx,new Proxy({measureText(text){return {width:String(text).length*.6}},strokeRect(x,y,w,h){events.push({kind:'rect',x,y,color:this.strokeStyle,dash:this.dash||[]})},fillText(text,x,y,...extra){events.push({kind:'text',text,x,y,color:this.fillStyle,font:this.font,extra})},setLineDash(d){this.dash=d.slice()}},{get(t,k){return k in t?t[k]:()=>{}},set(t,k,v){t[k]=v;return true}}));
+ pix={w:600,h:600,dpr:1};camera={x:0,y:0,z:10};selection=null;multiSelection=null;stampType=null;marquee=null;groupTransform=null;beltTrim=null;draft=null;
+ paintMachineTextAtZoom=function(){};paintMachineIndicators=function(){};paintPortSocket=function(){};
+ drawStaticScene();
+ assert(events.some(e=>e.kind==='rect'&&e.x===a.x+.16&&e.color==='#ff657d'&&e.dash.length));
+ assert(events.some(e=>e.kind==='text'&&e.text==='接口堵塞1'&&e.color==='#ff657d'&&e.x===a.x+.25));
+ assert(events.some(e=>e.kind==='text'&&e.text==='无出线'&&e.color==='#ffd16e'));
+ const red=events.find(e=>e.kind==='text'&&e.text==='接口堵塞1'&&e.x===a.x+.25),yellow=events.find(e=>e.kind==='text'&&e.text==='无出线'&&e.x===a.x+.25);assert(red&&yellow&&red.y<yellow.y,'separate rows');assert.equal(red.extra.length,0);assert.equal(yellow.extra.length,0);const multi=machineHintLayout({lines:[{text:'接口堵塞12',color:'#ff657d'},{text:'缺料2',color:'#ff657d'},{text:'出线悬空',color:'#ffd16e'}]},3,3,10);assert(multi.rows.length===3&&multi.inset<1.5);assert(parseFloat(multi.font.replace('bold ',''))<.84);
+ assert(!events.some(e=>e.kind==='rect'&&e.x===b.x+.16&&e.color==='#ff657d'));
+ b.x=22;events.length=0;drawStaticScene();
+ assert(!events.some(e=>e.kind==='text'&&e.text.includes('接口堵塞')));
+ assert(events.some(e=>e.kind==='rect'&&e.x===a.x+.16&&e.color==='#ffd16e'&&e.dash.length));
+}));

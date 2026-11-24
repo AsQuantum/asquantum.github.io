@@ -230,14 +230,17 @@ function machineLabelLines(m){let r=getRecipe(m),result=[{text:def(m).name,color
 // Rectangles occupied by input/output text. Socket squares are clipped only
 // where their outlines would cross these labels; no opaque rectangle is ever
 // painted over the machine body, panel marks or belts.
-function machineMaterialTextBounds(m,w,h){
+function machineLabelGeometry(m,h,lineCount,topInset=0){
+ const available=Math.max(.1,h-topInset-.5),spacing=Math.min(1.04,available/lineCount);
+ const heightLimit=topInset?Math.min(.83,spacing*.80):Math.max(.48,Math.min(.83,(h-.54)/lineCount));
+ return {heightLimit,spacing,base:m.y+topInset+(h-topInset)/2-(lineCount-1)*spacing/2};
+}
+function machineMaterialTextBounds(m,w,h,topInset=0){
  // The headless geometry-only test painter has no text metrics; browsers do.
  if(typeof ctx.measureText!=='function')return [];
  const lines=machineLabelLines(m);
  if(!lines.length)return [];
- const heightLimit=Math.max(.48,Math.min(.83,(h-.54)/lines.length));
- const spacing=Math.min(1.04,(h-.5)/lines.length);
- const base=m.y+h/2-(lines.length-1)*spacing/2;
+ const {heightLimit,spacing,base}=machineLabelGeometry(m,h,lines.length,topInset);
  const bounds=[];
  ctx.save();
  lines.forEach((line,i)=>{
@@ -259,9 +262,8 @@ function machineMaterialTextBounds(m,w,h){
  ctx.restore();
  return bounds;
 }
-function paintMachineText(m,w,h,preview=false){const lines=machineLabelLines(m);if(!lines.length)return;
- const heightLimit=Math.max(.48,Math.min(.83,(h-.54)/lines.length));
- const spacing=Math.min(1.04,(h-.5)/lines.length),base=m.y+h/2-(lines.length-1)*spacing/2;
+function paintMachineText(m,w,h,preview=false,topInset=0){const lines=machineLabelLines(m);if(!lines.length)return;
+ const {heightLimit,spacing,base}=machineLabelGeometry(m,h,lines.length,topInset);
  ctx.textAlign='center';ctx.textBaseline='middle';
  lines.forEach((line,i)=>{let sz=i===0?Math.min(1.04,heightLimit*1.22):heightLimit;ctx.font=(line.bold?'bold ':'')+sz+'px system-ui, "Microsoft YaHei", sans-serif';ctx.fillStyle=line.color;
   // Fit with proportional font size; never use fillText(maxWidth), which
@@ -297,10 +299,9 @@ function reserved(x,y){return x>=29&&x<43&&y>=29&&y<43;}
 function rectOverlap(x,y,w,h,a,b,c,d){return x<a+c&&x+w>a&&y<b+d&&y+h>b}
 function cellMachine(x,y,except){return state.machines.find(m=>m.id!==except&&x>=m.x&&y>=m.y&&x<m.x+dims(m)[0]&&y<m.y+dims(m)[1])}
 function cellRoutes(x,y){return state.routes.filter(r=>r.path.some(p=>p[0]===x&&p[1]===y))}
-// Unconnected splitter outputs and merger inputs are optional contact edges.
-// A neighboring machine may occupy their exterior tiles. Every connected port
-// remains protected by its belt tile and checkPath(), and a merger's output
-// remains a required clear port even when not connected.
+// Necessary ports are audited for accessibility, not reserved for placement.
+// Unused splitter outputs, merger inputs and computer inputs are optional.
+// Connected belt tiles remain protected by physical collision checks.
 function needsClearOutside(m,p){
   // Consumer inlet is optional; it needs exterior clearance only while wired.
   if(m.type==='电脑'&&p.kind==='in'&&!routeFor(m.id,'in',p.index))return false;
@@ -309,17 +310,18 @@ function needsClearOutside(m,p){
  return true;
 }
 function canPlace(m,exceptId=m.id){
- const [w,h]=dims(m);if(m.x<0||m.y<0||m.x+w>W||m.y+h>H)return false;
- // Reserve exterior contact tiles only for real/required machine ports.
- // Unused splitter outputs and merger inputs do not force a one-tile gap.
- const outsideOtherPorts=new Set();
- for(const o of state.machines)if(o.id!==exceptId)for(const p of getPorts(o))
-  if(needsClearOutside(o,p))outsideOtherPorts.add(p.ex+','+p.ey);
+ const [w,h]=dims(m);if(![m.x,m.y,w,h].every(Number.isInteger)||w<=0||h<=0||m.x<0||m.y<0||m.x+w>W||m.y+h>H)return false;
  for(let yy=m.y;yy<m.y+h;yy++)for(let xx=m.x;xx<m.x+w;xx++)
-  if(reserved(xx,yy)||cellMachine(xx,yy,exceptId)||cellRoutes(xx,yy).length||outsideOtherPorts.has(xx+','+yy))return false;
- // Only active/required candidate ports must face a clear exterior tile.
- for(const p of getPorts(m))if(needsClearOutside(m,p)&&inMap(p.ex,p.ey)&&cellMachine(p.ex,p.ey,exceptId))return false;
+  if(reserved(xx,yy)||cellMachine(xx,yy,exceptId)||cellRoutes(xx,yy).length)return false;
  return true;
+}
+// Soft warning for a newly placed machine, including ports of its neighbours.
+function placementPortWarningCount(m){
+ const [w,h]=dims(m);let count=0;
+ for(const p of getPorts(m))if(needsClearOutside(m,p)&&(!inMap(p.ex,p.ey)||reserved(p.ex,p.ey)||cellMachine(p.ex,p.ey,m.id)))count++;
+ for(const other of state.machines)if(other.id!==m.id)for(const p of getPorts(other))
+  if(needsClearOutside(other,p)&&p.ex>=m.x&&p.ex<m.x+w&&p.ey>=m.y&&p.ey<m.y+h)count++;
+ return count;
 }
 function findFree(m,hintX=9,hintY=2){let cand=[];for(let y=0;y<72;y++)for(let x=0;x<72;x++){let v={...m,x,y};if(canPlace(v)){let score=Math.abs(x-hintX)+Math.abs(y-hintY)+Math.random()*0.0001;cand.push([score,x,y]);}}cand.sort((a,b)=>a[0]-b[0]);return cand.length?{x:cand[0][1],y:cand[0][2]}:null;}
 function machineById(id){return state.machines.find(m=>m.id===id)}

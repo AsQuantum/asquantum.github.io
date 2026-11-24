@@ -44,14 +44,20 @@ function factorySteadyAutomaticFluidModel(layout=state,model=null,{unlimitedWare
   }
  }
  if(issues.length)return {status:'unresolved',issues,actualLongRunRatesSolved:false};
+ const frozen=typeof activeFrozenFactories==='function'?activeFrozenFactories(layout):[];
+ const frozenItems=[...new Set(frozen.flatMap(f=>Object.keys(f.rates)))];
  const startup=typeof factorySteadyGenericStartupReachability==='function'?
-  factorySteadyGenericStartupReachability(layout,{initialWarehouseItems:unlimitedWarehouse?(model.warehousePools||[]).map(p=>p.item):[]}):null;
+  factorySteadyGenericStartupReachability(layout,{initialWarehouseItems:unlimitedWarehouse?[...(model.warehousePools||[]).map(p=>p.item),...frozenItems]:[],frozenFactories:frozen}):null;
  const noMaterial=lines.map(r=>!r.materials.length);
  const disabled=lines.map((r,i)=>noMaterial[i]||
   (startup&&!(startup.potentiallyActiveItemsByRoute[r.route]||[]).length));
  const groups=(model.warehousePools||[]).map(p=>({item:p.item,
   inbound:lines.map((r,i)=>[r,i]).filter(([r])=>nodes.get(r.to.id).type==='仓入'&&r.materials.includes(p.item)).map(([,i])=>i),
   outbound:p.withdrawalMachineOrder.flatMap(id=>outs.get(id)||[])}));
+ for(const item of frozenItems)if(!groups.some(g=>g.item===item))groups.push({item,inbound:[],outbound:[]});
+ const frozenReachable=frozen.map(f=>unlimitedWarehouse||Object.entries(f.rates).every(([item,rate])=>frozenRateNumber(rate)>=0||!startup||startup.potentiallyStockedItems.includes(item)));
+ const frozenQ=frozen.map(f=>Object.fromEntries(Object.entries(f.rates).map(([k,v])=>[k,steadyRegionQ(v)])));
+ const frozenF=frozen.map(f=>Object.fromEntries(Object.entries(f.rates).map(([k,v])=>[k,frozenRateNumber(v)])));
  const recipeGroups=new Map();
  for(const m of nodes.values()){
   const r=getRecipe(m);if(!r)continue;
@@ -105,7 +111,7 @@ function factorySteadyAutomaticFluidModel(layout=state,model=null,{unlimitedWare
   }
   return lines.map((_,i)=>read(i));
  }
- function evaluate(s,d,o){
+ function evaluate(s,d,a,o){
   const {min,sum,bounded,water}=operators(o);
   const x=s.map((a,i)=>disabled[i]?o.zero:min(a,d[i]));
   const material=materialRates(x,o);
@@ -156,9 +162,32 @@ function factorySteadyAutomaticFluidModel(layout=state,model=null,{unlimitedWare
   }
   // Shared warehouse per material: strict continuous priority, not an
   // assertion about the exact finite reservation FIFO schedule.
+  // Frozen factories have priority in list order, before new warehouse
+  // reservations. Positive output of every source is coupled to its duty.
+  const fr=o===Q?frozenQ:frozenF,available=new Map();
+  for(const g of groups)available.set(g.item,sum(g.inbound.map(i=>material[i].get(g.item)||o.zero)));
+  for(let j=0;j<fr.length;j++)for(const [item,rate] of Object.entries(fr[j]))
+   if(o.cmp(rate,o.zero)>0)available.set(item,o.add(available.get(item)||o.zero,o.mul(rate,a[j])));
+  const na=[],latentFrozenDemand={};
+  for(let j=0;j<fr.length;j++){
+   let duty=frozenReachable[j]?o.one:o.zero;
+   if(!unlimitedWarehouse)for(const [item,rate] of Object.entries(fr[j]))if(o.cmp(rate,o.zero)<0)
+    duty=min(duty,bounded(o.div(available.get(item)||o.zero,o.sub(o.zero,rate))));
+   // Counterfactual demand for one material holds the other current
+   // bottlenecks and all prior withdrawals fixed (like recipe inputs).
+   const needs=Object.entries(fr[j]).filter(([,rate])=>o.cmp(rate,o.zero)<0);
+   for(const [item,rate] of needs){
+    let other=o.one;
+    for(const [k,v] of needs)if(k!==item)other=min(other,bounded(o.div(available.get(k)||o.zero,o.sub(o.zero,v))));
+    latentFrozenDemand[item]=o.add(latentFrozenDemand[item]||o.zero,o.mul(other,o.sub(o.zero,rate)));
+   }
+   na.push(duty);
+   for(const [item,rate] of Object.entries(fr[j]))if(o.cmp(rate,o.zero)<0)
+    available.set(item,o.add(available.get(item)||o.zero,o.mul(rate,duty)));
+  }
   for(const g of groups){
    if(unlimitedWarehouse){for(const i of g.outbound)ns[i]=o.one;continue;}
-   let remaining=sum(g.inbound.map(i=>material[i].get(g.item)||o.zero));
+   let remaining=available.get(g.item)||o.zero;
    for(const i of g.outbound){
     ns[i]=bounded(remaining);
     remaining=o.sub(remaining,min(ns[i],disabled[i]?o.zero:d[i]));
@@ -167,7 +196,7 @@ function factorySteadyAutomaticFluidModel(layout=state,model=null,{unlimitedWare
   for(let i=0;i<lines.length;i++){
    ns[i]=disabled[i]?o.zero:bounded(ns[i]);nd[i]=noMaterial[i]?o.zero:bounded(nd[i]);
   }
-  return {s:ns,d:nd};
+  return {s:ns,d:nd,a:na,latentFrozenDemand};
  }
  // Discover the active fixed point numerically (no time or item simulation).
  // Reconstruct bounded rational values and re-evaluate ALL equations with
@@ -187,22 +216,26 @@ function factorySteadyAutomaticFluidModel(layout=state,model=null,{unlimitedWare
  }
  function solve({maxIterations=12000,tolerance=1e-11,high=false,deadline=Infinity}={}){
   let s=lines.map((_,i)=>disabled[i]?0:high?1:0),d=lines.map((_,i)=>noMaterial[i]?0:1);
+  let a=frozen.map((_,j)=>frozenReachable[j]&&high?1:0);
   let residual=Infinity,iterations=0;
   try{
    for(;iterations<maxIterations;iterations++){
     if(deadline!==Infinity&&iterations%32===0&&performance.now()>=deadline)return {status:'unresolved',reason:'fluid fixed point time budget exceeded',retryable:true,iterations,residual};
-    const next=evaluate(s,d,F);
+    const next=evaluate(s,d,a,F);
     residual=0;
     for(let i=0;i<lines.length;i++){
      residual=Math.max(residual,Math.abs(next.s[i]-s[i]),Math.abs(next.d[i]-d[i]));
     }
+    for(let j=0;j<a.length;j++)residual=Math.max(residual,Math.abs(next.a[j]-a[j]));
     if(residual<tolerance)break;
+    a=a.map((v,j)=>(v+next.a[j])/2);
     s=s.map((v,i)=>(v+next.s[i])/2);
     d=d.map((v,i)=>(v+next.d[i])/2);
    }
    if(residual>=tolerance)return {status:'unresolved',reason:'fluid fixed point did not converge',retryable:true,iterations,residual};
-   const sq=s.map(rational),dq=d.map(rational);
-   const exact=evaluate(sq,dq,Q);
+   const sq=s.map(rational),dq=d.map(rational),aq=a.map(rational);
+   const exact=evaluate(sq,dq,aq,Q);
+   if(aq.some((v,j)=>steadyExactCmp(v,exact.a[j])))throw Error('frozen duty exact residual');
    if(sq.some((v,i)=>steadyExactCmp(v,exact.s[i])||steadyExactCmp(dq[i],exact.d[i])))
     return {status:'unresolved',reason:'rational fixed point fails exact local equations',iterations,residual};
    const x=sq.map((v,i)=>steadyExactMin(v,dq[i]));
@@ -234,15 +267,31 @@ function factorySteadyAutomaticFluidModel(layout=state,model=null,{unlimitedWare
    for(const [item,g] of Object.entries(model.warehouseFlow)){
     inflow[item]=steadyExactSum(g.inflow.map(t=>point.get(t)||STEADY_ZERO));
     outflow[item]=steadyExactSum(g.outflow.map(t=>point.get(t)||STEADY_ZERO));
-    if(!unlimitedWarehouse&&steadyExactCmp(inflow[item],outflow[item])<0)throw Error('warehouse depletion '+item);
+
    }
    // Snapshot of the unconstrained withdrawal demand at THIS fixed point.
    // Do not re-solve the rest of the network or increase other suppliers.
+   const localInflow={...inflow},localOutflow={...outflow},frozenDuty={},frozenInflow={},frozenOutflow={},frozenDemand=exact.latentFrozenDemand;
+   for(let j=0;j<frozen.length;j++){
+    frozenDuty[frozen[j].id]=aq[j];point.set('frozen:'+frozen[j].id,aq[j]);
+    for(const [item,rate] of Object.entries(frozenQ[j])){
+     const actual=steadyExactMul(rate,aq[j]);
+     if(steadyExactCmp(rate,STEADY_ZERO)>0)frozenInflow[item]=steadyExactAdd(frozenInflow[item]||STEADY_ZERO,actual);
+     else{
+      frozenOutflow[item]=steadyExactSub(frozenOutflow[item]||STEADY_ZERO,actual);
+     }
+    }
+   }
+   for(const item of frozenItems){
+    inflow[item]=steadyExactAdd(inflow[item]||STEADY_ZERO,frozenInflow[item]||STEADY_ZERO);
+    outflow[item]=steadyExactAdd(outflow[item]||STEADY_ZERO,frozenOutflow[item]||STEADY_ZERO);
+   }
+   if(!unlimitedWarehouse)for(const item of Object.keys(inflow))if(steadyExactCmp(inflow[item],outflow[item])<0)throw Error('warehouse depletion '+item);
    const withdrawalDemand={},potentialNet={};
-   for(const g of groups)withdrawalDemand[g.item]=steadyExactSum(g.outbound.map(i=>dq[i]));
+   for(const g of groups)withdrawalDemand[g.item]=steadyExactAdd(steadyExactSum(g.outbound.map(i=>dq[i])),frozenDemand[g.item]||STEADY_ZERO);
    for(const item of new Set([...Object.keys(inflow),...Object.keys(withdrawalDemand)]))
     potentialNet[item]=steadyExactSub(inflow[item]||STEADY_ZERO,withdrawalDemand[item]||STEADY_ZERO);
-   return {status:'conditional-fixed-point',iterations,residual,point,cycles,inflow,outflow,withdrawalDemand,potentialNet,
+   return {status:'conditional-fixed-point',iterations,residual,point,cycles,inflow,outflow,localInflow,localOutflow,frozenDuty,frozenInflow,frozenOutflow,withdrawalDemand,potentialNet,
     routeFlows:Object.fromEntries(lines.map((r,i)=>[r.route,Object.fromEntries(rates[i])])),
     exactLocalEquations:true,actualLongRunRatesSolved:false};
   }catch(e){return {status:'unresolved',reason:e.message,iterations,residual};}
@@ -272,8 +321,9 @@ function factorySteadyAutomaticFluidBudget(layout=state,model=null,options={}){
  return {status:'conditional-fixed-point',warehouseSupply:options.unlimitedWarehouse?'unlimited':'constrained',inflow:numbers(low.inflow),outflow:numbers(low.outflow),
   withdrawalDemand:demandConsistent?numbers(low.withdrawalDemand):null,
   potentialNet:demandConsistent?numbers(low.potentialNet):null,
+  localInflow:numbers(low.localInflow),localOutflow:numbers(low.localOutflow),frozenDuty:numbers(low.frozenDuty),frozenInflow:numbers(low.frozenInflow),frozenOutflow:numbers(low.frozenOutflow),
   machineCycles:numbers(low.cycles),routeFlows:Object.fromEntries(Object.entries(low.routeFlows).map(([id,items])=>[id,numbers(items)])),
-  fractions:{inflow:fractions(low.inflow),outflow:fractions(low.outflow),machineCycles:fractions(low.cycles),withdrawalDemand:demandConsistent?fractions(low.withdrawalDemand):null,potentialNet:demandConsistent?fractions(low.potentialNet):null,
+  fractions:{localInflow:fractions(low.localInflow),localOutflow:fractions(low.localOutflow),frozenDuty:fractions(low.frozenDuty),inflow:fractions(low.inflow),outflow:fractions(low.outflow),machineCycles:fractions(low.cycles),withdrawalDemand:demandConsistent?fractions(low.withdrawalDemand):null,potentialNet:demandConsistent?fractions(low.potentialNet):null,
    routes:Object.fromEntries(Object.entries(low.routeFlows).map(([id,items])=>[id,fractions(items)]))},
   iterations:[low.iterations,high.iterations],exactLocalEquations:true,actualLongRunRatesSolved:false,
   assumptions:compiled.assumptions,

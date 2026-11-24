@@ -4,17 +4,17 @@
 select{
  color-scheme:dark;
  scrollbar-width:thin;
- scrollbar-color:#648ba1 #112638;
+ scrollbar-color:var(--ui-control-border) var(--ui-field);
 }
 select option,select optgroup{
- background-color:#172b3e;
- color:#e5f2ff;
+ background-color:var(--ui-card);
+ color:var(--ui-text);
 }
-select option:disabled{color:#849eac}
+select option:disabled{color:var(--ui-muted)}
 select::-webkit-scrollbar{width:9px}
-select::-webkit-scrollbar-track{background:#112638}
+select::-webkit-scrollbar-track{background:var(--ui-field)}
 select::-webkit-scrollbar-thumb{
- background:#648ba1;border:2px solid #112638;border-radius:8px;
+ background:var(--ui-control-border);border:2px solid var(--ui-field);border-radius:8px;
 }
 /* Chromium 135+/modern browsers support author-styled native SELECT pickers.
    This is required because OS popups ignore option:hover background CSS and
@@ -32,25 +32,25 @@ select::-webkit-scrollbar-thumb{
  .inspector-machine .machine-field select:not([multiple]){
   display:flex;align-items:center;justify-content:space-between;
   box-sizing:border-box;min-height:35px;height:35px;max-height:35px;
-  padding:5px 8px;border:1px solid #45647a;border-radius:7px;
-  background:#162b3d;color:#e7f3fb;font-size:12px;
+  padding:5px 8px;border:1px solid var(--ui-control-border);border-radius:7px;
+  background:var(--ui-field);color:var(--ui-text);font-size:12px;
  }
  .inspector-machine .machine-port-bottom select:not([multiple]){
   display:flex;align-items:center;justify-content:space-between;
   min-height:28px;height:28px;max-height:28px;
-  padding:3px 7px;background:#162b3d;border-color:#45647a;
+  padding:3px 7px;background:var(--ui-field);border-color:var(--ui-control-border);
  }
  .machine-library .machine-config-field select:not([multiple]){
   display:flex;align-items:center;justify-content:space-between;
   box-sizing:border-box;min-height:34px;height:34px;max-height:34px;
-  padding:5px 8px;background:#162b3d;color:#e7f3fb;
-  border:1px solid #45647a;border-radius:7px;font-size:12px;
+  padding:5px 8px;background:var(--ui-field);color:var(--ui-text);
+  border:1px solid var(--ui-control-border);border-radius:7px;font-size:12px;
  }
  .top .sim-toolbar .sim-speed select:not([multiple]){
   display:inline-flex;align-items:center;justify-content:space-between;
   box-sizing:border-box;min-height:30px;height:30px;max-height:30px;
-  padding:3px 6px;background:#162b3d;border-color:#45647a;
-  color:#e7f3fb;font-size:11.5px;line-height:1;
+  padding:3px 6px;background:var(--ui-field);border-color:var(--ui-control-border);
+  color:var(--ui-text);font-size:11.5px;line-height:1;
  }
  select:not([multiple])::picker-icon{
   flex:0 0 auto;align-self:center;
@@ -61,9 +61,9 @@ select::-webkit-scrollbar-thumb{
  select:not([multiple]):open::picker-icon{transform:rotate(180deg)}
  ::picker(select){
   color-scheme:dark;
-  color:#e5f2ff;
-  background:#132a3d;
-  border:1px solid #3c6478;
+  color:var(--ui-text);
+  background:var(--ui-card);
+  border:1px solid var(--ui-control-border);
   border-radius:8px;
   box-shadow:0 13px 28px #020d19bf;
   padding:4px;
@@ -71,7 +71,7 @@ select::-webkit-scrollbar-thumb{
   overflow-y:auto;
   overscroll-behavior:contain;
   scrollbar-width:thin;
-  scrollbar-color:#648ba1 #112638;
+  scrollbar-color:var(--ui-control-border) var(--ui-field);
   opacity:0;
   transform:translateY(-6px) scale(.985);
   transform-origin:top center;
@@ -93,26 +93,26 @@ select::-webkit-scrollbar-thumb{
   }
  }
  ::picker(select)::-webkit-scrollbar{width:9px}
- ::picker(select)::-webkit-scrollbar-track{background:#112638}
+ ::picker(select)::-webkit-scrollbar-track{background:var(--ui-field)}
  ::picker(select)::-webkit-scrollbar-thumb{
-  background:#648ba1;border:2px solid #112638;border-radius:8px;
+  background:var(--ui-control-border);border:2px solid var(--ui-field);border-radius:8px;
  }
  select:not([multiple]) option{
   display:flex;align-items:center;min-height:30px;
   padding:7px 10px;margin:1px 0;
-  border-radius:5px;background:#172b3e;color:#e5f2ff;
+  border-radius:5px;background:var(--ui-card);color:var(--ui-text);
   font-size:inherit;
  }
  select:not([multiple]) option:checked{
-  background:#215148;color:#f1fff9;
+  background:var(--ui-selection);color:var(--ui-heading);
  }
  select:not([multiple]) option:is(:hover,:focus,:focus-visible),
  select:not([multiple]) option:checked:is(:hover,:focus,:focus-visible){
-  background:#2b5971;color:#f8ffff;
+  background:var(--ui-hover);color:var(--ui-heading);
  }
- select:not([multiple]) option::checkmark{color:#82dbba}
- select:not([multiple])::picker-icon{color:#b7d2df}
- select:not([multiple]):open{border-color:#76afaa}
+ select:not([multiple]) option::checkmark{color:var(--ui-positive)}
+ select:not([multiple])::picker-icon{color:var(--ui-label)}
+ select:not([multiple]):open{border-color:var(--ui-focus)}
 }
 /* In older native widgets CSS can't override the system hover highlight;
    all supported browsers still receive the standard dark color-scheme. */

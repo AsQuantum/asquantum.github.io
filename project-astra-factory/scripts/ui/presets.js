@@ -63,7 +63,7 @@ function schemeCanUseAST(src,decoded){
 function encodeScheme(layout=state){
  const json=compactFactoryJSON(layout);
  // AST1 stores the current state only when no information would be lost.
- if(layout!==state||!layout.machines.length)return {json};
+ if(layout!==state||!layout.machines.length||layout.frozenFactories?.length)return {json};
  try{
   const ast=ast1Encode();
   if(ast.length<json.length&&schemeCanUseAST(layout,ast1Decode(ast)))return {ast};
@@ -245,7 +245,7 @@ function importOverwriteScheme(input,{kind='json',astCode=''}={}){
  const preserved=copy(state);
  const previousSchemeId=solverSchemeId;
  const previousName=target.name;
- const loaded={...parsed,name:previousName};
+ const loaded={...parsed,name:previousName,...(kind==='ast'&&preserved.frozenFactories!==undefined?{frozenFactories:preserved.frozenFactories}:{})};
  solverSchemePaused=true;
  try{
   loadState(loaded);

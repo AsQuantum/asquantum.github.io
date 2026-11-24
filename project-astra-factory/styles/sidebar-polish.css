@@ -353,13 +353,13 @@
 #inspector .machine-summary-metrics>div:first-child{padding-left:0}
 #inspector .machine-summary-metrics>div:last-child{padding-right:0}
 /* Warehouse cards receive the same one-surface/row-based hierarchy. */
-.side.right .ledger-panel{background:#203548;border:1px solid #45617a;padding:10px;border-radius:8px}
-.side.right .ledger-panel .ledger-head strong{font-size:12.5px;color:#e7f2f8}
-.side.right .ledger-panel .ledger-mini{display:block}
-.side.right .ledger-panel .ledger-mini>div{display:flex;align-items:baseline;justify-content:space-between;
+.side.right :is(.ledger-panel,.frozen-panel){background:#203548;border:1px solid #45617a;padding:10px;border-radius:8px}
+.side.right :is(.ledger-panel,.frozen-panel) .ledger-head strong{font-size:12.5px;color:#e7f2f8}
+.side.right :is(.ledger-panel,.frozen-panel) .ledger-mini{display:block}
+.side.right :is(.ledger-panel,.frozen-panel) .ledger-mini>div{display:flex;align-items:baseline;justify-content:space-between;
  gap:8px;background:transparent;border-bottom:1px solid #3b556b;border-radius:0;padding:7px 2px}
-.side.right .ledger-panel .ledger-mini span{font-size:11.5px;color:#bad2de}
-.side.right .ledger-panel .ledger-mini b{font-size:13px;color:#e2f5ed}
+.side.right :is(.ledger-panel,.frozen-panel) .ledger-mini span{font-size:11.5px;color:#bad2de}
+.side.right :is(.ledger-panel,.frozen-panel) .ledger-mini b{font-size:13px;color:#e2f5ed}
 .side.right .ledger-table th{color:#c0d8e5;font-size:11px}
 .side.right .ledger-table td{color:#d9e9f4}
 
@@ -380,7 +380,7 @@
 #inspector .machine-summary,
 #inspector .machine-properties,
 #inspector .machine-analysis-panel,
-.side.right .ledger-panel{
+.side.right :is(.ledger-panel,.frozen-panel){
  background:#1d2b3d;
  border-color:#2d4159;
 }
@@ -396,7 +396,7 @@
 #inspector .machine-port-details-section,
 #inspector .machine-port-detail-row,
 #inspector .machine-live-detail .kv{border-color:#304458}
-.side.right .ledger-panel .ledger-mini>div{border-bottom-color:#304458}
+.side.right :is(.ledger-panel,.frozen-panel) .ledger-mini>div{border-bottom-color:#304458}
 .machine-library .machine-palette button[data-stamp]{background:#1b2939}
 .machine-library .machine-palette button[data-stamp]:hover{background:#253a50}
 .machine-library #search{background:#0c1521;border-color:#344659}

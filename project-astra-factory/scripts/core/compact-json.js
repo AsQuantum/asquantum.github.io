@@ -151,7 +151,7 @@ function compactFactoryLayout(layout=state){
   return row;
  });
  return {format:FACTORY_JSON_FORMAT,version:FACTORY_JSON_VERSION,
-  name:layout.name||'工厂布局',machines,routes};
+  name:layout.name||'工厂布局',machines,routes,...(layout.frozenFactories?.length?{frozenFactories:normalizeFrozenFactories(layout.frozenFactories)}:{})};
 }
 function expandCompactFactoryLayout(source){
  if(!source||source.format!==FACTORY_JSON_FORMAT||
@@ -203,6 +203,6 @@ function expandCompactFactoryLayout(source){
   return {...props,id:'R'+i,from,to,path:r.path.map(p=>p.slice())};
  });
  return {name:typeof source.name==='string'?source.name:'导入的工厂布局',
-  recordIndexed:true,machines,routes};
+  recordIndexed:true,machines,routes,...(source.frozenFactories!==undefined?{frozenFactories:normalizeFrozenFactories(source.frozenFactories)}:{})};
 }
 function compactFactoryJSON(layout=state){return JSON.stringify(compactFactoryLayout(layout));}
