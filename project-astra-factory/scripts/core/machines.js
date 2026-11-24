@@ -214,10 +214,10 @@ function machineLabelLines(m){let r=getRecipe(m),result=[{text:def(m).name,color
  for(let slot=0;slot<3;slot++){
    const p=outPort(m,ast1FilterPortFromGame(m,slot));
    if(!p)continue;
-   const filter=p.filter&&p.filter!=='任意'?p.filter:'any';
+   const filter=p.filter&&p.filter!=='任意'?p.filter:'任意';
    result.push({text:portDirectionArrow(p.side)+' '+filter,color:MACHINE_OUTPUT_LABEL_COLOR});
   }
- } else if(m.type==='仓入')result.push({text:m.inletItem||'any',color:MACHINE_INPUT_LABEL_COLOR});
+ } else if(m.type==='仓入')result.push({text:m.inletItem||'任意',color:MACHINE_INPUT_LABEL_COLOR});
  else if(m.type==='仓出'){
   result.push({text:(m.item||'未指定')+' ×1',color:MACHINE_OUTPUT_LABEL_COLOR});
   result.push({text:warehouseOutletTimeLabel(m),color:'#d4f4e4'});

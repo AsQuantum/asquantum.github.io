@@ -178,3 +178,16 @@ test('Canvas input/output text uses fixed pale colors, never per-item randomized
  const inputMachine={type:'仓入',face:'E',inletItem:'物品#462'};
  assert.equal(machineLabelLines(inputMachine)[1].color,MACHINE_INPUT_LABEL_COLOR);
 }));
+
+test('unrestricted warehouse and splitter labels use 任意 while preserving AST1 encoding',()=>run(function(){
+ const inlet={id:'M0',type:'仓入',x:10,y:10,face:'E',inletItem:''};
+ const splitter={id:'M1',type:'分流',x:20,y:10,face:'E',outFilters:{}};
+ state={name:'unrestricted',recordIndexed:true,machines:[inlet,splitter],routes:[]};
+ assert.equal(machineLabelLines(inlet)[1].text,'任意');
+ assert.equal(machineLabelLines(splitter).slice(1).length,3);
+ assert(machineLabelLines(splitter).slice(1).every(x=>/^[↑↓←→] 任意$/.test(x.text)));
+ const code=ast1Encode();state=ast1Decode(code);
+ assert.equal(ast1Encode(),code);
+ assert.equal(machineLabelLines(state.machines[0])[1].text,'任意');
+ assert(machineLabelLines(state.machines[1]).slice(1).every(x=>x.text.endsWith('任意')));
+}));

@@ -32,6 +32,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
 
 
 
+  assert.equal(await evaluate("document.querySelector('[data-ledger-toggle=theory] strong')?.textContent.trim()||document.querySelector('[data-ledger-toggle=theory]')?.textContent.trim().replace(/^[▸▾]\\s*/,'')"),'长期理论收支');
   const initial=await evaluate("(()=>{const cards=[...document.querySelectorAll('[data-ledger-toggle]')],style=e=>{const s=getComputedStyle(e);return [s.backgroundColor,s.borderColor,s.borderRadius,s.padding]};return {closed:cards.length===3&&cards.every(b=>b.getAttribute('aria-expanded')==='false'),header:$('warehousePanel').querySelector('summary').textContent,styles:[style($('warehouseFrozen')),...[...document.querySelectorAll('#warehouse .ledger-panel')].map(style)],copy:!!document.querySelector('[data-copy-frozen-net]')}})()");
   assert(initial.closed);assert.equal(initial.header,'仓库材料');assert(!initial.copy);assert(initial.styles.every(v=>JSON.stringify(v)===JSON.stringify(initial.styles[0])),JSON.stringify(initial.styles));
   const source=await evaluate("(()=>({id:solverSchemeId,name:state.name,snapshot:frozenSnapshot(theoreticalBudget,state.name)}))()");

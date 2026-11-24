@@ -283,7 +283,7 @@ function onPointerDown(e){
  if(!e._mobileCommit&&e.button===0&&tool==="belt"&&
     typeof mobileEditorActive==="function"&&mobileEditorActive()){
   const p=eventCoords(e),c=screenToCell(p.x,p.y),hit=portAt(c.x,c.y);
-  const sourceStart=!draft&&!selection?.routeId&&!beltEditExitPending&&hit?.p.kind==="out";
+  const sourceStart=!draft&&!beltTrim&&!beltPostTrimRouteId&&!beltEditExitPending&&hit?.p.kind==="out"&&!routeFor(hit.m.id,"out",hit.p.index);
   if(sourceStart)onPointerDown({button:0,pointerId:e.pointerId,clientX:e.clientX,clientY:e.clientY,pointerType:e.pointerType,_mobileCommit:true});
   drag={kind:"mobile-belt-gesture",pointerId:e.pointerId,startCell:c,sourceStart};
   hoverCell=c;
@@ -397,8 +397,11 @@ function onPointerDown(e){
     selection=null;setTool('select');inspectorRefresh();draw();return;
    }
    if(selection?.routeId){
-    clearBeltTrimSelection({awaitExit:true});return;
-   }
+     // A completed placement is not an active edit session.
+     const exiting=beltPostTrimRouteId===selection.routeId;
+     clearBeltTrimSelection({awaitExit:exiting});
+     if(exiting)return;
+    }
    if(hit?.p.kind==='out'){
     if(routeFor(hit.m.id,'out',hit.p.index))
      return notify('该输出口已有线路；请点击对应传送带进行编辑','bad');

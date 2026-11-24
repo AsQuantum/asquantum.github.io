@@ -71,6 +71,16 @@ async function until(f){
   assert.equal(connected.to,'M1');
   assert(connected.middle);
   assert.equal(await js('selection?.routeId'),'R0','newly saved belt remains selected');
+
+  // Complete another route with a single real touch drag, without changing tools.
+  const second=await js("(()=>{const a={id:'M2',type:'垃圾',mode:0,x:2,y:19,face:'E'},b={id:'M3',type:'废料',mode:'标准',x:20,y:19,face:'E'};b.y+=outPort(a,0).ey-inPort(b,0).ey;state.machines.push(a,b);const rect=canvas.getBoundingClientRect(),xy=p=>({x:rect.left+camera.x+(p.x+.5)*camera.z,y:rect.top+camera.y+(p.y+.5)*camera.z});return {p:xy(outPort(a,0)),q:xy(inPort(b,0))}})()");
+  await send('touchStart',[point(7,second.p)]);await sleep(40);
+  assert.equal(await js('draft?.from.id'),'M2','the very next touch must start a fresh draft');
+  await send('touchMove',[point(7,second.q)]);await sleep(55);
+  await send('touchEnd',[]);await sleep(70);
+  assert.deepEqual(await js('({tool,count:state.routes.length,target:state.routes[1]?.to?.id,pending:beltEditExitPending})'),{tool:'belt',count:2,target:'M3',pending:false});
+  await js('state.routes.splice(1);state.machines.splice(2);selection={routeId:"R0"};draw()');
+
   await js("setTool('select');selection=null;inspectorRefresh()");
   await tap(connected.middle);
   assert.equal(await js('selection?.routeId'),'R0');

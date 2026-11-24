@@ -1068,3 +1068,19 @@ test('placed machine hint uses red for blocked ports and retains yellow output w
  assert(!events.some(e=>e.kind==='text'&&e.text.includes('接口堵塞')));
  assert(events.some(e=>e.kind==='rect'&&e.x===a.x+.16&&e.color==='#ffd16e'&&e.dash.length));
 }));
+
+test('completed belt stays highlighted but next output click immediately starts a new belt without exiting',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const a={id:'M0',type:'垃圾',x:4,y:7,face:'E',mode:0},b={id:'M1',type:'废料',x:20,y:7,face:'E',mode:'标准'},
+ c={id:'M2',type:'垃圾',x:4,y:19,face:'E',mode:0},d={id:'M3',type:'废料',x:20,y:19,face:'E',mode:'标准'};
+ b.y+=outPort(a,0).ey-inPort(b,0).ey;d.y+=outPort(c,0).ey-inPort(d,0).ey;
+ state={name:'continuous belts',recordIndexed:true,machines:[a,b,c,d],routes:[]};
+ selection=null;setTool('belt');
+ const click=(x,y)=>{onPointerDown({button:0,pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});onPointerUp({pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});};
+ const p=outPort(a,0),q=inPort(b,0),r=outPort(c,0),t=inPort(d,0);
+ click(p.x,p.y);click(q.x,q.y);assert.equal(state.routes.length,1);assert.equal(selection.routeId,state.routes[0].id);assert.equal(draft,null);
+ click(r.x,r.y);assert.equal(draft?.from.id,c.id);assert.equal(tool,'belt');assert.equal(beltEditExitPending,false);
+ click(t.x,t.y);assert.equal(state.routes.length,2);assert(state.routes.every(r=>r.to&&!checkPath(r.path,r.from,r.to,r.id)));
+ click(1,1);click(2,1);click(3,1);assert.equal(tool,'belt');assert.equal(beltEditExitPending,false);
+}));

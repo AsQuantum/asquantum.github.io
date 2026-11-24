@@ -84,7 +84,7 @@ function frozenRefreshLive(v){
 }
 function frozenSnapshot(budget,name){
  const b=steadyDisplayRateBudget(budget);
- if(!b||!b.fractions?.localInflow||!b.fractions?.localOutflow)throw Error('当前方案尚未求得有效理论收支');
+ if(!b||!b.fractions?.localInflow||!b.fractions?.localOutflow)throw Error('当前方案尚未求得有效长期理论收支');
  const rates={};
  for(const k of new Set([...Object.keys(b.fractions.localInflow),...Object.keys(b.fractions.localOutflow)])){
   const q=steadyExactSub(steadyRegionQ(b.fractions.localInflow[k]||'0'),steadyRegionQ(b.fractions.localOutflow[k]||'0'));
@@ -114,7 +114,7 @@ async function frozenImportScheme(selected){
  try{layout=typeof t.ast==='string'&&t.ast.startsWith('AST1:')?raw:raw?.format===FACTORY_JSON_FORMAT&&raw?.version===FACTORY_JSON_VERSION?expandCompactFactoryLayout(raw):expandLegacyFactoryLayout(raw).layout;}finally{idSeed=previousSeed;}
  const b=await frozenComputeScheme(layout);
  if(target!==state||scheme!==solverSchemeId)throw Error('当前方案已切换，导入已取消');
- if(!steadyDisplayRateBudget(b))throw Error(b.calculationTimedOut||b.conditionalBudget?.retryable?'来源方案计算超时或未收敛':'来源方案未求得有效理论收支');
+ if(!steadyDisplayRateBudget(b))throw Error(b.calculationTimedOut||b.conditionalBudget?.retryable?'来源方案计算超时或未收敛':'来源方案未求得有效长期理论收支');
  const f=frozenSnapshot(b,t.name);if(!Object.keys(f.rates).length)throw Error('来源方案没有非零本厂净值');
  frozenAdd(f.name,f.rates);return f;
 }
