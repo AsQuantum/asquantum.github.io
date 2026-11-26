@@ -20,7 +20,7 @@
 #orchestraScore button,#orchestraScore select,#orchestraScore input{font:inherit;color:#dbe6f6;background:#192940;border:1px solid #3a506d;border-radius:6px;box-sizing:border-box;padding:4px 7px;min-height:28px}
 #orchestraScore button:hover{background:#29415d}
 .orch-control{display:flex;align-items:center;gap:5px;color:#9fb5d3;white-space:nowrap}.orch-control input[type=range]{width:65px;padding:0!important}.orch-grow{flex:1}
-.orch-live-status{position:absolute;bottom:9px;left:9px;z-index:6;pointer-events:none;background:#0d192ddd;color:#b9d8fa;border:1px solid #40597c;border-radius:6px;padding:5px 8px;font-size:11px}
+.orch-live-status{position:absolute;bottom:9px;right:9px;max-width:calc(100% - 18px);text-align:right;z-index:6;pointer-events:none;background:#0d192ddd;color:#b9d8fa;border:1px solid #40597c;border-radius:6px;padding:5px 8px;font-size:11px}
 .orch-live-status button{pointer-events:auto;margin-left:5px}
 .orch-live-status button[hidden]{display:none!important}
 .orch-strike{position:fixed;width:0;height:0;pointer-events:none;z-index:10000;mix-blend-mode:screen}
