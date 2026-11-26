@@ -93,7 +93,7 @@ async function poll(f){for(let i=0;i<650;i++){try{const v=await f();if(v)return 
   assert(actual.method.kind==='mixed'||actual.method.kind==='iteration');
   const label=await evaluate("theorySolutionLabel(theoreticalBudget)");
   assert.equal(label,actual.method.kind==='mixed'?'迭代+精确解':'迭代解');
-  assert(Number.isFinite(actual.wall)&&actual.wall>=0);assert.equal(actual.chip,label+' · 用时'+(actual.wall/1000).toFixed(3)+'s');
+  assert(Number.isFinite(actual.wall)&&actual.wall>=0);assert.equal(actual.chip,label+' · 用时'+(actual.wall/1000).toFixed(3)+'s · 件/分钟');
   const methodLabels=await evaluate("JSON.stringify([['exact-model-period'],['exact-model-analytic'],['exact-model-period','exact-model-analytic'],[]].map(xs=>{const p={completeHtmlQueries:xs.length>0,actual:{components:xs.map(actualStatus=>({actualStatus}))}};return theorySolutionLabel({status:xs.length?'iteration-complete':'iteration-partial',diagnostics:{solutionMethod:iterationSolutionMethod(p)}})}))");
   assert.deepEqual(JSON.parse(methodLabels),['迭代解','精确解','迭代+精确解','未求解']);
 

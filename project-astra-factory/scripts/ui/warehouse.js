@@ -67,8 +67,6 @@ function warehouseView(theoryRows=false){
  theoryTotal=theoryTotal.replace('</tr>',unrestrictedTotal+overdraftTotal+'</tr>');
  if(budget.direct){const t=displayBudget.totals||{};theoryTotal=warehouseTotalRow(directNumber(t.inflow),directNumber(t.outflow),directNet(t.net)).replace('</tr>',directNet(t.potential)+directNet(budget.overdraftTotal)+'</tr>');}
  const elapsedMinutes=Math.floor((simTime+1e-7)/60);
- const finished=elapsedMinutes>0?sim?.minuteBuckets?.[elapsedMinutes-1]:null;
- const showBucket=finished||{inbound:{},outbound:{}};
  const totalsIn=Object.values(sim?.inbound||{}).reduce((a,b)=>a+b,0);
  const totalsOut=Object.values(sim?.outbound||{}).reduce((a,b)=>a+b,0);
  const windowMinutes=warehouseNetWindowMinutes;
@@ -94,7 +92,7 @@ function warehouseView(theoryRows=false){
   const data=sim?.minuteBuckets?.[minute];
   recentBuckets.push({minute:minute+1,inbound:data?.inbound||{},outbound:data?.outbound||{}});
  }
- return {budget,conditional,materials,actualMaterials,tRows,theoryTotal,elapsedMinutes,showBucket,recentBuckets,
+ return {budget,conditional,materials,actualMaterials,tRows,theoryTotal,elapsedMinutes,recentBuckets,
   windowMinutes,windowReady,windowTotals,totalsIn,totalsOut,
   tenMinuteReady:windowReady,tenMinuteTotals:windowTotals};
 }
@@ -104,23 +102,21 @@ function warehouseSummaryMarkup(v){
  v.totalsIn+' / '+v.totalsOut+'</b></div></div>';
 }
 function warehouseActualMarkup(v){
+ const missingTitle='尚未累计完整的'+v.windowMinutes+'分钟窗口';
+ const missingCell='<td title="'+missingTitle+'">—</td>';
+ const rateText=count=>v.windowReady?ledgerNumber(count/v.windowMinutes):'—';
+ const rateCell=count=>v.windowReady?'<td>'+rateText(count)+'</td>':missingCell;
  const aRows=v.actualMaterials.map(mat=>{
-  const inc=v.showBucket.inbound[mat]||0,out=v.showBucket.outbound[mat]||0;
   const sample=v.windowTotals[mat]||{inbound:0,outbound:0};
-  const netCell=v.windowReady?ledgerNetCell((sample.inbound-sample.outbound)/v.windowMinutes):
-   '<td title="尚未累计完整的'+v.windowMinutes+'分钟窗口">—</td>';
+  const netCell=v.windowReady?ledgerNetCell((sample.inbound-sample.outbound)/v.windowMinutes):missingCell;
   return '<tr data-orch-item="'+esc(mat)+'"><td class="ledger-name" title="'+esc(mat)+'">'+ledgerMaterialLabel(mat)+
-   '</td><td>'+inc+'</td><td>'+out+'</td>'+netCell+'<td data-orch-stock title="拆除返库累计 '+(sim?.editReturns?.[mat]||0)+' 件（不计入常规收入）">'+(ware[mat]||0)+'</td></tr>';
+   '</td>'+rateCell(sample.inbound)+rateCell(sample.outbound)+netCell+'<td data-orch-stock title="拆除返库累计 '+(sim?.editReturns?.[mat]||0)+' 件（不计入常规收入）">'+(ware[mat]||0)+'</td></tr>';
  }).join('');
- const income=v.actualMaterials.reduce((sum,mat)=>sum+(v.showBucket.inbound[mat]||0),0);
- const expense=v.actualMaterials.reduce((sum,mat)=>sum+(v.showBucket.outbound[mat]||0),0);
+ const income=v.actualMaterials.reduce((sum,mat)=>sum+(v.windowTotals[mat]?.inbound||0),0);
+ const expense=v.actualMaterials.reduce((sum,mat)=>sum+(v.windowTotals[mat]?.outbound||0),0);
  const stock=v.actualMaterials.reduce((sum,mat)=>sum+(ware[mat]||0),0);
- const net=v.actualMaterials.reduce((sum,mat)=>{
-  const x=v.windowTotals[mat]||{inbound:0,outbound:0};
-  return sum+x.inbound-x.outbound;
- },0);
- const total=warehouseTotalRow(income,expense,
-  v.windowReady?ledgerNetCell(net/v.windowMinutes):'<td>—</td>',stock);
+ const total=warehouseTotalRow(rateText(income),rateText(expense),
+  v.windowReady?ledgerNetCell((income-expense)/v.windowMinutes):missingCell,stock);
  const history=v.recentBuckets.map(bucket=>{
   const iCount=Object.values(bucket.inbound).reduce((sum,n)=>sum+n,0);
   const oCount=Object.values(bucket.outbound).reduce((sum,n)=>sum+n,0);
@@ -133,9 +129,9 @@ function warehouseActualMarkup(v){
   '<button type="button" class="warehouse-stock-toggle" data-stock-chart-open title="查看仓库存量随模拟时间变化">▤ 库存趋势</button>'+
   '<span class="ledger-chip">'+(v.windowReady?'近'+v.windowMinutes+'分钟':v.elapsedMinutes>0?
     '已完成'+v.elapsedMinutes+'/'+v.windowMinutes+'分钟':'等待首个完整分钟')+'</span></div>'+
-  '<div class="ledger-card-body"'+(typeof warehouseCardOpen!=='undefined'&&!warehouseCardOpen.actual?' hidden':'')+'><div class="warehouse-net-window-row"><label class="warehouse-net-window" for="warehouseNetWindow">净值窗口 <select id="warehouseNetWindow" aria-label="实际收支净值计算窗口">'+windowOptions+'</select></label></div>'+
-  '<div class="ledger-table-scroll" tabindex="0" aria-label="实际收支表，可横向滚动"><table class="ledger-table"><thead><tr><th>物品</th><th title="上一完整分钟入库量">收入</th>'+
-  '<th title="上一完整分钟出库量">支出</th><th title="最近'+v.windowMinutes+
+  '<div class="ledger-card-body"'+(typeof warehouseCardOpen!=='undefined'&&!warehouseCardOpen.actual?' hidden':'')+'><div class="warehouse-net-window-row"><label class="warehouse-net-window" for="warehouseNetWindow">收支窗口 <select id="warehouseNetWindow" aria-label="实际收支计算窗口">'+windowOptions+'</select></label></div>'+
+  '<div class="ledger-table-scroll" tabindex="0" aria-label="实际收支表，可横向滚动"><table class="ledger-table"><thead><tr><th>物品</th><th title="最近'+v.windowMinutes+'个完整分钟的平均入库量（件/分钟）">收入</th>'+
+  '<th title="最近'+v.windowMinutes+'个完整分钟的平均出库量（件/分钟）">支出</th><th title="最近'+v.windowMinutes+
   '个完整分钟的平均每分钟净收支（件/分钟）">净值</th><th>库存</th></tr></thead>'+
   '<tbody>'+(aRows||'<tr><td colspan="5">仓库暂无材料</td></tr>')+
   total+'</tbody></table></div>'+
@@ -153,7 +149,7 @@ function theorySolutionLabel(b){
 function theorySolutionChip(b){
  const label=theorySolutionLabel(b),d=b.diagnostics||{},ms=d.wallElapsedMs??d.elapsedMs;
  if((d.solutionMethod?.kind==='iteration'||d.solutionMethod?.kind==='mixed')&&Number.isFinite(ms)&&ms>=0)
-  return label+' · 用时'+(ms/1000).toFixed(3)+'s';
+  return label+' · 用时'+(ms/1000).toFixed(3)+'s · 件/分钟';
  return label+' · 件/分钟';
 }
 function theoryDiagnosticsMarkup(b,expanded=false){
