@@ -1,6 +1,6 @@
 'use strict';
 function createOrchestraRhythmSource(score,plan,captureWarehouse=false){
- let preview=null,stock={},time=0,cache=null,remaining=Math.round(plan.phraseSeconds*40),events=[],frames=[];
+ let preview=null,stock={},time=0,cache=null,remaining=Math.round(plan.phraseSeconds*40),events=[],frames=[],packetFrames=[];
  const frameTicks=5;let ticks=0,warehouseEvent=false;
  const capture=(m,dir,port,item,t)=>{
   const track=score.track(m.type),i=Math.max(0,orchestraTransferCount(m.id,dir)-1);
@@ -16,6 +16,18 @@ function createOrchestraRhythmSource(score,plan,captureWarehouse=false){
    minuteBuckets:sim.minuteBuckets
   })});
  }
+ // Baked positions only: the renderer uses the belt timbre color for
+ // every packet. Typed arrays bound the memory cost even on full belts.
+ function capturePackets(){
+  if(!captureWarehouse)return;
+  const routes=Object.create(null);
+  for(const r of state.routes){
+   const lazy=typeof simBatchBelts!=='undefined'?simBatchBelts?.get(r):null;
+   if(lazy){const n=simLazyCount(lazy);if(n)routes[r.id]=Float32Array.from({length:n},(_,j)=>simMetres(simLazyPos(lazy,j)))}
+   else{const list=sim.routes[r.id];if(list?.length)routes[r.id]=Float32Array.from(list,p=>p.distance)}
+  }
+  packetFrames.push({time:simTime,routes});
+ }
  function step(){
   if(!remaining)return true;
   const saved={sim,ware,simTime,frozenSimCache,simVisualDirty,simTransferObserver};
@@ -25,10 +37,10 @@ function createOrchestraRhythmSource(score,plan,captureWarehouse=false){
     sim={byMachine:{},routes:{},inbound:{},outbound:{},crafts:{},consumed:{},editReturns:{},minuteBuckets:[]};
     for(const m of state.machines)sim.byMachine[m.id]=simMachineState();
     for(const r of state.routes)sim.routes[r.id]=[];
-    preview=sim;capturePanel();
+    preview=sim;capturePanel();capturePackets();
    }else sim=preview;
    const start=performance.now();
-   do{const n=Math.min(32,remaining);simulateBatchSteps(n,.05,{afterStep:captureWarehouse?()=>{ticks++;if(warehouseEvent||ticks%frameTicks===0){capturePanel();warehouseEvent=false}}:null});remaining-=n}while(remaining&&performance.now()-start<6);
+   do{const n=Math.min(32,remaining);simulateBatchSteps(n,.05,{afterStep:captureWarehouse?()=>{ticks++;if(ticks%2===0)capturePackets();if(warehouseEvent||ticks%frameTicks===0){capturePanel();warehouseEvent=false}}:null});remaining-=n}while(remaining&&performance.now()-start<6);
    time=simTime;cache=frozenSimCache;stock=ware;
    return remaining===0;
   }finally{
@@ -37,5 +49,5 @@ function createOrchestraRhythmSource(score,plan,captureWarehouse=false){
   }
  }
  function finish(){if(remaining)throw Error('unfinished rhythm source');const groups=orchestraGroupNotes(events);events=[];preview=null;return orchestraRhythmLoopGroups(groups,plan)}
- return {step,finish,panelFrames:()=>frames};
+ return {step,finish,panelFrames:()=>frames,packetFrames:()=>packetFrames};
 }

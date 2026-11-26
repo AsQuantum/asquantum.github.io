@@ -122,3 +122,37 @@ Editor selection, machine side panels, and yellow/red edit rails use a
 1.5x width multiplier on the normal rhythmic stroke. Conveyor rails grow
 inward to retain the fixed crossing footprint; draft/trim dashed previews
 follow the source route note envelope.
+
+Rhythm sidebars remain scrollable but editing events are blocked. Mobile
+read-only tabs pause gameplay rather than closing the song; resume from
+the map. A fitted full 72x72 factory preview reuses the original renderer
+with an isolated canvas/camera. It shows baked machine and route pulses and sampled packet positions
+(50 ms playback intervals), never frozen live packets. Hidden on narrow
+stages. Enter/exit transitions move the fitted map between the original
+camera and preview. Lane side rails blink in the note color on its onset.
+
+Music remains a shared localStorage configuration, independent of factory
+JSON and AST1. Reroll invalidates the fitted preview background via a score
+revision and rebuilds the active rhythm phrase and packet frames.
+
+The music editor shares ORCH1: codes separately from factory JSON/AST1.
+They contain the complete shared catalog score (including unused types),
+track volumes, harmony, modulation, BPM and phrase generation length.
+Import validates all directions before replacing the shared score, disables
+auto-random on entry, and uses the same reroll/invalidation path. Personal
+master volume, game difficulty and factory data are not part of the code.
+
+The music preset selector is global across factories. Legacy settings become
+the first preset; new presets start with a fresh random 16-slot score at
+120 BPM. Each preset retains its own musical code and random preferences.
+Switching, renaming and deleting never modify the factory layout. The
+active preset is automatically saved; the last preset cannot be deleted.
+
+Regression suites (node tests/run-tests.js):
+- orchestra-music: harmony, event periods, code and preset persistence.
+- orchestra-audio: synthesis, mixing, transport fade, lifecycle.
+- orchestra-rhythm: chart difficulty, score, replay and baked snapshots.
+- orchestra-desktop / orchestra-mobile: end-to-end score sharing, presets,
+  input, sidebars, map fit, packet animation, transitions, visual feedback,
+  rerolls and real simulator isolation.
+- orchestra: all five groups (also included in current).

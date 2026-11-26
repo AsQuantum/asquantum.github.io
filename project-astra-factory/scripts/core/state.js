@@ -1,5 +1,5 @@
 'use strict';
-const canvas=document.getElementById('map'),ctx=canvas.getContext('2d');
+const canvas=document.getElementById('map');let ctx=canvas.getContext('2d');
 const $=id=>document.getElementById(id);
 const copy=o=>JSON.parse(JSON.stringify(o));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

@@ -55,7 +55,7 @@ test('16 bars repeat twice at 120 BPM without resetting the song clock',()=>{
  assert.deepEqual(Array.from(song,x=>x.at),[.5,32,32.5,64]);assert.deepEqual(Array.from(song,x=>x.g.n),[60,62,60,62]);
 });
 test('source simulates one 16-bar phrase once and repeats its events',()=>{
- const c=vm.createContext({structuredClone,performance:{now:()=>0},sim:{real:true},ware:{real:9},simTime:777,frozenSimCache:{real:true},simVisualDirty:false,simTransferObserver:()=>{},state:{machines:[{id:'M0',type:'仓入'}],routes:[]},simMachineState:()=>({sent:0})});
+ const c=vm.createContext({structuredClone,performance:{now:()=>0},sim:{real:true},ware:{real:9},simTime:777,frozenSimCache:{real:true},simVisualDirty:false,simTransferObserver:()=>{},state:{machines:[{id:'M0',type:'仓入'}],routes:[{id:'R0'}]},simMachineState:()=>({sent:0})});
  vm.runInContext(fs.readFileSync('scripts/ui/orchestra/rhythm.js','utf8'),c);
  vm.runInContext(fs.readFileSync('scripts/ui/orchestra/rhythm-source.js','utf8'),c);
  vm.runInContext(`
@@ -64,14 +64,14 @@ test('source simulates one 16-bar phrase once and repeats its events',()=>{
  function orchestraGroupNotes(events){return events}
  function simulateBatchSteps(n,dt,{afterStep}={}){
   if(sim!==last){last=sim;resets++}
-  for(let i=0;i<n;i++){ticks++;simTime=ticks*dt;ware.count=(ware.count||0)+1;sim.byMachine.M0.sent++;
+  for(let i=0;i<n;i++){ticks++;simTime=ticks*dt;ware.count=(ware.count||0)+1;sim.byMachine.M0.sent++;sim.routes.R0=[{item:"test",distance:ticks*.05}];
    if(ticks===7||ticks%1280===0)simTransferObserver(state.machines[0],'in',0,'item',simTime);afterStep?.();}
  }
  const source=createOrchestraRhythmSource({track:()=>({instrument:'piano',volume:1}),pitch:(type,dir,i)=>i},orchestraRhythmSongPlan(),true);
- while(!source.step()){};const song=source.finish(),frames=source.panelFrames();
+ while(!source.step()){};const song=source.finish(),frames=source.panelFrames(),packets=source.packetFrames();
  `,c);
- const result=vm.runInContext('({ticks,resets,ats:song.map(x=>x.at),counts:song.map(x=>x.g.n),frames:frames.length,first:frames[0].time,last:frames.at(-1).time,stock:frames.at(-1).ware.count,restored:sim===original.sim&&ware===original.ware&&simTime===original.simTime&&frozenSimCache===original.frozenSimCache&&simTransferObserver===original.simTransferObserver})',c);
- assert.equal(result.ticks,1280);assert.equal(result.resets,1);assert.deepEqual(Array.from(result.ats),[.17500000000000002,32,32.175,64]);assert.deepEqual(Array.from(result.counts),[6,1279,6,1279]);assert.equal(result.frames,258);assert.equal(result.first,0);assert.equal(result.last,64);assert.equal(result.stock,1280);assert(result.restored);
+ const result=vm.runInContext('({ticks,resets,ats:song.map(x=>x.at),counts:song.map(x=>x.g.n),frames:frames.length,packetFrames:packets.length,packetLast:packets.at(-1).time,packetStart:packets[1].routes.R0[0],packetEnd:packets.at(-1).routes.R0[0],first:frames[0].time,last:frames.at(-1).time,stock:frames.at(-1).ware.count,restored:sim===original.sim&&ware===original.ware&&simTime===original.simTime&&frozenSimCache===original.frozenSimCache&&simTransferObserver===original.simTransferObserver})',c);
+ assert.equal(result.ticks,1280);assert.equal(result.resets,1);assert.deepEqual(Array.from(result.ats),[.17500000000000002,32,32.175,64]);assert.deepEqual(Array.from(result.counts),[6,1279,6,1279]);assert.equal(result.frames,258);assert.equal(result.packetFrames,641);assert.equal(result.packetLast,64);assert(Math.abs(result.packetStart-.1)<1e-6);assert.equal(result.packetEnd,64);assert.equal(result.first,0);assert.equal(result.last,64);assert.equal(result.stock,1280);assert(result.restored);
 });
 
 test('grade colors and bounded fall duration',()=>{

@@ -82,10 +82,10 @@ function orchestraRhythmLead(value,fallback=ORCHESTRA_RHYTHM_LEAD){
 const ORCHESTRA_RHYTHM_GRADE_COLORS={MISS:'#ff626b',GOOD:'#60aaff',GREAT:'#60e397',PERFECT:'#ffd268'};
 function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChange=()=>{},onRestart=()=>{},onUnlock=()=>{},onSave=()=>{},settings={}}){
  let laneCount=[4,6,8].includes(settings.lanes)?settings.lanes:4,lead=orchestraRhythmLead(settings.lead),auto=settings.auto===true,difficulty=orchestraRhythmDifficulty(settings.difficulty);
- const model=createOrchestraRhythmModel(laneCount,difficulty),root=document.createElement('section'),els=new Map(),held=new Set(),flashes=new Map();
- let active=false,finished=false,lastStats='',lanes=[],keys=[],plan=orchestraRhythmSongPlan(null);
+ const model=createOrchestraRhythmModel(laneCount,difficulty),root=document.createElement('section'),els=new Map(),held=new Set(),flashes=new Map(),railFlashes=new Map();
+ let active=false,finished=false,lastStats='',lanes=[],keys=[],railOnsets=[],railIndex=0,plan=orchestraRhythmSongPlan(null);
  root.className='orch-rhythm';root.hidden=true;root.setAttribute('aria-label','Factory Rhythm');
- root.innerHTML='<div class="orch-rhythm-top"><div><span class="orch-rhythm-eyebrow">FACTORY ORCHESTRA</span><strong>Rhythm</strong></div><div class="orch-rhythm-stats"><div><small>分数</small><b data-rhythm-score>000000</b></div><div><small>准确率</small><b data-rhythm-accuracy>100.0%</b></div><div><small>连击</small><b data-rhythm-combo>0</b></div><div><small>MISS</small><b data-rhythm-miss>0</b></div></div><button type="button" data-rhythm-close aria-label="关闭音游">×</button></div><div class="orch-rhythm-controls"><label>轨道 <select data-rhythm-count><option value="4">4K</option><option value="6">6K</option><option value="8">8K</option></select></label><label>难度 <select data-rhythm-difficulty aria-label="谱面难度"><option value="easy">简单</option><option value="advanced">进阶</option><option value="hard">困难</option></select></label><label>下落 <input type="number" data-rhythm-lead min="0.5" max="3" step="0.01" inputmode="decimal" aria-label="下落时间（秒）"> 秒</label><label class="orch-rhythm-auto"><input type="checkbox" data-rhythm-auto> 自动演奏</label><span data-rhythm-mode>手动模式</span></div><div class="orch-rhythm-song"><span class="orch-rhythm-tempo">120 BPM</span><span data-rhythm-time>0:00 / 1:04</span><div class="orch-rhythm-progress"><i></i></div><span data-rhythm-plan>限时演奏</span></div><div class="orch-rhythm-stage"><div class="orch-rhythm-field"><div class="orch-rhythm-lanes"></div><div class="orch-rhythm-judge-line"></div><div class="orch-rhythm-hint"></div></div><div class="orch-rhythm-keys"></div></div><div class="orch-rhythm-result" hidden><div class="orch-rhythm-result-card"><small data-rhythm-result-mode></small><strong>演奏结束</strong><b data-rhythm-final-score></b><div data-rhythm-result-detail></div><div class="orch-rhythm-result-actions"><button type="button" data-rhythm-restart>再演奏一次</button><button type="button" data-rhythm-return>返回工厂</button></div></div></div><div class="orch-rhythm-foot"><span>音符抵达判定线时按键 · 触屏可直接点击</span><span>Esc 退出 · 短按空格暂停</span></div>';
+ root.innerHTML='<div class="orch-rhythm-top"><div><span class="orch-rhythm-eyebrow">FACTORY ORCHESTRA</span><strong>Rhythm</strong></div><div class="orch-rhythm-stats"><div><small>分数</small><b data-rhythm-score>000000</b></div><div><small>准确率</small><b data-rhythm-accuracy>100.0%</b></div><div><small>连击</small><b data-rhythm-combo>0</b></div><div><small>MISS</small><b data-rhythm-miss>0</b></div></div><button type="button" data-rhythm-close aria-label="关闭音游">×</button></div><div class="orch-rhythm-controls"><label>轨道 <select data-rhythm-count><option value="4">4K</option><option value="6">6K</option><option value="8">8K</option></select></label><label>难度 <select data-rhythm-difficulty aria-label="谱面难度"><option value="easy">简单</option><option value="advanced">进阶</option><option value="hard">困难</option></select></label><label>下落 <input type="number" data-rhythm-lead min="0.5" max="3" step="0.01" inputmode="decimal" aria-label="下落时间（秒）"> 秒</label><label class="orch-rhythm-auto"><input type="checkbox" data-rhythm-auto> 自动演奏</label><span data-rhythm-mode>手动模式</span></div><div class="orch-rhythm-song"><span class="orch-rhythm-tempo">120 BPM</span><span data-rhythm-time>0:00 / 1:04</span><div class="orch-rhythm-progress"><i></i></div><span data-rhythm-plan>限时演奏</span></div><div class="orch-rhythm-body"><div class="orch-rhythm-factory" aria-label="工厂预演"><canvas data-rhythm-factory aria-label="工厂全图"></canvas><span>工厂预演</span></div><div class="orch-rhythm-stage"><div class="orch-rhythm-field"><div class="orch-rhythm-lanes"></div><div class="orch-rhythm-judge-line"></div><div class="orch-rhythm-hint"></div></div><div class="orch-rhythm-keys"></div></div><div class="orch-rhythm-balance" aria-hidden="true"></div></div><div class="orch-rhythm-result" hidden><div class="orch-rhythm-result-card"><small data-rhythm-result-mode></small><strong>演奏结束</strong><b data-rhythm-final-score></b><div data-rhythm-result-detail></div><div class="orch-rhythm-result-actions"><button type="button" data-rhythm-restart>再演奏一次</button><button type="button" data-rhythm-return>返回工厂</button></div></div></div><div class="orch-rhythm-foot"><span>音符抵达判定线时按键 · 触屏可直接点击</span><span>Esc 退出 · 短按空格暂停</span></div>';
  wrap.append(root);
  const q=s=>root.querySelector(s),field=q('.orch-rhythm-field'),hint=q('.orch-rhythm-hint');
  function saveOptions(){settings.lanes=laneCount;settings.difficulty=difficulty;settings.lead=lead;settings.auto=auto;onSave()}
@@ -95,7 +95,7 @@ function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChang
  }
  function buildLanes(){
   const labels=ORCHESTRA_RHYTHM_LAYOUTS[laneCount].labels;root.style.setProperty('--rhythm-lanes',laneCount);
-  q('.orch-rhythm-lanes').innerHTML=labels.map((_,i)=>'<div class="orch-rhythm-lane" data-rhythm-lane="'+i+'"><i class="orch-rhythm-hit-beam"></i><div class="orch-rhythm-grade" aria-hidden="true"></div></div>').join('');
+  q('.orch-rhythm-lanes').innerHTML=labels.map((_,i)=>'<div class="orch-rhythm-lane" data-rhythm-lane="'+i+'"><i class="orch-rhythm-hit-beam"></i><i class="orch-rhythm-rail-glow"></i><div class="orch-rhythm-grade" aria-hidden="true"></div></div>').join('');
   q('.orch-rhythm-keys').innerHTML=labels.map((key,i)=>'<button type="button" data-rhythm-key="'+i+'" aria-label="'+key+' 音轨">'+key+'</button>').join('');
   lanes=[...root.querySelectorAll('[data-rhythm-lane]')];keys=[...root.querySelectorAll('[data-rhythm-key]')];
   for(const b of keys){
@@ -104,7 +104,7 @@ function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChang
    for(const name of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(name,()=>release(lane));
   }
  }
- function clearFlashes(){for(const list of flashes.values())for(const a of list)a.cancel();flashes.clear();for(const el of [...keys,...lanes]){el.classList.remove('pressed');delete el.dataset.grade}}
+ function clearFlashes(){for(const a of railFlashes.values())a.cancel();railFlashes.clear();for(const list of flashes.values())for(const a of list)a.cancel();flashes.clear();for(const el of [...keys,...lanes]){el.classList.remove('pressed');delete el.dataset.grade}}
  function flash(note,grade){
   const i=note.lane,lane=lanes[i],key=keys[i];if(!lane||!key)return;
   for(const a of flashes.get(i)||[])a.cancel();
@@ -130,7 +130,7 @@ function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChang
  }
  function release(lane){held.delete(lane);keys[lane]?.classList.remove('pressed');lanes[lane]?.classList.remove('pressed')}
  function clearPending(){
-  model.clearPending();for(const el of els.values())el.remove();els.clear();for(let i=0;i<keys.length;i++)release(i);clearFlashes();
+  model.clearPending();railOnsets=[];railIndex=0;for(const el of els.values())el.remove();els.clear();for(let i=0;i<keys.length;i++)release(i);clearFlashes();
   hint.textContent='';paintStats();
  }
  function progress(elapsed){
@@ -155,7 +155,7 @@ function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChang
  function reset(){model.reset();clearPending()}
  function add(group,at){
   if(!active||finished)return;
-  const n=model.add(group,at);if(!n)return;
+  const n=model.add(group,at);if(!n)return;railOnsets.push(n);
   const el=document.createElement('div');el.className='orch-rhythm-note';el.style.setProperty('--note-color',n.color);el.style.transform='translateY(-100px)';lanes[n.lane].append(el);els.set(n.id,el);
  }
  function result(r){
@@ -172,6 +172,11 @@ function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChang
   if(preparing){hint.textContent='正在生成'+plan.bars+'小节谱面…';return}
   if(!ready()||!isRunning()){hint.textContent=ready()?'已暂停':'点击任意音轨启用声音';return}
   const now=clock(),height=field.clientHeight,hitY=height*.84;
+  while(railIndex<railOnsets.length&&railOnsets[railIndex].at<=now){
+   const n=railOnsets[railIndex++],el=lanes[n.lane]?.querySelector('.orch-rhythm-rail-glow');if(!el)continue;
+   railFlashes.get(n.lane)?.cancel();el.style.setProperty('--rail-color',n.color);
+   railFlashes.set(n.lane,el.animate([{opacity:.85},{opacity:.55,offset:.22},{opacity:0}],{duration:280,easing:'ease-out'}));
+  }
   for(const r of (auto?model.autoplay(now):model.expire(now)))result(r);
   for(const n of model.notes){const el=els.get(n.id);if(el){const y=hitY*(1-(n.at-now)/lead);el.style.transform='translateY('+Math.round(y)+'px)'}}
   root.style.setProperty('--rhythm-tread-offset',((Math.max(0,elapsed)*128)%32)+'px');
@@ -193,5 +198,5 @@ function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChang
  },true);
  window.addEventListener('keyup',e=>{if(!active)return;const lane=ORCHESTRA_RHYTHM_LAYOUTS[laneCount].keys.indexOf(e.code);if(lane>=0){release(lane);e.preventDefault();e.stopImmediatePropagation()}},true);
  window.addEventListener('blur',()=>{for(let i=0;i<keys.length;i++)release(i)});
- return {open,close,reset,start,finish,add,tick,clearPending,model,get finished(){return finished},get active(){return active},get lead(){return lead},get keys(){return ORCHESTRA_RHYTHM_LAYOUTS[laneCount].keys},get labels(){return ORCHESTRA_RHYTHM_LAYOUTS[laneCount].labels},get auto(){return auto},get difficulty(){return difficulty}};
+ return {open,close,reset,start,finish,add,tick,clearPending,model,root,previewCanvas:q('[data-rhythm-factory]'),get finished(){return finished},get active(){return active},get lead(){return lead},get keys(){return ORCHESTRA_RHYTHM_LAYOUTS[laneCount].keys},get labels(){return ORCHESTRA_RHYTHM_LAYOUTS[laneCount].labels},get auto(){return auto},get difficulty(){return difficulty}};
 }

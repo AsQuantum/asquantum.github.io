@@ -5,6 +5,42 @@ function orchestraTransferCount(id,dir){
  const counter=sim?.byMachine?.[id]?.[dir==='in'?'received':'sent'];
  return Object.values(counter||{}).reduce((sum,n)=>sum+n,0);
 }
+// Independent, shareable music code; factory JSON and AST1 remain unchanged.
+const ORCHESTRA_CODE_PREFIX='ORCH1:';
+function orchestraEncodeCode(data){
+ const bytes=new TextEncoder().encode(JSON.stringify(data));
+ return ORCHESTRA_CODE_PREFIX+btoa(Array.from(bytes,b=>String.fromCharCode(b)).join(''));
+}
+function orchestraDecodeCode(text){
+ const code=String(text).trim();
+ if(!code.startsWith(ORCHESTRA_CODE_PREFIX)||code.length>200000)throw Error('无效或不支持的音乐代码');
+ try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(Uint8Array.from(atob(code.slice(ORCHESTRA_CODE_PREFIX.length)),c=>c.charCodeAt(0))))}
+ catch(e){throw Error('音乐代码已损坏')}
+}
+// Presets are shared across all factory layouts. The working score remains
+// the existing settings object; snapshots are independent serialized codes.
+function orchestraMusicSnapshot(settings){
+ const tracks=settings.scores?.['shared-machine-events-v1'];
+ if(!settings.harmony||!tracks||!Object.keys(tracks).length)return null;
+ return orchestraEncodeCode({harmony:settings.harmony,keyPlan:settings.keyPlan||[0],modulate:settings.modulate!==false,bpm:settings.bpm,length:[1,2,4].includes(Number(settings.randomLength))?Number(settings.randomLength):4,tracks});
+}
+function orchestraMusicRegistry(settings){
+ const valid=Array.isArray(settings.musicPresets)?settings.musicPresets.filter(p=>p&&typeof p.id==='string'&&/^music[1-9][0-9]*$/.test(p.id)&&typeof p.name==='string'&&typeof p.code==='string'&&p.code.startsWith(ORCHESTRA_CODE_PREFIX)&&p.code.length<=200000).slice(0,32):[];
+ const seen=new Set();settings.musicPresets=valid.filter(p=>!seen.has(p.id)&&seen.add(p.id));
+ if(!settings.musicPresets.some(p=>p.id===settings.activeMusicPreset))settings.activeMusicPreset=settings.musicPresets[0]?.id||null;
+ return settings.musicPresets;
+}
+function orchestraNextMusicPreset(settings){
+ const list=orchestraMusicRegistry(settings),ids=new Set(list.map(p=>p.id)),names=new Set(list.map(p=>p.name));let n=1,k=1;
+ while(ids.has('music'+n))n++;while(names.has('音乐方案 '+k))k++;
+ return {id:'music'+n,name:'音乐方案 '+k,code:''};
+}
+function orchestraStoreMusicPreset(settings){
+ const code=orchestraMusicSnapshot(settings);if(!code)return;
+ const list=orchestraMusicRegistry(settings);let p=list.find(x=>x.id===settings.activeMusicPreset);
+ if(!p){p={id:'music1',name:'音乐方案 1',code};list.push(p);settings.activeMusicPreset=p.id}
+ p.code=code;p.autoRandom=!!settings.autoRandom;p.shuffleLength=!!settings.shuffleLength;
+}
 // Shared per-type score; no physical state is stored or mutated here.
 function createOrchestraScore(root,settings,onSave,onPalette,onVolume,getCount,getDropped,onReroll=()=>{}){
  const instruments=ORCHESTRA_INSTRUMENTS,q=s=>root.querySelector(s);
@@ -83,10 +119,10 @@ function createOrchestraScore(root,settings,onSave,onPalette,onVolume,getCount,g
  function setCell(id,key,i,n){
   const seq=tracks[id]?.ports[key];if(!seq||i<0||i>=MAX_STEPS||!safeNote(n))return false;
   while(seq.length<=i)seq.push(null);seq[i]=n;
-  bars=scoreBars();save();return true;
+  bars=scoreBars();save();onReroll();return true;
  }
 
- root.innerHTML='<section class="orch-editor" data-orch-view="edit"><div class="orch-edit-toolbar"><div class="orch-now" data-orch-current title="已保存的共同调性"></div><details class="orch-settings"><summary>音乐设置 <span aria-hidden="true">⌄</span></summary><div class="orch-settings-panel"><div class="orch-settings-heading">随机生成</div><label class="orch-control">调性 <select data-orch-key>'+names.map((n,i)=>'<option value="'+i+'">'+n+'</option>').join('')+'</select><select data-orch-scale><option value="minor">小七和声</option><option value="major">大六和声</option><option value="pentatonic">小调五声</option></select></label><label class="orch-control">长度 <select data-orch-length><option value="1">4音符位</option><option value="2">8音符位</option><option value="4" selected>16音符位</option></select></label><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-random-length>长度也随机</label><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-auto-random>每次进入随机</label><div class="orch-settings-heading">演奏</div><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-modulate>小节转调</label><div data-orch-key-plan class="orch-key-plan"></div><div class="orch-settings-actions"><button data-orch="random-all" title="随机主音、和声、各类型乐器、音量及旋律">全部随机</button><button data-orch="random-fixed" title="使用所选调性、保留音色音量">固定调性随机</button></div></div></details><button data-orch="random-track" title="仅重新生成当前选中的机器类型">随机本轨</button><div class="orch-grow"></div><span class="orch-loop" data-orch-loop>4/4 · 16 音符位</span></div><div class="orch-timeline" tabindex="0" aria-label="多轨乐谱"><div class="orch-score"></div></div><div class="orch-editor-foot"><span>滚轮上下 · Shift+滚轮水平 · Ctrl+滚轮时间缩放 · Ctrl+Shift+滚轮音高缩放</span><span data-orch-period title="基于空库存初始状态的理论稳定物流；实际当前库存、运行中改造及手动补料可能改变周期。不是最短听觉周期。"></span><span title="全局节拍参考；每台机器按收发次数独立推进" data-orch-position></span></div></section>';
+ root.innerHTML='<section class="orch-editor" data-orch-view="edit"><div class="orch-edit-toolbar"><div class="orch-now" data-orch-current title="已保存的共同调性"></div><select class="orch-music-presets" data-orch-preset aria-label="音乐方案"></select><details class="orch-settings"><summary>音乐设置 <span aria-hidden="true">⌄</span></summary><div class="orch-settings-panel"><div class="orch-settings-heading">音乐方案</div><div class="orch-settings-actions"><button data-orch="rename-preset">重命名</button><button data-orch="delete-preset">删除当前</button></div><div class="orch-settings-heading">随机生成</div><label class="orch-control">调性 <select data-orch-key>'+names.map((n,i)=>'<option value="'+i+'">'+n+'</option>').join('')+'</select><select data-orch-scale><option value="minor">小七和声</option><option value="major">大六和声</option><option value="pentatonic">小调五声</option></select></label><label class="orch-control">长度 <select data-orch-length><option value="1">4音符位</option><option value="2">8音符位</option><option value="4" selected>16音符位</option></select></label><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-random-length>长度也随机</label><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-auto-random>每次进入随机</label><div class="orch-settings-heading">演奏</div><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-modulate>小节转调</label><div data-orch-key-plan class="orch-key-plan"></div><div class="orch-settings-actions"><button data-orch="random-all" title="随机主音、和声、各类型乐器、音量及旋律">全部随机</button><button data-orch="random-fixed" title="使用所选调性、保留音色音量">固定调性随机</button></div><details class="orch-code-share"><summary>音乐代码 · 导入 / 导出</summary><textarea data-orch-code aria-label="音乐代码" rows="3" spellcheck="false" placeholder="粘贴 ORCH1: 音乐代码"></textarea><div class="orch-settings-actions"><button data-orch="export-code">导出代码</button><button data-orch="copy-code">复制</button><button data-orch="import-code">导入代码</button></div><small data-orch-code-status role="status">独立于工厂布局，所有方案共用。</small></details></div></details><button data-orch="random-track" title="仅重新生成当前选中的机器类型">随机本轨</button><div class="orch-grow"></div><span class="orch-loop" data-orch-loop>4/4 · 16 音符位</span></div><div class="orch-timeline" tabindex="0" aria-label="多轨乐谱"><div class="orch-score"></div></div><div class="orch-editor-foot"><span>滚轮上下 · Shift+滚轮水平 · Ctrl+滚轮时间缩放 · Ctrl+Shift+滚轮音高缩放</span><span data-orch-period title="基于空库存初始状态的理论稳定物流；实际当前库存、运行中改造及手动补料可能改变周期。不是最短听觉周期。"></span><span title="全局节拍参考；每台机器按收发次数独立推进" data-orch-position></span></div></section>';
  const save=()=>{const scores=settings.scores??={},all={...(scores[layoutKey]||{})};for(const [id,track] of Object.entries(tracks))all[id]={...track,ports:{...(all[id]?.ports||{}),...track.ports}};scores[layoutKey]=all;onSave()};
  function initScore(){
   const groups=new Map();
@@ -239,6 +275,80 @@ function createOrchestraScore(root,settings,onSave,onPalette,onVolume,getCount,g
   if(full||!settings.keyPlan||settings.keyPlan.length!==Number(q('[data-orch-length]').value))settings.keyPlan=orchestraHarmony.keyPlan(Number(q('[data-orch-length]').value)||DEFAULT_BARS);
   initScore();pitchWindows.clear();bars=scoreBars();save();refreshKeyPlan();if(!root.hidden)renderEditor();onPalette();onReroll();
  }
+ function exportCode(){
+  ensureShared();save();
+  return orchestraMusicSnapshot(settings);
+ }
+ function importCode(code,beforeApply=null){
+  const v=orchestraDecodeCode(code);
+  if(!v||!v.harmony||!Number.isInteger(v.harmony.key)||v.harmony.key<0||v.harmony.key>11||!Object.hasOwn(orchestraHarmony.modes,v.harmony.mode)||
+   typeof v.modulate!=='boolean'||!Array.isArray(v.keyPlan)||![1,2,4].includes(v.keyPlan.length)||!v.keyPlan.every(n=>[0,5,7].includes(n))||
+   !Number.isInteger(v.bpm)||v.bpm<30||v.bpm>360||![1,2,4].includes(v.length)||!v.tracks||typeof v.tracks!=='object'||Array.isArray(v.tracks))throw Error('音乐代码配置无效');
+  // Validate every catalog direction before touching shared settings.
+  const all=Object.create(null);
+  for(const m of catalogTracks()){
+   const t=Object.hasOwn(v.tracks,m.id)?v.tracks[m.id]:null;
+   if(!t||!Object.hasOwn(instruments,t.instrument)||!Number.isFinite(t.volume)||t.volume<0||t.volume>1)throw Error('缺少有效音轨：'+m.id);
+   const ports={};
+   for(const dir of new Set(m.ports.map(p=>p.kind))){
+    const seq=t.ports?.[dir];if(!Array.isArray(seq)||!seq.length||seq.length>MAX_STEPS||!seq.every(safeNote))throw Error('无效音符序列：'+m.id+' '+dir);
+    ports[dir]=seq.slice();
+   }
+   all[m.id]={instrument:t.instrument,volume:t.volume,ports};
+  }
+  beforeApply?.();
+  settings.scores??={};settings.scores[layoutKey]=all;
+  settings.harmony={key:v.harmony.key,mode:v.harmony.mode};settings.keyPlan=v.keyPlan.slice();settings.modulate=v.modulate;settings.bpm=v.bpm;settings.randomLength=String(v.length);
+  if(!beforeApply)settings.autoRandom=false;
+  q('[data-orch-key]').value=v.harmony.key;q('[data-orch-scale]').value=v.harmony.mode;q('[data-orch-length]').value=String(v.length);
+  q('[data-orch-modulate]').checked=v.modulate;q('[data-orch-auto-random]').checked=!!settings.autoRandom;q('[data-orch-random-length]').checked=!!settings.shuffleLength;
+  initScore();pitchWindows.clear();save();refreshKeyPlan();if(!root.hidden)renderEditor();onPalette();onReroll();
+ }
+ function paintPresets(){
+  const list=orchestraMusicRegistry(settings),select=q('[data-orch-preset]');
+  select.replaceChildren(...list.map(p=>new Option(p.name,p.id)),new Option('＋ 新建随机方案','__new'));
+  select.value=settings.activeMusicPreset||'__new';
+  q('[data-orch=delete-preset]').disabled=list.length<=1;
+ }
+ function choosePreset(id){
+  if(id===settings.activeMusicPreset)return;
+  save();
+  const list=orchestraMusicRegistry(settings);
+  if(id==='__new'){
+   if(list.length>=32)throw Error('音乐方案最多 32 个');
+   const p=orchestraNextMusicPreset(settings);
+   // Seed the new entry with a valid snapshot until randomAll commits.
+   p.code=orchestraMusicSnapshot(settings);settings.musicPresets.push(p);settings.activeMusicPreset=p.id;
+   settings.autoRandom=false;settings.shuffleLength=false;settings.modulate=true;settings.randomLength='4';settings.bpm=120;
+   q('[data-orch-auto-random]').checked=false;q('[data-orch-random-length]').checked=false;q('[data-orch-modulate]').checked=true;q('[data-orch-length]').value='4';
+   randomAll(true);
+  }else{
+   const p=list.find(x=>x.id===id);if(!p)throw Error('音乐方案不存在');
+   importCode(p.code,()=>{settings.activeMusicPreset=p.id;settings.autoRandom=!!p.autoRandom;settings.shuffleLength=!!p.shuffleLength});
+  }
+  paintPresets();
+ }
+ function presetAction(action){
+  const list=orchestraMusicRegistry(settings),p=list.find(x=>x.id===settings.activeMusicPreset);if(!p)return;
+  if(action==='rename-preset'){
+   const name=prompt('音乐方案名称',p.name)?.trim().slice(0,40);if(!name)return;
+   p.name=name;onSave();paintPresets();
+  }else if(list.length>1&&confirm('删除音乐方案「'+p.name+'」？')){
+   const next=list.find(x=>x.id!==p.id);choosePreset(next.id);
+   settings.musicPresets=settings.musicPresets.filter(x=>x.id!==p.id);onSave();paintPresets();
+  }
+ }
+ function codeAction(action){
+  const field=q('[data-orch-code]'),status=q('[data-orch-code-status]');
+  try{
+   if(action==='export-code'){field.value=exportCode();field.focus();field.select();status.textContent='已生成音乐代码，可复制分享。'}
+   else if(action==='copy-code'){
+    if(!field.value.trim())field.value=exportCode();field.focus();field.select();
+    const fallback=()=>{try{if(document.execCommand('copy')){status.textContent='已复制音乐代码。';return}}catch{}status.textContent='已选中代码，请手动复制。'};
+    if(navigator.clipboard?.writeText)navigator.clipboard.writeText(field.value).then(()=>status.textContent='已复制音乐代码。',fallback);else fallback();
+   }else{importCode(field.value);status.textContent='已导入，所有工厂共用新音乐。'}
+  }catch(err){status.textContent=err.message}
+ }
  q('[data-orch-key]').value=settings.harmony?.key??0;q('[data-orch-scale]').value=settings.harmony?.mode||'minor';
  q('[data-orch-length]').value=['1','2','4'].includes(String(settings.randomLength))?String(settings.randomLength):String(DEFAULT_BARS);
  q('[data-orch-auto-random]').checked=!!settings.autoRandom;
@@ -259,17 +369,20 @@ function createOrchestraScore(root,settings,onSave,onPalette,onVolume,getCount,g
   if(b.dataset.octave){const id=b.dataset.machineId,key=b.dataset.portKey,roll=[...root.querySelectorAll('[data-port]')].find(x=>x.dataset.machine===id&&x.dataset.port===key);if(roll){pitchWindows.set(id+'|'+key,Math.max(24,Math.min(84,Number(roll.dataset.lo)+Number(b.dataset.octave))));renderEditor()}return}
 
 
+  if(['rename-preset','delete-preset'].includes(action)){presetAction(action);return}
+  if(['export-code','copy-code','import-code'].includes(action)){codeAction(action);return}
   if(action==='random-all'||action==='random-fixed'){randomAll(action==='random-all');return}
   if(action==='random-track'){const m=trackList.find(m=>m.id===selected);if(m){q('[data-orch-key]').value=settings.harmony?.key??0;q('[data-orch-scale]').value=settings.harmony?.mode||'minor';randomTrack(m);for(const key of Object.keys(tracks[m.id].ports))pitchWindows.delete(m.id+'|'+key);bars=scoreBars();save();renderEditor();onReroll()}}
  });
  root.addEventListener('contextmenu',e=>{const roll=e.target.closest('[data-port]');if(!roll)return;e.preventDefault();const r=roll.getBoundingClientRect();setCell(roll.dataset.machine,roll.dataset.port,Math.floor((e.clientX-r.left)/stepWidth),null);renderEditor()});
  root.addEventListener('change',e=>{
   const el=e.target;
+  if(el.matches('[data-orch-preset]')){try{choosePreset(el.value)}catch(err){alert(err.message);paintPresets()}el.blur();return}
   if(el.matches('[data-orch-auto-random]'))settings.autoRandom=el.checked;
   if(el.matches('[data-orch-random-length]'))settings.shuffleLength=el.checked;
-  if(el.matches('[data-orch-modulate]')){settings.modulate=el.checked;if(!settings.keyPlan)settings.keyPlan=orchestraHarmony.keyPlan(Number(q('[data-orch-length]').value)||DEFAULT_BARS);refreshKeyPlan()}
+  if(el.matches('[data-orch-modulate]')){settings.modulate=el.checked;if(!settings.keyPlan)settings.keyPlan=orchestraHarmony.keyPlan(Number(q('[data-orch-length]').value)||DEFAULT_BARS);refreshKeyPlan();onReroll()}
   if(el.matches('[data-orch-length]'))settings.randomLength=el.value;
-  if(el.matches('[data-instrument]')&&tracks[el.dataset.instrument]){selected=el.dataset.instrument;tracks[selected].instrument=el.value;renderEditor();onPalette()}
+  if(el.matches('[data-instrument]')&&tracks[el.dataset.instrument]){selected=el.dataset.instrument;tracks[selected].instrument=el.value;renderEditor();onPalette();onReroll()}
   save();
  });
  root.addEventListener('input',e=>{
@@ -286,6 +399,6 @@ function createOrchestraScore(root,settings,onSave,onPalette,onVolume,getCount,g
  },{passive:false});
  timeline().addEventListener('pointerdown',()=>{followUntil=performance.now()+4000});
 
- function sync(){ensureShared();initScore();refreshKeyPlan();if(!root.hidden)renderEditor()}
- return {sync,save,randomAll,referencePeriod,render:renderEditor,paint:paintPlayhead,track:type=>tracks[type],pitch:(type,port,cursor,time=0)=>orchestraHarmony.transpose(tracks[type]?.ports[String(port)]?.[cursor%Math.max(1,tracks[type]?.ports[String(port)]?.length||1)]??null,time,settings.modulate&&!["kick","percussion"].includes(tracks[type]?.instrument)?settings.keyPlan||[0]:[0]),color:type=>instruments[tracks[type]?.instrument||settings.scores?.[layoutKey]?.[type]?.instrument]?.color||instruments[instrumentFor({type,mode:Object.keys(DEF[type]?.recipes||{})[0]})]?.color||'#697b99'};
+ function sync(){ensureShared();initScore();refreshKeyPlan();onSave();paintPresets();if(!root.hidden)renderEditor()}
+ return {sync,save,randomAll,exportCode,importCode,choosePreset,referencePeriod,render:renderEditor,paint:paintPlayhead,track:type=>tracks[type],pitch:(type,port,cursor,time=0)=>orchestraHarmony.transpose(tracks[type]?.ports[String(port)]?.[cursor%Math.max(1,tracks[type]?.ports[String(port)]?.length||1)]??null,time,settings.modulate&&!["kick","percussion"].includes(tracks[type]?.instrument)?settings.keyPlan||[0]:[0]),color:type=>instruments[tracks[type]?.instrument||settings.scores?.[layoutKey]?.[type]?.instrument]?.color||instruments[instrumentFor({type,mode:Object.keys(DEF[type]?.recipes||{})[0]})]?.color||'#697b99'};
 }

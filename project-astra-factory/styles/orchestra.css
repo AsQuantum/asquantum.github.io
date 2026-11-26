@@ -236,3 +236,39 @@ body.orchestra-active .top .sim-toolbar .orch-master-volume input[type=range]{wi
  body.orchestra-active .top>.sim-toolbar::after{content:"";flex:0 0 100%;height:0;order:1}
  body.orchestra-active .top>.sim-toolbar>.orch-master-volume~.orch-only{order:2}
 }
+
+
+/* Rhythm sidebars are readable, not editable. Do not use inert on a
+   scroll container, because that also blocks wheel/touch scrolling. */
+.orch-rhythm-readonly > .side{touch-action:pan-y;overscroll-behavior:contain;user-select:none;overflow-y:auto}
+.orch-rhythm-readonly > .side *{touch-action:pan-y!important}
+.orch-rhythm-readonly > .side :is(button,input,select,textarea,summary,a,[role="button"],[contenteditable]){pointer-events:none;cursor:default}
+.orch-rhythm-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.orch-rhythm-body>.orch-rhythm-stage{height:100%;max-width:740px}
+.orch-rhythm-factory,.orch-rhythm-balance{display:none}
+@container (min-width:660px){
+ .orch-rhythm-body>.orch-rhythm-stage{width:min(100%,740px)}
+}
+/* Leave the lanes centered; the preview occupies only the spare left
+   region, with a matching blank region to the right. */
+.orch-rhythm{container-type:inline-size}
+@container (min-width:660px){
+ .orch-rhythm-body{grid-template-columns:minmax(140px,1fr) minmax(340px,2.2fr) minmax(140px,1fr)}
+ .orch-rhythm-factory{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:0}
+ .orch-rhythm-factory canvas{display:block;width:100%;aspect-ratio:1;max-height:calc(100% - 20px);object-fit:contain;border:1px solid #30455d;border-radius:6px;pointer-events:none}
+ .orch-rhythm-factory span{font-size:10px;color:#819bbc;letter-spacing:.1em}
+ .orch-rhythm-balance{display:block}
+}
+
+/* Local rail blink follows the note color, independent of judgement. */
+.orch-rhythm-rail-glow{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;border-left:2px solid var(--rail-color,#8ab8ef);border-right:2px solid var(--rail-color,#8ab8ef);box-shadow:inset 5px 0 9px -5px var(--rail-color),inset -5px 0 9px -5px var(--rail-color)}
+.orch-rhythm-transition-map{position:absolute;z-index:19;transform-origin:center;pointer-events:none}
+.orch-rhythm-transition-ghost{z-index:18;pointer-events:none}
+
+.orch-code-share{border-top:1px solid #354863;padding-top:7px;min-width:0}
+.orch-code-share>summary{cursor:pointer;color:#a9c5ee;font-size:12px}
+.orch-code-share textarea{display:block;width:100%;box-sizing:border-box;margin:7px 0;min-height:55px;resize:vertical;background:#0e1a29;color:#dbe6f6;border:1px solid #45617f;border-radius:5px;padding:6px;font:11px monospace;overflow-wrap:anywhere}
+.orch-code-share small{display:block;color:#9fb5d3;margin-top:5px;overflow-wrap:anywhere}
+
+.orch-music-presets{max-width:155px;min-width:90px;background:#192940;color:#dbe6f6;border:1px solid #3a506d;border-radius:6px;padding:5px 7px;font:inherit}
+@media(max-width:650px){.orch-music-presets{max-width:120px}}

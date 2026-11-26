@@ -3,11 +3,11 @@
 // simulation, one interactive map, and the original editing controls.
 (()=>{
  const settings=(()=>{try{const v=JSON.parse(localStorage.getItem('astra-orchestra-v1'));return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch{return {}}})();
- settings.bpm=Number.isFinite(settings.bpm)?Math.max(30,Math.min(360,settings.bpm)):120;
+ settings.bpm=Number.isFinite(settings.bpm)?Math.max(30,Math.min(360,Math.round(settings.bpm))):120;
  settings.volume=Number.isFinite(settings.volume)?Math.max(0,Math.min(1,settings.volume)):.6;
  // Enable shared bar modulation for new scores; respect an explicit opt-out.
  settings.modulate=typeof settings.modulate==='boolean'?settings.modulate:true;
- const save=()=>{try{localStorage.setItem('astra-orchestra-v1',JSON.stringify(settings))}catch{}};
+ const save=()=>{try{orchestraStoreMusicPreset(settings);localStorage.setItem('astra-orchestra-v1',JSON.stringify(settings))}catch(e){console.warn('音乐配置保存失败',e)}};
  const audio=createOrchestraAudio(()=>effectiveBpm(),()=>settings.volume);
  const wrap=canvas.closest('.canvaswrap'),root=document.createElement('section');
  root.id='orchestraScore';root.hidden=true;const workspace=wrap.closest('.main');workspace.append(root);
@@ -29,13 +29,15 @@
  const badge=document.createElement('div');badge.className='orch-live-status';badge.hidden=true;badge.innerHTML='<span data-orch-status></span><button type="button" data-orch="sound" hidden>启用声音</button>';wrap.append(badge);
  const originalTitle=document.title;
  let active=false,priorSpeed=1,lastSync=0,previousObserver=null,previousSim=null,previousTime=0,events=[],count=0,anchor=null,signature='',lastPaint=0,taps=[],down=null;
- let holds=[],rhythmSession=null,resumeAfterRhythm=false,rhythmLocks=[];
+ let scoreRevision=0;
+ let holds=[],rhythmSession=null,resumeAfterRhythm=false,rhythmLocks=[],transitionLayers=[];
  function effectiveBpm(){return rhythm.active?ORCHESTRA_RHYTHM_BPM:settings.bpm}
  function rhythmClock(){
   const s=rhythmSession;if(!s)return 0;
   return s.anchor===null?s.elapsed:Math.max(s.elapsed,audio.time-s.anchor);
  }
  const rhythm=createOrchestraRhythm(wrap,{clock:rhythmClock,ready:()=>audio.ready,isRunning:()=>running,onClose:closeRhythm,onTimingChange:()=>startRhythmSong(false),onRestart:()=>startRhythmSong(true),onUnlock:()=>audio.unlock(),onSave:save,settings:settings.rhythm&&typeof settings.rhythm==='object'&&!Array.isArray(settings.rhythm)?settings.rhythm:(settings.rhythm={})});
+ const factoryPreview=createRhythmFactoryPreview(rhythm.previewCanvas);
  orchestraTheme.rhythm=rhythm;
  orchestraTheme.refreshRhythmWarehouse=()=>{if(rhythm.active)paintRhythmPanels(rhythmSession,rhythmClock(),true)};
  function clearScheduled(){
@@ -49,39 +51,85 @@
   if(on){
    // While a song plays the original simulator is frozen; editing and
    // manual inventory changes must not modify that saved continuation.
-   const inert=[...workspace.querySelectorAll(':scope > .side'),preset,edit,...document.querySelectorAll('.mobile-nav')];
+   const inert=[preset,edit];
+   workspace.classList.add('orch-rhythm-readonly');
    const disabled=['resetSim','stepMinute','addTestStock','simSpeed'].map(id=>$(id)).filter(Boolean);
    rhythmLocks=[];
    for(const el of inert)if(el){rhythmLocks.push([el,'inert',el.inert]);el.inert=true}
    for(const el of disabled){rhythmLocks.push([el,'disabled',el.disabled]);el.disabled=true}
+   const ledger=$('warehousePanel');
+   if(ledger){rhythmLocks.push([ledger,'open',ledger.open]);ledger.open=true}
+   if(typeof warehouseCardOpen!=='undefined'){rhythmLocks.push([warehouseCardOpen,'actual',warehouseCardOpen.actual]);warehouseCardOpen.actual=true;warehouseRefresh()}
    const panel=$('stockChartPanel');if(panel){rhythmLocks.push([panel,'hidden',panel.hidden]);panel.hidden=true}
   }else{
-   for(const [el,k,v] of rhythmLocks)el[k]=v;rhythmLocks=[];
+   for(const [el,k,v] of rhythmLocks)el[k]=v;rhythmLocks=[];workspace.classList.remove('orch-rhythm-readonly');
   }
  }
+ // Sidebars remain scrollable. Block delegated and native editing
+ // actions, including keyboard activation, without cancelling wheel/touch pan.
+ function lockedSide(e){return rhythm.active&&e.target?.closest?.('.main > .side')}
+ for(const name of ['click','dblclick','auxclick','contextmenu','submit','input','change','keydown','keyup']){
+  document.addEventListener(name,e=>{if(!lockedSide(e))return;e.preventDefault();e.stopImmediatePropagation()},true);
+ }
+ for(const name of ['pointerdown','pointerup','pointermove','mousedown','mouseup']){
+  document.addEventListener(name,e=>{if(lockedSide(e))e.stopImmediatePropagation()},true);
+ }
+ document.addEventListener('focusin',e=>{if(lockedSide(e))e.target.blur?.()},true);
  function newRhythmSession(plan){
-  return {plan,source:createOrchestraRhythmSource(score,plan,true),song:null,panelFrames:null,panelIndex:-1,panelPaintAt:-Infinity,visualQueue:[],chartIndex:0,audioIndex:0,elapsed:-Math.max(1.8,rhythm.lead),anchor:null};
+  return {plan,source:createOrchestraRhythmSource(score,plan,true),song:null,panelFrames:null,packetFrames:null,panelIndex:-1,panelPaintAt:-Infinity,visualQueue:[],chartIndex:0,audioIndex:0,elapsed:-Math.max(1.8,rhythm.lead),anchor:null};
  }
  function startRhythmSong(restart){
   if(!rhythm.active)return;
   const resume=restart||rhythm.finished||running;
-  clearScheduled();const plan=orchestraRhythmSongPlan();
+  clearScheduled();factoryPreview.reset();const plan=orchestraRhythmSongPlan();
   rhythmSession=newRhythmSession(plan);rhythm.start(plan);$('run').disabled=false;
   if(resume&&!running)$('run').click();audio.unlock();
  }
- function openRhythm(){
+ function cancelRhythmTransition(){for(const el of transitionLayers)el.remove();transitionLayers=[];for(const a of rhythm.root.getAnimations())a.cancel()}
+ function rhythmTransition(enter){
+  cancelRhythmTransition();
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const c=rhythm.previewCanvas,rect=c.getBoundingClientRect(),host=wrap.getBoundingClientRect();
+  const duration=360,easing='cubic-bezier(.22,.75,.25,1)';
+  if(!enter){
+   const ghost=rhythm.root.cloneNode(true);ghost.classList.add('orch-rhythm-transition-ghost');ghost.inert=true;ghost.setAttribute('aria-hidden','true');
+   ghost.querySelectorAll('canvas').forEach(x=>x.remove());wrap.append(ghost);transitionLayers.push(ghost);
+   ghost.animate([{opacity:1},{opacity:0}],{duration:240,easing}).onfinish=()=>ghost.remove();
+  }else rhythm.root.animate([{opacity:0},{opacity:0,offset:.18},{opacity:1}],{duration,easing});
+  if(rect.width<=0||rect.height<=0||!c.width)return;
+  const image=document.createElement('canvas');image.width=c.width;image.height=c.height;image.getContext('2d').drawImage(c,0,0);
+  image.className='orch-rhythm-transition-map';image.style.cssText='left:'+(rect.left-host.left)+'px;top:'+(rect.top-host.top)+'px;width:'+rect.width+'px;height:'+rect.height+'px';
+  const z=Math.max(.01,Math.min(rect.width-12,rect.height-12)/72),scale=camera.z/z;
+  const dx=camera.x+36*camera.z-(rect.left-host.left+rect.width/2),dy=camera.y+36*camera.z-(rect.top-host.top+rect.height/2);
+  const big={transform:'translate('+dx+'px,'+dy+'px) scale('+scale+')',opacity:1},small={transform:'translate(0,0) scale(1)',opacity:1};
+  wrap.append(image);transitionLayers.push(image);
+  image.animate(enter?[big,small,{...small,opacity:0}]:[small,big,{...big,opacity:0}],{duration,easing}).onfinish=()=>image.remove();
+ }
+ function previewFactory(t){
+  const s=rhythmSession,frames=s?.packetFrames;
+  if(!frames?.length){factoryPreview.render(t,null,0,null,scoreRevision);return}
+  const elapsed=Math.max(0,Math.min(s.plan.duration,rhythmClock())),target=2*(elapsed>=s.plan.duration?s.plan.phraseSeconds:elapsed%s.plan.phraseSeconds);
+  let lo=0,hi=frames.length;
+  while(lo+1<hi){const mid=(lo+hi)>>1;if(frames[mid].time<=target+1e-8)lo=mid;else hi=mid}
+  factoryPreview.render(t,frames[lo],target-frames[lo].time,frames[lo+1],scoreRevision);
+ }
+ function openRhythm(machine=null){
   if(!active||rhythm.active||!root.hidden||simAdvanceBusy)return;
   clearScheduled();document.activeElement?.blur();resumeAfterRhythm=running;
+  // The trigger machine remains the selected inspector, even when
+  // pointerup has not yet reached the ordinary editor selection handler.
+  if(machine){selection={machineId:machine.id};multiSelection=null;inspectorRefresh()}
   const plan=orchestraRhythmSongPlan();rhythmSession=newRhythmSession(plan);
-  rhythm.open(plan);rhythmTempo(true);lockFactory(true);wrap.classList.add('orch-rhythm-open');canvas.style.visibility='hidden';badge.hidden=true;
+  rhythm.open(plan);factoryPreview.reset();rhythmTempo(true);lockFactory(true);wrap.classList.add('orch-rhythm-open');canvas.style.visibility='hidden';badge.hidden=true;
+  previewFactory(performance.now());rhythmTransition(true);
   if(!running)$('run').click();audio.unlock();
  }
  function closeRhythm(){
   if(!rhythm.active)return;
-  clearScheduled();rhythm.close();rhythmSession=null;rhythmTempo(false);lockFactory(false);$('run').disabled=false;running=resumeAfterRhythm;
+  rhythmTransition(false);clearScheduled();rhythm.close();rhythmSession=null;rhythmTempo(false);lockFactory(false);$('run').disabled=false;running=resumeAfterRhythm;
   // The real factory never advanced during playback; preserve its
   // original inventory, counters, exact phases and fractional clock.
-  resetBeltMotionClock();animationLast=performance.now();wrap.classList.remove('orch-rhythm-open');canvas.style.visibility=root.hidden?'':'hidden';badge.hidden=!root.hidden;draw();warehouseRefreshLive();inspectorRefreshLive();status();
+  resetBeltMotionClock();animationLast=performance.now();wrap.classList.remove('orch-rhythm-open');canvas.style.visibility=root.hidden?'':'hidden';badge.hidden=!root.hidden;draw();warehouseRefresh();warehouseRefreshLive();inspectorRefreshLive();status();
  }
  function pauseRhythmClock(){
   const s=rhythmSession;if(!s||s.anchor===null)return;
@@ -124,7 +172,7 @@
   if(s.source){
    try{
     if(!s.source.step()){rhythm.tick(0,true);return}
-    s.song=s.source.finish();s.panelFrames=s.source.panelFrames();s.source=null;audio.prepare(s.song.map(x=>x.g));audio.setSongProfile(s.song);
+    s.song=s.source.finish();s.panelFrames=s.source.panelFrames();s.packetFrames=s.source.packetFrames();s.source=null;audio.prepare(s.song.map(x=>x.g));audio.setSongProfile(s.song);
    }catch(err){console.error('Rhythm song generation failed',err);s.source=null;s.song=[]}
    if(!s.song.length){finishRhythmSong(true);return}
   }
@@ -152,10 +200,14 @@
   rhythm.tick(now);
   if(now>=s.plan.duration+1.6&&!rhythm.model.notes.length&&s.audioIndex===s.song.length)finishRhythmSong();
  }
- const score=createOrchestraScore(root,settings,save,()=>{buildPalette();draw()},()=>audio.mix(),()=>count,()=>audio.dropped,()=>{if(rhythm.active)startRhythmSong(false);else clearScheduled()});
+ const score=createOrchestraScore(root,settings,save,()=>{scoreRevision++;factoryPreview.reset();buildPalette();draw()},()=>audio.mix(),()=>count,()=>audio.dropped,()=>{if(rhythm.active)startRhythmSong(false);else{rhythmTempo(false);clearScheduled()}});
  orchestraTheme.score=score;
  function scoreSignature(){return state.machines.map(m=>m.type+':'+getPorts(m).map(p=>p.kind+p.index).join(',')).sort().join('|')}
- function syncScore(force=false){const next=scoreSignature();if(force||next!==signature){signature=next;score.sync();return true}return false}
+ function syncScore(force=false){
+  const next=scoreSignature();
+  if(force||next!==signature){signature=next;score.sync();scoreRevision++;factoryPreview.reset();return true}
+  return false
+ }
  function status(){const run=$('run');if(run){run.textContent=running?'Ⅱ 暂停':'▶ 播放';run.classList.toggle('sim-running',running)}badge.querySelector('[data-orch-status]').textContent=(!audio.ready?'声音未启用 · ':settings.volume===0?'主音量为零 · ':'')+(running?'演奏中':'暂停')+' · '+count+' 次收发'+(audio.dropped?' · 音频过载 '+audio.dropped:'');badge.querySelector('button').hidden=audio.ready&&settings.volume>0}
  function resetPlaybackForSimulation(){
   if(previousSim===sim&&simTime>=previousTime)return;
@@ -263,7 +315,7 @@
    // separate timing windows so ordinary machine selection is unaffected.
    const long=duration>=550;if(!long&&duration>500){holds=[];return}
    holds=holds.filter(h=>h.id===d.machine.id&&h.long===long&&now-h.at<(long?10000:1500));holds.push({id:d.machine.id,long,at:now});
-   if(holds.length===3){holds=[];strike(e.clientX,e.clientY);openRhythm()}
+   if(holds.length===3){holds=[];strike(e.clientX,e.clientY);openRhythm(d.machine)}
    return;
   }
   if(duration>500||!center(e)){taps=[];return}
@@ -283,10 +335,11 @@
    previousTime=simTime;
    if(t-lastSync>=180){lastSync=t;syncScore()}
    if(rhythm.active){
-    if(!wrap.getClientRects().length||getComputedStyle(wrap).visibility==='hidden')closeRhythm();else updateRhythmSong();
+    if(typeof mobileEditorActive==='function'&&mobileEditorActive()&&mobileActiveView!=='map'){if(running){pauseRhythmClock();running=false;status()}}
+    else if(!wrap.getClientRects().length||getComputedStyle(wrap).visibility==='hidden')closeRhythm();else updateRhythmSong();
    }else if(running&&!document.hidden)playEvents();
    else{if(anchor)clearScheduled();events.length=0}
-   if(t-lastPaint>=1000/24){lastPaint=t;orchestraTheme.beginFrame(t);const hit=orchestraTheme.warehouseHitPending;orchestraTheme.warehouseHitPending=false;if(rhythm.active)paintRhythmPanels(rhythmSession,rhythmClock(),hit);else if(hit)warehouseRefreshLive();orchestraTheme.paintPalette(t);orchestraTheme.paintPanels(t);orchestraTheme.paintInspector(t);status();if(!root.hidden)score.paint(t)}
+   if(t-lastPaint>=1000/24){lastPaint=t;orchestraTheme.beginFrame(t);const hit=orchestraTheme.warehouseHitPending;orchestraTheme.warehouseHitPending=false;if(rhythm.active)paintRhythmPanels(rhythmSession,rhythmClock(),hit);else if(hit)warehouseRefreshLive();orchestraTheme.paintPalette(t);orchestraTheme.paintPanels(t);orchestraTheme.paintInspector(t);if(rhythm.active)previewFactory(t);status();if(!root.hidden)score.paint(t)}
   }
   requestAnimationFrame(frame)
  }

@@ -138,6 +138,35 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   assert.deepEqual(lengths,{seen:[4,8,16],valid:true});console.log('ORCH_LENGTHS',JSON.stringify(lengths));
   const edit=await evaluate("(()=>{const root=document.getElementById('orchestraScore');root.querySelector('[data-orch=random-all]').click();const stored=JSON.parse(localStorage.getItem('astra-orchestra-v1')).scores['shared-machine-events-v1'];return {length:stored['垃圾'].ports['out'].length,loop:root.querySelector('[data-orch-loop]').textContent,playing:running}})()");
   console.log('ORCH_EDIT',JSON.stringify(edit));assert.equal(edit.length,16);assert.match(edit.loop,/16 音符位/);assert(edit.playing);
+  const presetTest=await evaluate(`(()=>{
+   const root=document.getElementById('orchestraScore'),score=orchestraTheme.score,select=root.querySelector('[data-orch-preset]'),old=select.value,code=score.exportCode(),layout=compactFactoryJSON(),runtime=sim,time=simTime;
+   const choose=id=>{select.value=id;select.dispatchEvent(new Event('change',{bubbles:true}))};
+   choose('__new');const second=select.value,newCode=score.exportCode(),fresh=second!==old&&newCode!==code;
+   choose(old);const firstRestored=score.exportCode()===code;
+   choose(second);const secondRestored=score.exportCode()===newCode;
+   const p=window.prompt,c=window.confirm;window.prompt=()=> '节奏测试';window.confirm=()=>true;
+   let renamed,deleted;
+   try{root.querySelector('[data-orch=rename-preset]').click();renamed=select.selectedOptions[0].textContent==='节奏测试';
+   root.querySelector('[data-orch=delete-preset]').click();deleted=select.value===old&&score.exportCode()===code&&select.options.length===2}
+   finally{window.prompt=p;window.confirm=c}
+   const saved=JSON.parse(localStorage.getItem('astra-orchestra-v1'));
+   return {fresh,firstRestored,secondRestored,renamed,deleted,persisted:saved.activeMusicPreset===old&&saved.musicPresets.length===1&&saved.musicPresets[0].code===code,unchanged:compactFactoryJSON()===layout&&runtime===sim&&time===simTime,placement:select.nextElementSibling?.classList.contains('orch-settings')};
+  })()`);
+  console.log('ORCH_PRESETS',JSON.stringify(presetTest));assert(Object.values(presetTest).every(Boolean),JSON.stringify(presetTest));
+  const share=await evaluate(`(()=>{
+   const root=document.getElementById('orchestraScore'),score=orchestraTheme.score,field=root.querySelector('[data-orch-code]'),click=action=>root.querySelector('[data-orch='+action+']').click();
+   const before=compactFactoryJSON(),oldSim=sim,oldTime=simTime;
+   root.querySelector('.orch-settings').open=true;root.querySelector('.orch-code-share').open=true;
+   click('export-code');const code=field.value,original=orchestraDecodeCode(code);
+   click('random-all');const changed=score.exportCode()!==code;
+   field.value='ORCH1:broken';const current=score.exportCode();click('import-code');const badRejected=score.exportCode()===current;
+   const bad=orchestraDecodeCode(code);delete bad.tracks[Object.keys(bad.tracks)[0]];field.value=orchestraEncodeCode(bad);click('import-code');const incompleteRejected=score.exportCode()===current;
+   field.value=code;click('import-code');
+   const actual=orchestraDecodeCode(score.exportCode()),status=root.querySelector('[data-orch-code-status]').textContent;
+   root.querySelector('.orch-settings').open=false;document.activeElement?.blur();
+   return {prefix:code.startsWith('ORCH1:'),changed,badRejected,incompleteRejected,roundtrip:JSON.stringify(original)===JSON.stringify(actual),unchanged:compactFactoryJSON()===before&&sim===oldSim&&simTime===oldTime,shared:!JSON.parse(localStorage.getItem('astra-orchestra-v1')).autoRandom,complete:Object.keys(original.tracks).length>state.machines.length,status};
+  })()`);
+  console.log('ORCH_CODE_SHARE',JSON.stringify(share));assert(share.prefix&&share.changed&&share.badRejected&&share.incompleteRejected&&share.roundtrip&&share.unchanged&&share.shared&&share.complete&&share.status.includes('已导入'),JSON.stringify(share));
   await evaluate("document.querySelector('[data-orch=switch]').click();true");
   const levels=[];for(let i=0;i<28;i++){levels.push(await evaluate("(()=>{const a=window.orchAnalyser;if(!a)return 0;const b=new Float32Array(a.fftSize);a.getFloatTimeDomainData(b);return Math.max(...b.map(Math.abs))})()"));await new Promise(r=>setTimeout(r,45))}
   assert(Math.max(...levels)>.001,'audible mixed signal');
@@ -205,15 +234,31 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
    else{await send('Input.dispatchMouseEvent',{type:'mousePressed',x:machinePoint.x,y:machinePoint.y,button:'left',clickCount:1});await new Promise(r=>setTimeout(r,620));await send('Input.dispatchMouseEvent',{type:'mouseReleased',x:machinePoint.x,y:machinePoint.y,button:'left',clickCount:1})}
   };
   const oldTempo=await evaluate("Number(document.querySelector('[data-orch-bpm]').value)");
+  await evaluate(`(()=>{const theme=orchestraTheme;window.__previewProbe={packets:0,warehouse:false,inspector:false,rail:false,enter:false};const probe=window.__previewProbe;
+   const packet=theme.packet;theme.packet=function(...args){if(ctx.canvas===orchestraTheme.rhythm.previewCanvas)probe.packets++;return packet.apply(this,args)};
+   const pp=theme.paintPanels,pi=theme.paintInspector;
+   theme.paintPanels=function(...args){const result=pp.apply(this,args);if(this.rhythm.active&&[...document.querySelectorAll('#warehouseLiveActual [data-orch-item]')].some(e=>e.getAnimations().length))probe.warehouse=true;return result};
+   theme.paintInspector=function(...args){const result=pi.apply(this,args);if(this.rhythm.active&&document.querySelector('#inspector .machine-summary')?.getAnimations().length)probe.inspector=true;return result};
+   const monitor=()=>{if(theme.rhythm.active){if(document.querySelector('.orch-rhythm-transition-map')||theme.rhythm.root.getAnimations().length)probe.enter=true;
+   if([...document.querySelectorAll('.orch-rhythm-rail-glow')].some(e=>e.getAnimations().length&&e.style.getPropertyValue('--rail-color')))probe.rail=true}requestAnimationFrame(monitor)};requestAnimationFrame(monitor);return true})()`);
   await hold();await hold();assert.equal(await evaluate('orchestraTheme.rhythm.active'),false);
   await hold();await poll(()=>evaluate('orchestraTheme.rhythm.active'));
   const rhythmLayout=await evaluate(`(()=>{const el=document.querySelector('.orch-rhythm'),r=el.getBoundingClientRect(),w=canvas.closest('.canvaswrap').getBoundingClientRect();return {sameCanvas:document.querySelectorAll('#map').length===1,hiddenMap:getComputedStyle(canvas).visibility==='hidden',fits:Math.abs(r.width-w.width)<1&&Math.abs(r.height-w.height)<1,lanes:el.querySelectorAll('[data-rhythm-lane]').length,lead:orchestraTheme.rhythm.lead,auto:orchestraTheme.rhythm.auto,difficulty:orchestraTheme.rhythm.difficulty,keys:[...el.querySelectorAll('[data-rhythm-key]')].map(b=>b.textContent).join(''),tempo:simulationSpeed,locked:document.querySelector('[data-orch-bpm]').disabled,running}})()`);
   assert(rhythmLayout.sameCanvas&&rhythmLayout.hiddenMap&&rhythmLayout.fits&&rhythmLayout.lanes===4&&rhythmLayout.lead===1.2&&!rhythmLayout.auto&&rhythmLayout.difficulty==='easy'&&rhythmLayout.keys==='DFJK'&&rhythmLayout.tempo===2&&rhythmLayout.locked&&rhythmLayout.running,JSON.stringify(rhythmLayout));
   assert.equal(await evaluate("(()=>{const v=document.querySelector('[data-orch-volume]');v.value=37;v.dispatchEvent(new Event('input',{bubbles:true}));const ok=!v.disabled&&v.getBoundingClientRect().width>0&&JSON.parse(localStorage.getItem('astra-orchestra-v1')).volume===.37;v.value=60;v.dispatchEvent(new Event('input',{bubbles:true}));return ok})()"),true);
-  await evaluate("(()=>{$('warehousePanel').open=true;warehouseCardOpen.actual=true;warehouseRefresh();return true})()");
+  assert.equal(await evaluate("$('warehousePanel').open&&warehouseCardOpen.actual"),true);
   const frozen=await evaluate("(()=>{window.__rhythmOriginal={sim,ware,time:simTime,remainder:simClockRemainder,bytes:JSON.stringify({sim,ware}),cache:frozenSimCache,snapshot:simLayoutSnapshot};return {time:simTime,plan:orchestraRhythmSongPlan()}})()");
   assert.equal(frozen.plan.duration,64);assert.equal(frozen.plan.bars,16);assert.equal(frozen.plan.repeats,2);
   await poll(()=>evaluate("orchestraTheme.rhythm.model.notes.length>0"));
+  const previewFit=await evaluate(`(()=>{
+   const c=document.querySelector('[data-rhythm-factory]'),r=c.getBoundingClientRect(),stage=document.querySelector('.orch-rhythm-stage').getBoundingClientRect(),box=document.querySelector('.orch-rhythm-body').getBoundingClientRect();
+   const visible=r.width>0&&r.height>0;
+   let rendered=false;
+   if(visible){const a=c.getContext('2d').getImageData(0,0,c.width,c.height).data;rendered=a.some((v,i)=>i%4===3&&v>0)}
+   return {visible,rendered,left:r.right<=stage.left+1,centered:Math.abs((stage.left+stage.right-box.left-box.right)/2)<2,isolated:ctx.canvas===canvas,real:sim===window.__rhythmOriginal.sim&&simTime===window.__rhythmOriginal.time};
+  })()`);
+  console.log('ORCH_PREVIEW_FIT',JSON.stringify(previewFit));
+  assert(previewFit.isolated&&previewFit.real&&previewFit.centered&&(mobile?!previewFit.visible:previewFit.visible&&previewFit.rendered&&previewFit.left),JSON.stringify(previewFit));
   const beforeRhythm=await evaluate("(()=>{const r=orchestraTheme.rhythm;return {time:simTime,notes:r.model.notes.length,first:r.model.notes[0].at}})()");
   await poll(()=>evaluate("document.querySelector('#warehouseLiveSummary')?.textContent.includes('音游预演时间')"));
   const previewPanels=await evaluate("(()=>({preview:document.querySelector('#warehouseLiveSummary').textContent.includes('音游预演时间'),real:sim===window.__rhythmOriginal.sim&&simTime===window.__rhythmOriginal.time}))()");
@@ -222,6 +267,10 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   const judged=await evaluate(`new Promise(resolve=>{const r=orchestraTheme.rhythm,started=performance.now();let target=null;function loop(){const n=r.model.notes[0];if(n){const key=document.querySelector('[data-rhythm-key="'+n.lane+'"]');if(!target)target=n;const el=document.querySelector('[data-rhythm-lane="'+n.lane+'"] .orch-rhythm-note'),line=document.querySelector('.orch-rhythm-judge-line');if(el&&Math.abs(el.getBoundingClientRect().top+el.getBoundingClientRect().height/2-line.getBoundingClientRect().top)<12){if(${mobile}){key.dispatchEvent(new PointerEvent('pointerdown',{pointerId:999}));key.dispatchEvent(new PointerEvent('pointerup',{pointerId:999}))}else{const code=r.keys[n.lane],keyName=r.labels[n.lane].toLowerCase();window.dispatchEvent(new KeyboardEvent('keydown',{code,key:keyName,bubbles:true}));window.dispatchEvent(new KeyboardEvent('keyup',{code,key:keyName,bubbles:true}))}resolve(r.model.stats());return}}if(performance.now()-started>5000){resolve(r.model.stats());return}requestAnimationFrame(loop)}loop()})`);
   console.log('ORCH_RHYTHM',JSON.stringify({rhythmLayout,beforeRhythm,judged}));assert(judged.score>0,JSON.stringify(judged));
   assert.equal(await evaluate("!document.querySelector('.orch-rhythm-hit-ring') && [...document.querySelectorAll('.orch-rhythm-hit-beam')].some(e=>e.getAnimations().length>0) && [...document.querySelectorAll('.orch-rhythm-grade')].some(e=>e.textContent&&e.getAnimations().length>0)"),true);
+  await poll(()=>evaluate("window.__previewProbe.rail&&window.__previewProbe.inspector&&window.__previewProbe.enter&&("+mobile+"||window.__previewProbe.packets>0)"));
+  // Actual warehouse note (not a synthetic pulse) must reach the right ledger.
+  await poll(()=>evaluate("window.__previewProbe.warehouse"));
+  console.log('ORCH_PREVIEW_LIVE',JSON.stringify(await evaluate('window.__previewProbe')));
   const panelHits=await evaluate(`(async()=>{
    const theme=orchestraTheme,normal=state.machines.find(m=>m.type==='垃圾'),inlet=state.machines.find(m=>m.type==='仓入');
    const row=document.querySelector('#warehouseLiveActual tr[data-orch-item]'),item=row?.dataset.orchItem;
@@ -283,6 +332,25 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   }
 
   await evaluate("document.activeElement?.blur();true");await space();await poll(()=>evaluate('!running'));
+  const sidebarLock=await evaluate(`(()=>{
+   const side=document.querySelector('.main>.side.left'),right=document.querySelector('.main>.side.right'),button=side.querySelector('[data-stamp]'),before=JSON.stringify({tool,stampType,selection,ware,state});
+   button.click();const locked=JSON.stringify({tool,stampType,selection,ware,state})===before;
+   return {locked,scrollable:!side.inert&&!right.inert,pan:getComputedStyle(side).touchAction,control:getComputedStyle(button).pointerEvents};
+  })()`);
+  assert(sidebarLock.locked&&sidebarLock.scrollable&&sidebarLock.pan==='pan-y'&&sidebarLock.control==='none',JSON.stringify(sidebarLock));
+  if(mobile){
+   await evaluate("document.querySelector('[data-mobile-view=warehouse]').click();true");
+   await poll(()=>evaluate("mobileActiveView==='warehouse'&&orchestraTheme.rhythm.active&&!running"));
+  }
+  for(const name of mobile?['right']:['left','right']){
+   const pt=await evaluate(`(()=>{const side=document.querySelector('.main>.side.${name}'),spacer=document.createElement('div');spacer.dataset.orchScrollTest='1';spacer.style.cssText='height:1800px;min-height:1800px;flex:none';side.append(spacer);side.scrollTop=0;const r=side.getBoundingClientRect();return {x:r.left+r.width/2,y:${mobile?'r.top+r.height/2':'r.bottom-35'}}})()`);
+   if(mobile){await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:1,x:pt.x,y:pt.y+90}]});for(let j=1;j<=6;j++){await send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{id:1,x:pt.x,y:pt.y+90-j*30}]});await new Promise(r=>setTimeout(r,16))}await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})}
+   else await send('Input.dispatchMouseEvent',{type:'mouseWheel',x:pt.x,y:pt.y,deltaX:0,deltaY:450});
+   await poll(()=>evaluate(`(()=>{const side=document.querySelector('.main>.side.${name}');return side.scrollTop>0||[...side.querySelectorAll('*')].some(el=>el.scrollTop>0)})()`));
+   await evaluate("document.querySelector('[data-orch-scroll-test]').remove();true");
+  }
+  if(mobile){await evaluate("document.querySelector('[data-mobile-view=map]').click();true");await poll(()=>evaluate("mobileActiveView==='map'&&orchestraTheme.rhythm.active&&!running"))}
+  console.log('ORCH_SIDEBAR_SCROLL',JSON.stringify(sidebarLock));
   await new Promise(r=>setTimeout(r,80));
   const pauseStats=await evaluate("JSON.stringify({stats:orchestraTheme.rhythm.model.stats(),notes:orchestraTheme.rhythm.model.notes,positions:[...document.querySelectorAll('.orch-rhythm-note')].map(e=>e.style.transform),time:document.querySelector('[data-rhythm-time]').textContent})");
   await new Promise(r=>setTimeout(r,200));
@@ -291,6 +359,18 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   assert(scrollPreserved,'scroll speed must not restart or change the chart');
 
   await space();await poll(()=>evaluate('running'));
+  const rerollPreview=await evaluate(`(async()=>{
+   const theme=orchestraTheme,r=theme.rhythm,old=theme.color('垃圾'),before=JSON.stringify(r.model.notes),original=theme.machine,rendered=[];
+   theme.machine=function(m,...args){if(ctx.canvas!==canvas&&ctx.canvas!==r.previewCanvas&&m.type==='垃圾')rendered.push(this.color(m.type));return original.call(this,m,...args)};
+   try{
+    document.querySelector('[data-orch=random]').click();
+    const color=theme.color('垃圾'),reset=r.model.notes.length===0&&r.model.stats().score===0;
+    await new Promise(resolve=>setTimeout(resolve,250));
+    return {changed:color!==old,reset,rebuilt:rendered.includes(color),oldGone:rendered.every(c=>c===color),isolated:ctx.canvas===canvas,real:sim===window.__rhythmOriginal.sim&&simTime===window.__rhythmOriginal.time};
+   }finally{theme.machine=original}
+  })()`);
+  console.log('ORCH_REROLL_PREVIEW',JSON.stringify(rerollPreview));
+  assert(rerollPreview.changed&&rerollPreview.reset&&rerollPreview.isolated&&rerollPreview.real&&(mobile||rerollPreview.rebuilt&&rerollPreview.oldGone),JSON.stringify(rerollPreview));
   const options=await evaluate(`(()=>{
    const r=orchestraTheme.rhythm,set=(q,v)=>{const e=document.querySelector(q);e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))};
    set('[data-rhythm-difficulty]','advanced');const advanced=r.difficulty==='advanced'&&r.keys.length===4;set('[data-rhythm-count]',6);const six=r.keys.length===6&&document.querySelectorAll('[data-rhythm-lane]').length===6;
@@ -313,8 +393,9 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   await evaluate("orchestraRhythmSongPlan=window.__originalRhythmPlan;document.querySelector('[data-rhythm-restart]').click();true");
   assert.equal(await evaluate("!orchestraTheme.rhythm.finished&&running&&orchestraTheme.rhythm.model.stats().score===0"),true);
   await evaluate(`(()=>{const a=document.querySelector('[data-rhythm-auto]');a.checked=false;a.dispatchEvent(new Event('change',{bubbles:true}));const l=document.querySelector('[data-rhythm-lead]');l.value=1.2;l.dispatchEvent(new Event('change',{bubbles:true}));return true})()`);
-  const restored=await evaluate("(()=>{const o=window.__rhythmOriginal,same=sim===o.sim&&ware===o.ware&&simTime===o.time&&simClockRemainder===o.remainder&&JSON.stringify({sim,ware})===o.bytes&&frozenSimCache===o.cache&&simLayoutSnapshot===o.snapshot;document.querySelector('[data-rhythm-close]').click();return {same,restored:sim===o.sim&&ware===o.ware&&simTime===o.time&&simClockRemainder===o.remainder&&JSON.stringify({sim,ware})===o.bytes}})()");
-  console.log('ORCH_RHYTHM_CONTINUATION',JSON.stringify(restored));assert(restored.same&&restored.restored,JSON.stringify(restored));
+  const restored=await evaluate("(()=>{const o=window.__rhythmOriginal,same=sim===o.sim&&ware===o.ware&&simTime===o.time&&simClockRemainder===o.remainder&&JSON.stringify({sim,ware})===o.bytes&&frozenSimCache===o.cache&&simLayoutSnapshot===o.snapshot;document.querySelector('[data-rhythm-close]').click();return {same,restored:sim===o.sim&&ware===o.ware&&simTime===o.time&&simClockRemainder===o.remainder&&JSON.stringify({sim,ware})===o.bytes,ghost:!!document.querySelector('.orch-rhythm-transition-ghost')}})()");
+  console.log('ORCH_RHYTHM_CONTINUATION',JSON.stringify(restored));assert(restored.same&&restored.restored&&restored.ghost,JSON.stringify(restored));
+  await poll(()=>evaluate("!document.querySelector('.orch-rhythm-transition-ghost,.orch-rhythm-transition-map')"));
   assert.equal(await evaluate("!orchestraTheme.rhythm.active&&getComputedStyle(canvas).visibility==='visible'&&running"),true);
   assert.equal(await evaluate("Number(document.querySelector('[data-orch-bpm]').value)"),oldTempo);
   await tap(machinePoint);await tap(machinePoint);await tap(machinePoint);

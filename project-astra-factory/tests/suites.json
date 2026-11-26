@@ -89,15 +89,7 @@
       "tests/standalone-web-app.test.js",
       "tests/startup-browser.test.js",
       "tests/stock-chart-browser.test.js",
-      "tests/window-motion-browser.test.js",
-      "tests/orchestra-browser.test.js",
-      {
-        "file": "tests/orchestra-browser.test.js",
-        "args": [
-          "--file",
-          "--mobile"
-        ]
-      }
+      "tests/window-motion-browser.test.js"
     ],
     "iteration-unit": [
       "tests/iteration/period-candidate.test.js",
@@ -139,11 +131,28 @@
         ]
       }
     ],
-    "orchestra-unit": [
+    "orchestra-music": [
       "tests/orchestra-harmony.test.js",
       "tests/orchestra-period.test.js",
-      "tests/orchestra-audio-period.test.js",
+      "tests/orchestra-presets.test.js"
+    ],
+    "orchestra-audio": [
+      "tests/orchestra-audio-period.test.js"
+    ],
+    "orchestra-rhythm": [
       "tests/orchestra-rhythm.test.js"
+    ],
+    "orchestra-desktop": [
+      "tests/orchestra-browser.test.js"
+    ],
+    "orchestra-mobile": [
+      {
+        "file": "tests/orchestra-browser.test.js",
+        "args": [
+          "--file",
+          "--mobile"
+        ]
+      }
     ]
   },
   "aliases": {
@@ -164,7 +173,7 @@
       "physical",
       "codec",
       "ui",
-      "orchestra-unit"
+      "orchestra"
     ],
     "iteration-quick": [
       "iteration-unit"
@@ -173,6 +182,19 @@
       "iteration-quick",
       "iteration-validation",
       "iteration-browser"
+    ],
+    "orchestra-unit": [
+      "orchestra-music",
+      "orchestra-audio",
+      "orchestra-rhythm"
+    ],
+    "orchestra-browser": [
+      "orchestra-desktop",
+      "orchestra-mobile"
+    ],
+    "orchestra": [
+      "orchestra-unit",
+      "orchestra-browser"
     ]
   }
 }

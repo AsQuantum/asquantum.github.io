@@ -355,6 +355,52 @@ function draw(animationOnly=false){
  drawMovingPackets();
 }
 
+// Read-only fitted preview. Reuse the real renderer with a temporary
+// drawing target and camera, never the live factory canvas or its cache.
+function createRhythmFactoryPreview(target){
+ const background=document.createElement('canvas');
+ let rows=[],width=0,height=0,dpr=0,revision=-1;
+ function render(t,frame=null,offset=0,next=null,scoreRevision=0){
+  const bounds=target.getBoundingClientRect();if(bounds.width<1||bounds.height<1)return;
+  const nextDpr=Math.min(2,Math.max(1,window.devicePixelRatio||1));
+  const w=Math.round(bounds.width*nextDpr),h=Math.round(bounds.height*nextDpr);
+  const rebuild=w!==width||h!==height||nextDpr!==dpr||revision!==scoreRevision;
+  const old={ctx,camera,pix,selection,multiSelection,draft,stampType,marquee,groupTransform,beltTrim};
+  try{
+   if(rebuild){width=w;height=h;dpr=nextDpr;revision=scoreRevision;target.width=background.width=w;target.height=background.height=h}
+   pix={w:w/dpr,h:h/dpr,dpr};const z=Math.max(.01,Math.min(pix.w-12,pix.h-12)/72);
+   camera={x:(pix.w-72*z)/2,y:(pix.h-72*z)/2,z};
+   selection=multiSelection=draft=stampType=marquee=groupTransform=beltTrim=null;
+   if(rebuild){ctx=background.getContext('2d');drawStaticScene();rows=buildBeltVisualCache().rows}
+   ctx=target.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(background,0,0);
+   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.translate(camera.x,camera.y);ctx.scale(z,z);
+   // Pulse and draw only baked packet positions, never the frozen live ones.
+   orchestraTheme.animate(t);
+   for(const row of rows){
+    const clipped=orchestraTheme.clipUnderpasses(row.underpasses);
+    orchestraTheme.railPulse(row,t);orchestraTheme.gate(row,t);
+    const positions=frame?.routes[row.r.id]||[],following=next?.routes[row.r.id]||[];
+    const fraction=next?Math.max(0,Math.min(1,offset/(next.time-frame.time))):0;
+    let ahead=row.g.n;
+    for(let j=0;j<positions.length;j++){
+     const distance=positions[j],future=following[j];
+     // Interpolate only a physically possible forward movement. A packet
+     // disappearing or a queue shifting at an endpoint is a discrete event.
+     const advance=following.length===positions.length&&future>=distance&&future-distance<=.201?(future-distance)*fraction:0;
+     const d=Math.max(distance,Math.min(ahead,row.g.n,distance+advance));
+     ahead=d-ITEM_SPACING;
+     const [x,y]=beltPathPoint(row.g,d);orchestraTheme.packet(row.r,x,y);
+    }
+    if(clipped)ctx.restore();
+   }
+   ctx.setTransform(1,0,0,1,0,0);
+  }finally{
+   ({ctx,camera,pix,selection,multiSelection,draft,stampType,marquee,groupTransform,beltTrim}=old);
+  }
+ }
+ return {render,reset(){width=height=0;rows=[]}};
+}
+
 function hexAlpha(h,a){const x=h.replace('#','');let r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16);return `rgba(${r},${g},${b},${a})`;}
 const materialColorCache=new Map();
 function materialColor(s){const key=String(s??'');if(!materialColorCache.has(key))materialColorCache.set(key,computeMaterialColor(key));return materialColorCache.get(key);}
