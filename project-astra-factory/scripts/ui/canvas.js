@@ -167,6 +167,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  if(typeof beltTrim!=='undefined'&&beltTrim){
   const r=state.routes.find(q=>q.id===beltTrim.routeId);
   if(r&&beltTrim.index>=0&&beltTrim.hoverAnchor===true){
+   const music=musicThemeActive(),clipped=music&&orchestraTheme.clipUnderpasses(musicUnderpasses.get(r.id));
    ctx.strokeStyle='#ff6478';ctx.lineWidth=.45;ctx.lineCap='butt';ctx.beginPath();
    for(let i=beltTrim.index;i<r.path.length;i++){
     const [x,y]=r.path[i],t=routeTile(r,i);if(!t)continue;
@@ -174,7 +175,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
     ctx.lineTo(x+.5,y+.5);
     ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);
    }
-   ctx.stroke();
+   if(music)orchestraTheme.editRails('#ff6478',true);else ctx.stroke();if(clipped)ctx.restore();
   }
  }
  const placement=typeof machinePlacementIssues==='function'?machinePlacementIssues():null;
@@ -220,7 +221,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
    ctx.lineTo(x+.5,y+.5);
    ctx.lineTo(x+.5+V[tile.outgoing][0]*.5,y+.5+V[tile.outgoing][1]*.5);
   }
-  ctx.stroke();ctx.setLineDash([]);
+  if(musicThemeActive())orchestraTheme.editRails(color,dashed);else ctx.stroke();ctx.setLineDash([]);
  };
  // A confirmed final tile EXISTS already: it may change facing, but must
  // stay SOLID. Only new, uncommitted belt cells are shown dashed.

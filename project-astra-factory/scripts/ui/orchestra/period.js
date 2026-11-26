@@ -14,7 +14,7 @@ const orchestraPeriod=(()=>{
   const components=budget.diagnostics?.components,rates=budget.fractions?.machineTotals;
   if(!Array.isArray(components)||!rates)return {status:'unknown'};
   const machines=new Map(layout.machines.map(m=>[m.id,m])),seen=new Set();
-  let total=BigInt(modulationTicks),prefix=0,voices=0,unproven=0;
+  let total=BigInt(modulationTicks),prefix=0,voices=0,unproven=0,analytic=0,unresolved=0;
   if(total<1n)return {status:'unknown'};
   for(const c of components){
    let turns=1n,active=false,missing=false;
@@ -23,7 +23,7 @@ const orchestraPeriod=(()=>{
    for(const id of c.machines||[]){
     const m=machines.get(id);if(!m||seen.has(id)){missing=true;continue}seen.add(id);
     for(const dir of ['in','out']){
-     const L=lengthFor(m.type,dir);if(!Number.isSafeInteger(L)||L<1)continue;
+     const L=lengthFor(m.type,dir,m);if(!Number.isSafeInteger(L)||L<1)continue;
      const f=fraction(rates[id]?.[dir]);if(!f){missing=true;continue}
      const [a,b]=f;if(!a)continue;
      active=true;voices++;
@@ -34,11 +34,11 @@ const orchestraPeriod=(()=>{
      turns=lcm(turns,len/gcd(len,n));
     }
    }
-   if(missing||active&&!witnessed){unproven++;continue}
+   if(missing||active&&!witnessed){unproven++;if(!missing&&c.actualStatus==='exact-model-analytic')analytic++;else unresolved++;continue}
    if(active){total=lcm(total,period*turns);prefix=Math.max(prefix,c.prefixTicks)}
   }
-  for(const [id,m] of machines)if(!seen.has(id)&&['in','out'].some(dir=>lengthFor(m.type,dir)>0))unproven++;
-  if(unproven)return {status:'unknown',unproven,voices};
+  for(const [id,m] of machines)if(!seen.has(id)&&['in','out'].some(dir=>lengthFor(m.type,dir,m)>0)){unproven++;unresolved++}
+  if(unproven)return {status:'unknown',unproven,analytic,unresolved,voices};
   return voices?{status:'period',ticks:total,prefix,voices}:{status:'silent'};
  }
  function duration(ticks,bpm){

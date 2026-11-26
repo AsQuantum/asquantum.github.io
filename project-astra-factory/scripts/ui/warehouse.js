@@ -99,7 +99,7 @@ function warehouseView(theoryRows=false){
   tenMinuteReady:windowReady,tenMinuteTotals:windowTotals};
 }
 function warehouseSummaryMarkup(v){
- return '<div id="warehouseLiveSummary" class="ledger-mini"><div><span>模拟时间</span><b>'+
+ return '<div id="warehouseLiveSummary" class="ledger-mini"><div><span>'+((typeof orchestraTheme!=='undefined'&&orchestraTheme.panelPreview)?'音游预演时间':'模拟时间')+'</span><b>'+
  (simTime/60).toFixed(1)+'分</b></div><div><span>仓库累计进 / 出</span><b>'+
  v.totalsIn+' / '+v.totalsOut+'</b></div></div>';
 }
@@ -109,8 +109,8 @@ function warehouseActualMarkup(v){
   const sample=v.windowTotals[mat]||{inbound:0,outbound:0};
   const netCell=v.windowReady?ledgerNetCell((sample.inbound-sample.outbound)/v.windowMinutes):
    '<td title="尚未累计完整的'+v.windowMinutes+'分钟窗口">—</td>';
-  return '<tr><td class="ledger-name" title="'+esc(mat)+'">'+ledgerMaterialLabel(mat)+
-   '</td><td>'+inc+'</td><td>'+out+'</td>'+netCell+'<td title="拆除返库累计 '+(sim?.editReturns?.[mat]||0)+' 件（不计入常规收入）">'+(ware[mat]||0)+'</td></tr>';
+  return '<tr data-orch-item="'+esc(mat)+'"><td class="ledger-name" title="'+esc(mat)+'">'+ledgerMaterialLabel(mat)+
+   '</td><td>'+inc+'</td><td>'+out+'</td>'+netCell+'<td data-orch-stock title="拆除返库累计 '+(sim?.editReturns?.[mat]||0)+' 件（不计入常规收入）">'+(ware[mat]||0)+'</td></tr>';
  }).join('');
  const income=v.actualMaterials.reduce((sum,mat)=>sum+(v.showBucket.inbound[mat]||0),0);
  const expense=v.actualMaterials.reduce((sum,mat)=>sum+(v.showBucket.outbound[mat]||0),0);
@@ -186,15 +186,18 @@ function updateTheoryProgress(){
  el.querySelector('[data-theory-elapsed]').textContent=(elapsed/1000).toFixed(1)+' / '+(job.budgetMs/1000)+'s';
 }
 function warehouseRefresh(){
+ if(typeof orchestraTheme!=='undefined'&&orchestraTheme.rhythm?.active&&!orchestraTheme.panelPreview)orchestraTheme.panelRefreshNeeded=true;
  const expanded=!!$('warehouse').querySelector('.theory-diagnostics')?.open;
  const v=warehouseView(true),budget=v.budget;
  $('warehouse').innerHTML=warehouseSummaryMarkup(v)+(typeof frozenFactoriesMarkup==='function'?frozenFactoriesMarkup(v):'')+`<div class="ledger-panel"><div class="ledger-head">${typeof ledgerCollapseButton==='function'?ledgerCollapseButton('theory','长期理论收支'):'<strong>长期理论收支</strong>'}<span class="ledger-chip">${budget.calculating?(budget.background?"后台计算中…":"计算中…"):budget.failure?(budget.failure==="timeout"?"计算超时":budget.failure==="contradiction"?"约束矛盾":budget.failure==="unsupported"?"模型不支持":"计算失败"):budget.proofMode==="strict-counts"?theorySolutionChip(budget):budget.calculationTimedOut?(v.conditional?"条件解 · 透支超时":"计算超时"):v.conditional?"条件解 · 件/分钟":budget.status==="modelled-unresolved"&&v.materials.length?"未求解 · 件/分钟":"件/分钟"}</span></div>
  <div class="ledger-card-body"${typeof warehouseCardOpen!=='undefined'&&!warehouseCardOpen.theory?' hidden':''}>${theoryProgressMarkup(budget)}<div class="ledger-table-scroll" tabindex="0" aria-label="长期理论收支表，单位件/分钟，可横向滚动"><table class="ledger-table"><thead><tr><th>材料</th><th>收入</th><th>支出</th><th>净值</th><th title="当前实际收入 − 当前服务边界下的有效需求；计入传送带、加工、缓存和竞争，不重新求解仓库稳态。负值表示未满足需求">潜在净值</th><th title="允许所有仓库库存为负，重新求解全网络长期流率：新收入 − 新支出">透支净值</th></tr></thead><tbody>${v.tRows||'<tr><td colspan="6">暂无有效仓库物流</td></tr>'}${v.theoryTotal}</tbody></table></div>
  ${theoryDiagnosticsMarkup(budget,expanded)}
  </div></div>`+warehouseActualMarkup(v);
+ if(typeof orchestraTheme!=='undefined'&&orchestraTheme.rhythm?.active&&!orchestraTheme.panelPreview)orchestraTheme.refreshRhythmWarehouse?.();
 }
 // When folded, skip both DOM work and formatting until the panel is opened.
 function warehouseRefreshLive(){
+ if(typeof orchestraTheme!=='undefined'&&orchestraTheme.rhythm?.active&&!orchestraTheme.panelPreview)return;
  const panel=$('warehousePanel');
  if(panel&&!panel.open)return;
  const summary=$('warehouseLiveSummary'),actual=$('warehouseLiveActual');
@@ -202,5 +205,5 @@ function warehouseRefreshLive(){
  const v=warehouseView(false);
  syncLiveMarkup(summary,warehouseSummaryMarkup(v));
  if(typeof warehouseCardOpen==='undefined'||warehouseCardOpen.actual)syncLiveMarkup(actual,warehouseActualMarkup(v));
- if(typeof frozenRefreshLive==='function'&&warehouseCardOpen.frozen)frozenRefreshLive(v);
+ if(typeof frozenRefreshLive==='function'&&warehouseCardOpen.frozen&&!(typeof orchestraTheme!=='undefined'&&orchestraTheme.panelPreview))frozenRefreshLive(v);
 }

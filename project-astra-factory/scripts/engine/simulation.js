@@ -112,11 +112,11 @@ function simMaterializeBatchBelts(){
   sim.routes[r.id]=list;
  }
 }
-function simulateBatchSteps(steps,dt,{lazyBelts=true}={}){
+function simulateBatchSteps(steps,dt,{lazyBelts=true,afterStep=null}={}){
  if(!steps)return;
  const previous=simBatchIndex,previousBelts=simBatchBelts,previousTick=simBatchTick;
  simBatchIndex=simBuildBatchIndex();simBatchTick=simTicks(simTime);simBatchBelts=null;
- try{simBatchBelts=lazyBelts&&steps>=20&&dt===.05?simMakeBatchBelts(simBatchIndex):null;for(let i=0;i<steps;i++)simulate(dt);}finally{
+ try{simBatchBelts=lazyBelts&&steps>=20&&dt===.05?simMakeBatchBelts(simBatchIndex):null;for(let i=0;i<steps;i++){simulate(dt);afterStep?.()}}finally{
   try{simMaterializeBatchBelts()}finally{simBatchIndex=previous;simBatchBelts=previousBelts;simBatchTick=previousTick;}
  }
 }
@@ -589,7 +589,7 @@ function advanceRealtimeSimulation(elapsed){
 }
 function stepLoop(t){
  const elapsedReal=document.hidden?0:Math.min(.12,Math.max(0,(t-animationLast)/1000));animationLast=t;
- if(running){advanceRealtimeSimulation(elapsedReal*simulationSpeed);
+ if(running&&!(typeof orchestraTheme!=='undefined'&&orchestraTheme.rhythm?.active)){advanceRealtimeSimulation(elapsedReal*simulationSpeed);
   if(!simAdvanceBusy&&!document.hidden&&typeof inspectorRefreshProgress==='function')inspectorRefreshProgress();
   simPaintTimer+=elapsedReal;
   if(simPaintTimer>=.3){simPaintTimer=0;warehouseRefreshLive();inspectorRefreshLive();stockChartMaybeRefresh();}

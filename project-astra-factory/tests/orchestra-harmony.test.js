@@ -27,3 +27,13 @@ test('shared orchestration and optional modulation remain bounded',()=>{
   for(const bars of [1,2,4]){const p=h.keyPlan(bars,random);assert.equal(p.length,bars);assert.equal(h.barOffset(4*bars,p),0);assert(p.every(x=>[0,5,7].includes(x)))}
  }
 });
+
+test('modulation keeps pitch classes and minimizes register jumps over the loop',()=>{
+ assert.deepEqual(Array.from(h.voicedPlan([0,7])),[0,-5]);
+ for(const plan of [[0,5],[0,7],[0,5,0,7],[0,7,5,0],[0,0,5,7]]){
+  const voiced=h.voicedPlan(plan);
+  assert(voiced.every((n,i)=>(n+12)%12===plan[i]));
+  assert(Math.max(...voiced.map((n,i)=>Math.abs(n-voiced[(i+1)%voiced.length])))<=7);
+  assert(voiced.every((n,i)=>h.transpose(60,i*4,plan)===60+n));
+ }
+});

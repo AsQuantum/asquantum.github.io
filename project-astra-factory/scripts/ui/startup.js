@@ -6,13 +6,14 @@ function editorCanvasKeyboardActive(){
  return !!document.getElementById('map')?.matches(':hover');
 }
 // Space tap toggles transport; a held Space with a canvas drag still pans.
-let spacePanUsed=false;
+let spacePanUsed=false,spacePressedAt=0;
+const SPACE_TAP_MAX_MS=250;
 document.addEventListener('keydown',e=>{
  if(e.key==='Escape'){e.preventDefault();resetEditorMode();return;}
  const target=e.target;
  if(target?.closest?.('input,select,textarea,[contenteditable]'))return;
- if(e.key===' '&&!e.ctrlKey&&!e.metaKey&&!e.altKey){if(!e.repeat&&!spaceDown){spaceDown=true;spacePanUsed=false}e.preventDefault();return;}
- if(target?.closest?.('#orchestraScore'))return;
+ if(e.key===' '&&!e.ctrlKey&&!e.metaKey&&!e.altKey){if(!e.repeat&&!spaceDown){spaceDown=true;spacePanUsed=false;spacePressedAt=performance.now()}e.preventDefault();return;}
+ if(target?.closest?.('#orchestraScore')||(typeof orchestraTheme!=='undefined'&&orchestraTheme.rhythm?.active))return;
  // Editor clipboard commands are active ONLY while hovering the canvas;
  // browser-native text selection and clipboard actions always win elsewhere.
  if((e.ctrlKey||e.metaKey)&&['c','v','d'].includes(e.key.toLowerCase())&&!editorCanvasKeyboardActive())return;
@@ -39,9 +40,10 @@ document.addEventListener('keydown',e=>{
   if(selection?.routeId){deleteRoute(selection.routeId);e.preventDefault();return;}
  }
 });
-document.addEventListener('keyup',e=>{if(e.key!==' ')return;const toggle=spaceDown&&!spacePanUsed;spaceDown=false;spacePanUsed=false;if(toggle&&!e.target?.closest?.('input,select,textarea,[contenteditable]')&&!simAdvanceBusy){e.preventDefault();$('run').click()}});
+document.addEventListener('keyup',e=>{if(e.key!==' ')return;const toggle=spaceDown&&!spacePanUsed&&performance.now()-spacePressedAt<=SPACE_TAP_MAX_MS;spaceDown=false;spacePanUsed=false;spacePressedAt=0;if(toggle&&!e.target?.closest?.('input,select,textarea,[contenteditable]')&&!simAdvanceBusy){e.preventDefault();$('run').click()}});
 canvas.addEventListener('pointerdown',()=>{if(spaceDown)spacePanUsed=true},true);
-window.addEventListener('blur',()=>{spaceDown=false;spacePanUsed=false});
+window.addEventListener('blur',()=>{spaceDown=false;spacePanUsed=false;spacePressedAt=0});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){spaceDown=false;spacePanUsed=false;spacePressedAt=0}});
 window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden){try{localStorage.setItem('factory_lab_v13',compactFactoryJSON());saveCurrentScheme();}catch(e){}}});
 try{stampPrefs=JSON.parse(localStorage.getItem('factory_lab_v3_stamp_prefs')||'{}')||{};}catch(e){stampPrefs={};}
 let savedLayout=null,storageKey=null;

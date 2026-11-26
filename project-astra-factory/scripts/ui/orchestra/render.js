@@ -2,8 +2,8 @@
 // Theme hooks for the original canvas. All coordinates are in its world
 // space; hit testing, transforms, edit previews and geometry stay shared.
 const orchestraTheme={
- active:false,score:null,pulses:new Map(),routePulses:new Map(),pendingHits:[],typeHits:new Map(),gateHits:new Map(),dirty:false,
- laneWidth:.50,pulseMs:580,tempo:120,noteHalos:new Map(),
+ active:false,score:null,panelPreview:false,pulses:new Map(),routePulses:new Map(),pendingHits:[],typeHits:new Map(),itemHits:new Map(),warehouseAnimations:new Map(),warehouseHitPending:false,inspectorHits:new Map(),inspectorAnimations:new Map(),inspectorMachine:null,gateHits:new Map(),dirty:false,
+ laneWidth:.50,selectionScale:1.5,pulseMs:580,tempo:120,noteHalos:new Map(),
  // Visual hierarchy: background < matte keys < colored hit accents
  // < luminous moving notes. Large surfaces must never flash white.
  lighting:{idleFill:.17,hitFill:.18,idleEdge:.80,hitEdge:.95,idleText:.94,hitText:.95},
@@ -40,11 +40,11 @@ const orchestraTheme={
   ctx.globalAlpha=.33;word('PROJECT : ASTRA',115,31,'500',7,490,'#9aafd3');
   ctx.restore();
  },
- clear(){this.pulses.clear();this.routePulses.clear();this.typeHits.clear();this.gateHits.clear();this.pendingHits.length=0;this.dirty=true},
+ clear(){this.pulses.clear();this.routePulses.clear();this.typeHits.clear();this.itemHits.clear();this.warehouseHitPending=false;for(const a of this.warehouseAnimations.values())for(const animation of a.animations)animation.cancel();this.warehouseAnimations.clear();this.clearInspectorHits();this.gateHits.clear();this.pendingHits.length=0;this.dirty=true},
  hasAnimation(){return this.dirty||this.pendingHits.length>0||this.pulses.size>0||this.routePulses.size>0},
- hit(m,dir,index,at=performance.now()){
+ hit(m,dir,index,at=performance.now(),item=null){
   const r=routeFor(m.id,dir,index);
-  this.pendingHits.push({id:m.id,type:m.type,dir,index,now:at,route:r?.id});
+  this.pendingHits.push({id:m.id,type:m.type,dir,index,now:at,route:r?.id,item});
  },
  beginFrame(t){
   let n=0;
@@ -59,6 +59,20 @@ const orchestraTheme={
    const shownAt=Math.max(v.now,t-12);
    this.pulses.set(key,{...v,shownAt});
    this.typeHits.set(v.type,Math.max(shownAt,this.typeHits.get(v.type)??-Infinity));
+   const flow=v.type==='仓入'&&v.dir==='in'?'income':v.type==='仓出'&&v.dir==='out'?'expense':null;
+   if(flow&&v.item){
+    const old=this.itemHits.get(v.item);
+    if(!old||v.now>=old.now)this.itemHits.set(v.item,{at:shownAt,now:v.now,flow});
+    this.warehouseHitPending=true;
+   }
+   // The inspector belongs to a physical machine, not its machine type.
+   if(typeof selection!=='undefined'&&selection?.machineId===v.id){
+    this.syncInspectorMachine(v.id);
+    const pulse={at:shownAt,now:v.now,color:this.color(v.type)};
+    const save=(key,p)=>{if((this.inspectorHits.get(key)?.now??-Infinity)<=p.now)this.inspectorHits.set(key,p)};
+    save('machine',pulse);
+    if(v.item&&(v.dir==='in'||v.dir==='out'))save(JSON.stringify([v.dir,v.item]),{...pulse,color:materialColor(v.item)});
+   }
    if(v.route){
     this.routePulses.set(v.route,Math.max(shownAt,this.routePulses.get(v.route)??-Infinity));
     const k=v.route+":"+v.dir;this.gateHits.set(k,Math.max(shownAt,this.gateHits.get(k)??-Infinity));
@@ -77,6 +91,70 @@ const orchestraTheme={
    else if(button.classList.contains('orch-key-hit')){button.classList.remove('orch-key-hit');button.style.removeProperty('--orch-hit')}
   }
   for(const [type,at] of this.typeHits)if(t>=at&&!this.envelope(t,at))this.typeHits.delete(type);
+ },
+ paintPanels(t){
+  for(const [item,pulse] of this.itemHits)if(!this.envelope(t,pulse.at))this.itemHits.delete(item);
+  for(const [row,entry] of this.warehouseAnimations){
+   if(!this.active||!row.isConnected||!this.envelope(t,entry.pulse.at)){
+    for(const animation of entry.animations)animation.cancel();
+    this.warehouseAnimations.delete(row);
+   }
+  }
+  if(!this.active)return;
+  const duration=Math.min(this.pulseMs,this.beatMs()*.85),hold=Math.min(40,duration*.14);
+  for(const row of document.querySelectorAll('#warehouseLiveActual tr[data-orch-item]')){
+   const pulse=this.itemHits.get(row.dataset.orchItem);
+   if(!pulse)continue;
+   const old=this.warehouseAnimations.get(row);
+   if(old?.pulse===pulse)continue;
+   for(const animation of old?.animations||[])animation.cancel();
+   const rgb=pulse.flow==='income'?'78,224,155':'255,98,107';
+   const points=[0,hold/duration,.35,.65,1].map(offset=>({offset,e:offset===1?0:this.envelope(pulse.at+offset*duration,pulse.at)}));
+   const frames=points.map(({offset,e})=>({offset,backgroundColor:'rgba('+rgb+','+(.18*e)+')',boxShadow:'inset 2px 0 rgba('+rgb+','+(.85*e)+')'}));
+   const animations=[row.animate(frames,{duration,easing:'linear'})];
+   const stock=row.querySelector('[data-orch-stock]');
+   if(stock){const base=getComputedStyle(stock).color;animations.push(stock.animate(points.map(({offset,e})=>({offset,color:'color-mix(in srgb,rgb('+rgb+') '+(e*100)+'%,'+base+')',textShadow:'0 0 8px rgba('+rgb+','+(.8*e)+')'})),{duration,easing:'linear'}))}
+   for(const animation of animations)animation.currentTime=Math.max(0,t-pulse.at);
+   this.warehouseAnimations.set(row,{pulse,animations});
+  }
+ },
+ clearInspectorHits(){
+  this.inspectorHits.clear();this.inspectorMachine=null;
+  for(const entry of this.inspectorAnimations.values())for(const animation of entry.animations)animation.cancel();
+  this.inspectorAnimations.clear();
+ },
+ syncInspectorMachine(id){
+  if(this.inspectorMachine!==id){this.clearInspectorHits();this.inspectorMachine=id}
+ },
+ paintInspector(t){
+  const id=typeof selection!=='undefined'?selection?.machineId??null:null;this.syncInspectorMachine(id);
+  const root=document.getElementById('inspector');
+  if(!this.active||!id||root?.dataset.inspectorKey!=='machine:'+id){this.clearInspectorHits();return}
+  for(const [key,pulse] of this.inspectorHits)if(!this.envelope(t,pulse.at))this.inspectorHits.delete(key);
+  for(const [el,entry] of this.inspectorAnimations){
+   if(!el.isConnected||!this.envelope(t,entry.pulse.at)){for(const a of entry.animations)a.cancel();this.inspectorAnimations.delete(el)}
+  }
+  const duration=Math.min(this.pulseMs,this.beatMs()*.85),hold=Math.min(40,duration*.14);
+  const animate=(el,pulse,summary=false)=>{
+   if(!el||!pulse)return;
+   const old=this.inspectorAnimations.get(el);if(old?.pulse===pulse)return;
+   for(const a of old?.animations||[])a.cancel();
+   const base=getComputedStyle(el),bg=base.backgroundColor,border=base.borderTopColor,c=pulse.color;
+   const points=[0,hold/duration,.35,.65,1].map(offset=>({offset,e:offset===1?0:this.envelope(pulse.at+offset*duration,pulse.at)}));
+   const mix=(base,e)=>'color-mix(in srgb,'+c+' '+e+'%,'+base+')';
+   const frames=points.map(({offset,e})=>({offset,backgroundColor:mix(bg,e*(summary?5:18)),boxShadow:'inset 2px 0 '+mix('transparent',e*80),...(summary?{borderTopColor:mix(border,e*95)}:{})}));
+   const animations=[el.animate(frames,{duration,easing:'linear'})];
+   const text=el.querySelector(summary?'.machine-summary-name':'.machine-stack-count');
+   if(text){const color=getComputedStyle(text).color;animations.push(text.animate(points.map(({offset,e})=>({offset,color:mix(color,e*100),textShadow:'0 0 7px '+mix('transparent',e*75)})),{duration,easing:'linear'}))}
+   for(const a of animations)a.currentTime=Math.max(0,t-pulse.at);
+   this.inspectorAnimations.set(el,{pulse,animations});
+  };
+  animate(root.querySelector('.inspector-machine .machine-summary'),this.inspectorHits.get('machine'),true);
+  for(const row of root.querySelectorAll('#inspectorStacks .machine-stack-row')){
+   const button=row.querySelector('[data-stack-machine][data-stack-item][data-stack-direction]');
+   if(button?.dataset.stackMachine!==id)continue;
+   animate(row,this.inspectorHits.get(JSON.stringify([button.dataset.stackDirection,button.dataset.stackItem])));
+  }
  },
  // A port may trigger once every game second (warehouse inlets can
  // be faster). Scale the slow body tail and the short receptor flash
@@ -101,6 +179,7 @@ const orchestraTheme={
   ctx.save();ctx.strokeStyle=this.port(p);ctx.globalAlpha=overlay?.90*energy:preview?.9:.60+.40*energy;
   ctx.lineWidth=.075+.055*energy;ctx.strokeRect(p.x+.24,p.y+.24,.52,.52);ctx.restore();
  },
+ machineBorder(energy=0){return .095+.055*energy},
  indicators(m,w,h,energy=0,preview=false,overlay=false){
   const d=V[m.face||'E'],cx=m.x+w/2,cy=m.y+h/2,extent=(d[0]?w:h)/2;
   const tip=extent-.22,base=tip-.25,tx=-d[1],ty=d[0],color=this.color(m.type);
@@ -111,9 +190,9 @@ const orchestraTheme={
   if(supportsMachinePanel(m)){
    const n=V[machinePanelFacing(m)],edge=(n[0]?w:h)/2-.13,x=cx+n[0]*edge,y=cy+n[1]*edge;
    ctx.fillStyle=color;ctx.globalAlpha=overlay?energy:preview?.8:.40;
-   const len=Math.min(1.35,(n[0]?h:w)*.5);
-   if(n[0])ctx.fillRect(x-.045,cy-len/2,.09,len);
-   else ctx.fillRect(cx-len/2,y-.045,len,.09);
+   const len=Math.min(1.35,(n[0]?h:w)*.5),width=this.machineBorder(energy)*this.selectionScale;
+   if(n[0])ctx.fillRect(x-width/2,cy-len/2,width,len);
+   else ctx.fillRect(cx-len/2,y-width/2,len,width);
   }
   ctx.restore();
  },
@@ -136,12 +215,12 @@ const orchestraTheme={
   }
   ctx.strokeStyle=accent;
   ctx.globalAlpha=overlay?this.lighting.hitEdge*energy:selected||preview?.9:this.lighting.idleEdge;
-  ctx.lineWidth=selected?.13:overlay?.095+.055*energy:.095;ctx.stroke();
+  ctx.lineWidth=this.machineBorder(energy)*(selected?this.selectionScale:1);ctx.stroke();
   // Four short corner brackets give the pad a distinct hit-target shape.
   // Keep them subdued until a note; no full-panel white flash.
   const edge=.17,len=Math.min(.57,mw*.18,mh*.18);
   ctx.strokeStyle=accent;ctx.globalAlpha=overlay?.95*energy:preview?.6:.30;
-  ctx.lineWidth=overlay?.14:.065;ctx.lineCap='round';ctx.beginPath();
+  ctx.lineWidth=(.065+.075*energy)*(selected?this.selectionScale:1);ctx.lineCap='round';ctx.beginPath();
   for(const [cx,cy,sx,sy] of [[x+edge,y+edge,1,1],[x+mw-edge,y+edge,-1,1],[x+edge,y+mh-edge,1,-1],[x+mw-edge,y+mh-edge,-1,-1]]){
    ctx.moveTo(cx+sx*len,cy);ctx.lineTo(cx,cy);ctx.lineTo(cx,cy+sy*len);
   }
@@ -157,37 +236,56 @@ const orchestraTheme={
  // All dimensions are world-grid units. Keep the lane inside half a
  // cell and the single note block comfortably between its two rails.
  rails(r,selected){
-  const color=selected?'#f3d875':this.belt(r);ctx.save();ctx.lineJoin='round';ctx.lineCap='butt';
+  if(selected||!r.to){this.editRails(selected?'#f3d875':'#d2a94b',false);return}
+  const color=this.belt(r);ctx.save();ctx.lineJoin='round';ctx.lineCap='butt';
   ctx.strokeStyle=color;ctx.globalAlpha=.035;ctx.lineWidth=.56;ctx.stroke();
-  ctx.globalAlpha=selected?.95:r.to?.36:.24;ctx.lineWidth=this.laneWidth;ctx.stroke();
+  ctx.globalAlpha=.36;ctx.lineWidth=this.laneWidth;ctx.stroke();
   ctx.strokeStyle='#142234';ctx.globalAlpha=1;ctx.lineWidth=.43;ctx.stroke();
-  ctx.strokeStyle=color;ctx.globalAlpha=selected?.30:r.to?.16:.10;ctx.lineWidth=.036;ctx.stroke();
+  ctx.strokeStyle=color;ctx.globalAlpha=.16;ctx.lineWidth=.036;ctx.stroke();
   ctx.restore();
  },
- // Reuse the exact static lane path, cached for the lifetime of a row.
- // Only active, connected, unselected belts need an additional stroke.
+ // Edit highlights scale with the same note envelope as normal rails,
+ // without changing the lane footprint or the crossing geometry.
+ railInner(energy=0,selected=false){return this.laneWidth-2*(.035+.020*energy)*(selected?this.selectionScale:1)},
+ railDash(energy=0,selected=false){return (.036+.016*energy)*(selected?this.selectionScale:1)},
+ editRails(color,dashed=false,energy=0,path=null){
+  ctx.save();ctx.lineJoin='round';ctx.lineCap='butt';ctx.setLineDash([]);
+  const stroke=()=>path?ctx.stroke(path):ctx.stroke();
+  ctx.globalAlpha=1;ctx.strokeStyle='#142234';ctx.lineWidth=this.laneWidth;stroke();
+  ctx.strokeStyle=color;ctx.globalAlpha=.82+.16*energy;ctx.lineWidth=this.laneWidth;
+  if(dashed)ctx.setLineDash([.35,.15]);
+  stroke();
+  ctx.setLineDash([]);ctx.strokeStyle='#142234';ctx.globalAlpha=1;ctx.lineWidth=this.railInner(energy,true);stroke();
+  ctx.strokeStyle=color;ctx.globalAlpha=.45+.40*energy;ctx.lineWidth=this.railDash(energy,true);ctx.setLineDash([.12,.13]);stroke();
+  ctx.restore();
+ },
  routeEnergy(r,t){const at=this.routePulses.get(r.id);return at==null?0:this.envelope(t,at)},
  railPulse(row,t){
   const {r,connected,yellow}=row;
-  if(!connected||yellow)return;
+  if(!connected)return;
   const energy=this.routeEnergy(r,t);if(!energy)return;
-  if(!row.pulsePath){
-   const path=new Path2D();
+  if(!row.pulsePaths){
+   const path=new Path2D(),red=new Path2D();
    const preview=draft?.routeId===r.id&&draft.preview?.length>=r.path.length;
+   const trim=beltTrim?.routeId===r.id&&beltTrim.hoverAnchor===true?beltTrim.index:Infinity;
    for(let i=0;i<r.path.length;i++){
     if(preview&&i===r.path.length-1)continue;
     const tile=routeTile(r,i);if(!tile)continue;
-    const [x,y]=r.path[i],a=V[tile.incoming],b=V[tile.outgoing],cx=x+.5,cy=y+.5;
-    path.moveTo(cx+a[0]*.5,cy+a[1]*.5);path.lineTo(cx,cy);path.lineTo(cx+b[0]*.5,cy+b[1]*.5);
+    const [x,y]=r.path[i],a=V[tile.incoming],b=V[tile.outgoing],cx=x+.5,cy=y+.5,p=i>=trim?red:path;
+    p.moveTo(cx+a[0]*.5,cy+a[1]*.5);p.lineTo(cx,cy);p.lineTo(cx+b[0]*.5,cy+b[1]*.5);
    }
-   row.pulsePath=path;
+   row.pulsePaths={path,red,trim};
+  }
+  const {path,red,trim}=row.pulsePaths;
+  if(yellow){
+   this.editRails('#f3d875',false,energy,path);
+   if(trim!==Infinity)this.editRails('#ff6478',true,energy,red);
+   return;
   }
   ctx.save();ctx.lineJoin='round';ctx.lineCap='butt';
-  // Alpha composites with the cached .36 rail to reach about .60.
-  // Keep the footprint at .50 so crossing masks stay exact.
-  ctx.strokeStyle=this.belt(r);ctx.globalAlpha=.375*energy;ctx.lineWidth=this.laneWidth;ctx.stroke(row.pulsePath);
-  ctx.strokeStyle='#142234';ctx.globalAlpha=1;ctx.lineWidth=.43;ctx.stroke(row.pulsePath);
-  ctx.strokeStyle=this.belt(r);ctx.globalAlpha=.16+.30*energy;ctx.lineWidth=.036+.016*energy;ctx.stroke(row.pulsePath);
+  ctx.strokeStyle=this.belt(r);ctx.globalAlpha=.375*energy;ctx.lineWidth=this.laneWidth;ctx.stroke(path);
+  ctx.strokeStyle='#142234';ctx.globalAlpha=1;ctx.lineWidth=this.railInner(energy);ctx.stroke(path);
+  ctx.strokeStyle=this.belt(r);ctx.globalAlpha=.16+.30*energy;ctx.lineWidth=this.railDash(energy);ctx.stroke(path);
   ctx.restore();
  },
  // Route paint order defines the same top strand as the static scene.
@@ -237,21 +335,24 @@ const orchestraTheme={
  // Accent them on either endpoint's scheduled note, without changing
  // the lane footprint or competing with the luminous packet core.
  motion(row,t=performance.now()){
-  const {r,g,connected}=row;if(!connected)return;
+  const {r,g,connected,yellow}=row;if(!connected)return;
   ctx.save();ctx.lineCap='butt';
-  const phase=beltMotionPhase.get(r.id)??.5,color=this.belt(r),pulse=this.routeEnergy(r,t);
-  ctx.strokeStyle=color;
-  const half=.15+.025*pulse;
-  ctx.beginPath();
-  for(let d=phase%1;d<g.n;d+=1){
-   const [x,y,dx,dy]=beltTreadPoint(g,d);
-   if(x*camera.z+camera.x< -2||y*camera.z+camera.y< -2||x*camera.z+camera.x>pix.w+2||y*camera.z+camera.y>pix.h+2)continue;
-   ctx.moveTo(x-dy*half,y+dx*half);ctx.lineTo(x+dy*half,y-dx*half);
+  const phase=beltMotionPhase.get(r.id)??.5,pulse=this.routeEnergy(r,t);
+  const half=yellow?Math.min(.15,this.railInner(pulse,true)*.35):.15+.025*pulse;
+  const trim=beltTrim?.routeId===r.id&&beltTrim.hoverAnchor===true?beltTrim.index:Infinity;
+  for(const red of trim===Infinity?[false]:[false,true]){
+   ctx.strokeStyle=red?'#ff6478':yellow?'#f3d875':this.belt(r);
+   ctx.beginPath();
+   for(let d=phase%1;d<g.n;d+=1){
+    if((Math.floor(d)>=trim)!==red)continue;
+    const [x,y,dx,dy]=beltTreadPoint(g,d);
+    if(x*camera.z+camera.x< -2||y*camera.z+camera.y< -2||x*camera.z+camera.x>pix.w+2||y*camera.z+camera.y>pix.h+2)continue;
+    ctx.moveTo(x-dy*half,y+dx*half);ctx.lineTo(x+dy*half,y-dx*half);
+   }
+   if(pulse>0){ctx.globalAlpha=.07*pulse;ctx.lineWidth=.145;ctx.stroke()}
+   ctx.globalAlpha=yellow?.65+.25*pulse:.28+pulse*.29;ctx.lineWidth=(.045+pulse*.035)*(yellow?this.selectionScale:1);ctx.stroke();
   }
-  if(pulse>0){
-   ctx.globalAlpha=.07*pulse;ctx.lineWidth=.145;ctx.stroke();
-  }
-  ctx.globalAlpha=.28+pulse*.29;ctx.lineWidth=.045+pulse*.035;ctx.stroke();ctx.restore();
+  ctx.restore();
  },
  gate(row,t){
   const {r,g,connected}=row;if(!connected)return;
@@ -301,6 +402,25 @@ const orchestraTheme={
     ctx.fillStyle='#e4f2ff';ctx.globalAlpha=.75*a;ctx.fillRect(x-.085,y-.085,.17,.17);
    }
    ctx.restore();
+  }
+  if(draft?.from&&draft.preview?.length){
+   const r=state.routes.find(r=>r.id===draft.routeId),energy=r?this.routeEnergy(r,t):0;
+   if(energy>0){
+    const pts=draft.preview,locked=draft.path||[],source=machineById(draft.from.id),port=source&&outPort(source,draft.from.port);
+    if(port){
+     const paint=(start,end,color,dashed)=>{
+      const path=new Path2D();
+      for(let i=start;i<end;i++){
+       const tile=draftPreviewTile(pts,i,port,draft.previewTo);if(!tile)continue;
+       const [x,y]=pts[i],a=V[tile.incoming],b=V[tile.outgoing],cx=x+.5,cy=y+.5;
+       path.moveTo(cx+a[0]*.5,cy+a[1]*.5);path.lineTo(cx,cy);path.lineTo(cx+b[0]*.5,cy+b[1]*.5);
+      }
+      this.editRails(color,dashed,energy,path);
+     };
+     if(locked.length){paint(locked.length-1,locked.length,'#f3d875',false);paint(locked.length,pts.length,'#ffd176',true)}
+     else paint(0,pts.length,'#ffd176',true);
+    }
+   }
   }
   for(const [id,time] of this.routePulses)if(!this.envelope(t,time))this.routePulses.delete(id);
   for(const [key,time] of this.gateHits)if(!this.portEnvelope(t,time))this.gateHits.delete(key);

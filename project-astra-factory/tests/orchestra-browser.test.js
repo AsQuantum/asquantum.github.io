@@ -46,6 +46,9 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   await poll(()=>evaluate("orchestraTheme.active&&running"));console.log('ORCH_STAGE','entered');
   assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.side.right > h3,.side.right > details > summary'),e=>getComputedStyle(e).color)"),sidebarColors);
 
+  const volumeHeader=await evaluate(`(()=>{const v=document.querySelector('[data-orch-volume]'),b=document.querySelector('[data-orch-bpm]'),toolbar=document.querySelector('.sim-toolbar');v.value=42;v.dispatchEvent(new Event('input',{bubbles:true}));const saved=JSON.parse(localStorage.getItem('astra-orchestra-v1')).volume,visible=v.getBoundingClientRect().width>0,order=v.closest('label').nextElementSibling===b.closest('label');return {saved,visible,order,one:document.querySelectorAll('[data-orch-volume]').length===1,inHeader:toolbar.contains(v),label:document.querySelector('[data-orch-volume-value]').textContent}})()`);
+  assert(volumeHeader.saved===.42&&volumeHeader.visible&&volumeHeader.order&&volumeHeader.one&&volumeHeader.inHeader&&volumeHeader.label==='42%',JSON.stringify(volumeHeader));
+  await evaluate("(()=>{const v=document.querySelector('[data-orch-volume]');v.value=60;v.dispatchEvent(new Event('input',{bubbles:true}));return true})()");
   const globalScore=await evaluate("(()=>{const s=JSON.parse(localStorage.getItem('astra-orchestra-v1')),tracks=s.scores['shared-machine-events-v1'],types=Object.keys(DEF).filter(type=>getPorts({type,x:0,y:0,face:'E',mode:defaultModeFor(type)}).length);return {defaultModulate:s.modulate===true&&document.querySelector('[data-orch-modulate]').checked&&s.keyPlan?.length===4&&s.keyPlan.some(n=>n!==0),count:types.length,complete:types.every(k=>!!tracks[k]),lengths16:types.every(k=>Object.values(tracks[k].ports).every(p=>p.length===16&&p.every(Number.isInteger))),unused:types.some(k=>!state.machines.some(m=>m.type===k))}})()");
   assert(globalScore.defaultModulate&&globalScore.complete&&globalScore.lengths16&&globalScore.unused,JSON.stringify(globalScore));
 
@@ -75,10 +78,16 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   await evaluate("document.activeElement?.blur();true");await space();await poll(()=>evaluate("!running"));
   const paused=await evaluate("simTime");await new Promise(r=>setTimeout(r,120));assert.equal(await evaluate("simTime"),paused);
   const pausedStyle=await evaluate("(()=>{const b=$('run');return {w:b.getBoundingClientRect().width,bg:getComputedStyle(b).backgroundColor}})()");
+  await send('Input.dispatchKeyEvent',{type:'keyDown',key:' ',code:'Space',windowsVirtualKeyCode:32});
+  await new Promise(r=>setTimeout(r,420));
+  await send('Input.dispatchKeyEvent',{type:'keyUp',key:' ',code:'Space',windowsVirtualKeyCode:32});
+  assert.equal(await evaluate('running'),false,'long space must not resume a paused factory');
   await space();await poll(()=>evaluate("running"));const playingStyle=await evaluate("(()=>{const b=$('run');return {w:b.getBoundingClientRect().width,bg:getComputedStyle(b).backgroundColor}})()");
   assert.equal(pausedStyle.w,playingStyle.w);assert.match(pausedStyle.bg,/rgb\(52, 74, 121\)/);
   await new Promise(r=>setTimeout(r,1050));
   const headerLayout=await evaluate("(()=>{const a=document.querySelector('.brand').getBoundingClientRect(),b=$('presetDropdown').getBoundingClientRect(),c=$('editMenuWrap').getBoundingClientRect(),d=document.querySelector('.sim-toolbar').getBoundingClientRect();return {ordered:a.right<=b.left+1&&b.right<=c.left+1,center:(d.left+d.right)/2,width:innerWidth,leftFits:c.right<=innerWidth+1,overlap:!(c.right<=d.left+1||c.bottom<=d.top+1),fadeDone:!document.querySelector('.orch-transition-image')}})()");
+  const volumeRows=await evaluate(`(()=>{const v=document.querySelector('[data-orch-volume]').closest('label').getBoundingClientRect(),b=document.querySelector('[data-orch-bpm]').closest('label').getBoundingClientRect(),actions=[...document.querySelectorAll('.sim-toolbar [data-orch]')].map(e=>e.getBoundingClientRect());return {wrapped:b.top>=v.bottom-1&&actions.every(r=>r.top>=v.bottom-1),inline:Math.abs(b.top-v.top)<3&&v.right<=b.left+1,inside:actions.every(r=>r.left>=-1&&r.right<=innerWidth+1)}})()`);
+  assert(volumeRows.inside&&(mobile?volumeRows.wrapped:volumeRows.inline),JSON.stringify(volumeRows));
   console.log('ORCH_HEADER',JSON.stringify(headerLayout));
   assert(headerLayout.ordered&&headerLayout.leftFits&&!headerLayout.overlap&&headerLayout.fadeDone&&Math.abs(headerLayout.center-headerLayout.width/2)<3,JSON.stringify(headerLayout));
   if(!mobile){
@@ -187,6 +196,130 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   const libraryHit=await evaluate("(()=>{const theme=orchestraTheme,m=state.machines[0],p=getPorts(m).find(p=>p.kind==='out'),b=document.querySelector('#palette [data-stamp=垃圾]'),other=document.querySelector('#palette [data-stamp=分流]'),t=performance.now();theme.clear();theme.paintPalette(t);const idle=getComputedStyle(b).backgroundColor;theme.hit(m,p.kind,p.index,t+100);theme.beginFrame(t);theme.paintPalette(t);const future=!b.classList.contains('orch-key-hit');theme.beginFrame(t+100);theme.paintPalette(t+100);const hit=getComputedStyle(b).backgroundColor,energy=Number(b.style.getPropertyValue('--orch-hit')),only=!other.classList.contains('orch-key-hit');theme.hit(m,p.kind,p.index,t+100);theme.beginFrame(t+100);theme.paintPalette(t+100);const bounded=Number(b.style.getPropertyValue('--orch-hit'))===1;theme.paintPalette(t+681);const reset=!b.classList.contains('orch-key-hit')&&getComputedStyle(b).backgroundColor===idle;theme.clear();return {future,hit:hit!==idle,energy,only,bounded,reset}})()");
   console.log('ORCH_LIBRARY_HIT',JSON.stringify(libraryHit));
   assert(libraryHit.future&&libraryHit.hit&&libraryHit.energy===1&&libraryHit.only&&libraryHit.bounded&&libraryHit.reset,JSON.stringify(libraryHit));
+
+  // Real hold gesture, preview clock, key judgement, pause, and close.
+  await evaluate("(()=>{setTool('select');selection=null;multiSelection=null;draft=null;stampType=null;camera.z=8;const m=state.machines[0],[w,h]=dims(m);camera.x=pix.w/2-(m.x+w/2)*8;camera.y=pix.h/2-(m.y+h/2)*8;draw();return true})()");
+  const machinePoint=await point("(()=>{const m=state.machines[0],[w,h]=dims(m);return [m.x+w/2,m.y+h/2]})()");
+  const hold=async()=>{
+   if(mobile){await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:1,x:machinePoint.x,y:machinePoint.y}]});await new Promise(r=>setTimeout(r,620));await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})}
+   else{await send('Input.dispatchMouseEvent',{type:'mousePressed',x:machinePoint.x,y:machinePoint.y,button:'left',clickCount:1});await new Promise(r=>setTimeout(r,620));await send('Input.dispatchMouseEvent',{type:'mouseReleased',x:machinePoint.x,y:machinePoint.y,button:'left',clickCount:1})}
+  };
+  const oldTempo=await evaluate("Number(document.querySelector('[data-orch-bpm]').value)");
+  await hold();await hold();assert.equal(await evaluate('orchestraTheme.rhythm.active'),false);
+  await hold();await poll(()=>evaluate('orchestraTheme.rhythm.active'));
+  const rhythmLayout=await evaluate(`(()=>{const el=document.querySelector('.orch-rhythm'),r=el.getBoundingClientRect(),w=canvas.closest('.canvaswrap').getBoundingClientRect();return {sameCanvas:document.querySelectorAll('#map').length===1,hiddenMap:getComputedStyle(canvas).visibility==='hidden',fits:Math.abs(r.width-w.width)<1&&Math.abs(r.height-w.height)<1,lanes:el.querySelectorAll('[data-rhythm-lane]').length,lead:orchestraTheme.rhythm.lead,auto:orchestraTheme.rhythm.auto,difficulty:orchestraTheme.rhythm.difficulty,keys:[...el.querySelectorAll('[data-rhythm-key]')].map(b=>b.textContent).join(''),tempo:simulationSpeed,locked:document.querySelector('[data-orch-bpm]').disabled,running}})()`);
+  assert(rhythmLayout.sameCanvas&&rhythmLayout.hiddenMap&&rhythmLayout.fits&&rhythmLayout.lanes===4&&rhythmLayout.lead===1.2&&!rhythmLayout.auto&&rhythmLayout.difficulty==='easy'&&rhythmLayout.keys==='DFJK'&&rhythmLayout.tempo===2&&rhythmLayout.locked&&rhythmLayout.running,JSON.stringify(rhythmLayout));
+  assert.equal(await evaluate("(()=>{const v=document.querySelector('[data-orch-volume]');v.value=37;v.dispatchEvent(new Event('input',{bubbles:true}));const ok=!v.disabled&&v.getBoundingClientRect().width>0&&JSON.parse(localStorage.getItem('astra-orchestra-v1')).volume===.37;v.value=60;v.dispatchEvent(new Event('input',{bubbles:true}));return ok})()"),true);
+  await evaluate("(()=>{$('warehousePanel').open=true;warehouseCardOpen.actual=true;warehouseRefresh();return true})()");
+  const frozen=await evaluate("(()=>{window.__rhythmOriginal={sim,ware,time:simTime,remainder:simClockRemainder,bytes:JSON.stringify({sim,ware}),cache:frozenSimCache,snapshot:simLayoutSnapshot};return {time:simTime,plan:orchestraRhythmSongPlan()}})()");
+  assert.equal(frozen.plan.duration,64);assert.equal(frozen.plan.bars,16);assert.equal(frozen.plan.repeats,2);
+  await poll(()=>evaluate("orchestraTheme.rhythm.model.notes.length>0"));
+  const beforeRhythm=await evaluate("(()=>{const r=orchestraTheme.rhythm;return {time:simTime,notes:r.model.notes.length,first:r.model.notes[0].at}})()");
+  await poll(()=>evaluate("document.querySelector('#warehouseLiveSummary')?.textContent.includes('音游预演时间')"));
+  const previewPanels=await evaluate("(()=>({preview:document.querySelector('#warehouseLiveSummary').textContent.includes('音游预演时间'),real:sim===window.__rhythmOriginal.sim&&simTime===window.__rhythmOriginal.time}))()");
+  assert(previewPanels.preview&&previewPanels.real,JSON.stringify(previewPanels));
+  // Use the actual audio clock (the browser fixture exposes its analyser).
+  const judged=await evaluate(`new Promise(resolve=>{const r=orchestraTheme.rhythm,started=performance.now();let target=null;function loop(){const n=r.model.notes[0];if(n){const key=document.querySelector('[data-rhythm-key="'+n.lane+'"]');if(!target)target=n;const el=document.querySelector('[data-rhythm-lane="'+n.lane+'"] .orch-rhythm-note'),line=document.querySelector('.orch-rhythm-judge-line');if(el&&Math.abs(el.getBoundingClientRect().top+el.getBoundingClientRect().height/2-line.getBoundingClientRect().top)<12){if(${mobile}){key.dispatchEvent(new PointerEvent('pointerdown',{pointerId:999}));key.dispatchEvent(new PointerEvent('pointerup',{pointerId:999}))}else{const code=r.keys[n.lane],keyName=r.labels[n.lane].toLowerCase();window.dispatchEvent(new KeyboardEvent('keydown',{code,key:keyName,bubbles:true}));window.dispatchEvent(new KeyboardEvent('keyup',{code,key:keyName,bubbles:true}))}resolve(r.model.stats());return}}if(performance.now()-started>5000){resolve(r.model.stats());return}requestAnimationFrame(loop)}loop()})`);
+  console.log('ORCH_RHYTHM',JSON.stringify({rhythmLayout,beforeRhythm,judged}));assert(judged.score>0,JSON.stringify(judged));
+  assert.equal(await evaluate("!document.querySelector('.orch-rhythm-hit-ring') && [...document.querySelectorAll('.orch-rhythm-hit-beam')].some(e=>e.getAnimations().length>0) && [...document.querySelectorAll('.orch-rhythm-grade')].some(e=>e.textContent&&e.getAnimations().length>0)"),true);
+  const panelHits=await evaluate(`(async()=>{
+   const theme=orchestraTheme,normal=state.machines.find(m=>m.type==='垃圾'),inlet=state.machines.find(m=>m.type==='仓入');
+   const row=document.querySelector('#warehouseLiveActual tr[data-orch-item]'),item=row?.dataset.orchItem;
+   if(!normal||!inlet||!row)return {available:false};
+   const stock=row.querySelector('[data-orch-stock]'),t=performance.now(),outlet={id:'__test_warehouse_out',type:'仓出'};
+   theme.clear();theme.hit(normal,'out',0,t,item);theme.beginFrame(t);theme.paintPanels(t);
+   const ordinaryIgnored=!theme.warehouseHitPending&&!theme.itemHits.size&&!row.getAnimations().length;
+   theme.hit(inlet,'in',0,t,item);theme.beginFrame(t);theme.paintPanels(t);
+   const green=row.getAnimations()[0]?.effect.getKeyframes()[0].backgroundColor,greenStock=stock.getAnimations().length>0;
+   state.machines.push(outlet);
+   try{theme.hit(outlet,'out',0,t+1,item);theme.beginFrame(t+1);theme.paintPanels(t+1)}finally{state.machines.pop()}
+   const red=row.getAnimations()[0]?.effect.getKeyframes()[0].backgroundColor,redStock=stock.getAnimations().length>0,onlyOne=row.getAnimations().length===1;
+   const before=theme.warehouseHitPending;
+   const original=warehouseRefreshLive;let refreshes=0;warehouseRefreshLive=function(){refreshes++;return original()};
+   try{await new Promise(r=>setTimeout(r,90))}finally{warehouseRefreshLive=original}
+   return {available:true,ordinaryIgnored,green,red,greenStock,redStock,onlyOne,before,refreshes,after:theme.warehouseHitPending,inspectorUntouched:!document.querySelector('#inspector [data-orch-dir]')};
+  })()`);
+  console.log('ORCH_PANEL_HITS',JSON.stringify({previewPanels,panelHits}));
+  assert(panelHits.available&&panelHits.ordinaryIgnored&&panelHits.green.includes('78, 224, 155')&&panelHits.red.includes('255, 98, 107')&&panelHits.greenStock&&panelHits.redStock&&panelHits.onlyOne&&panelHits.before&&panelHits.refreshes>0&&!panelHits.after&&panelHits.inspectorUntouched,JSON.stringify(panelHits));
+  const inspectorHits=await evaluate(`(()=>{
+   const theme=orchestraTheme,oldSelection=selection,oldMarkup=$('inspector').innerHTML,oldKey=$('inspector').dataset.inspectorKey;
+   const type=Object.keys(DEF).find(type=>{const rec=getRecipe({type,mode:defaultModeFor(type)});return rec&&Object.keys(rec.inputs||{}).length>0});
+   const m={id:'__inspector_test',type,mode:defaultModeFor(type),x:1,y:1,face:'E'},other={...m,id:'__inspector_other'},rec=getRecipe(m),input=Object.keys(rec.inputs)[0],output=rec.output;
+   state.machines.push(m,other);sim.byMachine[m.id]=simMachineState();
+   try{
+    selection={machineId:m.id};inspectorRefresh();
+    const root=$('inspector'),summary=root.querySelector('.machine-summary'),row=(dir,item)=>[...root.querySelectorAll('#inspectorStacks .machine-stack-row')].find(el=>{const b=el.querySelector('[data-stack-item]');return b?.dataset.stackItem===item&&b.dataset.stackDirection===dir});
+    const a=row('in',input),b=row('out',output),t=performance.now();
+    theme.clearInspectorHits();theme.hit(other,'in',0,t,input);theme.beginFrame(t);theme.paintInspector(t);
+    const otherIgnored=!summary.getAnimations().length&&!a.getAnimations().length;
+    theme.hit(m,'in',0,t+1,input);theme.beginFrame(t+1);theme.paintInspector(t+1);
+    const inOnly=a.getAnimations().length===1&&!b.getAnimations().length,summaryFlash=summary.getAnimations().length===1,materialColorCorrect=theme.inspectorHits.get(JSON.stringify(['in',input])).color===materialColor(input),machineColorCorrect=theme.inspectorHits.get('machine').color===theme.color(type),countFlash=a.querySelector('.machine-stack-count').getAnimations().length===1;
+    theme.hit(m,'out',0,t+2,output);theme.beginFrame(t+2);theme.paintInspector(t+2);
+    const outputFlash=b.getAnimations().length===1&&theme.inspectorHits.get(JSON.stringify(['out',output])).color===materialColor(output);
+    const summaryFill=summary.getAnimations()[0].effect.getKeyframes()[0].backgroundColor;
+    const subdued=summaryFill.includes('5%')||summaryFill.includes('0.05')||summaryFill.includes('0.95')||summaryFill.includes('95%');
+    const saved={state,sim,ware,simTime,frozenSimCache,simVisualDirty,simTransferObserver};let noCraftFlash=false;
+    try{
+     state={...state,machines:[m],routes:[],frozenFactories:[]};sim={byMachine:{[m.id]:simMachineState()},routes:{},inbound:{},outbound:{},crafts:{},consumed:{},editReturns:{},minuteBuckets:[]};ware={};simTime=0;frozenSimCache=null;
+     const ms=sim.byMachine[m.id];for(const [k,n] of Object.entries(rec.inputs))ms.inputs[k]=n;
+     let events=0;simTransferObserver=()=>events++;
+     simulateBatchSteps(Math.ceil(rec.seconds*20)+2,.05);
+     noCraftFlash=events===0&&sim.crafts[output]===rec.qty&&ms.queue.length===rec.qty;
+    }finally{state=saved.state;sim=saved.sim;ware=saved.ware;simTime=saved.simTime;frozenSimCache=saved.frozenSimCache;simVisualDirty=saved.simVisualDirty;simTransferObserver=saved.simTransferObserver}
+
+    selection={machineId:other.id};theme.paintInspector(t+3);
+    return {otherIgnored,inOnly,summaryFlash,materialColorCorrect,machineColorCorrect,countFlash,outputFlash,subdued,noCraftFlash,cleared:!summary.getAnimations().length&&!a.getAnimations().length&&!b.getAnimations().length};
+   }finally{theme.clearInspectorHits();state.machines.splice(-2);delete sim.byMachine[m.id];selection=oldSelection;$('inspector').innerHTML=oldMarkup;$('inspector').dataset.inspectorKey=oldKey||'none'}
+  })()`);
+  console.log('ORCH_INSPECTOR_HITS',JSON.stringify(inspectorHits));
+  assert(inspectorHits&&Object.values(inspectorHits).every(v=>v===true),JSON.stringify(inspectorHits));
+  await poll(()=>evaluate('orchestraTheme.rhythm.model.stats().miss>0'));
+  assert.equal(await evaluate("document.querySelector('[data-rhythm-miss]').textContent===String(orchestraTheme.rhythm.model.stats().miss)"),true);
+  if(!mobile){
+   const before=await evaluate('JSON.stringify({tool,selection,m:state.machines.length})');
+   await send('Input.dispatchKeyEvent',{type:'keyDown',key:'b',code:'KeyB',windowsVirtualKeyCode:66});await send('Input.dispatchKeyEvent',{type:'keyUp',key:'b',code:'KeyB',windowsVirtualKeyCode:66});
+   await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Delete',code:'Delete',windowsVirtualKeyCode:46});await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Delete',code:'Delete',windowsVirtualKeyCode:46});
+   assert.equal(await evaluate('JSON.stringify({tool,selection,m:state.machines.length})'),before);
+  }
+
+  await evaluate("document.activeElement?.blur();true");await space();await poll(()=>evaluate('!running'));
+  await new Promise(r=>setTimeout(r,80));
+  const pauseStats=await evaluate("JSON.stringify({stats:orchestraTheme.rhythm.model.stats(),notes:orchestraTheme.rhythm.model.notes,positions:[...document.querySelectorAll('.orch-rhythm-note')].map(e=>e.style.transform),time:document.querySelector('[data-rhythm-time]').textContent})");
+  await new Promise(r=>setTimeout(r,200));
+  assert.equal(await evaluate("JSON.stringify({stats:orchestraTheme.rhythm.model.stats(),notes:orchestraTheme.rhythm.model.notes,positions:[...document.querySelectorAll('.orch-rhythm-note')].map(e=>e.style.transform),time:document.querySelector('[data-rhythm-time]').textContent})"),pauseStats);
+  const scrollPreserved=await evaluate("(()=>{const r=orchestraTheme.rhythm,score=JSON.stringify(r.model.stats()),notes=JSON.stringify(r.model.notes),e=document.querySelector('[data-rhythm-lead]');e.value=1.37;e.dispatchEvent(new Event('change',{bubbles:true}));return e.type==='number'&&r.lead===1.37&&JSON.stringify(r.model.stats())===score&&JSON.stringify(r.model.notes)===notes})()");
+  assert(scrollPreserved,'scroll speed must not restart or change the chart');
+
+  await space();await poll(()=>evaluate('running'));
+  const options=await evaluate(`(()=>{
+   const r=orchestraTheme.rhythm,set=(q,v)=>{const e=document.querySelector(q);e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))};
+   set('[data-rhythm-difficulty]','advanced');const advanced=r.difficulty==='advanced'&&r.keys.length===4;set('[data-rhythm-count]',6);const six=r.keys.length===6&&document.querySelectorAll('[data-rhythm-lane]').length===6;
+   const only468=[...document.querySelector('[data-rhythm-count]').options].map(e=>e.value).join(',')==='4,6,8';set('[data-rhythm-count]',8);const eight=r.keys.length===8&&document.querySelectorAll('[data-rhythm-key]').length===8&&r.keys[7]==='Semicolon';
+   const independent=r.difficulty==='advanced';set('[data-rhythm-difficulty]','hard');const hard=r.difficulty==='hard'&&r.keys.length===8;set('[data-rhythm-count]',4);set('[data-rhythm-difficulty]','easy');set('[data-rhythm-lead]',.8);
+   window.__originalRhythmPlan=orchestraRhythmSongPlan;orchestraRhythmSongPlan=()=>({bars:2,repeats:2,phraseSeconds:4,duration:8});
+   const a=document.querySelector('[data-rhythm-auto]');a.checked=true;a.dispatchEvent(new Event('change',{bubbles:true}));
+   return {advanced,independent,hard,easy:r.difficulty==='easy',six,eight,only468,four:r.keys.length===4,lead:r.lead,auto:r.auto,reset:r.model.stats().score===0,stored:JSON.parse(localStorage.getItem('astra-orchestra-v1')).rhythm};
+  })()`);
+  assert(options.advanced&&options.independent&&options.hard&&options.easy&&options.stored.difficulty==='easy'&&options.six&&options.eight&&options.only468&&options.four&&options.lead===.8&&options.auto&&options.reset&&options.stored.auto,JSON.stringify(options));
+  await poll(()=>evaluate('orchestraTheme.rhythm.model.stats().perfect>0'));
+  const autoResult=await evaluate('orchestraTheme.rhythm.model.stats()');
+  assert(autoResult.score>0&&autoResult.miss===0&&autoResult.accuracy===1,JSON.stringify(autoResult));
+  console.log('ORCH_RHYTHM_AUTO',JSON.stringify({options,autoResult}));
+  // A shortened repeated two-bar phrase exercises the actual audio clock.
+  const finishDeadline=Date.now()+14000;
+  while(Date.now()<finishDeadline&&!await evaluate('orchestraTheme.rhythm.finished'))await new Promise(r=>setTimeout(r,40));
+  const finish=await evaluate("(()=>{const r=orchestraTheme.rhythm;return {finished:r.finished,paused:!running,locked:$('run').disabled,result:!document.querySelector('.orch-rhythm-result').hidden,score:r.model.stats().score,miss:r.model.stats().miss}})()");
+  console.log('ORCH_RHYTHM_FINISH',JSON.stringify(finish));assert(finish.finished&&finish.paused&&finish.locked&&finish.result&&finish.score>=autoResult.score&&finish.miss===0,JSON.stringify(finish));
+  await evaluate("orchestraRhythmSongPlan=window.__originalRhythmPlan;document.querySelector('[data-rhythm-restart]').click();true");
+  assert.equal(await evaluate("!orchestraTheme.rhythm.finished&&running&&orchestraTheme.rhythm.model.stats().score===0"),true);
+  await evaluate(`(()=>{const a=document.querySelector('[data-rhythm-auto]');a.checked=false;a.dispatchEvent(new Event('change',{bubbles:true}));const l=document.querySelector('[data-rhythm-lead]');l.value=1.2;l.dispatchEvent(new Event('change',{bubbles:true}));return true})()`);
+  const restored=await evaluate("(()=>{const o=window.__rhythmOriginal,same=sim===o.sim&&ware===o.ware&&simTime===o.time&&simClockRemainder===o.remainder&&JSON.stringify({sim,ware})===o.bytes&&frozenSimCache===o.cache&&simLayoutSnapshot===o.snapshot;document.querySelector('[data-rhythm-close]').click();return {same,restored:sim===o.sim&&ware===o.ware&&simTime===o.time&&simClockRemainder===o.remainder&&JSON.stringify({sim,ware})===o.bytes}})()");
+  console.log('ORCH_RHYTHM_CONTINUATION',JSON.stringify(restored));assert(restored.same&&restored.restored,JSON.stringify(restored));
+  assert.equal(await evaluate("!orchestraTheme.rhythm.active&&getComputedStyle(canvas).visibility==='visible'&&running"),true);
+  assert.equal(await evaluate("Number(document.querySelector('[data-orch-bpm]').value)"),oldTempo);
+  await tap(machinePoint);await tap(machinePoint);await tap(machinePoint);
+  await poll(()=>evaluate('orchestraTheme.rhythm.active'));
+  await evaluate("document.querySelector('[data-rhythm-close]').click();true");
 
   await evaluate("document.querySelector('[data-orch=close]').click();true");
   const retrigger=await evaluate(`(()=>{
@@ -307,6 +440,31 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   })()`);
   console.log('ORCH_CROSSING',JSON.stringify(crossing));
   assert(crossing.valid&&crossing.horizontalBelow.cut&&crossing.horizontalBelow.hidden&&crossing.horizontalBelow.railHidden&&crossing.horizontalBelow.visible&&crossing.verticalBelow.cut&&crossing.verticalBelow.hidden&&crossing.verticalBelow.railHidden&&crossing.verticalBelow.visible&&crossing.transverse&&crossing.normalVisible,JSON.stringify(crossing));
+  const selectionStyle=await evaluate(`(()=>{
+   const theme=orchestraTheme,old={active:theme.active,selection,multiSelection,beltTrim,draft},r=state.routes[0],m=machineById(r.from.id),original=ctx.stroke,strokes=[];
+   ctx.stroke=function(...args){strokes.push({color:this.strokeStyle,width:this.lineWidth,dash:this.getLineDash(),alpha:this.globalAlpha});return original.apply(this,args)};
+   const sample=fn=>{strokes.length=0;fn();return strokes.slice()};
+   const contains=(a,c,w,d)=>a.some(x=>x.color===c&&Math.abs(x.width-w)<1e-6&&(!d||x.dash.length>0));
+   try{
+    theme.active=true;draft=null;beltTrim=null;multiSelection=null;
+    selection={machineId:m.id};const machine=sample(()=>drawStaticScene());
+    selection={routeId:r.id};const belt=sample(()=>drawStaticScene());
+    beltTrim={routeId:r.id,index:Math.floor(r.path.length/2),hoverAnchor:true};const trim=sample(()=>drawStaticScene());
+    beltTrim.hoverAnchor=false;const idleTrim=sample(()=>drawStaticScene());
+    beltTrim=null;const preview=sample(()=>{ctx.beginPath();ctx.moveTo(1,1);ctx.lineTo(3,1);theme.editRails('#ffd176',true)});
+    const peak=sample(()=>theme.machine(m,...dims(m),{selected:true,energy:1,overlay:true}));
+    const railPeak=sample(()=>{ctx.beginPath();ctx.moveTo(1,1);ctx.lineTo(3,1);theme.editRails('#ffd176',true,1)});
+    const panelMachine=state.machines.find(supportsMachinePanel),panelWidths=[];
+    if(panelMachine){
+     const fill=ctx.fillRect;
+     ctx.fillRect=function(x,y,w,h){panelWidths.push(Math.min(w,h));return fill.call(this,x,y,w,h)};
+     try{theme.indicators(panelMachine,...dims(panelMachine),0);theme.indicators(panelMachine,...dims(panelMachine),1,false,true)}finally{ctx.fillRect=fill}
+    }
+    theme.active=false;beltTrim={routeId:r.id,index:0,hoverAnchor:true};const normal=sample(()=>drawStaticScene());
+    return {machine:contains(machine,'#f3d875',.095*1.5),belt:contains(belt,'#f3d875',.5)&&contains(belt,'#142234',.395),trim:contains(trim,'#ff6478',.5,true)&&contains(trim,'#f3d875',.5),trimNotHover:!idleTrim.some(x=>x.color==='#ff6478'),preview:contains(preview,'#ffd176',.5,true),machinePulse:contains(peak,'#f3d875',.15*1.5),panelPulse:panelWidths.length===2&&Math.abs(panelWidths[0]-.1425)<1e-6&&Math.abs(panelWidths[1]-.225)<1e-6,railPulse:contains(railPeak,'#142234',.335)&&contains(railPeak,'#ffd176',.052*1.5,true),normal:contains(normal,'#ff6478',.45)&&!contains(normal,'#ff6478',.5,true)};
+   }finally{ctx.stroke=original;theme.active=old.active;selection=old.selection;multiSelection=old.multiSelection;beltTrim=old.beltTrim;draft=old.draft;draw()}
+  })()`);
+  console.log('ORCH_SELECTION_STYLE',JSON.stringify(selectionStyle));assert(Object.values(selectionStyle).every(v=>v===true),JSON.stringify(selectionStyle));
   const dense=await evaluate(`(async()=>{
    const a=createOrchestraAudio(()=>120,()=>.8);if(!await a.unlock())return {ready:false};
    const events=Array.from({length:1800},(_,i)=>({id:'dense'+i,time:0.05*Math.floor(i/600),instrument:'piano',n:60+(i%3)*4,volume:.7}));
@@ -318,6 +476,67 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   })()`);
   console.log('ORCH_DENSE',JSON.stringify(dense));
   assert(dense.ready&&dense.groups===9&&dense.timing&&dense.dropped===0&&dense.peak>.001&&dense.peak<1,JSON.stringify(dense));
+  const recovery=await evaluate(`(async()=>{
+   const a=createOrchestraAudio(()=>120,()=>.6);if(!await a.unlock())return {ready:false};
+   a.prepare([{instrument:'piano',n:60}]);const analyser=window.orchAnalyser,ctx=analyser.context,buf=new Float32Array(analyser.fftSize),wait=ms=>new Promise(r=>setTimeout(r,ms));
+   async function measure(){a.tone('piano',60,.7,a.time+.04);let peak=0;for(let i=0;i<20;i++){await wait(12);analyser.getFloatTimeDomainData(buf);for(const x of buf)peak=Math.max(peak,Math.abs(x))}return peak}
+   const baseline=await measure();a.stop();
+   async function dense(){const t=a.time+.03;a.batch(Array.from({length:48},(_,i)=>({instrument:'piano',n:60+i%3,volume:.7,time:t+i*.003})),t=>t);await wait(90)}
+   a.prepare([{instrument:'piano',n:61},{instrument:'piano',n:62}]);
+   await dense();a.stop();const afterPause=await measure();a.stop();
+   await dense();await ctx.suspend();a.stop();await wait(100);await a.unlock();const afterSuspend=await measure();a.stop();
+   return {ready:true,baseline,afterPause,afterSuspend};
+  })()`);
+  console.log('ORCH_AUDIO_RECOVERY',JSON.stringify(recovery));
+  assert(recovery.ready&&recovery.baseline>.01&&Math.abs(recovery.afterPause/recovery.baseline-1)<.15&&Math.abs(recovery.afterSuspend/recovery.baseline-1)<.15,JSON.stringify(recovery));
+  const channels=await evaluate(`(async()=>{
+   const original=AudioContext.prototype.createGain,nodes=[];
+   AudioContext.prototype.createGain=function(){const n=original.call(this);nodes.push(n);return n};
+   const a=createOrchestraAudio(()=>120,()=>.6);
+   try{if(!await a.unlock())return {ready:false}}finally{AudioContext.prototype.createGain=original}
+   const names=Object.keys(ORCHESTRA_INSTRUMENTS),master=nodes[0];
+   let mix=nodes[1],piano=nodes[2+names.indexOf('piano')],bass=nodes[2+names.indexOf('bass')],kick=nodes[2+names.indexOf('kick')];
+   function stopAndTrack(){
+    const fresh=[];AudioContext.prototype.createGain=function(){const n=original.call(this);if(this===master.context)fresh.push(n);return n};
+    try{a.stop()}finally{AudioContext.prototype.createGain=original}
+    if(fresh.length){mix=fresh[0];piano=fresh[1+names.indexOf('piano')];bass=fresh[1+names.indexOf('bass')];kick=fresh[1+names.indexOf('kick')]}
+   }
+   const wait=ms=>new Promise(r=>setTimeout(r,ms)),analyser=window.orchAnalyser,buf=new Float32Array(analyser.fftSize);
+   a.prepare([{instrument:'piano',n:60},{instrument:'bass',n:48},{instrument:'kick',n:36}]);
+   async function measure(n,queued=0){
+    stopAndTrack();await wait(60);const t=a.time+.08,groups=[{instrument:'bass',n:48,volume:.7,time:t},{instrument:'kick',n:36,volume:.7,time:t},...Array.from({length:n},()=>({instrument:'piano',n:60,volume:.7,time:t})),...Array.from({length:queued},(_,i)=>({instrument:'piano',n:60,volume:.7,time:t+2+i*.01}))];
+    a.batch(groups,t=>t);
+    while(a.time<t+.01)await wait(1);
+    const g={piano:piano.gain.value,bass:bass.gain.value,kick:kick.gain.value,master:master.gain.value,mix:mix.gain.value};
+    let peak=0;for(let i=0;i<12;i++){analyser.getFloatTimeDomainData(buf);for(const v of buf)peak=Math.max(peak,Math.abs(v));await wait(12)}
+    return {...g,peak};
+   }
+   const light=await measure(8),dense=await measure(64),sparse=await measure(1),queued=await measure(1,32);
+   a.stop();
+   const all=names.map((instrument,i)=>({instrument,n:48+i*3,volume:1}));
+   a.prepare(all);
+   let peak=0,energy=0,samples=0,ms=0;const start=a.time+.07;
+   // Simulate actual streaming rather than queue the entire song at once.
+   for(let i=0;i<65;i++){
+    if(i<48){const t=performance.now();a.batch(all.map(g=>({...g,time:Math.max(a.time+.035,start+i*.035)})),t=>t);ms=Math.max(ms,performance.now()-t)}
+    await wait(35);analyser.getFloatTimeDomainData(buf);
+    for(const x of buf){peak=Math.max(peak,Math.abs(x));if(i>10&&i<48){energy+=x*x;samples++}}
+   }
+   a.stop();return {ready:true,light,dense,sparse,queued,peak,rms:Math.sqrt(energy/samples),dropped:a.dropped,maxBatchMs:ms};
+  })()`);
+  console.log('ORCH_TIMBRE_MIX',JSON.stringify(channels));
+  assert(channels.ready&&Math.abs(channels.light.bass-channels.dense.bass)<.02&&Math.abs(channels.light.kick-channels.dense.kick)<.02&&Math.abs(channels.light.master-.6)<.001&&Math.abs(channels.dense.master-.6)<.001&&channels.dense.piano<channels.light.piano&&Math.abs(channels.queued.peak/channels.sparse.peak-1)<.15&&channels.peak<.45&&channels.rms>.001&&channels.rms<.12&&channels.dropped===0,JSON.stringify(channels));
+  const transportFade=await evaluate(`(async()=>{
+   const sr=48000,c=new OfflineAudioContext(1,sr*.2,sr),source=c.createConstantSource(),gain=c.createGain();
+   source.offset.value=.3;gain.gain.value=0;source.connect(gain);gain.connect(c.destination);
+   function schedule(from,to,start,duration){const p=orchestraTransportFade(from,to,start,duration);gain.gain.setValueAtTime(from,start);for(let i=1;i<p.times.length;i++)gain.gain.linearRampToValueAtTime(p.values[i],p.times[i])}
+   schedule(0,1,.01,.03);schedule(1,0,.09,.045);source.start(0);
+   const d=(await c.startRendering()).getChannelData(0);let maxJump=0;
+   for(let i=1;i<d.length;i++)maxJump=Math.max(maxJump,Math.abs(d[i]-d[i-1]));
+   return {maxJump,initial:d[0],steady:d[Math.round(.06*sr)],half:d[Math.round(.1125*sr)],end:d[Math.round(.14*sr)]};
+  })()`);
+  console.log('ORCH_TRANSPORT_FADE',JSON.stringify(transportFade));
+  assert(transportFade.maxJump<.001&&Math.abs(transportFade.steady-.3)<.001&&Math.abs(transportFade.half-.15)<.001&&Math.abs(transportFade.initial)<.00001&&Math.abs(transportFade.end)<.00001,JSON.stringify(transportFade));
   assert.equal(exceptions.length,0,exceptions.join('\n'));
   console.log('ORCHESTRA_SHARED_PASS',JSON.stringify({mobile,edit,peak:Math.max(...levels),machines:before.n}));
   ws.close();

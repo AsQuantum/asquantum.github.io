@@ -144,3 +144,95 @@ body.orchestra-active .top .brand .brand-mark{filter:hue-rotate(65deg) saturate(
 .orch-playhead{bottom:auto;height:36px;z-index:6;opacity:.65;box-shadow:none}
 [data-orch-cursor]{pointer-events:none}
 @media(max-width:650px){.orch-settings-panel{position:fixed;top:auto;left:12px;right:12px;width:auto;max-width:none}.orch-edit-toolbar{gap:6px!important}.orch-editor-foot{flex-wrap:wrap}.orch-editor-foot>span:first-child{display:none}}
+
+
+/* Falling-note challenge, inside the original map viewport. */
+.orch-rhythm[hidden]{display:none!important}
+.orch-rhythm{position:absolute;inset:0;z-index:16;display:flex;flex-direction:column;gap:12px;padding:18px;box-sizing:border-box;color:#dbe8f9;background:radial-gradient(ellipse at 50% 85%,#20334d 0,#111c30 48%,#0d1625 100%);overflow:hidden;font-variant-numeric:tabular-nums;user-select:none;touch-action:none}
+.orch-rhythm-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none}
+.orch-rhythm-top>div:first-child{display:grid;gap:3px;flex:none}
+.orch-rhythm-eyebrow{font-size:9px;letter-spacing:1.6px;color:#819bbc}
+.orch-rhythm-top strong{font-size:24px;font-weight:650;letter-spacing:.8px;color:#b9d3ff}
+.orch-rhythm-stats{display:flex;align-items:center;justify-content:center;gap:clamp(10px,2vw,30px);flex:1;flex-wrap:wrap}
+.orch-rhythm-stats>div{display:grid;gap:3px;text-align:center}
+.orch-rhythm-stats small{font-size:10px;color:#9aabc2}.orch-rhythm-stats b{font-size:17px;color:#dfebff;font-weight:650}
+.orch-rhythm [data-rhythm-close]{font-size:24px;line-height:1;width:34px;height:34px;padding:0;border:1px solid #43556c;background:#18263a;border-radius:7px;color:#c7d9ee;cursor:pointer;flex:none}
+.orch-rhythm-stage{flex:1;min-height:0;max-width:740px;width:100%;margin:auto;display:flex;flex-direction:column;gap:7px}
+.orch-rhythm-field{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));flex:1;min-height:0;overflow:hidden;border:1px solid #344962;border-radius:10px 10px 3px 3px;background:linear-gradient(#111b2c,#192940)}
+.orch-rhythm-lane{position:relative;border-right:1px solid #32455b;overflow:hidden;background:linear-gradient(180deg,#83b8fb02,#83b8fb09)}
+.orch-rhythm-lane:nth-child(2n){background:#0b132325}.orch-rhythm-lane:nth-child(4){border-right-color:#7895bf}
+.orch-rhythm-lane.pressed{background:linear-gradient(180deg,#80b3ee08,#80b3ee30)}
+.orch-rhythm-note{position:absolute;left:9%;width:82%;height:clamp(9px,1.6vh,15px);top:-6px;background:var(--note-color);border:1px solid #f0f7ff99;border-radius:4px;box-sizing:border-box;box-shadow:0 0 12px color-mix(in srgb,var(--note-color) 65%,transparent),inset 0 0 5px #f3fbff77;will-change:transform}
+.orch-rhythm-judge-line{position:absolute;top:84%;left:0;right:0;height:2px;background:#91a8c4;box-shadow:none;pointer-events:none;z-index:2}
+.orch-rhythm-judgement{position:absolute;top:63%;left:0;right:0;text-align:center;font-size:clamp(20px,4vw,36px);font-weight:750;letter-spacing:2px;color:#e3ebff;text-shadow:0 0 16px #a0bfffa0;pointer-events:none;z-index:3}
+.orch-rhythm-judgement[data-grade="MISS"]{color:#f49aa9;text-shadow:0 0 12px #f17e8e80}.orch-rhythm-judgement[data-grade="GREAT"]{color:#a6e9db}.orch-rhythm-judgement[data-grade="GOOD"]{color:#e5c994}
+.orch-rhythm-hint{position:absolute;top:37%;left:0;right:0;text-align:center;font-size:13px;color:#819bbc;pointer-events:none}
+.orch-rhythm-keys{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;flex:none}
+.orch-rhythm-keys button{min-width:0;padding:12px 0;touch-action:none;font-weight:650;font-size:16px;color:#c6dcfa;border:1px solid #506789;background:#1e3048;border-radius:5px;cursor:pointer}
+.orch-rhythm-keys button.pressed{background:#304963;color:#e1edff;border-color:#819bb9;box-shadow:none}
+.orch-rhythm-foot{display:flex;justify-content:space-between;gap:5px;font-size:10px;color:#8ea6c6;flex:none;flex-wrap:wrap}
+@media(max-width:850px){.orch-rhythm{padding:9px;gap:8px}.orch-rhythm-top{flex-wrap:wrap;gap:7px}.orch-rhythm-top strong{font-size:19px}.orch-rhythm-stats{gap:11px;order:3;flex-basis:100%}.orch-rhythm-top>[data-rhythm-close]{margin-left:auto}.orch-rhythm-stats b{font-size:14px}.orch-rhythm-keys button{padding:10px 0;font-size:14px}.orch-rhythm-foot{font-size:9px}}
+
+/* Configurable 4/6/8-key chart. Hit effects are local to the judgement area. */
+.orch-rhythm-controls{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 14px;flex:none;font-size:11px;color:#a3b8d4}
+.orch-rhythm-controls label{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.orch-rhythm-controls select,.orch-rhythm-controls input[type=number]{background:#1b2b40;color:#d9e8fc;border:1px solid #405975;border-radius:4px;padding:4px;font-size:11px}
+.orch-rhythm-controls input[type=number]{width:64px;box-sizing:border-box;touch-action:manipulation}
+.orch-rhythm-controls input{accent-color:#91bcf5}
+.orch-rhythm-controls [data-rhythm-mode]{font-size:10px;color:#9db5d3}
+.orch-rhythm-auto-on [data-rhythm-mode]{color:#e6c78e}
+.orch-rhythm-field{display:block}
+.orch-rhythm-lanes{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--rhythm-lanes,4),minmax(0,1fr))}
+.orch-rhythm-keys{grid-template-columns:repeat(var(--rhythm-lanes,4),minmax(0,1fr))}
+.orch-rhythm-lane:nth-child(4){border-right-color:#32455b}
+.orch-rhythm-lane:nth-child(2n){border-right-color:#47617c}
+.orch-rhythm-note{z-index:2;transform-origin:50% 50%;pointer-events:none}
+
+.orch-rhythm-judgement{top:60%;z-index:4}
+@media(max-width:850px){.orch-rhythm-controls{gap:5px 8px;font-size:10px}.orch-rhythm-controls select,.orch-rhythm-controls input[type=number]{font-size:10px;padding:3px}.orch-rhythm-controls [data-rhythm-mode]{display:none}}
+
+
+/* Belt-inspired rhythm lanes and individual animated hit labels. */
+.orch-rhythm-song{display:flex;align-items:center;gap:9px;flex:none;font-size:11px;color:#a6bdd9}
+.orch-rhythm-tempo{font-weight:650;color:#c1d7f5;white-space:nowrap}
+.orch-rhythm-progress{height:4px;flex:1;min-width:35px;background:#30445e;border-radius:5px;overflow:hidden}
+.orch-rhythm-progress i{display:block;height:100%;width:0;background:#9ac6ff;border-radius:5px}
+[data-rhythm-plan]{white-space:nowrap;font-size:10px;color:#819bb9}
+.orch-rhythm-field{background:#101c2e;border:1px solid #405570}
+.orch-rhythm-lane,.orch-rhythm-lane:nth-child(2n){border-right:1px solid #49617b;background:linear-gradient(90deg,#8cadcf10 0,transparent 3%,transparent 49.5%,#8cadcf08 49.5%,#8cadcf08 50.5%,transparent 50.5%,transparent 97%,#8cadcf10 100%),repeating-linear-gradient(180deg,transparent 0,transparent 30px,#86a7cc09 30px,#86a7cc09 32px),#142234;background-position:0 0,0 var(--rhythm-tread-offset,0px),0 0}
+.orch-rhythm-lane:nth-child(2n){background-color:#122031}
+.orch-rhythm-lane.pressed{background-color:#18283b}
+.orch-rhythm-grade{position:absolute;left:50%;top:calc(84% - 37px);white-space:nowrap;z-index:5;pointer-events:none;opacity:0;font-size:clamp(11px,2vw,21px);font-weight:800;letter-spacing:.035em;color:var(--grade-color,#ffd268);text-shadow:0 0 8px color-mix(in srgb,var(--grade-color,#ffd268) 65%,transparent),0 1px 3px #071222}
+.orch-rhythm-result[hidden]{display:none!important}
+.orch-rhythm-result{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:#0a1424d9;padding:16px}
+.orch-rhythm-result-card{display:grid;gap:14px;width:min(360px,100%);box-sizing:border-box;text-align:center;padding:22px;border:1px solid #4c6587;border-radius:12px;background:#192b41}
+.orch-rhythm-result-card small{color:#96afd2;letter-spacing:1px}
+.orch-rhythm-result-card strong{font-size:22px;color:#c5dcff}
+.orch-rhythm-result-card>[data-rhythm-final-score]{font-size:clamp(24px,5vw,40px);font-weight:700;color:#e8f4ff}
+.orch-rhythm-result-card>[data-rhythm-result-detail]{font-size:12px;color:#acc0db}
+.orch-rhythm-result-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.orch-rhythm-result-actions button{padding:8px 13px;background:#293f5b;border:1px solid #526d90;border-radius:5px;color:#e1edff;cursor:pointer}
+@media(max-width:850px){.orch-rhythm-song{gap:5px;font-size:10px}[data-rhythm-plan]{font-size:9px}.orch-rhythm-grade{top:calc(84% - 28px);font-size:11px}}
+
+/* Low-intensity local judgement feedback, shared by touch, keyboard and AUTO. */
+.orch-rhythm-hit-beam{position:absolute;left:2%;right:2%;top:68%;bottom:1%;pointer-events:none;background:linear-gradient(0deg,transparent 0%,var(--hit-color,#ffd268) 22%,transparent 100%);opacity:0;z-index:1}
+.orch-rhythm-keys button.pressed{box-shadow:inset 0 0 10px #8ab8f088,0 0 6px #88b9f966}
+@media(max-width:850px){.orch-rhythm-controls input[type=number]{width:58px}.orch-rhythm-keys button{min-width:0}}
+
+/* Shared master volume stays beside BPM in map, editor and rhythm views. */
+body.orchestra-active .top .sim-toolbar .orch-master-volume{gap:4px;flex:none;white-space:nowrap}
+body.orchestra-active .top .sim-toolbar .orch-master-volume input[type=range]{width:72px;min-width:0;padding:0;border:0;background:transparent;accent-color:#9dbaff;touch-action:pan-y}
+.orch-master-volume output{min-width:31px;text-align:right;font-size:10px;font-variant-numeric:tabular-nums;color:#b9cae8}
+@media(max-width:650px){
+ body.orchestra-active .top .sim-toolbar .orch-master-volume{gap:2px;padding:2px}
+ body.orchestra-active .top .sim-toolbar .orch-master-volume input[type=range]{width:48px}
+ .orch-master-volume output{min-width:26px;font-size:9px}
+}
+
+/* Keep transport and volume on the first mobile row; tempo and music actions
+   always start a new row rather than squeezing the original controls. */
+@media(max-width:650px){
+ body.orchestra-active .top>.sim-toolbar{display:flex;flex-wrap:wrap;align-content:center;justify-content:center;max-width:100%;box-sizing:border-box;overflow:visible}
+ body.orchestra-active .top>.sim-toolbar::after{content:"";flex:0 0 100%;height:0;order:1}
+ body.orchestra-active .top>.sim-toolbar>.orch-master-volume~.orch-only{order:2}
+}

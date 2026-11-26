@@ -86,7 +86,7 @@ function createOrchestraScore(root,settings,onSave,onPalette,onVolume,getCount,g
   bars=scoreBars();save();return true;
  }
 
- root.innerHTML='<section class="orch-editor" data-orch-view="edit"><div class="orch-edit-toolbar"><div class="orch-now" data-orch-current title="已保存的共同调性"></div><details class="orch-settings"><summary>音乐设置 <span aria-hidden="true">⌄</span></summary><div class="orch-settings-panel"><div class="orch-settings-heading">随机生成</div><label class="orch-control">调性 <select data-orch-key>'+names.map((n,i)=>'<option value="'+i+'">'+n+'</option>').join('')+'</select><select data-orch-scale><option value="minor">小七和声</option><option value="major">大六和声</option><option value="pentatonic">小调五声</option></select></label><label class="orch-control">长度 <select data-orch-length><option value="1">4音符位</option><option value="2">8音符位</option><option value="4" selected>16音符位</option></select></label><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-random-length>长度也随机</label><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-auto-random>每次进入随机</label><div class="orch-settings-heading">演奏</div><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-modulate>小节转调</label><div data-orch-key-plan class="orch-key-plan"></div><div class="orch-settings-actions"><button data-orch="random-all" title="随机主音、和声、各类型乐器、音量及旋律">全部随机</button><button data-orch="random-fixed" title="使用所选调性、保留音色音量">固定调性随机</button></div></div></details><button data-orch="random-track" title="仅重新生成当前选中的机器类型">随机本轨</button><div class="orch-grow"></div><label class="orch-control">音量 <input data-orch-volume type="range" min="0" max="100" aria-label="主音量"></label><span class="orch-loop" data-orch-loop>4/4 · 16 音符位</span></div><div class="orch-timeline" tabindex="0" aria-label="多轨乐谱"><div class="orch-score"></div></div><div class="orch-editor-foot"><span>滚轮上下 · Shift+滚轮水平 · Ctrl+滚轮时间缩放 · Ctrl+Shift+滚轮音高缩放</span><span data-orch-period title="基于空库存初始状态的理论稳定物流；实际当前库存、运行中改造及手动补料可能改变周期。不是最短听觉周期。"></span><span title="全局节拍参考；每台机器按收发次数独立推进" data-orch-position></span></div></section>';
+ root.innerHTML='<section class="orch-editor" data-orch-view="edit"><div class="orch-edit-toolbar"><div class="orch-now" data-orch-current title="已保存的共同调性"></div><details class="orch-settings"><summary>音乐设置 <span aria-hidden="true">⌄</span></summary><div class="orch-settings-panel"><div class="orch-settings-heading">随机生成</div><label class="orch-control">调性 <select data-orch-key>'+names.map((n,i)=>'<option value="'+i+'">'+n+'</option>').join('')+'</select><select data-orch-scale><option value="minor">小七和声</option><option value="major">大六和声</option><option value="pentatonic">小调五声</option></select></label><label class="orch-control">长度 <select data-orch-length><option value="1">4音符位</option><option value="2">8音符位</option><option value="4" selected>16音符位</option></select></label><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-random-length>长度也随机</label><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-auto-random>每次进入随机</label><div class="orch-settings-heading">演奏</div><label class="orch-control orch-auto-random"><input type="checkbox" data-orch-modulate>小节转调</label><div data-orch-key-plan class="orch-key-plan"></div><div class="orch-settings-actions"><button data-orch="random-all" title="随机主音、和声、各类型乐器、音量及旋律">全部随机</button><button data-orch="random-fixed" title="使用所选调性、保留音色音量">固定调性随机</button></div></div></details><button data-orch="random-track" title="仅重新生成当前选中的机器类型">随机本轨</button><div class="orch-grow"></div><span class="orch-loop" data-orch-loop>4/4 · 16 音符位</span></div><div class="orch-timeline" tabindex="0" aria-label="多轨乐谱"><div class="orch-score"></div></div><div class="orch-editor-foot"><span>滚轮上下 · Shift+滚轮水平 · Ctrl+滚轮时间缩放 · Ctrl+Shift+滚轮音高缩放</span><span data-orch-period title="基于空库存初始状态的理论稳定物流；实际当前库存、运行中改造及手动补料可能改变周期。不是最短听觉周期。"></span><span title="全局节拍参考；每台机器按收发次数独立推进" data-orch-position></span></div></section>';
  const save=()=>{const scores=settings.scores??={},all={...(scores[layoutKey]||{})};for(const [id,track] of Object.entries(tracks))all[id]={...track,ports:{...(all[id]?.ports||{}),...track.ports}};scores[layoutKey]=all;onSave()};
  function initScore(){
   const groups=new Map();
@@ -167,16 +167,19 @@ function createOrchestraScore(root,settings,onSave,onPalette,onVolume,getCount,g
   sc.innerHTML=ruler+(rows||'<p class="orch-no-tracks">当前没有带输入或输出接口的机器。</p>')+'<div class="orch-loop-boundary" style="left:calc(var(--orch-label) + '+(bars*4*stepWidth)+'px)"></div><div class="orch-playhead"></div>';
   t.scrollLeft=left;t.scrollTop=top;q('[data-orch-loop]').textContent='4/4 · '+bars*4+' 音符位';paintPlayhead(performance.now(),false);
  }
- function paintPeriod(t){
-  if(t-periodPaint<1000)return;periodPaint=t;
-  const el=q('[data-orch-period]');if(!el)return;
+ function referencePeriod(){
   const b=typeof theoreticalBudget==='undefined'?null:theoreticalBudget;
   // Reuse only the existing budget for the current layout; never start a
   // second solve. The reference is not a proof about edited live inventory.
   const current=b&&typeof theoryLayoutKey!=='undefined'&&theoryLayoutKey===theorySignature()?b:null;
-  const p=orchestraPeriod.estimate(state,current,(type,dir)=>tracks[type]?.ports[dir]?.length||0,settings.modulate?Math.max(1,settings.keyPlan?.length||1)*80:1);
-  el.textContent=p.status==='period'?'稳态参考循环 · '+orchestraPeriod.duration(p.ticks,settings.bpm):p.status==='silent'?'稳态无收发':p.status==='waiting'?'等待物流周期':'物流周期未证实';
-  el.title=p.status==='period'?'理论稳定事件与音符游标重复周期：'+p.ticks+' ticks；稳定前缀 '+p.prefix+' ticks。仅参考理论初始条件，不保证当前实际库存状态，也不保证最短听觉循环。': '仅复用已有精确物流周期；产率解析解或未完成求解时不猜测周期。';
+  return orchestraPeriod.estimate(state,current,(type,dir,m)=>getPorts(m).some(p=>p.kind===dir)?tracks[type]?.ports[dir]?.length||0:0,settings.modulate?Math.max(1,settings.keyPlan?.length||1)*80:1);
+ }
+ function paintPeriod(t){
+  if(t-periodPaint<1000)return;periodPaint=t;
+  const el=q('[data-orch-period]');if(!el)return;
+  const p=referencePeriod();
+  el.textContent=p.status==='period'?'稳态参考循环 · '+orchestraPeriod.duration(p.ticks,settings.bpm):p.status==='silent'?'稳态无收发':p.status==='waiting'?'等待物流求解':p.analytic&&!p.unresolved?'产率已解 · 事件周期未计算':p.analytic?'部分事件周期未计算':'事件周期尚未确定';
+  el.title=p.status==='period'?'理论稳定事件与音符游标重复周期：'+p.ticks+' ticks；稳定前缀 '+p.prefix+' ticks。仅参考理论初始条件，不保证当前实际库存状态，也不保证最短听觉循环。': '精确产率与事件循环不同。'+(p.analytic?' '+p.analytic+' 个解析组件未提供事件周期。':'')+(p.unresolved?' '+p.unresolved+' 个组件缺少完整周期或收发次数。':'')+' 不会为音乐重复运行求解器。';
  }
  // Show all physical machines' NEXT slot on the corresponding shared lane.
  // Several machines can legitimately be at different positions.
@@ -271,7 +274,6 @@ function createOrchestraScore(root,settings,onSave,onPalette,onVolume,getCount,g
  });
  root.addEventListener('input',e=>{
   const el=e.target;if(el.dataset.trackVolume&&tracks[el.dataset.trackVolume]){tracks[el.dataset.trackVolume].volume=Number(el.value)/100;save()}
-  if(el.matches('[data-orch-volume]')){settings.volume=Number(el.value)/100;onVolume();save()}
  });
  timeline().addEventListener('wheel',e=>{
   followUntil=performance.now()+2200;
@@ -285,5 +287,5 @@ function createOrchestraScore(root,settings,onSave,onPalette,onVolume,getCount,g
  timeline().addEventListener('pointerdown',()=>{followUntil=performance.now()+4000});
 
  function sync(){ensureShared();initScore();refreshKeyPlan();if(!root.hidden)renderEditor()}
- return {sync,save,randomAll,render:renderEditor,paint:paintPlayhead,track:type=>tracks[type],pitch:(type,port,cursor,time=0)=>orchestraHarmony.transpose(tracks[type]?.ports[String(port)]?.[cursor%Math.max(1,tracks[type]?.ports[String(port)]?.length||1)]??null,time,settings.modulate&&!["kick","percussion"].includes(tracks[type]?.instrument)?settings.keyPlan||[0]:[0]),color:type=>instruments[tracks[type]?.instrument||settings.scores?.[layoutKey]?.[type]?.instrument]?.color||instruments[instrumentFor({type,mode:Object.keys(DEF[type]?.recipes||{})[0]})]?.color||'#697b99'};
+ return {sync,save,randomAll,referencePeriod,render:renderEditor,paint:paintPlayhead,track:type=>tracks[type],pitch:(type,port,cursor,time=0)=>orchestraHarmony.transpose(tracks[type]?.ports[String(port)]?.[cursor%Math.max(1,tracks[type]?.ports[String(port)]?.length||1)]??null,time,settings.modulate&&!["kick","percussion"].includes(tracks[type]?.instrument)?settings.keyPlan||[0]:[0]),color:type=>instruments[tracks[type]?.instrument||settings.scores?.[layoutKey]?.[type]?.instrument]?.color||instruments[instrumentFor({type,mode:Object.keys(DEF[type]?.recipes||{})[0]})]?.color||'#697b99'};
 }

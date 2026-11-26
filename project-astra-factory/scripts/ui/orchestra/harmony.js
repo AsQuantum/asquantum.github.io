@@ -40,9 +40,29 @@ const orchestraHarmony=(()=>{
   const i=Math.max(0,Math.floor((Number(time)||0)/4))%plan.length;
   return [0,5,7].includes(plan[i])?plan[i]:0;
  }
+ // Choose octave-equivalent modulation offsets that minimize the worst
+ // register jump across a cyclic phrase, including the return to its root.
+ function voicedPlan(plan){
+  if(!Array.isArray(plan)||!plan.length)return [0];
+  const offsets=plan.map(n=>[0,5,7].includes(n)?n:0);
+  let best=null,score=Infinity;
+  function walk(i,path){
+   if(i===offsets.length){
+    const jumps=path.map((v,j)=>Math.abs(v-path[(j+1)%path.length]));
+    const cost=Math.max(...jumps)*100+jumps.reduce((a,b)=>a+b,0)*2+path.reduce((a,b)=>a+Math.abs(b),0)*.1;
+    if(cost<score){score=cost;best=path.slice()}return;
+   }
+   for(const n of offsets[i]===0?[0]:[offsets[i],offsets[i]-12])walk(i+1,[...path,n]);
+  }
+  walk(0,[]);return best||[0];
+ }
+ const voicingCache=new Map();
  function transpose(note,time,plan){
   if(note===null||!Number.isInteger(note))return null;
-  let n=note+barOffset(time,plan);
+  const key=Array.isArray(plan)?plan.join(','):'0';
+  if(!voicingCache.has(key))voicingCache.set(key,voicedPlan(plan));
+  const offsets=voicingCache.get(key),i=Math.max(0,Math.floor((Number(time)||0)/4))%offsets.length;
+  let n=note+offsets[i];
   while(n>96)n-=12;while(n<24)n+=12;
   return n;
  }
@@ -54,7 +74,7 @@ const orchestraHarmony=(()=>{
   return {instrument,volume:Math.round((gain+(random()-.5)*.16)*100)/100};
  }
  function make(instrument,dir,length,key=0,mode='minor',random=Math.random){
-  const role=roles[instrument]||roles.synth,h=modes[mode]||modes.minor,base=role.octave+((key%12+12)%12),pick=a=>a[Math.min(a.length-1,Math.floor(random()*a.length))];
+  const role=roles[instrument]||roles.synth,h=modes[mode]||modes.minor,pitchClass=(key%12+12)%12,base=role.octave+(pitchClass>6?pitchClass-12:pitchClass),pick=a=>a[Math.min(a.length-1,Math.floor(random()*a.length))];
   const low=instrument==='bass',drum=role.range===0;
   const chord=low?[0,7]:h.chord.filter(n=>n<=role.range);
   const extra=['chime','marimba','pluck'].includes(instrument)?h.scale.filter(n=>n<=role.range):chord;
@@ -120,5 +140,5 @@ const orchestraHarmony=(()=>{
   }
   return seq;
  }
- return {make,modes,chooseHarmony,arrange,instrumentPools,keyPlan,barOffset,transpose,randomBars};
+ return {make,modes,chooseHarmony,arrange,instrumentPools,keyPlan,barOffset,transpose,voicedPlan,randomBars};
 })();

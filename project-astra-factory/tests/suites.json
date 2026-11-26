@@ -142,7 +142,8 @@
     "orchestra-unit": [
       "tests/orchestra-harmony.test.js",
       "tests/orchestra-period.test.js",
-      "tests/orchestra-audio-period.test.js"
+      "tests/orchestra-audio-period.test.js",
+      "tests/orchestra-rhythm.test.js"
     ]
   },
   "aliases": {
