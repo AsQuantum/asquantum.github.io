@@ -6,13 +6,13 @@ test('old potential-net inference is absent from warehouse code',()=>{
  assert(src.includes('潜在净值'));assert(src.includes('透支净值'));
 });
 test('unproved theory displays em dashes rather than fabricated zero balances',()=>{
- const warehouse={innerHTML:''},c=vm.createContext({console,theoreticalBudget:{inflow:{},outflow:{},error:'未证明'},
+ const warehouse={innerHTML:'',querySelector(){return null}},c=vm.createContext({console,theoreticalBudget:{direct:true,status:'iteration-partial',warehouseItems:['硅晶圆'],inflow:{'硅晶圆':null},outflow:{'硅晶圆':null},net:{'硅晶圆':null},potentialNet:{'硅晶圆':null},overdraftNet:{'硅晶圆':null}},
  state:{machines:[{id:'o',type:'仓出',item:'硅晶圆'}]},ware:{},simTime:0,
  sim:{inbound:{},outbound:{},minuteBuckets:[]},MATERIALS:['硅晶圆'],REQUIRED_STOCK:[],
  factoryItemCompare:(a,b)=>a.localeCompare(b),materialColor(){return '#fff'},esc(x){return x},$(id){return id==='warehouse'?warehouse:null}});
  vm.runInContext(src,c);
  const view=vm.runInContext('warehouseView(true)',c);
- assert(view.budget.error);assert.equal(view.materials.length,1);
+ assert.equal(view.budget.status,'iteration-partial');assert.equal(view.materials.length,1);
  assert.equal((view.tRows.match(/—/g)||[]).length,5);
  vm.runInContext('warehouseRefresh()',c);
  assert(warehouse.innerHTML.includes('—'));

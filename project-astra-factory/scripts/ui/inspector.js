@@ -15,7 +15,7 @@ function warehouseInFilterHTML(m){
 }
 // A disclosure is a view preference, not a machine attribute. Preserve its
 // open state when switching machines or rebuilding the inspector after edits.
-const inspectorDisclosureSelectors=['.machine-port-details','.machine-live-detail','.machine-live-history'];
+const inspectorDisclosureSelectors=['.machine-port-details','.machine-live-history','.machine-buffer-details','.route-packet-details'];
 const inspectorDisclosureOpen=Object.create(null);
 function captureInspectorDisclosures(root){
  for(const selector of inspectorDisclosureSelectors){
@@ -37,65 +37,89 @@ $('inspector').addEventListener('toggle',e=>{
  for(const selector of inspectorDisclosureSelectors)
   if(e.target.matches?.(selector))inspectorDisclosureOpen[selector]=e.target.open;
 },true);
+function machineStackControls(m){
+ const rec=getRecipe(m),s=sim?.byMachine?.[m.id];if(!s||(!rec&&m.type!=='电脑'))return '';
+ const computer=m.type==='电脑',inItems=computer?[...new Set([...Object.keys(s.inputs||{}).filter(k=>s.inputs[k]>0),...Object.keys(ware||{}).filter(k=>ware[k]>0&&getPorts(m).some(p=>p.kind==='in'&&acceptsMaterial(m,k,p.index)))])]:Object.keys(rec.inputs||{});
+ const row=(item,n,cap,dir,available)=>`<div class="machine-stack-row"><span class="machine-stack-name"><span style="color:${materialColor(item)}">●</span> ${esc(item)} <span class="machine-stack-count">(${n}/${cap})</span></span><button type="button" class="smallbtn machine-stack-button" data-stack-machine="${esc(m.id)}" data-stack-item="${esc(item)}" data-stack-direction="${dir}" ${available<=0||simAdvanceBusy?'disabled':''} title="${dir==='in'?'仓库存入至缓存上限':'取出全部现有成品至仓库'}">${dir==='in'?'存入':'取出'}</button></div>`;
+ const inputs=inItems.sort(factoryItemCompare).map(item=>{
+  const n=s.inputs[item]||0,cap=computer?10:rec.inputs[item]*3,free=computer?10-s.consumerQueue.length:cap-n;
+  return row(item,n,cap,'in',Math.min(ware[item]||0,free));
+ }).join('');
+ const n=rec?s.queue.filter(k=>k===rec.output).length:0;
+ return `<div class="item machine-stack-controls" id="inspectorStacks">
+  <div class="machine-live-subhead">入口栈物品${computer?' · 共享容量 '+s.consumerQueue.length+'/10':''}</div>
+  ${inputs||'<div class="tiny">'+(computer?'暂无可存入物品':'无输入原料')+'</div>'}
+  <div class="machine-live-subhead machine-stack-out-heading">出口栈物品</div>
+  ${rec?row(rec.output,n,rec.qty*20,'out',n):'<div class="tiny">无成品出口</div>'}
+ </div>`;
+}
+function machineProgressState(m){
+ const s=sim?.byMachine?.[m.id],rec=getRecipe(m),computer=m.type==='电脑';
+ if(!s||(!rec&&!computer))return null;
+ const source=!!rec&&!Object.keys(rec.inputs||{}).length,T=computer?1:rec.seconds;
+ const active=computer?s.consumerQueue.length>0:source?s.queue.length+rec.qty<=rec.qty*20:s.busy>1e-7;
+ const raw=computer?s.consumerElapsed:source?s.tick:s.busy>1e-7?T-s.busy:0;
+ // Sub-tick interpolation is visual only. Never advance a stopped batch
+ // or change the authoritative recipe clock, inventory or completed count.
+ const sub=active&&!simAdvanceBusy?Math.max(0,Math.min(SIMULATION_STEP_SECONDS,simClockRemainder)):0;
+ const elapsed=Math.max(0,Math.min(T,raw+sub)),fraction=elapsed/T,percent=Math.floor(fraction*100+1e-8);
+ const action=computer?'销毁中':source?'生产中':'加工中';
+ const status=active?(running||simAdvanceBusy?action:'已暂停'):rec&&(source||s.queue.length+rec.qty>rec.qty*20)?'成品栈已满':computer?'等待物品':'等待原料';
+ return {status,action,T,elapsed,fraction,percent};
+}
+function machineProductionProgress(m){
+ const v=machineProgressState(m);if(!v)return '';
+ return `<div class="item machine-production-progress" id="inspectorProgress">
+  <div class="machine-live-head"><strong data-progress-status>${v.status}</strong><small data-progress-time>${v.percent}% · ${v.elapsed.toFixed(1)} / ${v.T} 秒</small></div>
+  <div class="machine-progress-track" role="progressbar" aria-label="${v.action}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${v.percent}"><div class="machine-progress-fill" style="transform:scaleX(${v.fraction})"></div></div>
+ </div>`;
+}
+function inspectorRefreshProgress(){
+ if(!selection?.machineId)return;
+ const root=$('inspector');if(root.dataset.inspectorKey!=='machine:'+selection.machineId)return;
+ const node=root.querySelector('#inspectorProgress');if(!node)return;
+ const m=machineById(selection.machineId),v=m&&machineProgressState(m);if(!v)return;
+ const fill=node.querySelector('.machine-progress-fill'),track=node.querySelector('[role=progressbar]');
+ const transform='scaleX('+v.fraction+')';if(fill.style.transform!==transform)fill.style.transform=transform;
+ const percent=String(v.percent);if(track.getAttribute('aria-valuenow')!==percent)track.setAttribute('aria-valuenow',percent);
+ setLiveText(node.querySelector('[data-progress-status]'),v.status);
+ setLiveText(node.querySelector('[data-progress-time]'),v.percent+'% · '+v.elapsed.toFixed(1)+' / '+v.T+' 秒');
+}
+// Logistics buffers are read-only. Shared mixed-material FIFOs list
+// actual items in service order, not separate fictitious per-item stacks.
+function machineLogisticsBuffers(m){
+ const s=sim?.byMachine?.[m.id];if(!s)return '';
+ let title,items;
+ if(m.type==='仓出'){title='出口缓存物品';items=s.warehouseQueue||[];}
+ else if(m.type==='分流'){title='入口缓存物品';items=s.portQueues?.[0]||[];}
+ else if(m.type==='汇流'){title='出口缓存物品';items=(s.mergerQueue||[]).map(p=>p.item);}
+ else return '';
+ const row=(k,label)=>`<div class="machine-stack-row"><span class="machine-stack-name"><span style="color:${materialColor(k)}">●</span> ${esc(k)}${label?' <span class="machine-stack-count">'+esc(label)+'</span>':''}</span></div>`;
+ const list=items.map(k=>row(k,'')).join('');
+ return `<div class="item machine-stack-controls" id="inspectorLogisticsBuffers">
+ <details class="machine-buffer-details">
+  <summary class="machine-live-subhead">${title} · ${items.length}/3</summary>
+  <div class="machine-buffer-list">${list||'<div class="tiny">当前缓存为空</div>'}</div>
+ </details>
+ </div>`;
+}
 function machineLiveInventory(m){
  const s=sim?.byMachine?.[m.id];if(!s)return '';
- if(m.type==='电脑'){
-  const entries=Object.entries(s.consumed||{}).filter(([,n])=>n>0);
-  const total=entries.reduce((sum,[,n])=>sum+n,0);
-  const rows=entries.length?entries.map(([item,n])=>`<div class="kv"><span><span style="color:${materialColor(item)}">●</span> ${esc(item)}</span><b>消耗 ${n} 件</b></div>`).join(''):'<div class="tiny">尚未收到物品</div>';
-  return `<div class="item machine-live" id="inspectorLive">
-   <div class="machine-live-head"><strong>Consumer · 实时消耗</strong><small>模拟时间 ${simTime.toFixed(1)} 秒</small></div>
-   <div class="machine-live-summary">
-    <div><span>累计销毁</span><b>${total}<small> 件</small></b></div>
-    <div><span>消耗上限</span><b>1<small> 件/秒</small></b></div>
-   </div>
-   <details class="machine-live-detail"><summary>查看物品消耗明细</summary><div class="machine-live-detail-body">${rows}</div></details>
-  </div>`;
- }
- const rec=getRecipe(m),inPorts=getPorts(m).filter(p=>p.kind==='in');
- const outCap=rec?rec.qty*20:0;
- const entries=(rec?Object.keys(rec.inputs):[...new Set([...Object.keys(s.inputs||{}),...Object.keys(s.received||{})])]).sort(factoryItemCompare);
- const itemRow=(item,current,capacity)=>`<div class="kv"><span><span style="color:${materialColor(item)}">●</span> ${esc(item)}</span><b>${current} / ${capacity}</b></div>`;
- let inputRows=entries.map(item=>{
-  const current=s.inputs[item]||0;
-  const cap=rec?inputCap(m,item,0):inPorts.length*3;
-  return itemRow(item,current,cap);
- }).join('');
- if(!inputRows)inputRows='<div class="tiny">没有待缓存的输入材料</div>';
- const portRows=inPorts.map(p=>{
-  const items=s.portItems?.[p.index]||{};
-  const total=Object.values(items).reduce((a,b)=>a+b,0);
-  const cap=m.type==='分流'||m.type==='汇流'?` / 3`:' 件';
-  const summary=Object.entries(items).filter(([,v])=>v>0).sort(([a],[b])=>factoryItemCompare(a,b)).map(([item,n])=>`<span style="color:${materialColor(item)}">●</span> ${esc(item)}×${n}`).join('、');
-  return `<div class="tiny" style="padding:3px 0;border-bottom:1px solid #304153">入${p.index+1} (${portDirectionArrow(p.side)})：<b>${total}${cap}</b>${summary?` · ${summary}`:' · 空'}</div>`;
- }).join('');
- const outputCounts={};for(const item of s.queue||[])outputCounts[item]=(outputCounts[item]||0)+1;
- const outputItems=rec?[rec.output]:Object.keys(outputCounts);
- const outputRows=outputItems.length?outputItems.map(item=>itemRow(item,outputCounts[item]||0,outCap)).join(''):'<div class="tiny">直通设备：物品直接从输入缓存发往出口，无独立输出队列</div>';
- const recent=[...new Set([...Object.keys(s.received||{}),...Object.keys(s.sent||{})])];
- const totalRows=recent.length?recent.map(item=>`<div class="kv"><span><span style="color:${materialColor(item)}">●</span> ${esc(item)}</span><b>入 ${s.received[item]||0} / 出 ${s.sent[item]||0}</b></div>`).join(''):'<div class="tiny">尚无物品传输记录</div>';
- let warehouseExtra='';
- if(m.type==='仓出')warehouseExtra=`<div class="kv"><span>全局仓库 ${esc(m.item||'未设置')} 库存</span><b>${ware[m.item]||0} 件</b></div>`;
- if(m.type==='仓入')warehouseExtra='<div class="tiny">入仓物品立即计入全局仓库，没有独立输入缓存；各物品数量见上方仓库收支。</div>';
- const inputTotal=Object.values(s.inputs||{}).reduce((sum,n)=>sum+n,0);
- const queueTotal=(s.queue||[]).length;
+ const rec=getRecipe(m),computer=m.type==='电脑',rows=[];
+ // Recipe and computer stacks are already shown in Production. Keep only
+ // the distinct live data for warehouse and routing devices here.
+ if(m.type==='仓出'){
+  rows.push(['共享仓库库存',(ware[m.item]||0)+' 件']);
+ }else if(m.type==='仓入')rows.push(['入仓方式','直接入库']);
+
+ if(computer)rows.push(['累计销毁',Object.values(s.consumed||{}).reduce((a,b)=>a+b,0)+' 件']);
+ const totals=[...new Set([...Object.keys(s.received||{}),...Object.keys(s.sent||{}),...Object.keys(s.consumed||{})])].sort(factoryItemCompare);
+ const history=totals.map(item=>`<div class="kv"><span><span style="color:${materialColor(item)}">●</span> ${esc(item)}</span><b>入 ${s.received[item]||0} / ${computer?'销毁 '+(s.consumed[item]||0):'出 '+(s.sent[item]||0)}</b></div>`).join('');
+
  return `<div class="item machine-live" id="inspectorLive">
-  <div class="machine-live-head"><strong>实时机器物料</strong><small>模拟时间 ${simTime.toFixed(1)} 秒</small></div>
-  <div class="machine-live-summary">
-   <div><span>输入缓存</span><b>${inputTotal}<small> 件</small></b></div>
-   <div><span>输出队列</span><b>${queueTotal}<small> 件</small></b></div>
-  </div>
-  <details class="machine-live-detail">
-   <summary>查看缓存与接口明细</summary>
-   <div class="machine-live-detail-body">
-    <div class="machine-live-subhead">输入库存（当前 / 上限）</div>${inputRows}
-    ${portRows?`<div class="machine-live-ports">${portRows}</div>`:''}
-    <div class="machine-live-subhead">输出库存（当前 / 上限）</div>${outputRows}
-    ${warehouseExtra}
-    <div class="kv"><span>加工状态</span><b>${rec?(s.busy>0?'加工中 '+s.busy.toFixed(1)+' 秒':'待机'):'—'}</b></div>
-    <details class="machine-live-history"><summary>本次模拟累计接收 / 发出</summary>${totalRows}</details>
-   </div>
-  </details>
+  <div class="machine-live-head"><strong>实时物流</strong><small>模拟时间 ${simTime.toFixed(1)} 秒</small></div>
+  ${rows.map(([k,v])=>`<div class="kv"><span>${k}</span><b>${v}</b></div>`).join('')}
+  <details class="machine-live-history"><summary>累计接收 / ${computer?'销毁':'发出'}</summary>${history||'<div class="tiny">尚无物品传输记录</div>'}</details>
  </div>`;
 }
 // Patch dynamic nodes only; preserve selection in static theory and controls.
@@ -125,6 +149,7 @@ function syncLiveMarkup(node,html){
    if(!b.hasAttribute(attr.name))a.removeAttribute(attr.name);
   }
   for(const attr of b.attributes){
+   if(a.tagName==='DETAILS'&&attr.name==='open')continue;
    if(a.getAttribute(attr.name)!==attr.value)a.setAttribute(attr.name,attr.value);
   }
   for(let i=0;i<b.childNodes.length;i++){
@@ -146,6 +171,16 @@ function routePacketsHTML(r,packets,length){
    return `<div class="route-packet"><span style="color:${materialColor(p.item)}">●</span><span>${i+1}. ${esc(p.item)}</span><span class="route-packet-pos">${remaining.toFixed(1)}m 剩余</span><div class="tiny route-packet-coord">${cell} · 距起点 ${p.distance.toFixed(1)}m</div></div>`;
  }).join('');
 }
+// Crossings belong to the entire selected route, not just its clicked cell.
+function inspectorRouteCrossings(r){
+ const cells=new Set(r.path.map(([x,y])=>x+','+y)),found=[];
+ for(const q of state.routes){
+  if(q.id===r.id)continue;
+  const crossings=q.path.filter(([x,y])=>cells.has(x+','+y));
+  if(crossings.length)found.push({route:q,count:new Set(crossings.map(p=>p.join(','))).size});
+ }
+ return found;
+}
 function inspectorRefreshLive(){
  if(!selection?.machineId&&!selection?.routeId)return;
  const root=$('inspector');
@@ -163,32 +198,79 @@ function inspectorRefreshLive(){
  const m=machineById(selection?.machineId);
  if(!m)return;
  if(root.dataset.inspectorKey!=='machine:'+m.id)return inspectorRefresh();
+ inspectorRefreshProgress();
+ syncLiveMarkup(root.querySelector('#inspectorStacks'),machineStackControls(m));
+ syncLiveMarkup(root.querySelector('#inspectorLogisticsBuffers'),machineLogisticsBuffers(m));
  syncLiveMarkup(root.querySelector('#inspectorLive'),machineLiveInventory(m));
 }
+function routeSteadyPanel(r){
+ const rateBudget=typeof steadyDisplayRateBudget==='function'?steadyDisplayRateBudget(theoreticalBudget):theoreticalBudget;
+ const rtFlows=rateBudget?.routeFlows?.[r.id]||{},total=rateBudget?.routeTotals?.[r.id];
+ const rtFlowRows=Object.entries(rtFlows).filter(([,v])=>v===null||v>1e-7).map(([mat,v])=>`<div class="kv"><span>${esc(mat)}</span><b>${v===null?"—":(v*60).toFixed(2)} /分钟</b></div>`).join('');
+ return `<div class="item machine-theory">
+   <div class="machine-analysis-title"><strong>稳态理论</strong><span class="analysis-unit">件/分钟</span></div>
+   <div class="machine-flow-summary"><div class="machine-flow-tile out"><span class="tile-label">运输总量</span><b class="tile-value">${total==null?'—':(total*60).toFixed(2)}<small> 件/分</small></b></div></div>
+   ${rtFlowRows||(r.to&&total!==0?'<div class="tiny">—（尚未证明）</div>':'<div class="tiny">长期流量为零</div>')}
+  </div>`;
+}
+// Worker results refresh only mathematical nodes, not the user's selected
+// text, input controls, or live route and machine panels.
+let inspectorTheoryDeferred=false;
+function inspectorRefreshTheory(){
+ const root=$('inspector'),r=state.routes.find(r=>r.id===selection?.routeId),m=machineById(selection?.machineId);
+ if(r&&root.dataset.inspectorKey==='route:'+r.id){
+  const panel=root.querySelector('.machine-theory');
+  if(hasSelectionInside(panel)){inspectorTheoryDeferred=true;return}
+  syncLiveMarkup(panel,routeSteadyPanel(r));
+ }else if(m&&root.dataset.inspectorKey==='machine:'+m.id){
+  const panel=root.querySelector('#inspectorTheory'),duty=root.querySelector('.machine-duty-section');
+  if(hasSelectionInside(panel)||hasSelectionInside(duty)){inspectorTheoryDeferred=true;return}
+  captureInspectorDisclosures(root);
+  syncLiveMarkup(panel,machineSteadyPanel(m,false));
+  if(duty)syncLiveMarkup(duty,machineProductionDuty(m));
+  restoreInspectorDisclosures(root);
+ }
+ inspectorTheoryDeferred=false;
+}
+document.addEventListener?.('selectionchange',()=>{if(inspectorTheoryDeferred)inspectorRefreshTheory()});
 function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosures(root);if(selection?.routeId){
  let r=state.routes.find(r=>r.id===selection.routeId);if(!r){selection=null;return inspectorRefresh()}
  root.dataset.inspectorKey='route:'+r.id;
  const packets=sim?.routes?.[r.id]||[],length=routeLength(r);
- const rateBudget=typeof steadyDisplayRateBudget==='function'?steadyDisplayRateBudget(theoreticalBudget):theoreticalBudget;
- const rtFlows=rateBudget?.routeFlows?.[r.id]||{};
- const rtFlowRows=Object.entries(rtFlows).filter(([,v])=>v>1e-7).map(([mat,v])=>`<div class="kv"><span>${esc(mat)}</span><b>${(v*60).toFixed(2)} /分钟</b></div>`).join('');
- const crossHere=selection?.crossAt?cellRoutes(...selection.crossAt).filter(q=>q.id!==r.id):[];
+ const crossHere=inspectorRouteCrossings(r);
  const items=routePacketsHTML(r,packets,length);
- root.innerHTML=`<div class="inspector-machine inspector-route"><section class="machine-summary route-summary" style="--machine-accent:#4ee09b"><div class="machine-summary-eyebrow"><span>传送带</span><code title="线路记录编号">${esc(routeRecordDisplayId(r))}</code></div><div class="machine-summary-name">物流线路</div><div class="machine-summary-location">${esc(routeTitle(r))}</div></section><div class="item">
- <div class="kv"><span>长度</span><b>${length}米</b></div>
- <div class="kv"><span>模拟时间</span><b data-live-route-time>${simTime.toFixed(1)}秒</b></div>
- <div class="kv"><span>线上物品</span><b data-live-route-count>${packets.length}件</b></div>
- <div class="divider"></div><strong>理论稳态线路流量</strong>${rtFlowRows||'<div class="tiny">0 件/分钟（未得到可行供给或下游不能生产）</div>'}
- ${r.label?`<div class="tiny">参考线路：${esc(r.label)}</div>`:''}</div>
- <div class="item"><strong>当前运输物品（靠近终点优先）</strong>
- <div class="tiny" style="margin:3px 0 8px">实时读取该条线路中的逐件运输队列，含堵塞停留物品；快进后也会更新。</div>
- <div class="route-packet-list" id="inspectorRoutePackets">${items||'<div class="tiny" style="padding:8px 0">当前线路没有物品。运行模拟后即可查看。</div>'}</div></div>
- ${crossHere.length?`<div class="tiny">这里是十字交叉；另有一条独立传送带：</div>${crossHere.map(q=>`<button class="full smallbtn" data-select-route="${esc(q.id)}" style="margin:4px 0">切换查看 #${esc(q.id)} · ${esc(routeTitle(q))}</button>`).join('')}`:''}
- <button class="full" data-delete-route="${esc(r.id)}">删除这条线路</button></div>`;
+ const connected=beltConnected(r),status=connected?'已连接':'末端悬空';
+ root.innerHTML=`<div class="inspector-machine inspector-route">
+ <section class="machine-summary" style="--machine-accent:${connected?'#4ee09b':'#e7be58'}">
+  <div class="machine-summary-eyebrow"><span>传送带详情</span><code title="线路记录编号">${esc(routeRecordDisplayId(r))}</code></div>
+  <div class="machine-summary-name">物流线路</div>
+  <div class="machine-summary-location">${esc(routeTitle(r))}</div>
+  <div class="machine-summary-metrics">
+   <div><span>线路状态</span><strong>${status}</strong></div>
+   <div><span>长度</span><strong>${length} 米</strong></div>
+   <div><span>传输速度</span><strong>${BELT_SPEED} 米/秒</strong></div>
+   <div><span>标称上限</span><strong>60 <small>件/分</small></strong></div>
+  </div>${r.label?`<div class="machine-ast1-meta">参考线路：${esc(r.label)}</div>`:''}
+ </section>
+ <section class="machine-analysis-panel">
+  <div class="machine-analysis-heading">运输与物流分析</div>
+  ${routeSteadyPanel(r)}
+  <div class="item machine-live">
+   <div class="machine-live-head"><strong>实时运输物品</strong><small data-live-route-time>${simTime.toFixed(1)}秒</small></div>
+   <div class="machine-live-summary"><div><span>线上物品</span><b data-live-route-count>${packets.length}件</b></div></div>
+   <details class="route-packet-details" open>
+    <summary>靠近终点优先 · 包含堵塞停留物品</summary>
+    <div class="route-packet-list" id="inspectorRoutePackets">${items||'<div class="tiny" style="padding:8px 0">当前线路没有物品。运行模拟后即可查看。</div>'}</div>
+   </details>
+  </div>
+  ${crossHere.length?`<div class="item route-crossings"><div class="machine-live-head"><strong>交叉的独立传送带</strong><small>${crossHere.length} 条</small></div><div class="route-crossing-buttons">${crossHere.map(({route:q,count})=>`<button type="button" class="full smallbtn route-crossing-button" data-select-route="${esc(q.id)}"><span class="route-crossing-label"><b>${esc(routeRecordDisplayId(q))}</b> · ${esc(routeTitle(q))}</span><small>${count} 处</small></button>`).join('')}</div></div>`:''}
+ </section>
+ </div>`;
+ restoreInspectorDisclosures(root);
  return;}
  let m=machineById(selection?.machineId);if(!m){root.dataset.inspectorKey='none';root.replaceChildren();return;}
  root.dataset.inspectorKey='machine:'+m.id;
- let d=def(m),[w,h]=dims(m),rec=getRecipe(m),ports=getPorts(m),modes=d.recipes?factoryRecipeModesByItem(m.type,recipeModes(m.type)):null;
+ let d=def(m),[w,h]=dims(m),rec=getRecipe(m),ports=getPorts(m),modes=d.recipes?recipeModes(m.type):null;
  const faceName=({E:'右',W:'左',N:'上',S:'下'})[m.face]||m.face;
  const maxRate=rec?(rec.qty/rec.seconds*60).toFixed(2):null;
  const inputRecipe=rec?Object.entries(rec.inputs).sort(([a],[b])=>factoryItemCompare(a,b)).map(([name,count])=>`<span class="machine-flow-input">${esc(name)} ×${count}</span>`).join(''):'';
@@ -233,9 +315,16 @@ function inspectorRefresh(){const root=$('inspector');captureInspectorDisclosure
   </section>
 
   ${machineProps.length?`<section class="machine-properties"><div class="machine-edit-heading">编辑设置</div>${machineProps.join('')}</section>`:''}
-  <section class="machine-analysis-panel">
-   <div class="machine-analysis-heading">生产与物流分析</div>
-   ${machineSteadyPanel(m)}
+  ${rec||m.type==='电脑'?`<section class="machine-analysis-panel machine-production-panel">
+   <div class="machine-analysis-heading">生产</div>
+   ${machineProductionProgress(m)}
+   ${machineStackControls(m)}
+  </section>`:''}
+  <section class="machine-analysis-panel machine-logistics-panel">
+   <div class="machine-analysis-heading">分析</div>
+   ${machineLogisticsBuffers(m)}
+   ${machineProductionDuty(m)}
+   ${machineSteadyPanel(m,false)}
    ${machineLiveInventory(m)}
   </section>
  </div>`;

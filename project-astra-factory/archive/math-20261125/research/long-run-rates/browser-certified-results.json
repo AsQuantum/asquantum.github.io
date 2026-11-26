@@ -1,0 +1,25 @@
+{
+  "browser": true,
+  "partialAggregate": {
+    "inflow": "1",
+    "outflow": "1",
+    "net": "0",
+    "potential": "-4",
+    "overdraft": "-4",
+    "withdrawalDemand": "5",
+    "localNet": "0"
+  },
+  "multiResourceDuty": "1/2",
+  "abundanceChain": [
+    "1",
+    "1"
+  ],
+  "largeLayoutReadinessDiagnostic": {
+    "status": "partial",
+    "actualStatus": "partial",
+    "known": 347,
+    "unknown": 435,
+    "unknownMetrics": 60,
+    "ms": 290
+  }
+}

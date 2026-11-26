@@ -1,0 +1,1415 @@
+[
+  {
+    "name": "physical and high-rate fractional frozen",
+    "proof": [
+      {
+        "items": [
+          "钛合金锭"
+        ],
+        "states": 352000,
+        "caps": [
+          10
+        ],
+        "thresholds": [
+          6
+        ],
+        "clockStates": 40,
+        "clockPrefix": 0,
+        "certifiedPhysicalWords": 0,
+        "cycleTicks": 40,
+        "cycleClasses": 1,
+        "duties": [
+          {
+            "factory": "a",
+            "duty": "3/4",
+            "proven": true,
+            "method": "exact-fixed-tick-certified-frozen-component-quotient"
+          }
+        ],
+        "outlets": [
+          {
+            "machine": "M9",
+            "route": "R5",
+            "item": "钛合金锭",
+            "conditional": false,
+            "rate": "0"
+          }
+        ],
+        "sourceRates": [],
+        "joint": null
+      }
+    ],
+    "unique": 34,
+    "actual": {
+      "sent": {
+        "M9": {},
+        "M11": {}
+      },
+      "duty": {
+        "s": 1.0000000000025668,
+        "a": 0.7500000000012778
+      },
+      "in": {
+        "钛合金锭": 1.5,
+        "硅晶圆": 1.5
+      },
+      "out": {
+        "钛合金锭": 1.5
+      }
+    },
+    "layout": {
+      "name": "physical and high-rate fractional frozen",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M9",
+          "type": "仓出",
+          "x": 18,
+          "y": 10,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M11",
+          "type": "电脑",
+          "x": 27,
+          "y": 11,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R5",
+          "from": {
+            "id": "M9",
+            "port": 0
+          },
+          "to": {
+            "id": "M11",
+            "port": 0
+          },
+          "path": [
+            [
+              23,
+              12
+            ],
+            [
+              24,
+              12
+            ],
+            [
+              25,
+              12
+            ],
+            [
+              26,
+              12
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "3/2"
+          }
+        },
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "-2",
+            "硅晶圆": "2"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "two negative consumers and free recipe",
+    "proof": [
+      {
+        "items": [
+          "钛合金锭"
+        ],
+        "states": 224000,
+        "caps": [
+          13
+        ],
+        "thresholds": [
+          8
+        ],
+        "clockStates": 4,
+        "clockPrefix": 0,
+        "certifiedPhysicalWords": 0,
+        "cycleTicks": 20,
+        "cycleClasses": 1,
+        "duties": [
+          {
+            "factory": "a",
+            "duty": "1",
+            "proven": true,
+            "method": "exact-fixed-tick-certified-frozen-component-quotient"
+          },
+          {
+            "factory": "b",
+            "duty": "1/2",
+            "proven": true,
+            "method": "exact-fixed-tick-certified-frozen-component-quotient"
+          }
+        ],
+        "outlets": [
+          {
+            "machine": "M8",
+            "route": "R4",
+            "item": "钛合金锭",
+            "conditional": false,
+            "rate": "0"
+          }
+        ],
+        "sourceRates": [],
+        "joint": null
+      }
+    ],
+    "unique": 59,
+    "actual": {
+      "sent": {
+        "M8": {},
+        "M10": {},
+        "M12": {}
+      },
+      "duty": {
+        "s": 1.0000000000025668,
+        "a": 1.0000000000025666,
+        "b": 0.49999999999998945
+      },
+      "in": {
+        "钛合金锭": 5,
+        "硅晶圆": 4,
+        "星尘粒子": 1
+      },
+      "out": {
+        "钛合金锭": 5
+      }
+    },
+    "layout": {
+      "name": "two negative consumers and free recipe",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M8",
+          "type": "仓出",
+          "x": 18,
+          "y": 1,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M10",
+          "type": "组装",
+          "x": 28,
+          "y": 0,
+          "face": "E",
+          "mode": "齿轮组"
+        },
+        {
+          "id": "M12",
+          "type": "仓入",
+          "x": 43,
+          "y": 1,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R4",
+          "from": {
+            "id": "M8",
+            "port": 0
+          },
+          "to": {
+            "id": "M10",
+            "port": 1
+          },
+          "path": [
+            [
+              23,
+              3
+            ],
+            [
+              24,
+              3
+            ],
+            [
+              25,
+              3
+            ],
+            [
+              26,
+              3
+            ],
+            [
+              27,
+              3
+            ]
+          ]
+        },
+        {
+          "id": "R6",
+          "from": {
+            "id": "M10",
+            "port": 0
+          },
+          "to": {
+            "id": "M12",
+            "port": 1
+          },
+          "path": [
+            [
+              39,
+              3
+            ],
+            [
+              40,
+              3
+            ],
+            [
+              41,
+              3
+            ],
+            [
+              42,
+              3
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "5"
+          }
+        },
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "-4",
+            "硅晶圆": "4"
+          }
+        },
+        {
+          "id": "b",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "-2",
+            "星尘粒子": "2"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "two exits with source later in order",
+    "proof": [
+      {
+        "items": [
+          "钛合金锭"
+        ],
+        "states": 409600,
+        "caps": [
+          15
+        ],
+        "thresholds": [
+          10
+        ],
+        "clockStates": 2,
+        "clockPrefix": 0,
+        "certifiedPhysicalWords": 0,
+        "cycleTicks": 20,
+        "cycleClasses": 40,
+        "duties": [
+          {
+            "factory": "a",
+            "duty": "4/5",
+            "proven": true,
+            "method": "exact-fixed-tick-certified-frozen-component-quotient"
+          }
+        ],
+        "outlets": [
+          {
+            "machine": "M8",
+            "route": "R4",
+            "item": "钛合金锭",
+            "conditional": false,
+            "rate": "1"
+          },
+          {
+            "machine": "M9",
+            "route": "R5",
+            "item": "钛合金锭",
+            "conditional": false,
+            "rate": "1"
+          }
+        ],
+        "sourceRates": [],
+        "joint": null
+      }
+    ],
+    "unique": 58,
+    "actual": {
+      "sent": {
+        "M8": {
+          "钛合金锭": 1
+        },
+        "M9": {
+          "钛合金锭": 1
+        },
+        "M10": {
+          "齿轮组": 0.5
+        },
+        "M11": {},
+        "M12": {}
+      },
+      "duty": {
+        "a": 0.800000000001535,
+        "s": 1.0000000000025668
+      },
+      "in": {
+        "钛合金锭": 10,
+        "硅晶圆": 8,
+        "齿轮组": 0.5
+      },
+      "out": {
+        "钛合金锭": 10
+      }
+    },
+    "layout": {
+      "name": "two exits with source later in order",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M8",
+          "type": "仓出",
+          "x": 18,
+          "y": 1,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M9",
+          "type": "仓出",
+          "x": 18,
+          "y": 10,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M10",
+          "type": "组装",
+          "x": 28,
+          "y": 0,
+          "face": "E",
+          "mode": "齿轮组"
+        },
+        {
+          "id": "M11",
+          "type": "电脑",
+          "x": 27,
+          "y": 11,
+          "face": "E"
+        },
+        {
+          "id": "M12",
+          "type": "仓入",
+          "x": 43,
+          "y": 1,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R4",
+          "from": {
+            "id": "M8",
+            "port": 0
+          },
+          "to": {
+            "id": "M10",
+            "port": 1
+          },
+          "path": [
+            [
+              23,
+              3
+            ],
+            [
+              24,
+              3
+            ],
+            [
+              25,
+              3
+            ],
+            [
+              26,
+              3
+            ],
+            [
+              27,
+              3
+            ]
+          ]
+        },
+        {
+          "id": "R5",
+          "from": {
+            "id": "M9",
+            "port": 0
+          },
+          "to": {
+            "id": "M11",
+            "port": 0
+          },
+          "path": [
+            [
+              23,
+              12
+            ],
+            [
+              24,
+              12
+            ],
+            [
+              25,
+              12
+            ],
+            [
+              26,
+              12
+            ]
+          ]
+        },
+        {
+          "id": "R6",
+          "from": {
+            "id": "M10",
+            "port": 0
+          },
+          "to": {
+            "id": "M12",
+            "port": 1
+          },
+          "path": [
+            [
+              39,
+              3
+            ],
+            [
+              40,
+              3
+            ],
+            [
+              41,
+              3
+            ],
+            [
+              42,
+              3
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "-10",
+            "硅晶圆": "10"
+          }
+        },
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "10"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "autonomous deposit and frozen injection",
+    "proof": [
+      {
+        "items": [
+          "钛合金锭"
+        ],
+        "states": 509600,
+        "caps": [
+          12
+        ],
+        "thresholds": [
+          6
+        ],
+        "clockStates": 490,
+        "clockPrefix": 190,
+        "certifiedPhysicalWords": 0,
+        "cycleTicks": 300,
+        "cycleClasses": 60,
+        "duties": [
+          {
+            "factory": "a",
+            "duty": "1/150",
+            "proven": true,
+            "method": "exact-fixed-tick-certified-frozen-component-quotient"
+          }
+        ],
+        "outlets": [
+          {
+            "machine": "M9",
+            "route": "R5",
+            "item": "钛合金锭",
+            "conditional": false,
+            "rate": "1"
+          }
+        ],
+        "sourceRates": [
+          {
+            "machine": "M0",
+            "rate": "2/15",
+            "proven": true,
+            "method": "exact-fixed-tick-independent-autonomous-deposit"
+          }
+        ],
+        "joint": null
+      }
+    ],
+    "unique": 44,
+    "actual": {
+      "sent": {
+        "M0": {
+          "钛合金锭": 0.13333333333333333
+        },
+        "M1": {},
+        "M9": {
+          "钛合金锭": 1
+        },
+        "M11": {}
+      },
+      "duty": {
+        "a": 0.006666666666666762,
+        "s": 1.0000000000025668
+      },
+      "in": {
+        "钛合金锭": 1.1333333333333333,
+        "硅晶圆": 0.13333333333333333
+      },
+      "out": {
+        "钛合金锭": 1.1333333333333333
+      }
+    },
+    "layout": {
+      "name": "autonomous deposit and frozen injection",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "采矿",
+          "x": 2,
+          "y": 1,
+          "face": "E",
+          "mode": 1
+        },
+        {
+          "id": "M1",
+          "type": "仓入",
+          "x": 11,
+          "y": 1,
+          "face": "E"
+        },
+        {
+          "id": "M9",
+          "type": "仓出",
+          "x": 18,
+          "y": 10,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M11",
+          "type": "电脑",
+          "x": 27,
+          "y": 11,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M1",
+            "port": 1
+          },
+          "path": [
+            [
+              7,
+              3
+            ],
+            [
+              8,
+              3
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              10,
+              3
+            ]
+          ]
+        },
+        {
+          "id": "R5",
+          "from": {
+            "id": "M9",
+            "port": 0
+          },
+          "to": {
+            "id": "M11",
+            "port": 0
+          },
+          "path": [
+            [
+              23,
+              12
+            ],
+            [
+              24,
+              12
+            ],
+            [
+              25,
+              12
+            ],
+            [
+              26,
+              12
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "-20",
+            "硅晶圆": "20"
+          }
+        },
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "1"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "two ingredients and physical consumer",
+    "proof": [
+      {
+        "items": [
+          "钛合金锭",
+          "合金板"
+        ],
+        "states": 89600,
+        "caps": [
+          13,
+          9
+        ],
+        "thresholds": [
+          8,
+          4
+        ],
+        "clockStates": 2,
+        "clockPrefix": 0,
+        "certifiedPhysicalWords": 0,
+        "cycleTicks": 2,
+        "cycleClasses": 70,
+        "duties": [
+          {
+            "factory": "a",
+            "duty": "1",
+            "proven": true,
+            "method": "exact-fixed-tick-certified-frozen-component-quotient"
+          },
+          {
+            "factory": "b",
+            "duty": "0",
+            "proven": true,
+            "method": "exact-fixed-tick-certified-frozen-component-quotient"
+          }
+        ],
+        "outlets": [
+          {
+            "machine": "M9",
+            "route": "R5",
+            "item": "钛合金锭",
+            "conditional": false,
+            "rate": "0"
+          }
+        ],
+        "sourceRates": [],
+        "joint": null
+      }
+    ],
+    "unique": 51,
+    "actual": {
+      "sent": {
+        "M9": {
+          "钛合金锭": 0
+        },
+        "M11": {}
+      },
+      "duty": {
+        "s": 1.0000000000025668,
+        "a": 1.0000000000025666,
+        "b": 0
+      },
+      "in": {
+        "钛合金锭": 20,
+        "合金板": 10,
+        "硅晶圆": 10
+      },
+      "out": {
+        "钛合金锭": 20,
+        "合金板": 10
+      }
+    },
+    "layout": {
+      "name": "two ingredients and physical consumer",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M9",
+          "type": "仓出",
+          "x": 18,
+          "y": 10,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M11",
+          "type": "电脑",
+          "x": 27,
+          "y": 11,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R5",
+          "from": {
+            "id": "M9",
+            "port": 0
+          },
+          "to": {
+            "id": "M11",
+            "port": 0
+          },
+          "path": [
+            [
+              23,
+              12
+            ],
+            [
+              24,
+              12
+            ],
+            [
+              25,
+              12
+            ],
+            [
+              26,
+              12
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "20",
+            "合金板": "10"
+          }
+        },
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "-20",
+            "合金板": "-10",
+            "硅晶圆": "10"
+          }
+        },
+        {
+          "id": "b",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "-10",
+            "合金板": "-20",
+            "星尘粒子": "10"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "slow protected physical competitor",
+    "proof": [
+      {
+        "items": [
+          "钛合金锭"
+        ],
+        "states": 528000,
+        "caps": [
+          10
+        ],
+        "thresholds": [
+          6
+        ],
+        "clockStates": 20,
+        "clockPrefix": 0,
+        "certifiedPhysicalWords": 0,
+        "cycleTicks": 40,
+        "cycleClasses": 1,
+        "duties": [
+          {
+            "factory": "a",
+            "duty": "3/4",
+            "proven": true,
+            "method": "exact-fixed-tick-certified-frozen-component-quotient"
+          }
+        ],
+        "outlets": [
+          {
+            "machine": "M9",
+            "route": "R5",
+            "item": "钛合金锭",
+            "conditional": false,
+            "rate": "1/2"
+          }
+        ],
+        "sourceRates": [],
+        "joint": null
+      }
+    ],
+    "unique": 34,
+    "actual": {
+      "sent": {
+        "M9": {
+          "钛合金锭": 0.5
+        },
+        "M11": {}
+      },
+      "duty": {
+        "s": 1.0000000000025668,
+        "a": 0.7500000000012778
+      },
+      "in": {
+        "钛合金锭": 1,
+        "硅晶圆": 0.5
+      },
+      "out": {
+        "钛合金锭": 1
+      }
+    },
+    "layout": {
+      "name": "slow protected physical competitor",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M9",
+          "type": "仓出",
+          "x": 18,
+          "y": 10,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M11",
+          "type": "电脑",
+          "x": 27,
+          "y": 11,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R5",
+          "from": {
+            "id": "M9",
+            "port": 0
+          },
+          "to": {
+            "id": "M11",
+            "port": 0
+          },
+          "path": [
+            [
+              23,
+              12
+            ],
+            [
+              24,
+              12
+            ],
+            [
+              25,
+              12
+            ],
+            [
+              26,
+              12
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "1"
+          }
+        },
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "钛合金锭": "-2/3",
+            "硅晶圆": "2/3"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "proved surplus propagates into multi-layer tree",
+    "unique": 76,
+    "actual": {
+      "sent": {
+        "M0": {
+          "太空垃圾": 1
+        },
+        "M1": {
+          "废金属": 0.6666666666666666
+        },
+        "M2": {
+          "小行星矿石": 0.6666666666666666
+        },
+        "M3": {
+          "合金板": 0.6666666666666666
+        },
+        "M4": {},
+        "M5": {
+          "小行星矿石": 1
+        },
+        "M6": {}
+      },
+      "duty": {
+        "s": 1.0000000000025668,
+        "a": 1.0000000000025642
+      },
+      "in": {
+        "小行星矿石": 1.5,
+        "硅晶圆": 0.25,
+        "合金板": 0.6666666666666666
+      },
+      "out": {
+        "小行星矿石": 0.9166666666666666
+      }
+    },
+    "values": {
+      "flow:R0|太空垃圾": "1",
+      "routeTotal:R0": "1",
+      "flow:R1|废金属": "2/3",
+      "routeTotal:R1": "2/3",
+      "flow:R2|小行星矿石": "2/3",
+      "routeTotal:R2": "2/3",
+      "flow:R3|合金板": "2/3",
+      "routeTotal:R3": "2/3",
+      "flow:R4|小行星矿石": "1",
+      "routeTotal:R4": "1",
+      "cycle:M0": "1/3",
+      "machineDuty:M0": "1",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "1",
+      "machineMaterial:M0|out|太空垃圾": "1",
+      "cycle:M1": "1/3",
+      "machineDuty:M1": "2/3",
+      "machineTotal:M1|in": "1",
+      "machineMaterial:M1|in|太空垃圾": "1",
+      "machineTotal:M1|out": "2/3",
+      "machineMaterial:M1|out|废金属": "2/3",
+      "machineTotal:M2|in": "0",
+      "machineTotal:M2|out": "2/3",
+      "machineMaterial:M2|out|小行星矿石": "2/3",
+      "cycle:M3": "1/3",
+      "machineDuty:M3": "5/6",
+      "machineTotal:M3|in": "4/3",
+      "machineMaterial:M3|in|废金属": "2/3",
+      "machineMaterial:M3|in|小行星矿石": "2/3",
+      "machineTotal:M3|out": "2/3",
+      "machineMaterial:M3|out|合金板": "2/3",
+      "machineTotal:M4|in": "2/3",
+      "machineMaterial:M4|in|合金板": "2/3",
+      "machineTotal:M4|out": "0",
+      "cycle:M5": "1/3",
+      "machineDuty:M5": "1",
+      "machineTotal:M5|in": "0",
+      "machineTotal:M5|out": "1",
+      "machineMaterial:M5|out|小行星矿石": "1",
+      "machineTotal:M6|in": "1",
+      "machineMaterial:M6|in|小行星矿石": "1",
+      "machineTotal:M6|out": "0",
+      "duty:s": "1",
+      "duty:a": "1",
+      "inflow:小行星矿石": "3/2",
+      "outflow:小行星矿石": "11/12",
+      "net:小行星矿石": "7/12",
+      "localIn:小行星矿石": "1",
+      "localOut:小行星矿石": "2/3",
+      "localNet:小行星矿石": "1/3",
+      "frozenIn:小行星矿石": "1/2",
+      "frozenOut:小行星矿石": "1/4",
+      "inflow:合金板": "2/3",
+      "outflow:合金板": "0",
+      "net:合金板": "2/3",
+      "localIn:合金板": "2/3",
+      "localOut:合金板": "0",
+      "localNet:合金板": "2/3",
+      "frozenIn:合金板": "0",
+      "frozenOut:合金板": "0",
+      "inflow:硅晶圆": "1/4",
+      "outflow:硅晶圆": "0",
+      "net:硅晶圆": "1/4",
+      "localIn:硅晶圆": "0",
+      "localOut:硅晶圆": "0",
+      "localNet:硅晶圆": "0",
+      "frozenIn:硅晶圆": "1/4",
+      "frozenOut:硅晶圆": "0",
+      "total:inflow": "29/12",
+      "total:outflow": "11/12",
+      "total:net": "3/2",
+      "total:localIn": "5/3",
+      "total:localOut": "2/3",
+      "total:localNet": "1",
+      "total:frozenIn": "3/4",
+      "total:frozenOut": "1/4"
+    },
+    "sources": {
+      "cadence": 0,
+      "clearance": 1,
+      "round-robin": 0,
+      "recipe-tree": 1,
+      "priority-tree": 0,
+      "split-tree": 0,
+      "merger-tree": 0,
+      "shared-inlet": 0,
+      "mixed": 0,
+      "burst": 0,
+      "overlap": 0,
+      "envelope": 0,
+      "smooth": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 4,
+      "feed-forward": 2,
+      "frozen-protection": 0,
+      "stock": 2,
+      "stock-free-exits": 1,
+      "proved-stock-tree": 3,
+      "proved-stock-region": 0,
+      "frozen-exclusive": 1,
+      "frozen-ring": 0,
+      "frozen-network": 1,
+      "return": 0
+    },
+    "layout": {
+      "name": "Alloy converging multi-layer recipe tree",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "垃圾",
+          "x": 2,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        },
+        {
+          "id": "M1",
+          "type": "废料",
+          "x": 11,
+          "y": 1,
+          "face": "E",
+          "mode": "标准"
+        },
+        {
+          "id": "M2",
+          "type": "仓出",
+          "x": 24,
+          "y": 10,
+          "face": "N",
+          "mode": 0,
+          "item": "小行星矿石"
+        },
+        {
+          "id": "M3",
+          "type": "冶炼",
+          "x": 28,
+          "y": 1,
+          "face": "E",
+          "mode": "合金板"
+        },
+        {
+          "id": "M4",
+          "type": "仓入",
+          "x": 43,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        },
+        {
+          "id": "M5",
+          "type": "采矿",
+          "x": 2,
+          "y": 20,
+          "face": "E",
+          "mode": 0
+        },
+        {
+          "id": "M6",
+          "type": "仓入",
+          "x": 11,
+          "y": 20,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M1",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              4
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              10,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 0
+          },
+          "path": [
+            [
+              20,
+              4
+            ],
+            [
+              21,
+              4
+            ],
+            [
+              22,
+              4
+            ],
+            [
+              23,
+              4
+            ],
+            [
+              24,
+              4
+            ],
+            [
+              25,
+              4
+            ],
+            [
+              26,
+              4
+            ],
+            [
+              27,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              26,
+              9
+            ],
+            [
+              26,
+              8
+            ],
+            [
+              26,
+              7
+            ],
+            [
+              26,
+              6
+            ],
+            [
+              26,
+              5
+            ],
+            [
+              27,
+              5
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M4",
+            "port": 1
+          },
+          "path": [
+            [
+              37,
+              4
+            ],
+            [
+              38,
+              4
+            ],
+            [
+              39,
+              4
+            ],
+            [
+              40,
+              4
+            ],
+            [
+              41,
+              4
+            ],
+            [
+              42,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R4",
+          "from": {
+            "id": "M5",
+            "port": 0
+          },
+          "to": {
+            "id": "M6",
+            "port": 1
+          },
+          "path": [
+            [
+              7,
+              22
+            ],
+            [
+              8,
+              22
+            ],
+            [
+              9,
+              22
+            ],
+            [
+              10,
+              22
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "小行星矿石": "1/2"
+          }
+        },
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "小行星矿石": "-1/4",
+            "硅晶圆": "1/4"
+          }
+        }
+      ]
+    }
+  }
+]

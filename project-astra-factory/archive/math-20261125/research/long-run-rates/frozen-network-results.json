@@ -1,0 +1,113 @@
+{
+  "cases": [
+    {
+      "name": "lossy-fed",
+      "duties": {
+        "a": "1/5",
+        "b": "1/5",
+        "s": "1"
+      },
+      "actual": {
+        "a": 0.19999999999990445,
+        "b": 0.1999999999999046,
+        "s": 1.0000000000025668
+      },
+      "queries": 21
+    },
+    {
+      "name": "lossy-unfed",
+      "duties": {
+        "a": "0",
+        "b": "0"
+      },
+      "actual": {
+        "a": 0,
+        "b": 0
+      },
+      "queries": 20
+    },
+    {
+      "name": "equal-fed",
+      "duties": {
+        "a": "5/8",
+        "b": "1",
+        "s": "1"
+      },
+      "actual": {
+        "a": 0.6250000000006296,
+        "b": 1.00000000000256,
+        "s": 1.0000000000025668
+      },
+      "queries": 21
+    },
+    {
+      "name": "gain-fed",
+      "duties": {
+        "a": "11/20",
+        "b": "1",
+        "s": "1"
+      },
+      "actual": {
+        "a": 0.55000000000024,
+        "b": 1.0000000000025535,
+        "s": 1.0000000000025668
+      },
+      "queries": 21
+    },
+    {
+      "name": "multi-input-feedback",
+      "duties": {
+        "a": "3/10",
+        "b": "1/5",
+        "s": "1"
+      },
+      "actual": {
+        "a": 0.2999999999997758,
+        "b": 0.19999999999990833,
+        "s": 1.0000000000025668
+      },
+      "queries": 33
+    },
+    {
+      "name": "multiple-producers",
+      "duties": {
+        "a": "2/5",
+        "b": "1/5",
+        "c": "1/5",
+        "s": "1"
+      },
+      "actual": {
+        "a": 0.39999999999964725,
+        "b": 0.1999999999999046,
+        "c": 0.19999999999990445,
+        "s": 1.0000000000025668
+      },
+      "queries": 28
+    }
+  ],
+  "nonunique": [
+    {
+      "factory": "a",
+      "reason": "multiple fixed values; count limit not certified"
+    },
+    {
+      "factory": "b",
+      "reason": "multiple fixed values; count limit not certified"
+    }
+  ],
+  "shared": [
+    {
+      "factory": "a",
+      "reason": "shared input"
+    },
+    {
+      "factory": "rival",
+      "reason": "shared input"
+    },
+    {
+      "factory": "b",
+      "reason": "depends on unproved producer"
+    }
+  ],
+  "scope": "exclusive input network, actual count limits only for unique fixed coordinates"
+}

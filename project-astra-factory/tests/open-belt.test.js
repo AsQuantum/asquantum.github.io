@@ -3,13 +3,13 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.resolve(__dirname,'..');
 const files=['data/catalog','blueprints/machine-ids','blueprints/item-ids',
  'core/state','core/machines','core/routing','core/audit','core/selection-transform',
- 'core/editor','ui/editor-controls','ui/canvas','engine/steady-flow',
+ 'core/editor','ui/editor-controls','ui/canvas','engine/math/arithmetic/rational','engine/steady-flow',
  'engine/simulation','core/compact-json','blueprints/ast1-codec'];
 const bundle=files.map(f=>fs.readFileSync(path.join(root,'scripts',f+'.js'),'utf8')).join('\n;\n');
 function run(fn){
  const canvas={getContext(){return{};},getBoundingClientRect(){return{left:0,top:0};},setPointerCapture(){}};
  const document={getElementById(id){return id==='map'?canvas:{style:{},textContent:'',classList:{add(){},remove(){}}};},querySelectorAll(){return[];}};
- return new Function('document','assert','atob','btoa','performance',bundle+'\nfunction inspectorRefresh(){}\n('+fn.toString()+')()')(document,assert,atob,btoa,performance);
+ return new Function('document','assert','atob','btoa','performance',bundle+'\nfunction inspectorRefresh(){}\nfunction recordWarehouseMovement(){}\n('+fn.toString()+')()')(document,assert,atob,btoa,performance);
 }
 test('0xffff open AST1 and JSON -1 roundtrips',()=>run(function(){
  const m={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},p=outPort(m,0);
@@ -28,7 +28,7 @@ test('0xffff open AST1 and JSON -1 roundtrips',()=>run(function(){
  assert.equal(restored.routes[0].to,null);
  assert.equal(restored.routes[0].openEndSide,'N');
 }));
-test('open belt stops at adjacent inlet and eventually backpressures',()=>run(function(){
+test('open belt never transports; producer fills its own output stack until connection',()=>run(function(){
  const src={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0};
  const dst={id:'m2',type:'废料',x:18,y:9,face:'E',mode:'标准'};
  const p=outPort(src,0),q=inPort(dst,0),cells=[[p.ex,p.ey],[p.ex+1,p.ey],[p.ex+2,p.ey]];
@@ -39,9 +39,18 @@ test('open belt stops at adjacent inlet and eventually backpressures',()=>run(fu
  sim={byMachine:{},routes:{r1:[]},inbound:{},outbound:{},crafts:{},consumed:{}};
  for(const m of state.machines)sim.byMachine[m.id]={inputs:{},portInputs:{},portItems:{},received:{},sent:{},consumed:{},queue:[],busy:0,tick:0,lastSend:{},lastReceive:{},roundRobin:0};
  simTime=0;ware={};for(let i=0;i<1200;i++)simulate(.05);
- assert.equal(sim.routes.r1.length,4);
+ assert.equal(sim.routes.r1.length,0);
+ assert.equal(sim.byMachine.m1.queue.length,getRecipe(src).qty*20);
  assert.equal(Object.keys(sim.inbound).length,0);
  assert.equal(state.routes[0].to,null);
+ state.routes[0].to={id:dst.id,port:0};
+ simulate(.05);
+ assert.equal(sim.routes.r1.length,1);
+ assert.equal(sim.routes.r1[0].distance,0);
+ simulate(.05);assert(sim.routes.r1[0].distance>0);
+ state.routes[0].to=null;const pos=sim.routes.r1[0].distance;
+ simulate(.05);assert.equal(sim.routes.r1[0].distance,pos);
+
 }));
 test('marquee keeps only output-connected line prefix',()=>run(function(){
  const a={id:'m1',type:'垃圾',x:10,y:10,face:'E',mode:0},b={id:'m2',type:'废料',x:25,y:9,face:'E',mode:'标准'};
@@ -1069,7 +1078,7 @@ test('placed machine hint uses red for blocked ports and retains yellow output w
  assert(events.some(e=>e.kind==='rect'&&e.x===a.x+.16&&e.color==='#ffd16e'&&e.dash.length));
 }));
 
-test('completed belt stays highlighted but next output click immediately starts a new belt without exiting',()=>run(function(){
+test('completed belt supports immediate next output or two non-route taps to exit',()=>run(function(){
  draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
  camera={x:0,y:0,z:10};
  const a={id:'M0',type:'垃圾',x:4,y:7,face:'E',mode:0},b={id:'M1',type:'废料',x:20,y:7,face:'E',mode:'标准'},
@@ -1082,5 +1091,159 @@ test('completed belt stays highlighted but next output click immediately starts 
  click(p.x,p.y);click(q.x,q.y);assert.equal(state.routes.length,1);assert.equal(selection.routeId,state.routes[0].id);assert.equal(draft,null);
  click(r.x,r.y);assert.equal(draft?.from.id,c.id);assert.equal(tool,'belt');assert.equal(beltEditExitPending,false);
  click(t.x,t.y);assert.equal(state.routes.length,2);assert(state.routes.every(r=>r.to&&!checkPath(r.path,r.from,r.to,r.id)));
- click(1,1);click(2,1);click(3,1);assert.equal(tool,'belt');assert.equal(beltEditExitPending,false);
+ click(1,1);assert.equal(selection,null);assert.equal(tool,'belt');assert.equal(beltEditExitPending,true);
+ click(2,1);assert.equal(tool,'select');assert.equal(beltEditExitPending,false);assert.equal(state.routes.length,2);
+}));
+
+
+test('incompatible material wiring is allowed by direct connect and editor, audited and preserved by AST1 and JSON',()=>run(function(){
+ const a={id:'M0',type:'仓出',x:8,y:8,face:'E',item:'太空垃圾'};
+ const b={id:'M1',type:'仓入',x:24,y:8,face:'E',inletItem:'合金板'};
+ const p=outPort(a,0);b.y+=p.ey-inPort(b,0).ey;
+ const q=inPort(b,0),cells=[];for(let x=p.ex;x<=q.ex;x++)cells.push([x,p.ey]);
+ const from={id:a.id,port:0},to={id:b.id,port:0};
+ state={name:'wrong material',machines:[a,b],routes:[]};
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ assert.equal(checkPath(cells,from,to),null);
+ assert.equal(acceptsMaterial(b,a.item,0),false);
+ connect(from,to,[],cells);
+ assert.equal(state.routes.length,1);assert.deepEqual(state.routes[0].to,to);
+ assert.equal(warnings().invalid.length,0);assert.equal(mixedInputWarnings().length,1);
+ state.routes=[];draft={from,path:[],phase:'placing'};
+ assert.equal(saveDraftRoute(cells,to),true);
+ assert.equal(state.routes.length,1);assert.equal(mixedInputWarnings().length,1);
+ const ast=ast1Encode();state=ast1Decode(ast);
+ assert.equal(state.routes.length,1);assert(state.routes[0].to);
+ assert.equal(ast1Encode(),ast);assert.equal(mixedInputWarnings().length,1);
+ const json=compactFactoryLayout(state);state=expandCompactFactoryLayout(json);
+ assert.equal(state.routes.length,1);assert(state.routes[0].to);
+ assert.equal(ast1Encode(),ast);assert.equal(mixedInputWarnings().length,1);
+}));
+
+test('wrong material travels along belt and backpressures source only when belt and real output FIFO are full',()=>run(function(){
+ const a={id:'M0',type:'仓出',x:8,y:8,face:'E',item:'太空垃圾'};
+ const b={id:'M1',type:'仓入',x:24,y:8,face:'E',inletItem:'合金板'};
+ const p=outPort(a,0);b.y+=p.ey-inPort(b,0).ey;
+ const q=inPort(b,0),cells=[];for(let x=p.ex;x<=q.ex;x++)cells.push([x,p.ey]);
+ state={name:'blocked by wrong material',machines:[a,b],routes:[{id:'R0',from:{id:a.id,port:0},to:{id:b.id,port:0},path:cells}]};
+ simTime=0;ware={'太空垃圾':100};sim={byMachine:{M0:simMachineState(),M1:simMachineState()},routes:{R0:[]},inbound:{},outbound:{},crafts:{},consumed:{},minuteBuckets:[]};
+ for(let i=0;i<2400;i++)simulate(.05);
+ assert.equal(sim.routes.R0.length,cells.length+1);
+ assert.equal(sim.routes.R0[0].distance,cells.length);
+ assert.equal(sim.routes.R0.at(-1).distance,0);
+ assert(sim.routes.R0.every(p=>p.item==='太空垃圾'));
+ assert.equal(sim.byMachine.M0.warehouseQueue.length,3);
+ assert.equal(sim.inbound['太空垃圾']||0,0);
+ assert.equal(sim.outbound['太空垃圾'],cells.length+4);
+ assert.equal(ware['太空垃圾'],100-cells.length-4);
+ const oldSent=sim.byMachine.M0.sent['太空垃圾'];
+ for(let i=0;i<100;i++)simulate(.05);
+ assert.equal(sim.byMachine.M0.sent['太空垃圾'],oldSent);
+}));
+
+
+test('belt treads follow centerline corner tangent and stop at full congestion or open end',()=>run(function(){
+ const a={id:'a',type:'仓出',x:8,y:8,face:'E',item:'太空垃圾'};
+ const b={id:'b',type:'仓入',x:24,y:10,face:'E'};
+ const p=outPort(a,0),q=inPort(b,0),path=[];
+ for(let x=p.ex;x<=p.ex+2;x++)path.push([x,p.ey]);
+ const corner=path.length-1;
+ for(let y=p.ey+1;y<=q.ey;y++)path.push([p.ex+2,y]);
+ for(let x=p.ex+3;x<=q.ex;x++)path.push([x,q.ey]);
+ const r={id:'r',from:{id:'a',port:0},to:{id:'b',port:0},path};
+ state={machines:[a,b],routes:[r]};assert.equal(checkPath(path,r.from,r.to,r.id),null);
+ const g=beltPathGeometry(r);assert(g);
+ const before=beltPathPoint(g,corner+.4),after=beltPathPoint(g,corner+.6);
+ assert.deepEqual(before.slice(2),[1,0]);assert.deepEqual(after.slice(2),[0,1]);
+ assert.equal(before[1],p.ey+.5);assert.equal(after[0],p.ex+2+.5);
+ sim={routes:{r:[]}};advanceBeltMotion(0);assert(advanceBeltMotion(100));
+ const phase=beltMotionPhase.get('r');
+ sim.routes.r=Array.from({length:path.length+1},(_,i)=>({item:'太空垃圾',distance:path.length-i}));
+ assert(beltFullyBlocked(r,sim.routes.r));assert.equal(advanceBeltMotion(200),false);
+ assert.equal(beltMotionPhase.get('r'),phase);
+ sim.routes.r.shift();assert(advanceBeltMotion(300));assert.notEqual(beltMotionPhase.get('r'),phase);
+ r.to=null;assert.equal(advanceBeltMotion(400),false);assert(!beltMotionPhase.has('r'));
+}));
+
+
+test('belt visual phase follows completed simulation time at 1x and 60x, and freezes when fully blocked',()=>run(function(){
+ const a={id:'a',type:'仓出',x:8,y:8,face:'E',item:'太空垃圾'};
+ const b={id:'b',type:'仓入',x:24,y:8,face:'E'};
+ const p=outPort(a,0);b.y+=p.ey-inPort(b,0).ey;
+ const q=inPort(b,0),path=[];for(let x=p.ex;x<=q.ex;x++)path.push([x,p.ey]);
+ const r={id:'r',from:{id:'a',port:0},to:{id:'b',port:0},path};
+ state={machines:[a,b],routes:[r]};sim={routes:{r:[]}};simTime=0;running=true;
+ advanceBeltMotion(0);const start=beltMotionPhase.get('r');
+ simTime=.1;advanceBeltMotion(100);
+ assert(Math.abs(beltMotionPhase.get('r')-(start+.2)%7)<1e-8);
+ const last=beltMotionPhase.get('r');
+ simulationSpeed=60;simTime+=6;advanceBeltMotion(200);
+ assert(Math.abs(beltMotionPhase.get('r')-(last+12)%7)<1e-8);
+ const phase=beltMotionPhase.get('r');
+ sim.routes.r=Array.from({length:path.length+1},(_,i)=>({item:'太空垃圾',distance:path.length-i}));
+ simTime+=6;assert.equal(advanceBeltMotion(300),false);assert.equal(beltMotionPhase.get('r'),phase);
+}));
+
+
+test('batch fast-forward freezes belt treads and does not replay skipped time on resume',()=>run(function(){
+ const a={id:'a',type:'仓出',x:8,y:8,face:'E',item:'太空垃圾'},b={id:'b',type:'仓入',x:24,y:8,face:'E'};
+ const p=outPort(a,0);b.y+=p.ey-inPort(b,0).ey;
+ const q=inPort(b,0),path=[];for(let x=p.ex;x<=q.ex;x++)path.push([x,p.ey]);
+ state={machines:[a,b],routes:[{id:'r',from:{id:'a',port:0},to:{id:'b',port:0},path}]};
+ sim={routes:{r:[]}};simTime=0;running=true;
+ advanceBeltMotion(0);simTime=.1;advanceBeltMotion(100);
+ const phase=beltMotionPhase.get('r');
+ simAdvanceBusy=true;running=false;simTime+=3600;
+ assert.equal(advanceBeltMotion(200),false);assert.equal(beltMotionPhase.get('r'),phase);
+ simAdvanceBusy=false;running=true;resetBeltMotionClock();
+ assert.equal(advanceBeltMotion(300),false);
+ simTime+=.1;advanceBeltMotion(400);
+ assert(Math.abs(beltMotionPhase.get('r')-(phase+.2)%7)<1e-8);
+}));
+
+
+test('open yellow belt paints stationary dark treads at each tile center',()=>run(function(){
+ const a={id:'a',type:'仓出',x:8,y:8,face:'E',item:'太空垃圾'};
+ const p=outPort(a,0),path=[[p.ex,p.ey],[p.ex+1,p.ey],[p.ex+2,p.ey]];
+ state={machines:[a],routes:[{id:'r',from:{id:'a',port:0},to:null,path}]};
+ const lines=[];
+ ctx.beginPath=()=>{};ctx.stroke=()=>{};
+ ctx.moveTo=(x,y)=>lines.push(['m',x,y]);ctx.lineTo=(x,y)=>lines.push(['l',x,y]);
+ paintBeltMotion();const first=JSON.stringify(lines);
+ assert.equal(lines.length,6);
+ beltMotionPhase.set('r',3.2);
+ advanceBeltMotion(0);advanceBeltMotion(100);
+ lines.length=0;paintBeltMotion();
+ assert.equal(JSON.stringify(lines),first);
+}));
+
+
+test('tread rotates continuously across left and right corners while staying on the exact centerline',()=>run(function(){
+ for(const turn of [-1,1]){
+  const g={path:[[0,0],[1,0],[1,turn]],n:3,sx:1,sy:0,tx:0,ty:turn};
+  for(const d of [1.2,1.3,1.4,1.5,1.6,1.7,1.8]){
+   const a=beltTreadPoint(g,d),b=beltPathPoint(g,d);
+   assert.deepEqual(a.slice(0,2),b.slice(0,2));
+   assert(Math.abs(Math.hypot(a[2],a[3])-1)<1e-9);
+   const expected=turn*Math.PI/2*Math.max(0,Math.min(1,(d-1.3)/.4));
+   assert(Math.abs(Math.atan2(a[3],a[2])-expected)<1e-9);
+  }
+ }
+}));
+
+
+test('finished open placement uses two non-route taps to leave Belt and another belt cancels pending exit',()=>run(function(){
+ draw=function(){};afterChange=function(){};notify=function(){};updateHint=function(){};updateGroupControls=function(){};
+ camera={x:0,y:0,z:10};
+ const m={id:'M0',type:'垃圾',x:6,y:10,face:'E',mode:0},p=outPort(m,0);
+ state={name:'finished open exit',recordIndexed:true,machines:[m],routes:[]};
+ selection=null;draft=null;beltTrim=null;setTool('belt');
+ const click=(x,y)=>{onPointerDown({button:0,pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});onPointerUp({pointerId:1,clientX:(x+.5)*10,clientY:(y+.5)*10});};
+ click(p.x,p.y);click(p.ex+2,p.ey);
+ const r=state.routes[0];assert(r);click(...r.path.at(-1));
+ assert.equal(draft,null);assert.equal(selection.routeId,r.id);
+ click(m.x+1,m.y+1);assert.equal(selection,null);assert.equal(beltEditExitPending,true);assert.equal(tool,'belt');
+ click(...r.path[0]);assert.equal(beltEditExitPending,false);assert.equal(tool,'belt');assert.equal(selection.routeId,r.id);
+ click(m.x+1,m.y+1);assert.equal(beltEditExitPending,true);
+ click(2,5);assert.equal(tool,'select');assert.equal(state.routes.length,1);assert.equal(r.path.length,3);
 }));

@@ -1,0 +1,884 @@
+[
+  {
+    "dx": 0,
+    "reverse": false,
+    "lengths": [
+      14,
+      14,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 0,
+    "reverse": true,
+    "lengths": [
+      14,
+      14,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 1,
+    "reverse": false,
+    "lengths": [
+      14,
+      13,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 1,
+    "reverse": true,
+    "lengths": [
+      14,
+      13,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 2,
+    "reverse": false,
+    "lengths": [
+      14,
+      12,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 2,
+    "reverse": true,
+    "lengths": [
+      14,
+      12,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 3,
+    "reverse": false,
+    "lengths": [
+      14,
+      11,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 3,
+    "reverse": true,
+    "lengths": [
+      14,
+      11,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 4,
+    "reverse": false,
+    "lengths": [
+      14,
+      10,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 4,
+    "reverse": true,
+    "lengths": [
+      14,
+      10,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 5,
+    "reverse": false,
+    "lengths": [
+      14,
+      9,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 5,
+    "reverse": true,
+    "lengths": [
+      14,
+      9,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 6,
+    "reverse": false,
+    "lengths": [
+      14,
+      8,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  },
+  {
+    "dx": 6,
+    "reverse": true,
+    "lengths": [
+      14,
+      8,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    },
+    "math": {
+      "status": "conditional-exact",
+      "certificates": [
+        {
+          "machine": "M2",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-saturated-service+batch-phase-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "period": "2",
+          "maxSupplyInterval": "1",
+          "ports": [
+            {
+              "route": "R1",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R0",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "supplyProof": [
+            {
+              "route": "R0",
+              "item": "小行星矿石",
+              "machine": "M0",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            },
+            {
+              "route": "R1",
+              "item": "小行星矿石",
+              "machine": "M1",
+              "rule": "autonomous-saturated-generator",
+              "parents": [],
+              "interval": "1"
+            }
+          ]
+        }
+      ],
+      "left": "1/2",
+      "right": "1",
+      "cycle": "1/2"
+    }
+  }
+]

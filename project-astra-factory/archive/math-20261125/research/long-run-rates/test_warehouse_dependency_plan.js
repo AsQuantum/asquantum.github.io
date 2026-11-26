@@ -1,0 +1,35 @@
+'use strict';
+const assert=require('assert/strict'),fs=require('fs');
+const {arith}=require('./run_direct'),{planWarehouseDependencies:plan}=require('./warehouse_dependency_plan');
+const nodes=[],lines=[],frozen=[],pools=[];
+function m(id,type,item){nodes.push({id,type,item});return id;}
+function e(id,from,to,...materials){lines.push({id,from,to,materials});}
+m('source','生产');m('deposit','仓入');e('d0','source','deposit','a');
+m('out1','仓出','a');m('craft1','生产');e('r1','out1','craft1','a');e('d1','craft1','deposit','b');
+m('out2','仓出','a');m('craft2','生产');e('r2','out2','craft2','a');e('d2','craft2','deposit','c');
+m('out3','仓出','b');m('craft3','生产');e('r3','out3','craft3','b');e('d3','craft3','deposit','d');
+m('out4','仓出','z');m('craft4','生产');e('r4','out4','craft4','z');e('d4','craft4','deposit','v');
+frozen.push({id:'sourceZ',rates:{z:'1/2',unused:'0'}},{id:'converter',rates:{c:'-1/2',b:'-1/4',e:'1'}},{id:'sourceA',rates:{a:'1/2'}});
+pools.push({item:'a',order:['out2','out1']},{item:'b',order:['out3']},{item:'z',order:['out4']});
+const g={status:'compiled',completePhysicalRoutes:true,nodes,lines,pools,frozen};
+const get=(p,id)=>p.components.find(c=>c.machines.includes(id)).id;
+const stage=(p,id)=>p.stages.findIndex(s=>s.members.includes(id));
+const p=plan(g,arith);assert.equal(p.status,'planned');assert.equal(p.components.length,5);
+assert.deepEqual(p.pools.find(x=>x.item==='a').order,['out2','out1']);
+assert(!p.pools.some(x=>x.item==='unused'));
+assert.equal(stage(p,get(p,'out1')),stage(p,get(p,'out2')));
+assert(stage(p,get(p,'source'))<stage(p,get(p,'out1')));
+assert(stage(p,'F:sourceA')<stage(p,get(p,'out1')));
+assert.equal(stage(p,get(p,'out3')),stage(p,'F:converter'));
+assert(stage(p,get(p,'out2'))<stage(p,'F:converter'));
+assert(stage(p,'F:sourceZ')<stage(p,get(p,'out4')));
+const feedback=structuredClone(g);feedback.frozen.find(f=>f.id==='converter').rates.a='1';
+const q=plan(feedback,arith);assert.equal(stage(q,'F:converter'),stage(q,get(q,'out1')));assert.equal(stage(q,get(q,'out3')),stage(q,get(q,'out2')));
+const surplus=structuredClone(g);surplus.frozen.find(f=>f.id==='sourceA').rates.a='3';
+const r=plan(surplus,arith);assert(r.pools.find(x=>x.item==='a').permanentAbundance);assert.notEqual(stage(r,get(r,'out1')),stage(r,get(r,'out2')));
+assert.equal(r.stages[stage(r,get(r,'out1'))].kind,'eventually-unconstrained-physical');
+surplus.frozen.find(f=>f.id==='sourceA').rates.a='2';
+const critical=plan(surplus,arith);assert(!critical.pools.find(x=>x.item==='a').permanentAbundance);
+const withProof=plan(g,arith,{provedDeposits:{d0:{a:'1'}}});assert.equal(withProof.pools.find(x=>x.item==='a').supplyLower,'3/2');
+const report={normal:p,feedback:q,surplus:r,critical:critical.pools.find(x=>x.item==='a'),provedDeposit:withProof.pools.find(x=>x.item==='a')};
+fs.writeFileSync(__dirname+'/warehouse-dependency-plan-results.json',JSON.stringify(report,null,2));console.log(JSON.stringify({components:p.components.length,stages:p.stages.map(s=>({members:s.members,kind:s.kind})),feedback:q.stages.filter(s=>s.feedback).map(s=>s.members),surplus:r.pools.find(x=>x.item==='a'),critical:report.critical}));

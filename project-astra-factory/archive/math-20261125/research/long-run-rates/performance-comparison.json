@@ -1,0 +1,15 @@
+{
+  "before": {
+    "simMs": 7781,
+    "treadCpuMs": 522,
+    "strokes": 118,
+    "marks": 391
+  },
+  "after": {
+    "simMs": 1417,
+    "treadCpuMs": 156,
+    "strokes": 4,
+    "marks": 391
+  },
+  "identicalSimulationState": true
+}

@@ -1,0 +1,766 @@
+{
+  "original": {
+    "proof": {
+      "supply": [
+        {
+          "route": "R0",
+          "interval": "1",
+          "rule": "autonomous-generator",
+          "parents": []
+        },
+        {
+          "route": "R3",
+          "interval": "1",
+          "rule": "autonomous-generator",
+          "parents": []
+        },
+        {
+          "route": "R4",
+          "interval": "1",
+          "rule": "independent-warehouse-source",
+          "parents": []
+        },
+        {
+          "route": "R1",
+          "interval": "3",
+          "rule": "homogeneous-splitter",
+          "parents": [
+            "R0"
+          ]
+        },
+        {
+          "route": "R2",
+          "interval": "3",
+          "rule": "homogeneous-splitter",
+          "parents": [
+            "R0"
+          ]
+        },
+        {
+          "route": "R5",
+          "interval": "3",
+          "rule": "batch-recipe-conservative-per-item-bound",
+          "parents": [
+            "R3"
+          ]
+        },
+        {
+          "route": "R6",
+          "interval": "4",
+          "rule": "batch-recipe-conservative-per-item-bound",
+          "parents": [
+            "R4",
+            "R5"
+          ]
+        }
+      ],
+      "cadences": [
+        {
+          "machine": "M6",
+          "status": "proven-cadence",
+          "period": "4",
+          "phases": [
+            "0"
+          ],
+          "minGap": "4",
+          "batchCount": 1,
+          "rate": "1/4",
+          "rule": "terminal-batch-nominal",
+          "via": "R6"
+        },
+        {
+          "machine": "M4",
+          "status": "proven-cadence",
+          "period": "4",
+          "batchCount": 1,
+          "items": 1,
+          "cycleCheck": "strict-negative-upper-circuits",
+          "vertices": 3,
+          "edges": 7,
+          "lower": [
+            "-239/2"
+          ],
+          "upper": [
+            "-239/2"
+          ],
+          "phases": [
+            "-239/2"
+          ],
+          "minGap": "4",
+          "rate": "1/4",
+          "rule": "finite-batch-periodic-backpressure",
+          "via": "R5"
+        }
+      ],
+      "certificates": [
+        {
+          "machine": "M4",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-batch-envelope+preferred-inlet-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "minGap": "4",
+          "minNominalPeriod": "2",
+          "ports": [
+            {
+              "route": "R3",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R1",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "required": "3"
+        }
+      ],
+      "rateCertificates": [
+        {
+          "machine": "M6",
+          "rate": "1/4",
+          "method": "terminal-batch-nominal",
+          "proven": true
+        },
+        {
+          "machine": "M4",
+          "rate": "1/4",
+          "method": "finite-batch-periodic-backpressure",
+          "proven": true
+        }
+      ],
+      "machineBounds": [
+        {
+          "machine": "M6",
+          "lower": "1/4",
+          "proven": true,
+          "method": "terminal-batch-supply-gap-lower",
+          "batchGap": "4"
+        }
+      ],
+      "refused": []
+    },
+    "net": "3/4",
+    "unknown": 0
+  },
+  "synthetic": {
+    "proof": {
+      "supply": [
+        {
+          "route": "R0",
+          "interval": "1",
+          "rule": "autonomous-generator",
+          "parents": []
+        },
+        {
+          "route": "R3",
+          "interval": "1",
+          "rule": "autonomous-generator",
+          "parents": []
+        },
+        {
+          "route": "R4",
+          "interval": "1",
+          "rule": "independent-warehouse-source",
+          "parents": []
+        },
+        {
+          "route": "R1",
+          "interval": "3",
+          "rule": "homogeneous-splitter",
+          "parents": [
+            "R0"
+          ]
+        },
+        {
+          "route": "R2",
+          "interval": "3",
+          "rule": "homogeneous-splitter",
+          "parents": [
+            "R0"
+          ]
+        },
+        {
+          "route": "R5",
+          "interval": "3",
+          "rule": "batch-recipe-conservative-per-item-bound",
+          "parents": [
+            "R3"
+          ]
+        },
+        {
+          "route": "R6",
+          "interval": "8",
+          "rule": "batch-recipe-conservative-per-item-bound",
+          "parents": [
+            "R4",
+            "R5"
+          ]
+        }
+      ],
+      "cadences": [
+        {
+          "machine": "M6",
+          "status": "proven-cadence",
+          "period": "8",
+          "phases": [
+            "0"
+          ],
+          "minGap": "8",
+          "batchCount": 1,
+          "rate": "1/8",
+          "rule": "terminal-batch-nominal",
+          "via": "R6"
+        },
+        {
+          "machine": "M4",
+          "status": "proven-cadence",
+          "period": "24",
+          "batchCount": 2,
+          "items": 6,
+          "cycleCheck": "strict-negative-upper-circuits",
+          "vertices": 14,
+          "edges": 34,
+          "lower": [
+            "-573/2",
+            "-543/2"
+          ],
+          "upper": [
+            "-573/2",
+            "-543/2"
+          ],
+          "phases": [
+            "-573/2",
+            "-543/2"
+          ],
+          "minGap": "9",
+          "rate": "1/12",
+          "rule": "finite-batch-periodic-backpressure",
+          "via": "R5"
+        }
+      ],
+      "certificates": [
+        {
+          "machine": "M4",
+          "item": "小行星矿石",
+          "provenReady": true,
+          "cooldown": "1",
+          "method": "continuous-batch-envelope+preferred-inlet-alignment",
+          "scope": "ideal-continuous-event-model",
+          "batch": 3,
+          "minGap": "9",
+          "minNominalPeriod": "2",
+          "ports": [
+            {
+              "route": "R3",
+              "port": 1,
+              "perBatch": 2
+            },
+            {
+              "route": "R1",
+              "port": 0,
+              "perBatch": 1
+            }
+          ],
+          "required": "3"
+        }
+      ],
+      "rateCertificates": [
+        {
+          "machine": "M6",
+          "rate": "1/8",
+          "method": "terminal-batch-nominal",
+          "proven": true
+        },
+        {
+          "machine": "M4",
+          "rate": "1/12",
+          "method": "finite-batch-periodic-backpressure",
+          "proven": true
+        }
+      ],
+      "machineBounds": [
+        {
+          "machine": "M6",
+          "lower": "1/8",
+          "proven": true,
+          "method": "terminal-batch-supply-gap-lower",
+          "batchGap": "8"
+        }
+      ],
+      "refused": []
+    },
+    "net": "11/12",
+    "unknown": 0
+  },
+  "cases": [
+    {
+      "b": 1,
+      "q": 1,
+      "T": 2,
+      "F": 3,
+      "H": 4,
+      "L": 6,
+      "C": 20,
+      "status": "proven-cadence",
+      "period": "4",
+      "batchCount": 1,
+      "items": 1,
+      "cycleCheck": "strict-negative-upper-circuits",
+      "vertices": 3,
+      "edges": 7,
+      "lower": [
+        "-239/2"
+      ],
+      "upper": [
+        "-239/2"
+      ],
+      "phases": [
+        "-239/2"
+      ],
+      "minGap": "4",
+      "rate": "1/4"
+    },
+    {
+      "b": 2,
+      "q": 3,
+      "T": 2,
+      "F": 3,
+      "H": 9,
+      "L": 6,
+      "C": 40,
+      "status": "proven-envelope",
+      "period": "18",
+      "batchCount": 3,
+      "items": 6,
+      "cycleCheck": "strict-negative-upper-circuits",
+      "vertices": 15,
+      "edges": 36,
+      "lower": [
+        "-337/2",
+        "-321/2",
+        "-305/2"
+      ],
+      "upper": [
+        "-335/2",
+        "-321/2",
+        "-305/2"
+      ],
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "b": 3,
+      "q": 2,
+      "T": 2,
+      "F": 3,
+      "H": 8,
+      "L": 6,
+      "C": 60,
+      "status": "proven-cadence",
+      "period": "24",
+      "batchCount": 2,
+      "items": 6,
+      "cycleCheck": "strict-negative-upper-circuits",
+      "vertices": 14,
+      "edges": 34,
+      "lower": [
+        "-573/2",
+        "-543/2"
+      ],
+      "upper": [
+        "-573/2",
+        "-543/2"
+      ],
+      "phases": [
+        "-573/2",
+        "-543/2"
+      ],
+      "minGap": "9",
+      "rate": "1/12"
+    },
+    {
+      "b": 2,
+      "q": 4,
+      "T": 2,
+      "F": 3,
+      "H": 9,
+      "L": 6,
+      "C": 40,
+      "status": "proven-envelope",
+      "period": "9",
+      "batchCount": 2,
+      "items": 4,
+      "cycleCheck": "strict-negative-upper-circuits",
+      "vertices": 10,
+      "edges": 24,
+      "lower": [
+        "-265/2",
+        "-251/2"
+      ],
+      "upper": [
+        "-263/2",
+        "-251/2"
+      ],
+      "minGap": "2",
+      "rate": "2/9"
+    },
+    {
+      "b": 2,
+      "q": 3,
+      "T": 2,
+      "F": 3,
+      "H": 5,
+      "L": 6,
+      "C": 40,
+      "status": "proven-envelope",
+      "period": "10",
+      "batchCount": 3,
+      "items": 6,
+      "cycleCheck": "strict-negative-upper-circuits",
+      "vertices": 15,
+      "edges": 36,
+      "lower": [
+        "-185/2",
+        "-177/2",
+        "-169/2"
+      ],
+      "upper": [
+        "-183/2",
+        "-177/2",
+        "-169/2"
+      ],
+      "minGap": "2",
+      "rate": "3/10"
+    },
+    {
+      "b": 3,
+      "q": 5,
+      "T": 2,
+      "F": 3,
+      "H": 7,
+      "L": 6,
+      "C": 60,
+      "status": "proven-cadence",
+      "period": "21",
+      "batchCount": 5,
+      "items": 15,
+      "cycleCheck": "strict-negative-upper-circuits",
+      "vertices": 35,
+      "edges": 85,
+      "lower": [
+        "-223/2",
+        "-217/2",
+        "-207/2",
+        "-201/2",
+        "-191/2"
+      ],
+      "upper": [
+        "-223/2",
+        "-217/2",
+        "-207/2",
+        "-201/2",
+        "-191/2"
+      ],
+      "phases": [
+        "-223/2",
+        "-217/2",
+        "-207/2",
+        "-201/2",
+        "-191/2"
+      ],
+      "minGap": "3",
+      "rate": "5/21"
+    },
+    {
+      "b": 3,
+      "q": 2,
+      "T": 2,
+      "F": 3,
+      "H": 4,
+      "L": 6,
+      "C": 60,
+      "status": "proven-cadence",
+      "period": "12",
+      "batchCount": 2,
+      "items": 6,
+      "cycleCheck": "strict-negative-upper-circuits",
+      "vertices": 14,
+      "edges": 34,
+      "lower": [
+        "-285/2",
+        "-271/2"
+      ],
+      "upper": [
+        "-285/2",
+        "-271/2"
+      ],
+      "phases": [
+        "-285/2",
+        "-271/2"
+      ],
+      "minGap": "5",
+      "rate": "1/6"
+    },
+    {
+      "b": 2,
+      "q": 3,
+      "T": 2,
+      "F": 3,
+      "H": 9,
+      "L": 1,
+      "C": 2,
+      "status": "proven-cadence",
+      "period": "18",
+      "batchCount": 3,
+      "items": 6,
+      "cycleCheck": "strict-negative-upper-circuits",
+      "vertices": 15,
+      "edges": 36,
+      "lower": [
+        "-71/2",
+        "-65/2",
+        "-51/2"
+      ],
+      "upper": [
+        "-71/2",
+        "-65/2",
+        "-51/2"
+      ],
+      "phases": [
+        "-71/2",
+        "-65/2",
+        "-51/2"
+      ],
+      "minGap": "3",
+      "rate": "1/6"
+    },
+    {
+      "b": 2,
+      "q": 3,
+      "T": 2,
+      "F": 3,
+      "H": 9,
+      "L": 1,
+      "C": 40,
+      "status": "proven-envelope",
+      "period": "18",
+      "batchCount": 3,
+      "items": 6,
+      "cycleCheck": "strict-negative-upper-circuits",
+      "vertices": 15,
+      "edges": 36,
+      "lower": [
+        "-303/2",
+        "-287/2",
+        "-283/2"
+      ],
+      "upper": [
+        "-303/2",
+        "-287/2",
+        "-281/2"
+      ],
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "b": 1,
+      "q": 1,
+      "T": 3,
+      "F": 4,
+      "H": 4,
+      "L": 6,
+      "C": 20,
+      "status": "not-proved",
+      "reason": "upper recurrence has nonnegative circuit"
+    }
+  ],
+  "originals": [
+    {
+      "f": "tests/fixtures/ast1-warp-coil-double-inlet-v1.txt",
+      "certificates": 0,
+      "rates": 0,
+      "net": "1/99",
+      "unknown": 25
+    },
+    {
+      "f": "tests/fixtures/ast1-warehouse-port-balance-v1.txt",
+      "certificates": 0,
+      "rates": 0,
+      "net": "11/1440",
+      "unknown": 0
+    }
+  ],
+  "envelopes": [
+    {
+      "depth": 1,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 2,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 3,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 4,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 5,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 6,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 7,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 8,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 9,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 10,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 11,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 12,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 13,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 14,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 15,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 16,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 17,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 18,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 19,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 20,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 21,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 22,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 23,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    },
+    {
+      "depth": 24,
+      "status": "proven-envelope",
+      "minGap": "2",
+      "rate": "1/6"
+    }
+  ],
+  "rational": {
+    "status": "proven-cadence",
+    "period": "24009/1000",
+    "batchCount": 2,
+    "items": 6,
+    "cycleCheck": "strict-negative-upper-circuits",
+    "vertices": 14,
+    "edges": 34,
+    "lower": [
+      "-35826/125",
+      "-135801/500"
+    ],
+    "upper": [
+      "-35826/125",
+      "-135801/500"
+    ],
+    "phases": [
+      "-35826/125",
+      "-135801/500"
+    ],
+    "minGap": "9003/1000",
+    "rate": "2000/24009"
+  }
+}

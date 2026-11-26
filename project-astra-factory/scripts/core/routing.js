@@ -159,15 +159,7 @@ function pathSearch(start,end,avoid=new Set(),options={}){
  }
  return null;
 }
-function connect(from,to,waypoints=[],manualPath=null){if(from.id===to.id)return notify('机器输出口不能连接自身输入口','bad');let a=machineById(from.id),b=machineById(to.id);if(!a||!b)return notify('接口所属机器不存在','bad');let p=outPort(a,from.port),q=inPort(b,to.port);if(!p||!q)return notify('请选择橙色输出口、蓝色输入口','bad');if(routeFor(a.id,'out',from.port)||routeFor(b.id,'in',to.port))return notify('接口已被线路使用；一对一连接需要先删除旧线或放分流器 / 汇流器','bad');let item=recipeOutput(a);if(a.type==='分流'){const f=p.filter;if(f&&f!=='任意'&&!acceptsMaterial(b,f,to.port))return notify('分流器出口过滤物品 '+f+' 不符合目标配方','bad');}
- if(getRecipe(b)){
-  // Mixed upstream streams are valid if every known material matches this recipe
-  // and any player-selected input filter. Unknown stream is permitted for later wiring.
-  const mats=[...possibleSourceMaterials(a,new Set(),from.port)];
-  const incompatible=mats.filter(mat=>!acceptsMaterial(b,mat,to.port));
-  if(incompatible.length)return notify('输入流包含当前配方或手动过滤不接收的材料：'+incompatible.join('、')+'；可选择“按配方自动”或重新分流。','bad');
- }
- if(item&&!acceptsMaterial(b,item,to.port))return notify(`材料不匹配：${item} 不能送入该机器当前配方或手动过滤的入口`,'bad');
+function connect(from,to,waypoints=[],manualPath=null){if(from.id===to.id)return notify('机器输出口不能连接自身输入口','bad');let a=machineById(from.id),b=machineById(to.id);if(!a||!b)return notify('接口所属机器不存在','bad');let p=outPort(a,from.port),q=inPort(b,to.port);if(!p||!q)return notify('请选择橙色输出口、蓝色输入口','bad');if(routeFor(a.id,'out',from.port)||routeFor(b.id,'in',to.port))return notify('接口已被线路使用；一对一连接需要先删除旧线或放分流器 / 汇流器','bad');// Material compatibility is audited, not a geometric wiring constraint.
  let checkpoints=[[p.ex,p.ey],...waypoints,[q.ex,q.ey]],path=manualPath?manualPath.map(v=>v.slice()):[];
  if(!manualPath)for(let j=0;j<checkpoints.length-1;j++){
   const startPrev=j===0?[p.x,p.y]:(path.length>1?path[path.length-2]:[p.x,p.y]);

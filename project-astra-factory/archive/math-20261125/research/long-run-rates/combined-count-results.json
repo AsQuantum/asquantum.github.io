@@ -1,0 +1,436 @@
+[
+  {
+    "name": "legal-net-branch",
+    "n": 8,
+    "l": 7,
+    "ms": 35,
+    "bare": {
+      "status": "sat",
+      "unique": 12,
+      "unknown": 63
+    },
+    "passes": [
+      {
+        "status": "sat",
+        "unique": 75,
+        "unknown": 0
+      }
+    ],
+    "sources": {
+      "cadence": 4,
+      "clearance": 1,
+      "round-robin": 1,
+      "recipe-tree": 0,
+      "priority-tree": 0,
+      "split-tree": 2,
+      "merger-tree": 0,
+      "shared-inlet": 0,
+      "mixed": 0,
+      "burst": 0,
+      "overlap": 0,
+      "envelope": 0,
+      "smooth": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 0,
+      "feed-forward": 0,
+      "frozen-protection": 0
+    },
+    "status": "sat",
+    "intervals": {
+      "net:小行星矿石": {
+        "status": "interval",
+        "lower": "3/4",
+        "upper": "3/4",
+        "unique": true
+      },
+      "net:合金板": {
+        "status": "interval",
+        "lower": "0",
+        "upper": "0",
+        "unique": true
+      },
+      "net:复合装甲板": {
+        "status": "interval",
+        "lower": "1/4",
+        "upper": "1/4",
+        "unique": true
+      }
+    },
+    "witnessDiagnostic": null,
+    "stats": {
+      "factors": [],
+      "directions": 0,
+      "initialFree": 0
+    },
+    "partial": null,
+    "net": {
+      "net:小行星矿石": "3/4",
+      "net:合金板": "0",
+      "net:复合装甲板": "1/4"
+    },
+    "unknown": []
+  },
+  {
+    "name": "research/long-run-rates/new-warp.ast1.txt",
+    "n": 73,
+    "l": 50,
+    "ms": 74,
+    "bare": {
+      "status": "sat",
+      "unique": 87,
+      "unknown": 298
+    },
+    "passes": [
+      {
+        "status": "sat",
+        "unique": 87,
+        "unknown": 298
+      }
+    ],
+    "sources": {
+      "cadence": 1,
+      "clearance": 0,
+      "round-robin": 0,
+      "recipe-tree": 0,
+      "priority-tree": 0,
+      "split-tree": 0,
+      "merger-tree": 0,
+      "shared-inlet": 0,
+      "mixed": 0,
+      "burst": 0,
+      "overlap": 0,
+      "envelope": 0,
+      "smooth": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 0,
+      "feed-forward": 0,
+      "frozen-protection": 0,
+      "stock": 0,
+      "stock-free-exits": 0,
+      "return": 0
+    },
+    "status": "sat",
+    "intervals": {
+      "net:曲速线圈": {
+        "status": "interval",
+        "lower": "1/1560",
+        "upper": "1/99",
+        "unique": false,
+        "steps": 1,
+        "maxSeen": 8,
+        "free": 2
+      }
+    },
+    "witnessDiagnostic": null,
+    "stats": {
+      "factors": [
+        {
+          "columns": 2,
+          "rows": 196,
+          "status": "feasible"
+        }
+      ],
+      "directions": 4,
+      "initialFree": 2
+    },
+    "partial": null,
+    "net": {},
+    "unknown": [
+      "cycle:M0",
+      "cycle:M1",
+      "cycle:M2",
+      "cycle:M3",
+      "cycle:M4",
+      "cycle:M5",
+      "cycle:M6",
+      "cycle:M7",
+      "cycle:M10",
+      "cycle:M12",
+      "cycle:M14",
+      "cycle:M19",
+      "cycle:M20",
+      "cycle:M21",
+      "cycle:M22",
+      "cycle:M23",
+      "cycle:M28",
+      "cycle:M30",
+      "cycle:M31",
+      "cycle:M32",
+      "cycle:M33",
+      "cycle:M72",
+      "net:曲速线圈"
+    ]
+  },
+  {
+    "name": "tests/fixtures/ast1-warp-coil-only.txt",
+    "n": 72,
+    "l": 49,
+    "ms": 34,
+    "bare": {
+      "status": "sat",
+      "unique": 86,
+      "unknown": 292
+    },
+    "passes": [
+      {
+        "status": "sat",
+        "unique": 86,
+        "unknown": 292
+      }
+    ],
+    "sources": {
+      "cadence": 1,
+      "clearance": 0,
+      "round-robin": 0,
+      "recipe-tree": 0,
+      "priority-tree": 0,
+      "split-tree": 0,
+      "merger-tree": 0,
+      "shared-inlet": 0,
+      "mixed": 0,
+      "burst": 0,
+      "overlap": 0,
+      "envelope": 0,
+      "smooth": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 0,
+      "feed-forward": 0,
+      "frozen-protection": 0,
+      "stock": 0,
+      "stock-free-exits": 0,
+      "return": 0
+    },
+    "status": "sat",
+    "intervals": {
+      "net:曲速线圈": {
+        "status": "interval",
+        "lower": "1/1560",
+        "upper": "1/128",
+        "unique": false,
+        "steps": 0,
+        "maxSeen": 2,
+        "free": 1
+      }
+    },
+    "witnessDiagnostic": null,
+    "stats": {
+      "factors": [
+        {
+          "columns": 1,
+          "rows": 191,
+          "status": "feasible"
+        }
+      ],
+      "directions": 1,
+      "initialFree": 1
+    },
+    "partial": null,
+    "net": {},
+    "unknown": [
+      "cycle:M0",
+      "cycle:M1",
+      "cycle:M2",
+      "cycle:M3",
+      "cycle:M4",
+      "cycle:M5",
+      "cycle:M6",
+      "cycle:M7",
+      "cycle:M10",
+      "cycle:M12",
+      "cycle:M14",
+      "cycle:M19",
+      "cycle:M20",
+      "cycle:M21",
+      "cycle:M22",
+      "cycle:M23",
+      "cycle:M28",
+      "cycle:M30",
+      "cycle:M31",
+      "cycle:M32",
+      "cycle:M33",
+      "net:曲速线圈"
+    ]
+  },
+  {
+    "name": "tests/fixtures/ast1-warehouse-port-balance-v1.txt",
+    "n": 115,
+    "l": 84,
+    "ms": 1145,
+    "bare": {
+      "status": "unknown",
+      "unique": 0,
+      "unknown": 0
+    },
+    "passes": [
+      {
+        "status": "sat",
+        "unique": 317,
+        "unknown": 435
+      },
+      {
+        "status": "sat",
+        "unique": 317,
+        "unknown": 435
+      }
+    ],
+    "sources": {
+      "cadence": 9,
+      "clearance": 0,
+      "round-robin": 0,
+      "recipe-tree": 24,
+      "priority-tree": 0,
+      "split-tree": 0,
+      "merger-tree": 0,
+      "shared-inlet": 0,
+      "mixed": 0,
+      "burst": 0,
+      "overlap": 0,
+      "envelope": 0,
+      "smooth": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 7,
+      "feed-forward": 36,
+      "frozen-protection": 0,
+      "stock": 1,
+      "stock-free-exits": 0,
+      "proved-stock-tree": 0,
+      "proved-stock-region": 0,
+      "return": 0
+    },
+    "status": "sat",
+    "intervals": {
+      "net:合金板": {
+        "status": "unknown",
+        "steps": 7,
+        "maxSeen": 904
+      },
+      "net:钛合金锭": {
+        "status": "unknown",
+        "steps": 7,
+        "maxSeen": 548
+      },
+      "net:齿轮组": {
+        "status": "unknown",
+        "steps": 7,
+        "maxSeen": 492
+      },
+      "net:能量电池": {
+        "status": "unknown",
+        "steps": 8,
+        "maxSeen": 2742
+      },
+      "net:硅晶圆": {
+        "status": "unknown",
+        "steps": 8,
+        "maxSeen": 1364
+      },
+      "net:燃料罐": {
+        "status": "interval",
+        "lower": "1/5",
+        "upper": "1/5",
+        "unique": true
+      },
+      "net:导线线圈": {
+        "status": "unknown",
+        "steps": 7,
+        "maxSeen": 631
+      },
+      "net:共鸣水晶": {
+        "status": "unknown",
+        "steps": 8,
+        "maxSeen": 556
+      },
+      "net:框架模块": {
+        "status": "unknown",
+        "steps": 8,
+        "maxSeen": 572
+      },
+      "net:电动机": {
+        "status": "unknown",
+        "steps": 8,
+        "maxSeen": 433
+      },
+      "net:引力透镜": {
+        "status": "unknown",
+        "steps": 8,
+        "maxSeen": 433
+      },
+      "net:等离子电池": {
+        "status": "unknown",
+        "steps": 7,
+        "maxSeen": 341
+      },
+      "net:量子处理器": {
+        "status": "unknown",
+        "steps": 8,
+        "maxSeen": 1364
+      },
+      "net:曲速线圈": {
+        "status": "unknown",
+        "steps": 8,
+        "maxSeen": 433
+      }
+    },
+    "witnessDiagnostic": {
+      "status": "sat",
+      "stats": {
+        "activeRows": 7,
+        "directions": 35,
+        "free": 11
+      }
+    },
+    "stats": {
+      "activeRows": 7,
+      "directions": 35,
+      "free": 11
+    },
+    "partial": null,
+    "net": {
+      "net:燃料罐": "1/5"
+    },
+    "unknown": [
+      "cycle:M2",
+      "cycle:M3",
+      "cycle:M14",
+      "cycle:M19",
+      "cycle:M22",
+      "cycle:M23",
+      "cycle:M24",
+      "cycle:M31",
+      "cycle:M32",
+      "cycle:M33",
+      "cycle:M34",
+      "cycle:M35",
+      "cycle:M87",
+      "cycle:M88",
+      "cycle:M93",
+      "cycle:M94",
+      "cycle:M95",
+      "cycle:M99",
+      "cycle:M101",
+      "cycle:M102",
+      "cycle:M103",
+      "cycle:M104",
+      "cycle:M105",
+      "cycle:M106",
+      "cycle:M107",
+      "net:合金板",
+      "net:钛合金锭",
+      "net:齿轮组",
+      "net:能量电池",
+      "net:硅晶圆",
+      "net:导线线圈",
+      "net:共鸣水晶",
+      "net:框架模块",
+      "net:电动机",
+      "net:引力透镜",
+      "net:等离子电池",
+      "net:量子处理器",
+      "net:曲速线圈"
+    ]
+  }
+]

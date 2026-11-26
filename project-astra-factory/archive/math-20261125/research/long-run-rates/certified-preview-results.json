@@ -1,0 +1,1467 @@
+[
+  {
+    "name": "autonomous source",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 26,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "遐想物质": {
+        "inflow": "2/15",
+        "outflow": "0",
+        "net": "2/15",
+        "potential": "2/15",
+        "overdraft": "2/15",
+        "withdrawalDemand": "0",
+        "localNet": "2/15"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 16,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 10
+  },
+  {
+    "name": "open belt",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 17,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {},
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 0,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 1
+  },
+  {
+    "name": "sparse shared frozen scarcity; exact priority",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 35,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "合金板": {
+        "inflow": "1",
+        "outflow": "1",
+        "net": "0",
+        "potential": "-4",
+        "overdraft": "-4",
+        "withdrawalDemand": "5",
+        "localNet": "0"
+      },
+      "硅晶圆": {
+        "inflow": "3/2",
+        "outflow": "0",
+        "net": "3/2",
+        "potential": "3/2",
+        "overdraft": "3",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      },
+      "能量电池": {
+        "inflow": "0",
+        "outflow": "0",
+        "net": "0",
+        "potential": "0",
+        "overdraft": "5",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 19,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 3
+  },
+  {
+    "name": "unproved slow frozen priority remains unknown",
+    "status": "partial",
+    "actual": "partial",
+    "known": 24,
+    "unknown": 11,
+    "unknownMetrics": [
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆",
+      "inflow:能量电池",
+      "net:能量电池",
+      "potential:能量电池",
+      "total:inflow",
+      "total:net",
+      "total:potential"
+    ],
+    "rows": {
+      "合金板": {
+        "inflow": "1",
+        "outflow": "1",
+        "net": "0",
+        "potential": "-5/2",
+        "overdraft": "-5/2",
+        "withdrawalDemand": "7/2",
+        "localNet": "0"
+      },
+      "硅晶圆": {
+        "inflow": null,
+        "outflow": "0",
+        "net": null,
+        "potential": null,
+        "overdraft": "3",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      },
+      "能量电池": {
+        "inflow": null,
+        "outflow": "0",
+        "net": null,
+        "potential": null,
+        "overdraft": "5",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 3,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 2,
+            "rows": 7,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 8,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 8,
+            "status": "feasible",
+            "strictInterior": false,
+            "origin": false
+          }
+        ]
+      }
+    ],
+    "ms": 5
+  },
+  {
+    "name": "strict surplus and linked frozen production",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 35,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "合金板": {
+        "inflow": "2",
+        "outflow": "1",
+        "net": "1",
+        "potential": "1",
+        "overdraft": "1",
+        "withdrawalDemand": "1",
+        "localNet": "0"
+      },
+      "硅晶圆": {
+        "inflow": "2",
+        "outflow": "1",
+        "net": "1",
+        "potential": "1",
+        "overdraft": "1",
+        "withdrawalDemand": "1",
+        "localNet": "0"
+      },
+      "能量电池": {
+        "inflow": "1",
+        "outflow": "0",
+        "net": "1",
+        "potential": "1",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 3,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 2,
+            "rows": 7,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 10,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 4,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 21,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 4
+  },
+  {
+    "name": "single partially loaded frozen factory",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 26,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "合金板": {
+        "inflow": "1",
+        "outflow": "1",
+        "net": "0",
+        "potential": "-1",
+        "overdraft": "-1",
+        "withdrawalDemand": "2",
+        "localNet": "0"
+      },
+      "硅晶圆": {
+        "inflow": "3/2",
+        "outflow": "0",
+        "net": "3/2",
+        "potential": "3/2",
+        "overdraft": "3",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 3,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 4,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 15,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 1
+  },
+  {
+    "name": "physical first, frozen last",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 43,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "遐想物质": {
+        "inflow": "2/15",
+        "outflow": "2/15",
+        "net": "0",
+        "potential": "-28/15",
+        "overdraft": "-28/15",
+        "withdrawalDemand": "2",
+        "localNet": "0"
+      },
+      "合金板": {
+        "inflow": "0",
+        "outflow": "0",
+        "net": "0",
+        "potential": "0",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 33,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 2,
+            "rows": 8,
+            "status": "feasible",
+            "strictInterior": false,
+            "origin": false
+          }
+        ]
+      }
+    ],
+    "ms": 5
+  },
+  {
+    "name": "independent warehouse-fed tree with offer 2/5",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 41,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "废金属": {
+        "inflow": "2/5",
+        "outflow": "2/5",
+        "net": "0",
+        "potential": "-2/5",
+        "overdraft": "-2/5",
+        "withdrawalDemand": "4/5",
+        "localNet": "-2/5"
+      },
+      "能量电池": {
+        "inflow": "1/5",
+        "outflow": "0",
+        "net": "1/5",
+        "potential": "1/5",
+        "overdraft": "2/5",
+        "withdrawalDemand": "0",
+        "localNet": "1/5"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 4,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 9,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 32,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 8
+  },
+  {
+    "name": "independent warehouse-fed tree with offer 4/5",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 41,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "废金属": {
+        "inflow": "4/5",
+        "outflow": "4/5",
+        "net": "0",
+        "potential": "0",
+        "overdraft": "0",
+        "withdrawalDemand": "4/5",
+        "localNet": "-4/5"
+      },
+      "能量电池": {
+        "inflow": "2/5",
+        "outflow": "0",
+        "net": "2/5",
+        "potential": "2/5",
+        "overdraft": "2/5",
+        "withdrawalDemand": "0",
+        "localNet": "2/5"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 4,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 9,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 32,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 7
+  },
+  {
+    "name": "independent warehouse-fed tree with offer 1",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 41,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "废金属": {
+        "inflow": "1",
+        "outflow": "4/5",
+        "net": "1/5",
+        "potential": "1/5",
+        "overdraft": "1/5",
+        "withdrawalDemand": "4/5",
+        "localNet": "-4/5"
+      },
+      "能量电池": {
+        "inflow": "2/5",
+        "outflow": "0",
+        "net": "2/5",
+        "potential": "2/5",
+        "overdraft": "2/5",
+        "withdrawalDemand": "0",
+        "localNet": "2/5"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 4,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 9,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 32,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 6
+  },
+  {
+    "name": "joint warehouse tree 1/4 1/3",
+    "status": "partial",
+    "actual": "proved",
+    "known": 55,
+    "unknown": 0,
+    "unknownMetrics": [
+      "potential:合金板",
+      "potential:能量电池",
+      "total:potential"
+    ],
+    "rows": {
+      "合金板": {
+        "inflow": "1/4",
+        "outflow": "1/4",
+        "net": "0",
+        "potential": null,
+        "overdraft": "-1/4",
+        "withdrawalDemand": null,
+        "localNet": "-1/4"
+      },
+      "能量电池": {
+        "inflow": "1/3",
+        "outflow": "1/4",
+        "net": "1/12",
+        "potential": null,
+        "overdraft": "-1/6",
+        "withdrawalDemand": null,
+        "localNet": "-1/4"
+      },
+      "导线线圈": {
+        "inflow": "1/2",
+        "outflow": "0",
+        "net": "1/2",
+        "potential": "1/2",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "1/2"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 8,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 13,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 43,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 9
+  },
+  {
+    "name": "joint warehouse tree 1/3 1/4",
+    "status": "partial",
+    "actual": "proved",
+    "known": 55,
+    "unknown": 0,
+    "unknownMetrics": [
+      "potential:合金板",
+      "potential:能量电池",
+      "total:potential"
+    ],
+    "rows": {
+      "合金板": {
+        "inflow": "1/3",
+        "outflow": "1/4",
+        "net": "1/12",
+        "potential": null,
+        "overdraft": "-1/6",
+        "withdrawalDemand": null,
+        "localNet": "-1/4"
+      },
+      "能量电池": {
+        "inflow": "1/4",
+        "outflow": "1/4",
+        "net": "0",
+        "potential": null,
+        "overdraft": "-1/4",
+        "withdrawalDemand": null,
+        "localNet": "-1/4"
+      },
+      "导线线圈": {
+        "inflow": "1/2",
+        "outflow": "0",
+        "net": "1/2",
+        "potential": "1/2",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "1/2"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 8,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 13,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 43,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 9
+  },
+  {
+    "name": "joint warehouse tree 1/4 1/4",
+    "status": "partial",
+    "actual": "proved",
+    "known": 55,
+    "unknown": 0,
+    "unknownMetrics": [
+      "potential:合金板",
+      "potential:能量电池",
+      "total:potential"
+    ],
+    "rows": {
+      "合金板": {
+        "inflow": "1/4",
+        "outflow": "1/4",
+        "net": "0",
+        "potential": null,
+        "overdraft": "-1/4",
+        "withdrawalDemand": null,
+        "localNet": "-1/4"
+      },
+      "能量电池": {
+        "inflow": "1/4",
+        "outflow": "1/4",
+        "net": "0",
+        "potential": null,
+        "overdraft": "-1/4",
+        "withdrawalDemand": null,
+        "localNet": "-1/4"
+      },
+      "导线线圈": {
+        "inflow": "1/2",
+        "outflow": "0",
+        "net": "1/2",
+        "potential": "1/2",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "1/2"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 8,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 13,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 43,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 9
+  },
+  {
+    "name": "joint warehouse tree 1 1",
+    "status": "partial",
+    "actual": "proved",
+    "known": 55,
+    "unknown": 0,
+    "unknownMetrics": [
+      "potential:合金板",
+      "potential:能量电池",
+      "total:potential"
+    ],
+    "rows": {
+      "合金板": {
+        "inflow": "1",
+        "outflow": "1/2",
+        "net": "1/2",
+        "potential": null,
+        "overdraft": "1/2",
+        "withdrawalDemand": null,
+        "localNet": "-1/2"
+      },
+      "能量电池": {
+        "inflow": "1",
+        "outflow": "1/2",
+        "net": "1/2",
+        "potential": null,
+        "overdraft": "1/2",
+        "withdrawalDemand": null,
+        "localNet": "-1/2"
+      },
+      "导线线圈": {
+        "inflow": "1",
+        "outflow": "0",
+        "net": "1",
+        "potential": "1",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "1"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 8,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 13,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 43,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 8
+  },
+  {
+    "name": "joint warehouse tree 0 1",
+    "status": "partial",
+    "actual": "proved",
+    "known": 55,
+    "unknown": 0,
+    "unknownMetrics": [
+      "potential:合金板",
+      "potential:能量电池",
+      "total:potential"
+    ],
+    "rows": {
+      "合金板": {
+        "inflow": "0",
+        "outflow": "0",
+        "net": "0",
+        "potential": null,
+        "overdraft": "-1/2",
+        "withdrawalDemand": null,
+        "localNet": "0"
+      },
+      "导线线圈": {
+        "inflow": "0",
+        "outflow": "0",
+        "net": "0",
+        "potential": "0",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      },
+      "能量电池": {
+        "inflow": "1",
+        "outflow": "0",
+        "net": "1",
+        "potential": null,
+        "overdraft": "1/2",
+        "withdrawalDemand": null,
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 7,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 6
+  },
+  {
+    "name": "relay chain 2/5",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 53,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "废金属": {
+        "inflow": "2/5",
+        "outflow": "2/5",
+        "net": "0",
+        "potential": "-2/5",
+        "overdraft": "-2/5",
+        "withdrawalDemand": "4/5",
+        "localNet": "-2/5"
+      },
+      "能量电池": {
+        "inflow": "1/5",
+        "outflow": "0",
+        "net": "1/5",
+        "potential": "1/5",
+        "overdraft": "2/5",
+        "withdrawalDemand": "0",
+        "localNet": "1/5"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 4,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 9,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 44,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 11
+  },
+  {
+    "name": "relay chain 1",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 53,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "废金属": {
+        "inflow": "1",
+        "outflow": "4/5",
+        "net": "1/5",
+        "potential": "1/5",
+        "overdraft": "1/5",
+        "withdrawalDemand": "4/5",
+        "localNet": "-4/5"
+      },
+      "能量电池": {
+        "inflow": "2/5",
+        "outflow": "0",
+        "net": "2/5",
+        "potential": "2/5",
+        "overdraft": "2/5",
+        "withdrawalDemand": "0",
+        "localNet": "2/5"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 4,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 9,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 44,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 12
+  },
+  {
+    "name": "recipe tree with blocked splitter sibling 2/5",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 61,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "废金属": {
+        "inflow": "2/5",
+        "outflow": "2/5",
+        "net": "0",
+        "potential": "-2/5",
+        "overdraft": "-2/5",
+        "withdrawalDemand": "4/5",
+        "localNet": "-2/5"
+      },
+      "能量电池": {
+        "inflow": "1/5",
+        "outflow": "0",
+        "net": "1/5",
+        "potential": "1/5",
+        "overdraft": "2/5",
+        "withdrawalDemand": "0",
+        "localNet": "1/5"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 4,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 14,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 42,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 8
+  },
+  {
+    "name": "recipe tree with blocked splitter sibling 1",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 61,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "废金属": {
+        "inflow": "1",
+        "outflow": "4/5",
+        "net": "1/5",
+        "potential": "1/5",
+        "overdraft": "1/5",
+        "withdrawalDemand": "4/5",
+        "localNet": "-4/5"
+      },
+      "能量电池": {
+        "inflow": "2/5",
+        "outflow": "0",
+        "net": "2/5",
+        "potential": "2/5",
+        "overdraft": "2/5",
+        "withdrawalDemand": "0",
+        "localNet": "2/5"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 4,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 14,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 42,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 7
+  },
+  {
+    "name": "bounded merger receiver 1/2",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 66,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "星尘粒子": {
+        "inflow": "1/2",
+        "outflow": "1/2",
+        "net": "0",
+        "potential": "-1/2",
+        "overdraft": "-1/2",
+        "withdrawalDemand": "1",
+        "localNet": "-1/2"
+      },
+      "小行星矿石": {
+        "inflow": "9/10",
+        "outflow": "0",
+        "net": "9/10",
+        "potential": "9/10",
+        "overdraft": "4/5",
+        "withdrawalDemand": "0",
+        "localNet": "9/10"
+      },
+      "燃料罐": {
+        "inflow": "1/10",
+        "outflow": "0",
+        "net": "1/10",
+        "potential": "1/10",
+        "overdraft": "1/5",
+        "withdrawalDemand": "0",
+        "localNet": "1/10"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 10,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 16,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 52,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 17
+  },
+  {
+    "name": "bounded merger receiver 1",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 66,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "星尘粒子": {
+        "inflow": "1",
+        "outflow": "1",
+        "net": "0",
+        "potential": "0",
+        "overdraft": "0",
+        "withdrawalDemand": "1",
+        "localNet": "-1"
+      },
+      "小行星矿石": {
+        "inflow": "4/5",
+        "outflow": "0",
+        "net": "4/5",
+        "potential": "4/5",
+        "overdraft": "4/5",
+        "withdrawalDemand": "0",
+        "localNet": "4/5"
+      },
+      "燃料罐": {
+        "inflow": "1/5",
+        "outflow": "0",
+        "net": "1/5",
+        "potential": "1/5",
+        "overdraft": "1/5",
+        "withdrawalDemand": "0",
+        "localNet": "1/5"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 10,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 1,
+            "rows": 16,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 52,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 14
+  },
+  {
+    "name": "joint capacity balance with competing frozen factories",
+    "status": "partial",
+    "actual": "proved",
+    "known": 51,
+    "unknown": 0,
+    "unknownMetrics": [
+      "potential:合金板",
+      "potential:硅晶圆",
+      "potential:能量电池",
+      "total:potential"
+    ],
+    "rows": {
+      "合金板": {
+        "inflow": "2",
+        "outflow": "2",
+        "net": "0",
+        "potential": null,
+        "overdraft": "0",
+        "withdrawalDemand": null,
+        "localNet": "0"
+      },
+      "硅晶圆": {
+        "inflow": "1",
+        "outflow": "1",
+        "net": "0",
+        "potential": null,
+        "overdraft": "0",
+        "withdrawalDemand": null,
+        "localNet": "0"
+      },
+      "能量电池": {
+        "inflow": "1",
+        "outflow": "1",
+        "net": "0",
+        "potential": null,
+        "overdraft": "0",
+        "withdrawalDemand": null,
+        "localNet": "0"
+      },
+      "齿轮组": {
+        "inflow": "1",
+        "outflow": "0",
+        "net": "1",
+        "potential": "1",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      },
+      "导线线圈": {
+        "inflow": "1",
+        "outflow": "0",
+        "net": "1",
+        "potential": "1",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 7,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 2,
+            "rows": 9,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 29,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 3
+  },
+  {
+    "name": "joint tree and frozen capacity balance",
+    "status": "partial",
+    "actual": "proved",
+    "known": 64,
+    "unknown": 0,
+    "unknownMetrics": [
+      "potential:合金板",
+      "potential:能量电池",
+      "total:potential"
+    ],
+    "rows": {
+      "合金板": {
+        "inflow": "3/2",
+        "outflow": "3/2",
+        "net": "0",
+        "potential": null,
+        "overdraft": "0",
+        "withdrawalDemand": null,
+        "localNet": "-1/2"
+      },
+      "能量电池": {
+        "inflow": "3/2",
+        "outflow": "3/2",
+        "net": "0",
+        "potential": null,
+        "overdraft": "0",
+        "withdrawalDemand": null,
+        "localNet": "-1/2"
+      },
+      "导线线圈": {
+        "inflow": "1",
+        "outflow": "0",
+        "net": "1",
+        "potential": "1",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "1"
+      },
+      "齿轮组": {
+        "inflow": "1",
+        "outflow": "0",
+        "net": "1",
+        "potential": "1",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 6,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 2,
+            "rows": 16,
+            "status": "feasible",
+            "strictInterior": true,
+            "origin": true
+          }
+        ]
+      },
+      {
+        "status": "sat",
+        "unique": 50,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 9
+  },
+  {
+    "name": "warehouse priority through no-wait merger",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 48,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "遐想物质": {
+        "inflow": "2/15",
+        "outflow": "2/15",
+        "net": "0",
+        "potential": "-28/15",
+        "overdraft": "-28/15",
+        "withdrawalDemand": "2",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 38,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": [
+          {
+            "columns": 2,
+            "rows": 10,
+            "status": "feasible",
+            "strictInterior": false,
+            "origin": false
+          }
+        ]
+      }
+    ],
+    "ms": 5
+  },
+  {
+    "name": "sparse frozen source with priority",
+    "status": "partial",
+    "actual": "proved",
+    "known": 43,
+    "unknown": 0,
+    "unknownMetrics": [
+      "potential:合金板",
+      "potential:硅晶圆",
+      "total:potential"
+    ],
+    "rows": {
+      "合金板": {
+        "inflow": "3/5",
+        "outflow": "3/5",
+        "net": "0",
+        "potential": null,
+        "overdraft": "-19/10",
+        "withdrawalDemand": null,
+        "localNet": "0"
+      },
+      "硅晶圆": {
+        "inflow": "1",
+        "outflow": "0",
+        "net": "1",
+        "potential": null,
+        "overdraft": "0",
+        "withdrawalDemand": null,
+        "localNet": "0"
+      },
+      "齿轮组": {
+        "inflow": "2/5",
+        "outflow": "0",
+        "net": "2/5",
+        "potential": "2/5",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      },
+      "导线线圈": {
+        "inflow": "0",
+        "outflow": "0",
+        "net": "0",
+        "potential": "0",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 24,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 1
+  },
+  {
+    "name": "sparse physical deposits with frozen priority",
+    "status": "proved-for-contract",
+    "actual": "proved",
+    "known": 44,
+    "unknown": 0,
+    "unknownMetrics": [],
+    "rows": {
+      "遐想物质": {
+        "inflow": "2/15",
+        "outflow": "2/15",
+        "net": "0",
+        "potential": "-88/15",
+        "overdraft": "-88/15",
+        "withdrawalDemand": "6",
+        "localNet": "2/15"
+      },
+      "合金板": {
+        "inflow": "2/15",
+        "outflow": "0",
+        "net": "2/15",
+        "potential": "2/15",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      },
+      "硅晶圆": {
+        "inflow": "0",
+        "outflow": "0",
+        "net": "0",
+        "potential": "0",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "rounds": [
+      {
+        "status": "sat",
+        "unique": 29,
+        "unresolved": 0,
+        "globallyFeasible": true,
+        "factors": []
+      }
+    ],
+    "ms": 3
+  }
+]

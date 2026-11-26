@@ -1,0 +1,379 @@
+{
+  "catalog": {
+    "recipes": 25,
+    "materials": 23,
+    "arcs": 41,
+    "ranks": {
+      "太空垃圾": 0,
+      "遐想物质": 0,
+      "星尘粒子": 0,
+      "相位粒子": 0,
+      "小行星矿石": 0,
+      "钛合金锭": 1,
+      "废金属": 1,
+      "合金板": 2,
+      "燃料罐": 1,
+      "能量电池": 2,
+      "硅晶圆": 1,
+      "古代芯片": 4,
+      "导线线圈": 3,
+      "复合装甲板": 3,
+      "框架模块": 3,
+      "齿轮组": 2,
+      "电动机": 4,
+      "隔热泡沫": 2,
+      "共鸣水晶": 3,
+      "量子处理器": 5,
+      "等离子电池": 3,
+      "引力透镜": 4,
+      "曲速线圈": 6
+    }
+  },
+  "layout": {
+    "name": "Garbage to alloy tandem",
+    "recordIndexed": true,
+    "machines": [
+      {
+        "id": "M0",
+        "type": "垃圾",
+        "x": 2,
+        "y": 2,
+        "face": "E",
+        "mode": 0
+      },
+      {
+        "id": "M1",
+        "type": "废料",
+        "x": 11,
+        "y": 1,
+        "face": "E",
+        "mode": "标准"
+      },
+      {
+        "id": "M2",
+        "type": "浇筑",
+        "x": 25,
+        "y": 1,
+        "face": "E",
+        "mode": "标准"
+      },
+      {
+        "id": "M3",
+        "type": "仓入",
+        "x": 40,
+        "y": 2,
+        "face": "E"
+      }
+    ],
+    "routes": [
+      {
+        "id": "R0",
+        "from": {
+          "id": "M0",
+          "port": 0
+        },
+        "to": {
+          "id": "M1",
+          "port": 0
+        },
+        "path": [
+          [
+            7,
+            4
+          ],
+          [
+            8,
+            4
+          ],
+          [
+            9,
+            4
+          ],
+          [
+            10,
+            4
+          ]
+        ]
+      },
+      {
+        "id": "R1",
+        "from": {
+          "id": "M1",
+          "port": 0
+        },
+        "to": {
+          "id": "M2",
+          "port": 0
+        },
+        "path": [
+          [
+            20,
+            4
+          ],
+          [
+            21,
+            4
+          ],
+          [
+            22,
+            4
+          ],
+          [
+            23,
+            4
+          ],
+          [
+            24,
+            4
+          ]
+        ]
+      },
+      {
+        "id": "R2",
+        "from": {
+          "id": "M2",
+          "port": 0
+        },
+        "to": {
+          "id": "M3",
+          "port": 1
+        },
+        "path": [
+          [
+            34,
+            4
+          ],
+          [
+            35,
+            4
+          ],
+          [
+            36,
+            4
+          ],
+          [
+            37,
+            4
+          ],
+          [
+            38,
+            4
+          ],
+          [
+            39,
+            4
+          ]
+        ]
+      }
+    ],
+    "frozenFactories": []
+  },
+  "ast1": "AST1:BAQAAAICAAAAAAMLAQAAAAAEGQEAAAAACigCAwAAAAMAAAAAAQAABBUBAAACAAAFVQIAAAMAAQZVAQ==",
+  "chain": {
+    "machines": [
+      "M0",
+      "M1",
+      "M2"
+    ],
+    "stages": [
+      {
+        "b": 3,
+        "a": 0,
+        "T": 3
+      },
+      {
+        "b": 2,
+        "a": 3,
+        "T": 2
+      },
+      {
+        "b": 1,
+        "a": 3,
+        "T": 2.5
+      }
+    ],
+    "lengths": [
+      4,
+      5,
+      6
+    ],
+    "status": "proved",
+    "blockTime": "9",
+    "batchCounts": [
+      3,
+      3,
+      2
+    ],
+    "packetCounts": [
+      9,
+      6,
+      2
+    ],
+    "stageRates": [
+      "1/3",
+      "1/3",
+      "2/9"
+    ],
+    "routeRates": [
+      "1",
+      "2/3",
+      "2/9"
+    ],
+    "vertices": 42,
+    "expandedVertices": 102,
+    "unitEdges": 689,
+    "criticalCircuit": true
+  },
+  "unique": 38,
+  "actual": [
+    60,
+    40,
+    13.333333333333334
+  ],
+  "cases": [
+    {
+      "status": "proved",
+      "blockTime": "4",
+      "batchCounts": [
+        1,
+        1
+      ],
+      "packetCounts": [
+        1,
+        1
+      ],
+      "stageRates": [
+        "1/4",
+        "1/4"
+      ],
+      "routeRates": [
+        "1/4",
+        "1/4"
+      ],
+      "vertices": 6,
+      "expandedVertices": 48,
+      "unitEdges": 83,
+      "criticalCircuit": true
+    },
+    {
+      "status": "proved",
+      "blockTime": "5",
+      "batchCounts": [
+        5,
+        1
+      ],
+      "packetCounts": [
+        5,
+        1
+      ],
+      "stageRates": [
+        "1",
+        "1/5"
+      ],
+      "routeRates": [
+        "1",
+        "1/5"
+      ],
+      "vertices": 18,
+      "expandedVertices": 63,
+      "unitEdges": 208,
+      "criticalCircuit": true
+    },
+    {
+      "status": "proved",
+      "blockTime": "6",
+      "batchCounts": [
+        3,
+        2
+      ],
+      "packetCounts": [
+        6,
+        4
+      ],
+      "stageRates": [
+        "1/2",
+        "1/3"
+      ],
+      "routeRates": [
+        "1",
+        "2/3"
+      ],
+      "vertices": 25,
+      "expandedVertices": 63,
+      "unitEdges": 317,
+      "criticalCircuit": true
+    },
+    {
+      "status": "proved",
+      "blockTime": "3",
+      "batchCounts": [
+        1
+      ],
+      "packetCounts": [
+        3
+      ],
+      "stageRates": [
+        "1/3"
+      ],
+      "routeRates": [
+        "1"
+      ],
+      "vertices": 7,
+      "expandedVertices": 26,
+      "unitEdges": 50,
+      "criticalCircuit": true
+    },
+    {
+      "status": "proved",
+      "blockTime": "2",
+      "batchCounts": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "packetCounts": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "stageRates": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2"
+      ],
+      "routeRates": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2"
+      ],
+      "vertices": 27,
+      "expandedVertices": 223,
+      "unitEdges": 951,
+      "criticalCircuit": true
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{
+  "cases": 45,
+  "chains": [
+    {
+      "depth": 1,
+      "period": "3",
+      "rates": "1/3"
+    },
+    {
+      "depth": 4,
+      "period": "3",
+      "rates": "1/3"
+    },
+    {
+      "depth": 12,
+      "period": "3",
+      "rates": "1/3"
+    },
+    {
+      "depth": 24,
+      "period": "3",
+      "rates": "1/3"
+    }
+  ],
+  "dags": [
+    {
+      "n": 4,
+      "edges": 5,
+      "period": "7/3"
+    },
+    {
+      "n": 5,
+      "edges": 6,
+      "period": "7/3"
+    },
+    {
+      "n": 6,
+      "edges": 11,
+      "period": "7/3"
+    },
+    {
+      "n": 7,
+      "edges": 9,
+      "period": "7/3"
+    },
+    {
+      "n": 8,
+      "edges": 15,
+      "period": "7/3"
+    },
+    {
+      "n": 9,
+      "edges": 16,
+      "period": "7/3"
+    },
+    {
+      "n": 10,
+      "edges": 19,
+      "period": "7/3"
+    },
+    {
+      "n": 4,
+      "edges": 3,
+      "period": "7/3"
+    },
+    {
+      "n": 5,
+      "edges": 8,
+      "period": "7/3"
+    },
+    {
+      "n": 6,
+      "edges": 10,
+      "period": "7/3"
+    },
+    {
+      "n": 7,
+      "edges": 12,
+      "period": "7/3"
+    },
+    {
+      "n": 8,
+      "edges": 13,
+      "period": "7/3"
+    },
+    {
+      "n": 9,
+      "edges": 16,
+      "period": "7/3"
+    },
+    {
+      "n": 10,
+      "edges": 19,
+      "period": "7/3"
+    },
+    {
+      "n": 4,
+      "edges": 4,
+      "period": "7/3"
+    },
+    {
+      "n": 5,
+      "edges": 4,
+      "period": "7/3"
+    }
+  ],
+  "alternatives": [
+    {
+      "word": [
+        "batch",
+        "right",
+        "right",
+        "right"
+      ],
+      "status": "unsat"
+    },
+    {
+      "word": [
+        "batch",
+        "left",
+        "right",
+        "right"
+      ],
+      "status": "priority-infeasible"
+    },
+    {
+      "word": [
+        "batch",
+        "right",
+        "left",
+        "right"
+      ],
+      "status": "conditional-word",
+      "rates": {
+        "batch": "1/4",
+        "right": "1/2",
+        "left": "1/4"
+      }
+    },
+    {
+      "word": [
+        "batch",
+        "left",
+        "left",
+        "right"
+      ],
+      "status": "unsat"
+    },
+    {
+      "word": [
+        "batch",
+        "right",
+        "right",
+        "left"
+      ],
+      "status": "unsat"
+    },
+    {
+      "word": [
+        "batch",
+        "left",
+        "right",
+        "left"
+      ],
+      "status": "priority-infeasible"
+    },
+    {
+      "word": [
+        "batch",
+        "right",
+        "left",
+        "left"
+      ],
+      "status": "priority-infeasible"
+    },
+    {
+      "word": [
+        "batch",
+        "left",
+        "left",
+        "left"
+      ],
+      "status": "unsat"
+    }
+  ],
+  "shared": {
+    "period": "4",
+    "rates": {
+      "batch": "1/4",
+      "right": "1/2",
+      "left": "1/4"
+    },
+    "allRight": "unsat",
+    "allLeft": "unsat",
+    "extraLeft": "priority-infeasible",
+    "overfill": "invalid-word"
+  }
+}

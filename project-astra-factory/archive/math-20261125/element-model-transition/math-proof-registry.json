@@ -1,0 +1,232 @@
+{
+  "activeBundleModules": [
+    "direct_graph",
+    "symbolic_physical_spec",
+    "tandem_count_proof",
+    "recipe_tree_proof",
+    "permanent_fifo_blockage",
+    "real_refill_priority_proof",
+    "counterfactual_metrics",
+    "count_proof_compile",
+    "count_factored_projection",
+    "count_interval_projection",
+    "stock_work_conservation",
+    "warehouse_ready_tree_proof",
+    "structural_zero_proof",
+    "proof_depth_plan",
+    "terminal_subgraphs",
+    "saturated_router_proof",
+    "joint_stock_residual_bounds",
+    "sparse_frozen_priority",
+    "bounded_shared_root_tree_proof",
+    "frozen_exclusive_proof",
+    "frozen_fed_ring_proof",
+    "frozen_exclusive_network_proof",
+    "priority_deposit_calendar",
+    "relative_splitter_service",
+    "certified_counts"
+  ],
+  "historicalModules": {
+    "batch_ready_certificate": {
+      "status": "partially_replaced",
+      "note": "固定帧就绪时钟已覆盖部分；一般批次相位条件仍需移植"
+    },
+    "general_batch_cadence": {
+      "status": "partially_replaced",
+      "note": "固定帧单位批反压节拍与优先补料已接入；多件批次相位包络未全部移植"
+    },
+    "cadence_backpressure": {
+      "status": "partially_replaced",
+      "note": "部分由固定帧序号树和新反压节拍替代；一般相位包络待移植"
+    },
+    "round_robin_certificates": {
+      "status": "partially_replaced",
+      "note": "saturated_router_proof中固定帧轮询关系已替代基础条件"
+    },
+    "rr_bounded_service": {
+      "status": "partially_replaced",
+      "note": "固定帧自由接收、共享根服务时钟已覆盖部分；慢源一般清空界待核对"
+    },
+    "merger_recipe_tree_proof": {
+      "status": "partially_replaced",
+      "note": "固定帧有界接收及共享根证明已覆盖部分"
+    },
+    "split_recipe_branch_proof": {
+      "status": "partially_replaced",
+      "note": "bounded_shared_root_tree_proof及服务下界覆盖部分"
+    },
+    "shared_recipe_input_proof": {
+      "status": "partially_replaced",
+      "note": "多口原料就绪及固定帧优先补料覆盖部分；低供给突发包络待移植"
+    },
+    "warehouse_priority_tree_proof": {
+      "status": "partially_replaced",
+      "note": "warehouse_ready_tree_proof及库存优先级覆盖部分"
+    },
+    "shared_stock_proof": {
+      "status": "partially_replaced",
+      "note": "stock_work_conservation及joint_stock_residual_bounds覆盖部分"
+    },
+    "warehouse_return_proof": {
+      "status": "partially_replaced",
+      "note": "严格盈余、直接回流由库存正净值与自由仓出合同覆盖部分；一般增强库存池待移植"
+    },
+    "warehouse_mode_facts": {
+      "status": "partially_replaced",
+      "note": "库存事实传播已整合部分，旧重分组未加载"
+    },
+    "warehouse_dependency_plan": {
+      "status": "partially_replaced",
+      "note": "物理深度与全局库存守恒已覆盖部分，完整库存依赖分块待接入"
+    },
+    "frozen_tick_priority_proof": {
+      "status": "partially_replaced",
+      "note": "sparse_frozen_priority覆盖稀疏单源情形，其他条件待核对"
+    },
+    "batch_backpressure_bounds": {
+      "status": "needs_fixed_frame_review",
+      "note": "原始连续相位包络需逐边核对0.05s因果、批次缓存与等号"
+    },
+    "refill_invariant": {
+      "status": "needs_fixed_frame_review",
+      "note": "相位对齐前提需固定帧证明；不能单独作为真实流率"
+    },
+    "mixed_count_proof": {
+      "status": "needs_fixed_frame_review",
+      "note": "混合FIFO及真实过滤阻塞规则需重新校验"
+    },
+    "saturated_transfer_regions": {
+      "status": "needs_fixed_frame_review",
+      "note": "一般无环物流区域饱和，需校验固定帧接收与派发先后"
+    },
+    "warehouse_burst_proof": {
+      "status": "needs_fixed_frame_review",
+      "note": "旧预约与瞬时服务模型，不可直接加载"
+    },
+    "warehouse_envelope_proof": {
+      "status": "needs_fixed_frame_review",
+      "note": "到货包络可复用，真实3件仓出缓存优先级待重证"
+    },
+    "warehouse_overlap_proof": {
+      "status": "needs_fixed_frame_review",
+      "note": "旧预约损失映射不等于现行FIFO补料"
+    },
+    "warehouse_smooth_priority_proof": {
+      "status": "needs_fixed_frame_review",
+      "note": "连续事件旧仓出规则需重证"
+    },
+    "frozen_protected_item_proof": {
+      "status": "needs_fixed_frame_review",
+      "note": "旧保护/预约时序需按当前冻结执行顺序核验"
+    },
+    "frozen_token_ring_proof": {
+      "status": "needs_fixed_frame_review",
+      "note": "连续因果时间与实际固定帧重叠不同，禁止直接采用"
+    },
+    "asymptotic_guard_algebra": {
+      "status": "research_only",
+      "note": "候选守恒/守卫约束工具，尚未建立实际图通用编译"
+    },
+    "joint_service_clocks": {
+      "status": "research_only",
+      "note": "CRT时钟代数工具，仍需已证相位输入"
+    },
+    "local_mean_certificate": {
+      "status": "research_only",
+      "note": "局部势函数证书框架，未完成真实设备编译"
+    },
+    "symbolic_mean_algebra": {
+      "status": "research_only",
+      "note": "有限状态代数，规模与用户直接求率约束需另审"
+    },
+    "symbolic_relation_algebra": {
+      "status": "research_only",
+      "note": "符号势函数关系，尚未完成通用生产接入"
+    },
+    "symbolic_bdd": {
+      "status": "research_only",
+      "note": "状态表示实验，不直接输出率"
+    },
+    "symbolic_physical": {
+      "status": "research_only",
+      "note": "固定帧状态编译尚有资源/正确性限制"
+    },
+    "periodic_resource_algebra": {
+      "status": "research_only",
+      "note": "需要证明周期事件关系，不能假定候选词"
+    },
+    "feed_forward_ordinal_proof": {
+      "status": "research_only",
+      "note": "有限前缀及仿射序号词研究，非现行严格直接求率路径"
+    },
+    "frozen_finite_components": {
+      "status": "research_only",
+      "note": "有限状态商算法，不作为现行直接率求解"
+    },
+    "frozen_single_item_finite": {
+      "status": "research_only",
+      "note": "有限状态关系分解，不作为现行直接率求解"
+    },
+    "exact_event_orbit": {
+      "status": "research_only",
+      "note": "轨道搜索，按用户要求不接入"
+    },
+    "compile_exact": {
+      "status": "legacy_or_harness",
+      "note": "旧供需模型编译器，不使用"
+    },
+    "count_witness_projection": {
+      "status": "legacy_or_harness",
+      "note": "可行见证诊断，不能选择真实率"
+    },
+    "combine_count_proofs": {
+      "status": "legacy_or_harness",
+      "note": "历史混合时钟研究组合器，不使用"
+    },
+    "html_research_queries": {
+      "status": "legacy_or_harness",
+      "note": "旧适配器，不使用"
+    },
+    "run_direct": {
+      "status": "legacy_or_harness",
+      "note": "研究命令入口"
+    },
+    "direct_algebra": {
+      "status": "legacy_or_harness",
+      "note": "现行精确代数唯一源码为scripts/engine/math/algebra/direct_algebra.js；历史研究副本只归档。"
+    }
+  },
+  "sourcePaths": {
+    "direct_graph": "scripts/engine/math/graph/direct_graph.js",
+    "symbolic_physical_spec": "scripts/engine/math/graph/symbolic_physical_spec.js",
+    "structural_zero_proof": "scripts/engine/math/graph/structural_zero_proof.js",
+    "proof_depth_plan": "scripts/engine/math/graph/proof_depth_plan.js",
+    "count_proof_compile": "scripts/engine/math/algebra/count_proof_compile.js",
+    "count_factored_projection": "scripts/engine/math/algebra/count_factored_projection.js",
+    "count_interval_projection": "scripts/engine/math/algebra/count_interval_projection.js",
+    "tandem_count_proof": "scripts/engine/math/proofs/ordinal/tandem_count_proof.js",
+    "recipe_tree_proof": "scripts/engine/math/proofs/ordinal/recipe_tree_proof.js",
+    "bounded_shared_root_tree_proof": "scripts/engine/math/proofs/ordinal/bounded_shared_root_tree_proof.js",
+    "permanent_fifo_blockage": "scripts/engine/math/proofs/logistics/permanent_fifo_blockage.js",
+    "saturated_router_proof": "scripts/engine/math/proofs/logistics/saturated_router_proof.js",
+    "real_refill_priority_proof": "scripts/engine/math/proofs/warehouse/real_refill_priority_proof.js",
+    "stock_work_conservation": "scripts/engine/math/proofs/warehouse/stock_work_conservation.js",
+    "warehouse_ready_tree_proof": "scripts/engine/math/proofs/warehouse/warehouse_ready_tree_proof.js",
+    "joint_stock_residual_bounds": "scripts/engine/math/proofs/warehouse/joint_stock_residual_bounds.js",
+    "sparse_frozen_priority": "scripts/engine/math/proofs/frozen/sparse_frozen_priority.js",
+    "frozen_exclusive_proof": "scripts/engine/math/proofs/frozen/frozen_exclusive_proof.js",
+    "frozen_fed_ring_proof": "scripts/engine/math/proofs/frozen/frozen_fed_ring_proof.js",
+    "frozen_exclusive_network_proof": "scripts/engine/math/proofs/frozen/frozen_exclusive_network_proof.js",
+    "counterfactual_metrics": "scripts/engine/math/metrics/counterfactual_metrics.js",
+    "certified_counts": "scripts/engine/math/pipeline/certified_counts.js",
+    "priority_deposit_calendar": "scripts/engine/math/proofs/warehouse/priority_deposit_calendar.js",
+    "terminal_subgraphs": "scripts/engine/math/graph/terminal_subgraphs.js",
+    "relative_splitter_service": "scripts/engine/math/proofs/logistics/relative_splitter_service.js"
+  },
+  "archiveRoot": "archive/math-20261125/research/long-run-rates",
+  "standaloneSources": [
+    "scripts/engine/math/arithmetic/rational.js",
+    "scripts/engine/math/algebra/direct_algebra.js",
+    "scripts/engine/math/graph/startup_reachability.js"
+  ]
+}

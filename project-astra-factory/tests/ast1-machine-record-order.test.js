@@ -4,7 +4,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),
 const root=path.resolve(__dirname,'..');
 const files=['data/catalog','blueprints/machine-ids','blueprints/item-ids',
  'core/state','core/machines','core/routing','core/audit',
- 'core/selection-transform','core/editor','engine/steady-flow',
+ 'core/selection-transform','core/editor','engine/math/arithmetic/rational','engine/steady-flow',
  'core/compact-json','blueprints/ast1-codec'];
 const bundle=files.map(f=>fs.readFileSync(path.join(root,'scripts',f+'.js'),'utf8')).join('\n;\n');
 const fixture=fs.readFileSync(path.join(root,'tests/fixtures/ast1-warehouse-port-balance-v1.txt'),'utf8').trim();

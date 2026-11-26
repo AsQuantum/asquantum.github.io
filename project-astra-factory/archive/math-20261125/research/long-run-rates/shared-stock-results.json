@@ -1,0 +1,91 @@
+{
+  "envelope": {
+    "threeSources": "2/5",
+    "asynchronous": "529/1155",
+    "asynchronousGear": "529/2310",
+    "allUnique": true,
+    "rejectedFour": true,
+    "rejectedBoundary": true
+  },
+  "cases": [
+    {
+      "input": "0",
+      "out": "0",
+      "net": "0",
+      "a": "0",
+      "b": "0"
+    },
+    {
+      "input": "1/8",
+      "out": "1/8",
+      "net": "0",
+      "a": null,
+      "b": null
+    },
+    {
+      "input": "3/4",
+      "out": "3/4",
+      "net": "0",
+      "a": null,
+      "b": null
+    },
+    {
+      "input": "5/4",
+      "out": "5/4",
+      "net": "0",
+      "a": "1",
+      "b": "1"
+    },
+    {
+      "input": "2",
+      "out": "5/4",
+      "net": "3/4",
+      "a": "1",
+      "b": "1"
+    },
+    {
+      "input": "15/4",
+      "out": "5/4",
+      "net": "5/2",
+      "a": "1",
+      "b": "1"
+    }
+  ],
+  "multi": {
+    "outflow": "1",
+    "unknown": 10
+  },
+  "blocked": {
+    "refused": [
+      {
+        "item": "x",
+        "reason": "another frozen ingredient may block service"
+      },
+      {
+        "item": "y",
+        "reason": "another frozen ingredient may block service"
+      },
+      {
+        "item": "a",
+        "reason": "total income not proved"
+      },
+      {
+        "item": "b",
+        "reason": "total income not proved"
+      }
+    ],
+    "duty": "0"
+  },
+  "physical": {
+    "outflow": "8/15",
+    "unknown": 28
+  },
+  "single": {
+    "gear": "4/15",
+    "unknown": 0
+  },
+  "mixed": {
+    "outflow": "8/15",
+    "unknown": 34
+  }
+}

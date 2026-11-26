@@ -1,0 +1,2055 @@
+{
+  "extended": {
+    "allBlocked": {
+      "layout": {
+        "name": "Two fully throttled armor branches",
+        "recordIndexed": true,
+        "machines": [
+          {
+            "id": "M0",
+            "type": "仓出",
+            "x": 2,
+            "y": 19,
+            "face": "E",
+            "item": "钛合金锭"
+          },
+          {
+            "id": "M1",
+            "type": "分流",
+            "x": 8,
+            "y": 20,
+            "face": "E"
+          },
+          {
+            "id": "M2",
+            "type": "组装",
+            "x": 22,
+            "y": 18,
+            "face": "E",
+            "mode": "复合装甲板"
+          },
+          {
+            "id": "M3",
+            "type": "仓出",
+            "x": 14,
+            "y": 27,
+            "face": "N",
+            "item": "合金板"
+          },
+          {
+            "id": "M4",
+            "type": "仓入",
+            "x": 39,
+            "y": 19,
+            "face": "E"
+          },
+          {
+            "id": "M5",
+            "type": "组装",
+            "x": 22,
+            "y": 5,
+            "face": "E",
+            "mode": "复合装甲板"
+          },
+          {
+            "id": "M6",
+            "type": "仓出",
+            "x": 14,
+            "y": 11,
+            "face": "E",
+            "item": "合金板"
+          },
+          {
+            "id": "M7",
+            "type": "仓入",
+            "x": 39,
+            "y": 6,
+            "face": "E"
+          }
+        ],
+        "routes": [
+          {
+            "id": "R0",
+            "from": {
+              "id": "M0",
+              "port": 0
+            },
+            "to": {
+              "id": "M1",
+              "port": 0
+            },
+            "path": [
+              [
+                7,
+                21
+              ]
+            ]
+          },
+          {
+            "id": "R1",
+            "from": {
+              "id": "M1",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 1
+            },
+            "path": [
+              [
+                11,
+                21
+              ],
+              [
+                12,
+                21
+              ],
+              [
+                13,
+                21
+              ],
+              [
+                14,
+                21
+              ],
+              [
+                15,
+                21
+              ],
+              [
+                16,
+                21
+              ],
+              [
+                17,
+                21
+              ],
+              [
+                18,
+                21
+              ],
+              [
+                19,
+                21
+              ],
+              [
+                20,
+                21
+              ],
+              [
+                21,
+                21
+              ]
+            ]
+          },
+          {
+            "id": "R2",
+            "from": {
+              "id": "M1",
+              "port": 1
+            },
+            "to": {
+              "id": "M5",
+              "port": 1
+            },
+            "path": [
+              [
+                9,
+                19
+              ],
+              [
+                9,
+                18
+              ],
+              [
+                9,
+                17
+              ],
+              [
+                9,
+                16
+              ],
+              [
+                9,
+                15
+              ],
+              [
+                9,
+                14
+              ],
+              [
+                9,
+                13
+              ],
+              [
+                9,
+                12
+              ],
+              [
+                9,
+                11
+              ],
+              [
+                9,
+                10
+              ],
+              [
+                9,
+                9
+              ],
+              [
+                9,
+                8
+              ],
+              [
+                10,
+                8
+              ],
+              [
+                11,
+                8
+              ],
+              [
+                12,
+                8
+              ],
+              [
+                13,
+                8
+              ],
+              [
+                14,
+                8
+              ],
+              [
+                15,
+                8
+              ],
+              [
+                16,
+                8
+              ],
+              [
+                17,
+                8
+              ],
+              [
+                18,
+                8
+              ],
+              [
+                19,
+                8
+              ],
+              [
+                20,
+                8
+              ],
+              [
+                21,
+                8
+              ]
+            ]
+          },
+          {
+            "id": "R3",
+            "from": {
+              "id": "M3",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 2
+            },
+            "path": [
+              [
+                16,
+                26
+              ],
+              [
+                16,
+                25
+              ],
+              [
+                16,
+                24
+              ],
+              [
+                16,
+                23
+              ],
+              [
+                16,
+                22
+              ],
+              [
+                17,
+                22
+              ],
+              [
+                18,
+                22
+              ],
+              [
+                19,
+                22
+              ],
+              [
+                20,
+                22
+              ],
+              [
+                21,
+                22
+              ]
+            ]
+          },
+          {
+            "id": "R4",
+            "from": {
+              "id": "M2",
+              "port": 0
+            },
+            "to": {
+              "id": "M4",
+              "port": 1
+            },
+            "path": [
+              [
+                33,
+                21
+              ],
+              [
+                34,
+                21
+              ],
+              [
+                35,
+                21
+              ],
+              [
+                36,
+                21
+              ],
+              [
+                37,
+                21
+              ],
+              [
+                38,
+                21
+              ]
+            ]
+          },
+          {
+            "id": "R5",
+            "from": {
+              "id": "M6",
+              "port": 0
+            },
+            "to": {
+              "id": "M5",
+              "port": 2
+            },
+            "path": [
+              [
+                19,
+                13
+              ],
+              [
+                20,
+                13
+              ],
+              [
+                21,
+                13
+              ],
+              [
+                21,
+                12
+              ],
+              [
+                21,
+                11
+              ],
+              [
+                21,
+                10
+              ],
+              [
+                21,
+                9
+              ]
+            ]
+          },
+          {
+            "id": "R6",
+            "from": {
+              "id": "M5",
+              "port": 0
+            },
+            "to": {
+              "id": "M7",
+              "port": 1
+            },
+            "path": [
+              [
+                33,
+                8
+              ],
+              [
+                34,
+                8
+              ],
+              [
+                35,
+                8
+              ],
+              [
+                36,
+                8
+              ],
+              [
+                37,
+                8
+              ],
+              [
+                38,
+                8
+              ]
+            ]
+          }
+        ],
+        "frozenFactories": [
+          {
+            "id": "s",
+            "rates": {
+              "钛合金锭": "2",
+              "合金板": "3"
+            }
+          }
+        ]
+      },
+      "proof": {
+        "machineRates": [],
+        "machineBounds": [
+          {
+            "machine": "M2",
+            "lower": "1/4",
+            "proven": true,
+            "method": "bounded-splitter-scan-ordinal-envelope"
+          },
+          {
+            "machine": "M5",
+            "lower": "1/4",
+            "proven": true,
+            "method": "bounded-splitter-scan-ordinal-envelope"
+          }
+        ],
+        "roundRobin": [],
+        "branches": [
+          {
+            "route": "R1",
+            "machines": [
+              "M2",
+              null,
+              null
+            ],
+            "stages": [
+              {
+                "b": 1,
+                "T": 4,
+                "length": 6,
+                "to": null,
+                "a": 0
+              },
+              {
+                "b": 1,
+                "T": "4",
+                "offerGap": "4",
+                "length": 11,
+                "to": 0,
+                "a": 1
+              },
+              {
+                "b": 1,
+                "T": 1,
+                "offerGap": 1,
+                "length": 10,
+                "to": 0,
+                "a": 4
+              }
+            ],
+            "status": "proved",
+            "blockTime": "4",
+            "batchCounts": [
+              1,
+              1,
+              4
+            ],
+            "packetCounts": [
+              1,
+              1,
+              4
+            ],
+            "stageRates": [
+              "1/4",
+              "1/4",
+              "1"
+            ],
+            "routeRates": [
+              "1/4",
+              "1/4",
+              "1"
+            ],
+            "vertices": 18,
+            "expandedVertices": 106,
+            "unitEdges": 258,
+            "criticalCircuit": true,
+            "scope": "lower-rates-only",
+            "offerGap": "4"
+          },
+          {
+            "route": "R2",
+            "machines": [
+              "M5",
+              null,
+              null
+            ],
+            "stages": [
+              {
+                "b": 1,
+                "T": 4,
+                "length": 6,
+                "to": null,
+                "a": 0
+              },
+              {
+                "b": 1,
+                "T": "4",
+                "offerGap": "4",
+                "length": 24,
+                "to": 0,
+                "a": 1
+              },
+              {
+                "b": 1,
+                "T": 1,
+                "offerGap": 1,
+                "length": 7,
+                "to": 0,
+                "a": 4
+              }
+            ],
+            "status": "proved",
+            "blockTime": "4",
+            "batchCounts": [
+              1,
+              1,
+              4
+            ],
+            "packetCounts": [
+              1,
+              1,
+              4
+            ],
+            "stageRates": [
+              "1/4",
+              "1/4",
+              "1"
+            ],
+            "routeRates": [
+              "1/4",
+              "1/4",
+              "1"
+            ],
+            "vertices": 18,
+            "expandedVertices": 116,
+            "unitEdges": 268,
+            "criticalCircuit": true,
+            "scope": "lower-rates-only",
+            "offerGap": "4"
+          }
+        ],
+        "refused": []
+      },
+      "actual": {
+        "M0": {},
+        "M1": {
+          "钛合金锭": 30
+        },
+        "M2": {
+          "合金板": 60,
+          "钛合金锭": 15
+        },
+        "M3": {},
+        "M4": {
+          "复合装甲板": 15
+        },
+        "M5": {
+          "合金板": 60,
+          "钛合金锭": 15
+        },
+        "M6": {},
+        "M7": {
+          "复合装甲板": 15
+        }
+      },
+      "unique": 72
+    },
+    "functional": {
+      "layout": {
+        "name": "Two fully throttled armor branches",
+        "recordIndexed": true,
+        "machines": [
+          {
+            "id": "M0",
+            "type": "仓出",
+            "x": 2,
+            "y": 19,
+            "face": "E",
+            "item": "钛合金锭"
+          },
+          {
+            "id": "M1",
+            "type": "分流",
+            "x": 8,
+            "y": 20,
+            "face": "E"
+          },
+          {
+            "id": "M2",
+            "type": "组装",
+            "x": 22,
+            "y": 18,
+            "face": "E",
+            "mode": "复合装甲板"
+          },
+          {
+            "id": "M3",
+            "type": "仓出",
+            "x": 14,
+            "y": 27,
+            "face": "N",
+            "item": "合金板"
+          },
+          {
+            "id": "M4",
+            "type": "仓入",
+            "x": 39,
+            "y": 19,
+            "face": "E"
+          },
+          {
+            "id": "M5",
+            "type": "组装",
+            "x": 22,
+            "y": 5,
+            "face": "E",
+            "mode": "齿轮组"
+          },
+          {
+            "id": "M7",
+            "type": "仓入",
+            "x": 39,
+            "y": 6,
+            "face": "E"
+          }
+        ],
+        "routes": [
+          {
+            "id": "R0",
+            "from": {
+              "id": "M0",
+              "port": 0
+            },
+            "to": {
+              "id": "M1",
+              "port": 0
+            },
+            "path": [
+              [
+                7,
+                21
+              ]
+            ]
+          },
+          {
+            "id": "R1",
+            "from": {
+              "id": "M1",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 1
+            },
+            "path": [
+              [
+                11,
+                21
+              ],
+              [
+                12,
+                21
+              ],
+              [
+                13,
+                21
+              ],
+              [
+                14,
+                21
+              ],
+              [
+                15,
+                21
+              ],
+              [
+                16,
+                21
+              ],
+              [
+                17,
+                21
+              ],
+              [
+                18,
+                21
+              ],
+              [
+                19,
+                21
+              ],
+              [
+                20,
+                21
+              ],
+              [
+                21,
+                21
+              ]
+            ]
+          },
+          {
+            "id": "R2",
+            "from": {
+              "id": "M1",
+              "port": 1
+            },
+            "to": {
+              "id": "M5",
+              "port": 1
+            },
+            "path": [
+              [
+                9,
+                19
+              ],
+              [
+                9,
+                18
+              ],
+              [
+                9,
+                17
+              ],
+              [
+                9,
+                16
+              ],
+              [
+                9,
+                15
+              ],
+              [
+                9,
+                14
+              ],
+              [
+                9,
+                13
+              ],
+              [
+                9,
+                12
+              ],
+              [
+                9,
+                11
+              ],
+              [
+                9,
+                10
+              ],
+              [
+                9,
+                9
+              ],
+              [
+                9,
+                8
+              ],
+              [
+                10,
+                8
+              ],
+              [
+                11,
+                8
+              ],
+              [
+                12,
+                8
+              ],
+              [
+                13,
+                8
+              ],
+              [
+                14,
+                8
+              ],
+              [
+                15,
+                8
+              ],
+              [
+                16,
+                8
+              ],
+              [
+                17,
+                8
+              ],
+              [
+                18,
+                8
+              ],
+              [
+                19,
+                8
+              ],
+              [
+                20,
+                8
+              ],
+              [
+                21,
+                8
+              ]
+            ]
+          },
+          {
+            "id": "R3",
+            "from": {
+              "id": "M3",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 2
+            },
+            "path": [
+              [
+                16,
+                26
+              ],
+              [
+                16,
+                25
+              ],
+              [
+                16,
+                24
+              ],
+              [
+                16,
+                23
+              ],
+              [
+                16,
+                22
+              ],
+              [
+                17,
+                22
+              ],
+              [
+                18,
+                22
+              ],
+              [
+                19,
+                22
+              ],
+              [
+                20,
+                22
+              ],
+              [
+                21,
+                22
+              ]
+            ]
+          },
+          {
+            "id": "R4",
+            "from": {
+              "id": "M2",
+              "port": 0
+            },
+            "to": {
+              "id": "M4",
+              "port": 1
+            },
+            "path": [
+              [
+                33,
+                21
+              ],
+              [
+                34,
+                21
+              ],
+              [
+                35,
+                21
+              ],
+              [
+                36,
+                21
+              ],
+              [
+                37,
+                21
+              ],
+              [
+                38,
+                21
+              ]
+            ]
+          },
+          {
+            "id": "R6",
+            "from": {
+              "id": "M5",
+              "port": 0
+            },
+            "to": {
+              "id": "M7",
+              "port": 1
+            },
+            "path": [
+              [
+                33,
+                8
+              ],
+              [
+                34,
+                8
+              ],
+              [
+                35,
+                8
+              ],
+              [
+                36,
+                8
+              ],
+              [
+                37,
+                8
+              ],
+              [
+                38,
+                8
+              ]
+            ]
+          }
+        ],
+        "frozenFactories": [
+          {
+            "id": "s",
+            "rates": {
+              "钛合金锭": "2",
+              "合金板": "3"
+            }
+          }
+        ]
+      },
+      "proof": {
+        "machineRates": [],
+        "machineBounds": [
+          {
+            "machine": "M2",
+            "lower": "1/4",
+            "proven": true,
+            "method": "bounded-splitter-scan-ordinal-envelope"
+          },
+          {
+            "machine": "M5",
+            "lower": "1/4",
+            "proven": true,
+            "method": "bounded-splitter-scan-ordinal-envelope"
+          }
+        ],
+        "roundRobin": [
+          {
+            "machine": "M1",
+            "kind": "splitter",
+            "ports": [
+              "R1",
+              "R2"
+            ],
+            "unskipped": [
+              "R2"
+            ],
+            "commonRoute": "R0",
+            "totalRate": "1"
+          }
+        ],
+        "branches": [
+          {
+            "route": "R1",
+            "machines": [
+              "M2",
+              null,
+              null
+            ],
+            "stages": [
+              {
+                "b": 1,
+                "T": 4,
+                "length": 6,
+                "to": null,
+                "a": 0
+              },
+              {
+                "b": 1,
+                "T": "2",
+                "offerGap": "2",
+                "length": 11,
+                "to": 0,
+                "a": 1
+              },
+              {
+                "b": 1,
+                "T": 1,
+                "offerGap": 1,
+                "length": 10,
+                "to": 0,
+                "a": 4
+              }
+            ],
+            "status": "proved",
+            "blockTime": "4",
+            "batchCounts": [
+              1,
+              1,
+              4
+            ],
+            "packetCounts": [
+              1,
+              1,
+              4
+            ],
+            "stageRates": [
+              "1/4",
+              "1/4",
+              "1"
+            ],
+            "routeRates": [
+              "1/4",
+              "1/4",
+              "1"
+            ],
+            "vertices": 18,
+            "expandedVertices": 106,
+            "unitEdges": 258,
+            "criticalCircuit": true,
+            "scope": "lower-rates-only",
+            "offerGap": "2"
+          },
+          {
+            "route": "R2",
+            "machines": [
+              "M5",
+              null
+            ],
+            "stages": [
+              {
+                "b": 1,
+                "T": 1.5,
+                "length": 6,
+                "to": null,
+                "a": 0
+              },
+              {
+                "b": 1,
+                "T": "2",
+                "offerGap": "2",
+                "length": 24,
+                "to": 0,
+                "a": 2
+              }
+            ],
+            "status": "proved",
+            "blockTime": "4",
+            "batchCounts": [
+              1,
+              2
+            ],
+            "packetCounts": [
+              1,
+              2
+            ],
+            "stageRates": [
+              "1/4",
+              "1/2"
+            ],
+            "routeRates": [
+              "1/4",
+              "1/2"
+            ],
+            "vertices": 9,
+            "expandedVertices": 79,
+            "unitEdges": 138,
+            "criticalCircuit": true,
+            "scope": "lower-rates-only",
+            "offerGap": "2"
+          }
+        ],
+        "refused": []
+      },
+      "actual": {
+        "M0": {},
+        "M1": {
+          "钛合金锭": 60
+        },
+        "M2": {
+          "合金板": 60,
+          "钛合金锭": 15
+        },
+        "M3": {},
+        "M4": {
+          "复合装甲板": 15
+        },
+        "M5": {
+          "钛合金锭": 45
+        },
+        "M7": {
+          "齿轮组": 22.5
+        }
+      },
+      "unique": 72
+    },
+    "longer": {
+      "unknown": 60
+    }
+  },
+  "layout": {
+    "name": "Saturated splitter with slow armor branch",
+    "recordIndexed": true,
+    "machines": [
+      {
+        "id": "M0",
+        "type": "仓出",
+        "x": 2,
+        "y": 9,
+        "face": "E",
+        "item": "钛合金锭"
+      },
+      {
+        "id": "M1",
+        "type": "分流",
+        "x": 15,
+        "y": 10,
+        "face": "E"
+      },
+      {
+        "id": "M2",
+        "type": "仓入",
+        "x": 14,
+        "y": 1,
+        "face": "N"
+      },
+      {
+        "id": "M3",
+        "type": "组装",
+        "x": 28,
+        "y": 8,
+        "face": "E",
+        "mode": "复合装甲板"
+      },
+      {
+        "id": "M4",
+        "type": "仓出",
+        "x": 20,
+        "y": 17,
+        "face": "N",
+        "item": "合金板"
+      },
+      {
+        "id": "M5",
+        "type": "仓入",
+        "x": 44,
+        "y": 9,
+        "face": "E"
+      }
+    ],
+    "routes": [
+      {
+        "id": "R0",
+        "from": {
+          "id": "M0",
+          "port": 0
+        },
+        "to": {
+          "id": "M1",
+          "port": 0
+        },
+        "path": [
+          [
+            7,
+            11
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            14,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R1",
+        "from": {
+          "id": "M1",
+          "port": 0
+        },
+        "to": {
+          "id": "M3",
+          "port": 1
+        },
+        "path": [
+          [
+            18,
+            11
+          ],
+          [
+            19,
+            11
+          ],
+          [
+            20,
+            11
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            22,
+            11
+          ],
+          [
+            23,
+            11
+          ],
+          [
+            24,
+            11
+          ],
+          [
+            25,
+            11
+          ],
+          [
+            26,
+            11
+          ],
+          [
+            27,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R2",
+        "from": {
+          "id": "M1",
+          "port": 1
+        },
+        "to": {
+          "id": "M2",
+          "port": 1
+        },
+        "path": [
+          [
+            16,
+            9
+          ],
+          [
+            16,
+            8
+          ],
+          [
+            16,
+            7
+          ],
+          [
+            16,
+            6
+          ]
+        ]
+      },
+      {
+        "id": "R3",
+        "from": {
+          "id": "M4",
+          "port": 0
+        },
+        "to": {
+          "id": "M3",
+          "port": 2
+        },
+        "path": [
+          [
+            22,
+            16
+          ],
+          [
+            22,
+            15
+          ],
+          [
+            22,
+            14
+          ],
+          [
+            22,
+            13
+          ],
+          [
+            22,
+            12
+          ],
+          [
+            23,
+            12
+          ],
+          [
+            24,
+            12
+          ],
+          [
+            25,
+            12
+          ],
+          [
+            26,
+            12
+          ],
+          [
+            27,
+            12
+          ]
+        ]
+      },
+      {
+        "id": "R4",
+        "from": {
+          "id": "M3",
+          "port": 0
+        },
+        "to": {
+          "id": "M5",
+          "port": 1
+        },
+        "path": [
+          [
+            39,
+            11
+          ],
+          [
+            40,
+            11
+          ],
+          [
+            41,
+            11
+          ],
+          [
+            42,
+            11
+          ],
+          [
+            43,
+            11
+          ]
+        ]
+      }
+    ],
+    "frozenFactories": [
+      {
+        "id": "s",
+        "rates": {
+          "钛合金锭": "2",
+          "合金板": "2"
+        }
+      }
+    ]
+  },
+  "three": {
+    "name": "Saturated splitter with slow armor branch",
+    "recordIndexed": true,
+    "machines": [
+      {
+        "id": "M0",
+        "type": "仓出",
+        "x": 2,
+        "y": 9,
+        "face": "E",
+        "item": "钛合金锭"
+      },
+      {
+        "id": "M1",
+        "type": "分流",
+        "x": 15,
+        "y": 10,
+        "face": "E"
+      },
+      {
+        "id": "M2",
+        "type": "仓入",
+        "x": 14,
+        "y": 1,
+        "face": "N"
+      },
+      {
+        "id": "M3",
+        "type": "组装",
+        "x": 28,
+        "y": 8,
+        "face": "E",
+        "mode": "复合装甲板"
+      },
+      {
+        "id": "M4",
+        "type": "仓出",
+        "x": 20,
+        "y": 17,
+        "face": "N",
+        "item": "合金板"
+      },
+      {
+        "id": "M5",
+        "type": "仓入",
+        "x": 44,
+        "y": 9,
+        "face": "E"
+      },
+      {
+        "id": "M6",
+        "type": "仓入",
+        "x": 14,
+        "y": 17,
+        "face": "S"
+      }
+    ],
+    "routes": [
+      {
+        "id": "R0",
+        "from": {
+          "id": "M0",
+          "port": 0
+        },
+        "to": {
+          "id": "M1",
+          "port": 0
+        },
+        "path": [
+          [
+            7,
+            11
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            14,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R1",
+        "from": {
+          "id": "M1",
+          "port": 0
+        },
+        "to": {
+          "id": "M3",
+          "port": 1
+        },
+        "path": [
+          [
+            18,
+            11
+          ],
+          [
+            19,
+            11
+          ],
+          [
+            20,
+            11
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            22,
+            11
+          ],
+          [
+            23,
+            11
+          ],
+          [
+            24,
+            11
+          ],
+          [
+            25,
+            11
+          ],
+          [
+            26,
+            11
+          ],
+          [
+            27,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R2",
+        "from": {
+          "id": "M1",
+          "port": 1
+        },
+        "to": {
+          "id": "M2",
+          "port": 1
+        },
+        "path": [
+          [
+            16,
+            9
+          ],
+          [
+            16,
+            8
+          ],
+          [
+            16,
+            7
+          ],
+          [
+            16,
+            6
+          ]
+        ]
+      },
+      {
+        "id": "R3",
+        "from": {
+          "id": "M4",
+          "port": 0
+        },
+        "to": {
+          "id": "M3",
+          "port": 2
+        },
+        "path": [
+          [
+            22,
+            16
+          ],
+          [
+            22,
+            15
+          ],
+          [
+            22,
+            14
+          ],
+          [
+            22,
+            13
+          ],
+          [
+            22,
+            12
+          ],
+          [
+            23,
+            12
+          ],
+          [
+            24,
+            12
+          ],
+          [
+            25,
+            12
+          ],
+          [
+            26,
+            12
+          ],
+          [
+            27,
+            12
+          ]
+        ]
+      },
+      {
+        "id": "R4",
+        "from": {
+          "id": "M3",
+          "port": 0
+        },
+        "to": {
+          "id": "M5",
+          "port": 1
+        },
+        "path": [
+          [
+            39,
+            11
+          ],
+          [
+            40,
+            11
+          ],
+          [
+            41,
+            11
+          ],
+          [
+            42,
+            11
+          ],
+          [
+            43,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R5",
+        "from": {
+          "id": "M1",
+          "port": 2
+        },
+        "to": {
+          "id": "M6",
+          "port": 1
+        },
+        "path": [
+          [
+            16,
+            13
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            16,
+            15
+          ],
+          [
+            16,
+            16
+          ]
+        ]
+      }
+    ],
+    "frozenFactories": [
+      {
+        "id": "s",
+        "rates": {
+          "钛合金锭": "2",
+          "合金板": "2"
+        }
+      }
+    ]
+  },
+  "proof": {
+    "machineRates": [],
+    "machineBounds": [
+      {
+        "machine": "M3",
+        "lower": "1/4",
+        "proven": true,
+        "method": "bounded-splitter-scan-ordinal-envelope"
+      }
+    ],
+    "roundRobin": [
+      {
+        "machine": "M1",
+        "kind": "splitter",
+        "ports": [
+          "R1",
+          "R2"
+        ],
+        "unskipped": [
+          "R2"
+        ],
+        "commonRoute": "R0",
+        "totalRate": "1"
+      }
+    ],
+    "branches": [
+      {
+        "route": "R1",
+        "machines": [
+          "M3",
+          null,
+          null
+        ],
+        "stages": [
+          {
+            "b": 1,
+            "T": 4,
+            "length": 5,
+            "to": null,
+            "a": 0
+          },
+          {
+            "b": 1,
+            "T": "2",
+            "offerGap": "2",
+            "length": 10,
+            "to": 0,
+            "a": 1
+          },
+          {
+            "b": 1,
+            "T": 1,
+            "offerGap": 1,
+            "length": 10,
+            "to": 0,
+            "a": 4
+          }
+        ],
+        "status": "proved",
+        "blockTime": "4",
+        "batchCounts": [
+          1,
+          1,
+          4
+        ],
+        "packetCounts": [
+          1,
+          1,
+          4
+        ],
+        "stageRates": [
+          "1/4",
+          "1/4",
+          "1"
+        ],
+        "routeRates": [
+          "1/4",
+          "1/4",
+          "1"
+        ],
+        "vertices": 18,
+        "expandedVertices": 104,
+        "unitEdges": 256,
+        "criticalCircuit": true,
+        "scope": "lower-rates-only",
+        "offerGap": "2"
+      }
+    ],
+    "refused": []
+  },
+  "unique": 58,
+  "actual": {
+    "M0": {},
+    "M1": {
+      "钛合金锭": 60
+    },
+    "M2": {
+      "钛合金锭": 45
+    },
+    "M3": {
+      "合金板": 60,
+      "钛合金锭": 15
+    },
+    "M4": {},
+    "M5": {
+      "复合装甲板": 15
+    }
+  },
+  "threeProof": {
+    "machineRates": [],
+    "machineBounds": [
+      {
+        "machine": "M3",
+        "lower": "1/4",
+        "proven": true,
+        "method": "bounded-splitter-scan-ordinal-envelope"
+      }
+    ],
+    "roundRobin": [
+      {
+        "machine": "M1",
+        "kind": "splitter",
+        "ports": [
+          "R1",
+          "R2",
+          "R5"
+        ],
+        "unskipped": [
+          "R2",
+          "R5"
+        ],
+        "commonRoute": "R0",
+        "totalRate": "1"
+      }
+    ],
+    "branches": [
+      {
+        "route": "R1",
+        "machines": [
+          "M3",
+          null,
+          null
+        ],
+        "stages": [
+          {
+            "b": 1,
+            "T": 4,
+            "length": 5,
+            "to": null,
+            "a": 0
+          },
+          {
+            "b": 1,
+            "T": "3",
+            "offerGap": "3",
+            "length": 10,
+            "to": 0,
+            "a": 1
+          },
+          {
+            "b": 1,
+            "T": 1,
+            "offerGap": 1,
+            "length": 10,
+            "to": 0,
+            "a": 4
+          }
+        ],
+        "status": "proved",
+        "blockTime": "4",
+        "batchCounts": [
+          1,
+          1,
+          4
+        ],
+        "packetCounts": [
+          1,
+          1,
+          4
+        ],
+        "stageRates": [
+          "1/4",
+          "1/4",
+          "1"
+        ],
+        "routeRates": [
+          "1/4",
+          "1/4",
+          "1"
+        ],
+        "vertices": 18,
+        "expandedVertices": 104,
+        "unitEdges": 256,
+        "criticalCircuit": true,
+        "scope": "lower-rates-only",
+        "offerGap": "3"
+      }
+    ],
+    "refused": []
+  },
+  "threeUnique": 63,
+  "actual3": {
+    "M0": {},
+    "M1": {
+      "钛合金锭": 60
+    },
+    "M2": {
+      "钛合金锭": 22.5
+    },
+    "M3": {
+      "合金板": 60,
+      "钛合金锭": 15
+    },
+    "M4": {},
+    "M5": {
+      "复合装甲板": 15
+    },
+    "M6": {
+      "钛合金锭": 22.5
+    }
+  },
+  "fast": {
+    "unique": 52,
+    "actual": {
+      "M0": {},
+      "M1": {
+        "钛合金锭": 60
+      },
+      "M2": {
+        "钛合金锭": 30
+      },
+      "M3": {
+        "钛合金锭": 30
+      },
+      "M5": {
+        "齿轮组": 15
+      }
+    },
+    "proof": {
+      "machineRates": [],
+      "machineBounds": [
+        {
+          "machine": "M3",
+          "lower": "1/4",
+          "proven": true,
+          "method": "bounded-splitter-scan-ordinal-envelope"
+        }
+      ],
+      "roundRobin": [
+        {
+          "machine": "M1",
+          "kind": "splitter",
+          "ports": [
+            "R1",
+            "R2"
+          ],
+          "unskipped": [
+            "R1",
+            "R2"
+          ],
+          "commonRoute": "R0",
+          "totalRate": "1"
+        }
+      ],
+      "branches": [
+        {
+          "route": "R1",
+          "machines": [
+            "M3",
+            null
+          ],
+          "stages": [
+            {
+              "b": 1,
+              "T": 1.5,
+              "length": 5,
+              "to": null,
+              "a": 0
+            },
+            {
+              "b": 1,
+              "T": "2",
+              "offerGap": "2",
+              "length": 10,
+              "to": 0,
+              "a": 2
+            }
+          ],
+          "status": "proved",
+          "blockTime": "4",
+          "batchCounts": [
+            1,
+            2
+          ],
+          "packetCounts": [
+            1,
+            2
+          ],
+          "stageRates": [
+            "1/4",
+            "1/2"
+          ],
+          "routeRates": [
+            "1/4",
+            "1/2"
+          ],
+          "vertices": 9,
+          "expandedVertices": 64,
+          "unitEdges": 123,
+          "criticalCircuit": true,
+          "scope": "lower-rates-only",
+          "offerGap": "2"
+        }
+      ],
+      "refused": []
+    }
+  },
+  "rejections": 3
+}

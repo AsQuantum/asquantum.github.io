@@ -1,0 +1,1027 @@
+{
+  "cases": [
+    {
+      "layout": {
+        "name": "Independent slow sources sharing gear buffer",
+        "recordIndexed": true,
+        "machines": [
+          {
+            "id": "M0",
+            "type": "采矿",
+            "x": 2,
+            "y": 9,
+            "face": "E",
+            "mode": 1
+          },
+          {
+            "id": "M1",
+            "type": "采矿",
+            "x": 20,
+            "y": 17,
+            "face": "N",
+            "mode": 1
+          },
+          {
+            "id": "M2",
+            "type": "组装",
+            "x": 28,
+            "y": 8,
+            "face": "E",
+            "mode": "齿轮组"
+          },
+          {
+            "id": "M3",
+            "type": "仓入",
+            "x": 44,
+            "y": 9,
+            "face": "E"
+          }
+        ],
+        "routes": [
+          {
+            "id": "R0",
+            "from": {
+              "id": "M0",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 1
+            },
+            "path": [
+              [
+                7,
+                11
+              ],
+              [
+                8,
+                11
+              ],
+              [
+                9,
+                11
+              ],
+              [
+                10,
+                11
+              ],
+              [
+                11,
+                11
+              ],
+              [
+                12,
+                11
+              ],
+              [
+                13,
+                11
+              ],
+              [
+                14,
+                11
+              ],
+              [
+                15,
+                11
+              ],
+              [
+                16,
+                11
+              ],
+              [
+                17,
+                11
+              ],
+              [
+                18,
+                11
+              ],
+              [
+                19,
+                11
+              ],
+              [
+                20,
+                11
+              ],
+              [
+                21,
+                11
+              ],
+              [
+                22,
+                11
+              ],
+              [
+                23,
+                11
+              ],
+              [
+                24,
+                11
+              ],
+              [
+                25,
+                11
+              ],
+              [
+                26,
+                11
+              ],
+              [
+                27,
+                11
+              ]
+            ]
+          },
+          {
+            "id": "R1",
+            "from": {
+              "id": "M1",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 2
+            },
+            "path": [
+              [
+                22,
+                16
+              ],
+              [
+                22,
+                15
+              ],
+              [
+                22,
+                14
+              ],
+              [
+                22,
+                13
+              ],
+              [
+                22,
+                12
+              ],
+              [
+                23,
+                12
+              ],
+              [
+                24,
+                12
+              ],
+              [
+                25,
+                12
+              ],
+              [
+                26,
+                12
+              ],
+              [
+                27,
+                12
+              ]
+            ]
+          },
+          {
+            "id": "R2",
+            "from": {
+              "id": "M2",
+              "port": 0
+            },
+            "to": {
+              "id": "M3",
+              "port": 1
+            },
+            "path": [
+              [
+                39,
+                11
+              ],
+              [
+                40,
+                11
+              ],
+              [
+                41,
+                11
+              ],
+              [
+                42,
+                11
+              ],
+              [
+                43,
+                11
+              ]
+            ]
+          }
+        ],
+        "frozenFactories": []
+      },
+      "proof": {
+        "machineRates": [
+          {
+            "machine": "M0",
+            "rate": "2/15",
+            "proven": true,
+            "method": "shared-input-arrival-envelope"
+          },
+          {
+            "machine": "M1",
+            "rate": "2/15",
+            "proven": true,
+            "method": "shared-input-arrival-envelope"
+          },
+          {
+            "machine": "M2",
+            "rate": "2/15",
+            "proven": true,
+            "method": "shared-input-arrival-envelope"
+          }
+        ],
+        "refills": [],
+        "certificates": [
+          {
+            "machine": "M2",
+            "method": "shared-input-arrival-envelope",
+            "rate": "2/15",
+            "item": "钛合金锭",
+            "burst": 2,
+            "supply": "4/15",
+            "bufferUpper": 5,
+            "capacity": 6,
+            "sources": [
+              {
+                "machine": "M0",
+                "rate": "2/15",
+                "proven": true,
+                "method": "shared-input-arrival-envelope"
+              },
+              {
+                "machine": "M1",
+                "rate": "2/15",
+                "proven": true,
+                "method": "shared-input-arrival-envelope"
+              }
+            ]
+          }
+        ],
+        "refused": []
+      },
+      "unique": 37,
+      "unknown": 0,
+      "actual": {
+        "M0": {
+          "钛合金锭": 8
+        },
+        "M1": {
+          "钛合金锭": 8
+        },
+        "M2": {
+          "齿轮组": 8
+        },
+        "M3": {}
+      }
+    },
+    {
+      "layout": {
+        "name": "Independent slow sources sharing gear buffer",
+        "recordIndexed": true,
+        "machines": [
+          {
+            "id": "M0",
+            "type": "采矿",
+            "x": 2,
+            "y": 9,
+            "face": "E",
+            "mode": 1
+          },
+          {
+            "id": "M1",
+            "type": "采矿",
+            "x": 20,
+            "y": 17,
+            "face": "N",
+            "mode": 1
+          },
+          {
+            "id": "M2",
+            "type": "组装",
+            "x": 28,
+            "y": 8,
+            "face": "E",
+            "mode": "齿轮组"
+          },
+          {
+            "id": "M3",
+            "type": "仓入",
+            "x": 44,
+            "y": 9,
+            "face": "E"
+          },
+          {
+            "id": "M4",
+            "type": "采矿",
+            "x": 20,
+            "y": 1,
+            "face": "S",
+            "mode": 1
+          }
+        ],
+        "routes": [
+          {
+            "id": "R0",
+            "from": {
+              "id": "M0",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 1
+            },
+            "path": [
+              [
+                7,
+                11
+              ],
+              [
+                8,
+                11
+              ],
+              [
+                9,
+                11
+              ],
+              [
+                10,
+                11
+              ],
+              [
+                11,
+                11
+              ],
+              [
+                12,
+                11
+              ],
+              [
+                13,
+                11
+              ],
+              [
+                14,
+                11
+              ],
+              [
+                15,
+                11
+              ],
+              [
+                16,
+                11
+              ],
+              [
+                17,
+                11
+              ],
+              [
+                18,
+                11
+              ],
+              [
+                19,
+                11
+              ],
+              [
+                20,
+                11
+              ],
+              [
+                21,
+                11
+              ],
+              [
+                22,
+                11
+              ],
+              [
+                23,
+                11
+              ],
+              [
+                24,
+                11
+              ],
+              [
+                25,
+                11
+              ],
+              [
+                26,
+                11
+              ],
+              [
+                27,
+                11
+              ]
+            ]
+          },
+          {
+            "id": "R1",
+            "from": {
+              "id": "M1",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 2
+            },
+            "path": [
+              [
+                22,
+                16
+              ],
+              [
+                22,
+                15
+              ],
+              [
+                22,
+                14
+              ],
+              [
+                22,
+                13
+              ],
+              [
+                22,
+                12
+              ],
+              [
+                23,
+                12
+              ],
+              [
+                24,
+                12
+              ],
+              [
+                25,
+                12
+              ],
+              [
+                26,
+                12
+              ],
+              [
+                27,
+                12
+              ]
+            ]
+          },
+          {
+            "id": "R2",
+            "from": {
+              "id": "M2",
+              "port": 0
+            },
+            "to": {
+              "id": "M3",
+              "port": 1
+            },
+            "path": [
+              [
+                39,
+                11
+              ],
+              [
+                40,
+                11
+              ],
+              [
+                41,
+                11
+              ],
+              [
+                42,
+                11
+              ],
+              [
+                43,
+                11
+              ]
+            ]
+          },
+          {
+            "id": "R3",
+            "from": {
+              "id": "M4",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 0
+            },
+            "path": [
+              [
+                22,
+                6
+              ],
+              [
+                22,
+                7
+              ],
+              [
+                22,
+                8
+              ],
+              [
+                22,
+                9
+              ],
+              [
+                22,
+                10
+              ],
+              [
+                23,
+                10
+              ],
+              [
+                24,
+                10
+              ],
+              [
+                25,
+                10
+              ],
+              [
+                26,
+                10
+              ],
+              [
+                27,
+                10
+              ]
+            ]
+          }
+        ],
+        "frozenFactories": []
+      },
+      "proof": {
+        "machineRates": [
+          {
+            "machine": "M0",
+            "rate": "2/15",
+            "proven": true,
+            "method": "shared-input-arrival-envelope"
+          },
+          {
+            "machine": "M1",
+            "rate": "2/15",
+            "proven": true,
+            "method": "shared-input-arrival-envelope"
+          },
+          {
+            "machine": "M4",
+            "rate": "2/15",
+            "proven": true,
+            "method": "shared-input-arrival-envelope"
+          },
+          {
+            "machine": "M2",
+            "rate": "1/5",
+            "proven": true,
+            "method": "shared-input-arrival-envelope"
+          }
+        ],
+        "refills": [],
+        "certificates": [
+          {
+            "machine": "M2",
+            "method": "shared-input-arrival-envelope",
+            "rate": "1/5",
+            "item": "钛合金锭",
+            "burst": 3,
+            "supply": "2/5",
+            "bufferUpper": 6,
+            "capacity": 6,
+            "sources": [
+              {
+                "machine": "M0",
+                "rate": "2/15",
+                "proven": true,
+                "method": "shared-input-arrival-envelope"
+              },
+              {
+                "machine": "M1",
+                "rate": "2/15",
+                "proven": true,
+                "method": "shared-input-arrival-envelope"
+              },
+              {
+                "machine": "M4",
+                "rate": "2/15",
+                "proven": true,
+                "method": "shared-input-arrival-envelope"
+              }
+            ]
+          }
+        ],
+        "refused": []
+      },
+      "unique": 44,
+      "unknown": 0,
+      "actual": {
+        "M0": {
+          "钛合金锭": 8
+        },
+        "M1": {
+          "钛合金锭": 8
+        },
+        "M2": {
+          "齿轮组": 12
+        },
+        "M3": {},
+        "M4": {
+          "钛合金锭": 8
+        }
+      }
+    },
+    {
+      "layout": {
+        "name": "Independent slow sources sharing gear buffer",
+        "recordIndexed": true,
+        "machines": [
+          {
+            "id": "M0",
+            "type": "仓出",
+            "x": 2,
+            "y": 9,
+            "face": "E",
+            "mode": 1,
+            "item": "钛合金锭"
+          },
+          {
+            "id": "M1",
+            "type": "仓出",
+            "x": 20,
+            "y": 17,
+            "face": "N",
+            "mode": 1,
+            "item": "合金板"
+          },
+          {
+            "id": "M2",
+            "type": "组装",
+            "x": 28,
+            "y": 8,
+            "face": "E",
+            "mode": "复合装甲板"
+          },
+          {
+            "id": "M3",
+            "type": "仓入",
+            "x": 44,
+            "y": 9,
+            "face": "E"
+          },
+          {
+            "id": "M4",
+            "type": "仓出",
+            "x": 20,
+            "y": 1,
+            "face": "S",
+            "mode": 1,
+            "item": "钛合金锭"
+          }
+        ],
+        "routes": [
+          {
+            "id": "R0",
+            "from": {
+              "id": "M0",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 1
+            },
+            "path": [
+              [
+                7,
+                11
+              ],
+              [
+                8,
+                11
+              ],
+              [
+                9,
+                11
+              ],
+              [
+                10,
+                11
+              ],
+              [
+                11,
+                11
+              ],
+              [
+                12,
+                11
+              ],
+              [
+                13,
+                11
+              ],
+              [
+                14,
+                11
+              ],
+              [
+                15,
+                11
+              ],
+              [
+                16,
+                11
+              ],
+              [
+                17,
+                11
+              ],
+              [
+                18,
+                11
+              ],
+              [
+                19,
+                11
+              ],
+              [
+                20,
+                11
+              ],
+              [
+                21,
+                11
+              ],
+              [
+                22,
+                11
+              ],
+              [
+                23,
+                11
+              ],
+              [
+                24,
+                11
+              ],
+              [
+                25,
+                11
+              ],
+              [
+                26,
+                11
+              ],
+              [
+                27,
+                11
+              ]
+            ]
+          },
+          {
+            "id": "R1",
+            "from": {
+              "id": "M1",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 2
+            },
+            "path": [
+              [
+                22,
+                16
+              ],
+              [
+                22,
+                15
+              ],
+              [
+                22,
+                14
+              ],
+              [
+                22,
+                13
+              ],
+              [
+                22,
+                12
+              ],
+              [
+                23,
+                12
+              ],
+              [
+                24,
+                12
+              ],
+              [
+                25,
+                12
+              ],
+              [
+                26,
+                12
+              ],
+              [
+                27,
+                12
+              ]
+            ]
+          },
+          {
+            "id": "R2",
+            "from": {
+              "id": "M2",
+              "port": 0
+            },
+            "to": {
+              "id": "M3",
+              "port": 1
+            },
+            "path": [
+              [
+                39,
+                11
+              ],
+              [
+                40,
+                11
+              ],
+              [
+                41,
+                11
+              ],
+              [
+                42,
+                11
+              ],
+              [
+                43,
+                11
+              ]
+            ]
+          },
+          {
+            "id": "R3",
+            "from": {
+              "id": "M4",
+              "port": 0
+            },
+            "to": {
+              "id": "M2",
+              "port": 0
+            },
+            "path": [
+              [
+                22,
+                6
+              ],
+              [
+                22,
+                7
+              ],
+              [
+                22,
+                8
+              ],
+              [
+                22,
+                9
+              ],
+              [
+                22,
+                10
+              ],
+              [
+                23,
+                10
+              ],
+              [
+                24,
+                10
+              ],
+              [
+                25,
+                10
+              ],
+              [
+                26,
+                10
+              ],
+              [
+                27,
+                10
+              ]
+            ]
+          }
+        ],
+        "frozenFactories": [
+          {
+            "id": "s",
+            "rates": {
+              "钛合金锭": "3",
+              "合金板": "2"
+            }
+          }
+        ]
+      },
+      "proof": {
+        "machineRates": [
+          {
+            "machine": "M2",
+            "rate": "1/4",
+            "proven": true,
+            "method": "parallel-abundant-input-nominal"
+          }
+        ],
+        "refills": [
+          {
+            "machine": "M2",
+            "item": "钛合金锭",
+            "provenReady": true,
+            "method": "abundant-shared-input-full-cache-priority-refill",
+            "batch": 1,
+            "period": "4",
+            "ports": [
+              {
+                "route": "R0",
+                "port": 1,
+                "perBatch": 1
+              },
+              {
+                "route": "R3",
+                "port": 0,
+                "perBatch": 0
+              }
+            ]
+          }
+        ],
+        "certificates": [
+          {
+            "machine": "M2",
+            "method": "parallel-abundant-input-nominal",
+            "rate": "1/4",
+            "groups": [
+              {
+                "item": "合金板",
+                "need": 4,
+                "ports": 1,
+                "refillBound": 4
+              },
+              {
+                "item": "钛合金锭",
+                "need": 1,
+                "ports": 2,
+                "refillBound": 1
+              }
+            ]
+          }
+        ],
+        "refused": []
+      },
+      "unique": 52,
+      "unknown": 0,
+      "actual": {
+        "M0": {
+          "钛合金锭": 15
+        },
+        "M1": {
+          "合金板": 60
+        },
+        "M2": {
+          "复合装甲板": 15
+        },
+        "M3": {},
+        "M4": {
+          "钛合金锭": 0
+        }
+      }
+    }
+  ],
+  "rejections": 3
+}

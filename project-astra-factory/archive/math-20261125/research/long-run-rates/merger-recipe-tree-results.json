@@ -1,0 +1,2180 @@
+[
+  {
+    "layout": {
+      "name": "Stocked merger and throttled recipe",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "仓出",
+          "x": 2,
+          "y": 9,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M1",
+          "type": "仓出",
+          "x": 14,
+          "y": 1,
+          "face": "S",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M2",
+          "type": "汇流",
+          "x": 15,
+          "y": 10,
+          "face": "E"
+        },
+        {
+          "id": "M3",
+          "type": "组装",
+          "x": 28,
+          "y": 8,
+          "face": "E",
+          "mode": "复合装甲板"
+        },
+        {
+          "id": "M4",
+          "type": "仓出",
+          "x": 20,
+          "y": 17,
+          "face": "N",
+          "item": "合金板"
+        },
+        {
+          "id": "M5",
+          "type": "仓入",
+          "x": 44,
+          "y": 9,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              11
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              12,
+              11
+            ],
+            [
+              13,
+              11
+            ],
+            [
+              14,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 1
+          },
+          "path": [
+            [
+              16,
+              6
+            ],
+            [
+              16,
+              7
+            ],
+            [
+              16,
+              8
+            ],
+            [
+              16,
+              9
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              18,
+              11
+            ],
+            [
+              19,
+              11
+            ],
+            [
+              20,
+              11
+            ],
+            [
+              21,
+              11
+            ],
+            [
+              22,
+              11
+            ],
+            [
+              23,
+              11
+            ],
+            [
+              24,
+              11
+            ],
+            [
+              25,
+              11
+            ],
+            [
+              26,
+              11
+            ],
+            [
+              27,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M4",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 2
+          },
+          "path": [
+            [
+              22,
+              16
+            ],
+            [
+              22,
+              15
+            ],
+            [
+              22,
+              14
+            ],
+            [
+              22,
+              13
+            ],
+            [
+              22,
+              12
+            ],
+            [
+              23,
+              12
+            ],
+            [
+              24,
+              12
+            ],
+            [
+              25,
+              12
+            ],
+            [
+              26,
+              12
+            ],
+            [
+              27,
+              12
+            ]
+          ]
+        },
+        {
+          "id": "R4",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M5",
+            "port": 1
+          },
+          "path": [
+            [
+              39,
+              11
+            ],
+            [
+              40,
+              11
+            ],
+            [
+              41,
+              11
+            ],
+            [
+              42,
+              11
+            ],
+            [
+              43,
+              11
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "rates": {
+            "钛合金锭": "4",
+            "合金板": "2"
+          }
+        }
+      ]
+    },
+    "proof": {
+      "machineRates": [
+        {
+          "machine": "M3",
+          "rate": "1/4",
+          "proven": true,
+          "method": "permanently-ready-merger-root-ordinal-graph"
+        }
+      ],
+      "roundRobin": [
+        {
+          "machine": "M2",
+          "kind": "merger",
+          "ports": [
+            "R0",
+            "R1"
+          ],
+          "unskipped": [
+            "R0",
+            "R1"
+          ],
+          "commonRoute": "R2",
+          "totalRate": null
+        }
+      ],
+      "trees": [
+        {
+          "machines": [
+            "M3",
+            null,
+            null
+          ],
+          "stages": [
+            {
+              "b": 1,
+              "T": 4,
+              "length": 5,
+              "to": null,
+              "a": 0
+            },
+            {
+              "b": 1,
+              "T": 1,
+              "length": 10,
+              "to": 0,
+              "a": 1,
+              "readyRoot": true
+            },
+            {
+              "b": 1,
+              "T": 1,
+              "length": 10,
+              "to": 0,
+              "a": 4,
+              "readyRoot": true
+            }
+          ],
+          "status": "proved",
+          "blockTime": "4",
+          "batchCounts": [
+            1,
+            1,
+            4
+          ],
+          "packetCounts": [
+            1,
+            1,
+            4
+          ],
+          "stageRates": [
+            "1/4",
+            "1/4",
+            "1"
+          ],
+          "routeRates": [
+            "1/4",
+            "1/4",
+            "1"
+          ],
+          "vertices": 13,
+          "expandedVertices": 64,
+          "unitEdges": 152,
+          "criticalCircuit": true,
+          "scope": "ideal-continuous-event"
+        }
+      ],
+      "refused": []
+    },
+    "unique": 58,
+    "unknown": 0,
+    "actual": {
+      "M0": {
+        "钛合金锭": 7.5
+      },
+      "M1": {
+        "钛合金锭": 7.5
+      },
+      "M2": {
+        "钛合金锭": 15
+      },
+      "M3": {
+        "复合装甲板": 15
+      },
+      "M4": {
+        "合金板": 60
+      },
+      "M5": {}
+    }
+  },
+  {
+    "layout": {
+      "name": "Stocked merger and throttled recipe",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "仓出",
+          "x": 2,
+          "y": 9,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M1",
+          "type": "仓出",
+          "x": 14,
+          "y": 1,
+          "face": "S",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M2",
+          "type": "汇流",
+          "x": 15,
+          "y": 10,
+          "face": "E"
+        },
+        {
+          "id": "M3",
+          "type": "组装",
+          "x": 28,
+          "y": 8,
+          "face": "E",
+          "mode": "复合装甲板"
+        },
+        {
+          "id": "M4",
+          "type": "仓出",
+          "x": 20,
+          "y": 17,
+          "face": "N",
+          "item": "合金板"
+        },
+        {
+          "id": "M5",
+          "type": "仓入",
+          "x": 44,
+          "y": 9,
+          "face": "E"
+        },
+        {
+          "id": "M6",
+          "type": "仓出",
+          "x": 14,
+          "y": 17,
+          "face": "N",
+          "item": "钛合金锭"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              11
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              12,
+              11
+            ],
+            [
+              13,
+              11
+            ],
+            [
+              14,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 1
+          },
+          "path": [
+            [
+              16,
+              6
+            ],
+            [
+              16,
+              7
+            ],
+            [
+              16,
+              8
+            ],
+            [
+              16,
+              9
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              18,
+              11
+            ],
+            [
+              19,
+              11
+            ],
+            [
+              20,
+              11
+            ],
+            [
+              21,
+              11
+            ],
+            [
+              22,
+              11
+            ],
+            [
+              23,
+              11
+            ],
+            [
+              24,
+              11
+            ],
+            [
+              25,
+              11
+            ],
+            [
+              26,
+              11
+            ],
+            [
+              27,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M4",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 2
+          },
+          "path": [
+            [
+              22,
+              16
+            ],
+            [
+              22,
+              15
+            ],
+            [
+              22,
+              14
+            ],
+            [
+              22,
+              13
+            ],
+            [
+              22,
+              12
+            ],
+            [
+              23,
+              12
+            ],
+            [
+              24,
+              12
+            ],
+            [
+              25,
+              12
+            ],
+            [
+              26,
+              12
+            ],
+            [
+              27,
+              12
+            ]
+          ]
+        },
+        {
+          "id": "R4",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M5",
+            "port": 1
+          },
+          "path": [
+            [
+              39,
+              11
+            ],
+            [
+              40,
+              11
+            ],
+            [
+              41,
+              11
+            ],
+            [
+              42,
+              11
+            ],
+            [
+              43,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R5",
+          "from": {
+            "id": "M6",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 2
+          },
+          "path": [
+            [
+              16,
+              16
+            ],
+            [
+              16,
+              15
+            ],
+            [
+              16,
+              14
+            ],
+            [
+              16,
+              13
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "rates": {
+            "钛合金锭": "4",
+            "合金板": "2"
+          }
+        }
+      ]
+    },
+    "proof": {
+      "machineRates": [
+        {
+          "machine": "M3",
+          "rate": "1/4",
+          "proven": true,
+          "method": "permanently-ready-merger-root-ordinal-graph"
+        }
+      ],
+      "roundRobin": [
+        {
+          "machine": "M2",
+          "kind": "merger",
+          "ports": [
+            "R0",
+            "R1",
+            "R5"
+          ],
+          "unskipped": [
+            "R0",
+            "R1",
+            "R5"
+          ],
+          "commonRoute": "R2",
+          "totalRate": null
+        }
+      ],
+      "trees": [
+        {
+          "machines": [
+            "M3",
+            null,
+            null
+          ],
+          "stages": [
+            {
+              "b": 1,
+              "T": 4,
+              "length": 5,
+              "to": null,
+              "a": 0
+            },
+            {
+              "b": 1,
+              "T": 1,
+              "length": 10,
+              "to": 0,
+              "a": 1,
+              "readyRoot": true
+            },
+            {
+              "b": 1,
+              "T": 1,
+              "length": 10,
+              "to": 0,
+              "a": 4,
+              "readyRoot": true
+            }
+          ],
+          "status": "proved",
+          "blockTime": "4",
+          "batchCounts": [
+            1,
+            1,
+            4
+          ],
+          "packetCounts": [
+            1,
+            1,
+            4
+          ],
+          "stageRates": [
+            "1/4",
+            "1/4",
+            "1"
+          ],
+          "routeRates": [
+            "1/4",
+            "1/4",
+            "1"
+          ],
+          "vertices": 13,
+          "expandedVertices": 64,
+          "unitEdges": 152,
+          "criticalCircuit": true,
+          "scope": "ideal-continuous-event"
+        }
+      ],
+      "refused": []
+    },
+    "unique": 63,
+    "unknown": 0,
+    "actual": {
+      "M0": {
+        "钛合金锭": 5
+      },
+      "M1": {
+        "钛合金锭": 5
+      },
+      "M2": {
+        "钛合金锭": 15
+      },
+      "M3": {
+        "复合装甲板": 15
+      },
+      "M4": {
+        "合金板": 60
+      },
+      "M5": {},
+      "M6": {
+        "钛合金锭": 5
+      }
+    }
+  },
+  {
+    "layout": {
+      "name": "Stocked merger and throttled recipe",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "仓出",
+          "x": 2,
+          "y": 9,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M1",
+          "type": "仓出",
+          "x": 14,
+          "y": 1,
+          "face": "S",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M2",
+          "type": "汇流",
+          "x": 15,
+          "y": 10,
+          "face": "E"
+        },
+        {
+          "id": "M3",
+          "type": "组装",
+          "x": 28,
+          "y": 8,
+          "face": "E",
+          "mode": "齿轮组"
+        },
+        {
+          "id": "M5",
+          "type": "仓入",
+          "x": 44,
+          "y": 9,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              11
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              12,
+              11
+            ],
+            [
+              13,
+              11
+            ],
+            [
+              14,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 1
+          },
+          "path": [
+            [
+              16,
+              6
+            ],
+            [
+              16,
+              7
+            ],
+            [
+              16,
+              8
+            ],
+            [
+              16,
+              9
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              18,
+              11
+            ],
+            [
+              19,
+              11
+            ],
+            [
+              20,
+              11
+            ],
+            [
+              21,
+              11
+            ],
+            [
+              22,
+              11
+            ],
+            [
+              23,
+              11
+            ],
+            [
+              24,
+              11
+            ],
+            [
+              25,
+              11
+            ],
+            [
+              26,
+              11
+            ],
+            [
+              27,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R4",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M5",
+            "port": 1
+          },
+          "path": [
+            [
+              39,
+              11
+            ],
+            [
+              40,
+              11
+            ],
+            [
+              41,
+              11
+            ],
+            [
+              42,
+              11
+            ],
+            [
+              43,
+              11
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "rates": {
+            "钛合金锭": "4",
+            "合金板": "2"
+          }
+        }
+      ]
+    },
+    "proof": {
+      "machineRates": [
+        {
+          "machine": "M3",
+          "rate": "1/2",
+          "proven": true,
+          "method": "permanently-ready-merger-root-ordinal-graph"
+        }
+      ],
+      "roundRobin": [
+        {
+          "machine": "M2",
+          "kind": "merger",
+          "ports": [
+            "R0",
+            "R1"
+          ],
+          "unskipped": [
+            "R0",
+            "R1"
+          ],
+          "commonRoute": "R2",
+          "totalRate": null
+        }
+      ],
+      "trees": [
+        {
+          "machines": [
+            "M3",
+            null
+          ],
+          "stages": [
+            {
+              "b": 1,
+              "T": 1.5,
+              "length": 5,
+              "to": null,
+              "a": 0
+            },
+            {
+              "b": 1,
+              "T": 1,
+              "length": 10,
+              "to": 0,
+              "a": 2,
+              "readyRoot": true
+            }
+          ],
+          "status": "proved",
+          "blockTime": "2",
+          "batchCounts": [
+            1,
+            2
+          ],
+          "packetCounts": [
+            1,
+            2
+          ],
+          "stageRates": [
+            "1/2",
+            "1"
+          ],
+          "routeRates": [
+            "1/2",
+            "1"
+          ],
+          "vertices": 7,
+          "expandedVertices": 44,
+          "unitEdges": 81,
+          "criticalCircuit": true,
+          "scope": "ideal-continuous-event"
+        }
+      ],
+      "refused": []
+    },
+    "unique": 52,
+    "unknown": 0,
+    "actual": {
+      "M0": {
+        "钛合金锭": 30
+      },
+      "M1": {
+        "钛合金锭": 30
+      },
+      "M2": {
+        "钛合金锭": 60
+      },
+      "M3": {
+        "齿轮组": 30
+      },
+      "M5": {}
+    }
+  },
+  {
+    "layout": {
+      "name": "Stocked merger and throttled recipe",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "仓出",
+          "x": 2,
+          "y": 9,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M1",
+          "type": "采矿",
+          "x": 14,
+          "y": 1,
+          "face": "S",
+          "mode": 1
+        },
+        {
+          "id": "M2",
+          "type": "汇流",
+          "x": 15,
+          "y": 10,
+          "face": "E"
+        },
+        {
+          "id": "M3",
+          "type": "组装",
+          "x": 28,
+          "y": 8,
+          "face": "E",
+          "mode": "复合装甲板"
+        },
+        {
+          "id": "M4",
+          "type": "仓出",
+          "x": 20,
+          "y": 17,
+          "face": "N",
+          "item": "合金板"
+        },
+        {
+          "id": "M5",
+          "type": "仓入",
+          "x": 44,
+          "y": 9,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              11
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              12,
+              11
+            ],
+            [
+              13,
+              11
+            ],
+            [
+              14,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 1
+          },
+          "path": [
+            [
+              16,
+              6
+            ],
+            [
+              16,
+              7
+            ],
+            [
+              16,
+              8
+            ],
+            [
+              16,
+              9
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              18,
+              11
+            ],
+            [
+              19,
+              11
+            ],
+            [
+              20,
+              11
+            ],
+            [
+              21,
+              11
+            ],
+            [
+              22,
+              11
+            ],
+            [
+              23,
+              11
+            ],
+            [
+              24,
+              11
+            ],
+            [
+              25,
+              11
+            ],
+            [
+              26,
+              11
+            ],
+            [
+              27,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M4",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 2
+          },
+          "path": [
+            [
+              22,
+              16
+            ],
+            [
+              22,
+              15
+            ],
+            [
+              22,
+              14
+            ],
+            [
+              22,
+              13
+            ],
+            [
+              22,
+              12
+            ],
+            [
+              23,
+              12
+            ],
+            [
+              24,
+              12
+            ],
+            [
+              25,
+              12
+            ],
+            [
+              26,
+              12
+            ],
+            [
+              27,
+              12
+            ]
+          ]
+        },
+        {
+          "id": "R4",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M5",
+            "port": 1
+          },
+          "path": [
+            [
+              39,
+              11
+            ],
+            [
+              40,
+              11
+            ],
+            [
+              41,
+              11
+            ],
+            [
+              42,
+              11
+            ],
+            [
+              43,
+              11
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "rates": {
+            "钛合金锭": "4",
+            "合金板": "2"
+          }
+        }
+      ]
+    },
+    "proof": {
+      "machineRates": [
+        {
+          "machine": "M3",
+          "rate": "1/4",
+          "proven": true,
+          "method": "permanently-ready-merger-root-ordinal-graph"
+        }
+      ],
+      "roundRobin": [
+        {
+          "machine": "M2",
+          "kind": "merger",
+          "ports": [
+            "R0",
+            "R1"
+          ],
+          "unskipped": [
+            "R0",
+            "R1"
+          ],
+          "commonRoute": "R2",
+          "totalRate": null,
+          "rule": "two-input-alternation-proved-output-cadence"
+        }
+      ],
+      "trees": [
+        {
+          "machines": [
+            "M3",
+            null,
+            null
+          ],
+          "stages": [
+            {
+              "b": 1,
+              "T": 4,
+              "length": 5,
+              "to": null,
+              "a": 0
+            },
+            {
+              "b": 1,
+              "T": 1,
+              "length": 10,
+              "to": 0,
+              "a": 1,
+              "readyRoot": true
+            },
+            {
+              "b": 1,
+              "T": 1,
+              "length": 10,
+              "to": 0,
+              "a": 4,
+              "readyRoot": true
+            }
+          ],
+          "status": "proved",
+          "blockTime": "4",
+          "batchCounts": [
+            1,
+            1,
+            4
+          ],
+          "packetCounts": [
+            1,
+            1,
+            4
+          ],
+          "stageRates": [
+            "1/4",
+            "1/4",
+            "1"
+          ],
+          "routeRates": [
+            "1/4",
+            "1/4",
+            "1"
+          ],
+          "vertices": 13,
+          "expandedVertices": 64,
+          "unitEdges": 152,
+          "criticalCircuit": true,
+          "scope": "ideal-continuous-event"
+        }
+      ],
+      "refused": []
+    },
+    "unique": 60,
+    "unknown": 0,
+    "actual": {
+      "M0": {
+        "钛合金锭": 7.5
+      },
+      "M1": {
+        "钛合金锭": 7.5
+      },
+      "M2": {
+        "钛合金锭": 15
+      },
+      "M3": {
+        "复合装甲板": 15
+      },
+      "M4": {
+        "合金板": 60
+      },
+      "M5": {}
+    }
+  },
+  {
+    "layout": {
+      "name": "Stocked merger and throttled recipe",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "仓出",
+          "x": 2,
+          "y": 9,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M1",
+          "type": "采矿",
+          "x": 14,
+          "y": 1,
+          "face": "S",
+          "mode": 1
+        },
+        {
+          "id": "M2",
+          "type": "汇流",
+          "x": 15,
+          "y": 10,
+          "face": "E"
+        },
+        {
+          "id": "M3",
+          "type": "组装",
+          "x": 28,
+          "y": 8,
+          "face": "E",
+          "mode": "齿轮组"
+        },
+        {
+          "id": "M5",
+          "type": "仓入",
+          "x": 44,
+          "y": 9,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              11
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              12,
+              11
+            ],
+            [
+              13,
+              11
+            ],
+            [
+              14,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 1
+          },
+          "path": [
+            [
+              16,
+              6
+            ],
+            [
+              16,
+              7
+            ],
+            [
+              16,
+              8
+            ],
+            [
+              16,
+              9
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              18,
+              11
+            ],
+            [
+              19,
+              11
+            ],
+            [
+              20,
+              11
+            ],
+            [
+              21,
+              11
+            ],
+            [
+              22,
+              11
+            ],
+            [
+              23,
+              11
+            ],
+            [
+              24,
+              11
+            ],
+            [
+              25,
+              11
+            ],
+            [
+              26,
+              11
+            ],
+            [
+              27,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R4",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M5",
+            "port": 1
+          },
+          "path": [
+            [
+              39,
+              11
+            ],
+            [
+              40,
+              11
+            ],
+            [
+              41,
+              11
+            ],
+            [
+              42,
+              11
+            ],
+            [
+              43,
+              11
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "rates": {
+            "钛合金锭": "4",
+            "合金板": "2"
+          }
+        }
+      ]
+    },
+    "proof": {
+      "machineRates": [
+        {
+          "machine": "M1",
+          "rate": "2/15",
+          "proven": true,
+          "method": "merger-functional-free-terminal-clearance"
+        },
+        {
+          "machine": "M3",
+          "rate": "1/2",
+          "proven": true,
+          "method": "permanently-ready-merger-root-ordinal-graph"
+        }
+      ],
+      "roundRobin": [
+        {
+          "machine": "M2",
+          "kind": "merger",
+          "ports": [
+            "R0",
+            "R1"
+          ],
+          "unskipped": [],
+          "commonRoute": "R2",
+          "totalRate": null
+        }
+      ],
+      "trees": [
+        {
+          "machines": [
+            "M3",
+            null
+          ],
+          "stages": [
+            {
+              "b": 1,
+              "T": 1.5,
+              "length": 5,
+              "to": null,
+              "a": 0
+            },
+            {
+              "b": 1,
+              "T": 1,
+              "length": 10,
+              "to": 0,
+              "a": 2,
+              "readyRoot": true
+            }
+          ],
+          "status": "proved",
+          "blockTime": "2",
+          "batchCounts": [
+            1,
+            2
+          ],
+          "packetCounts": [
+            1,
+            2
+          ],
+          "stageRates": [
+            "1/2",
+            "1"
+          ],
+          "routeRates": [
+            "1/2",
+            "1"
+          ],
+          "vertices": 7,
+          "expandedVertices": 44,
+          "unitEdges": 81,
+          "criticalCircuit": true,
+          "scope": "ideal-continuous-event"
+        }
+      ],
+      "refused": []
+    },
+    "unique": 54,
+    "unknown": 0,
+    "actual": {
+      "M0": {
+        "钛合金锭": 52
+      },
+      "M1": {
+        "钛合金锭": 8
+      },
+      "M2": {
+        "钛合金锭": 60
+      },
+      "M3": {
+        "齿轮组": 30
+      },
+      "M5": {}
+    }
+  },
+  {
+    "layout": {
+      "name": "Stocked merger and throttled recipe",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "仓出",
+          "x": 2,
+          "y": 9,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M1",
+          "type": "采矿",
+          "x": 14,
+          "y": 1,
+          "face": "S",
+          "mode": 1
+        },
+        {
+          "id": "M2",
+          "type": "汇流",
+          "x": 15,
+          "y": 10,
+          "face": "E"
+        },
+        {
+          "id": "M3",
+          "type": "组装",
+          "x": 28,
+          "y": 8,
+          "face": "E",
+          "mode": "齿轮组"
+        },
+        {
+          "id": "M5",
+          "type": "仓入",
+          "x": 44,
+          "y": 9,
+          "face": "E"
+        },
+        {
+          "id": "M6",
+          "type": "仓出",
+          "x": 14,
+          "y": 17,
+          "face": "N",
+          "item": "钛合金锭"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              11
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              12,
+              11
+            ],
+            [
+              13,
+              11
+            ],
+            [
+              14,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 1
+          },
+          "path": [
+            [
+              16,
+              6
+            ],
+            [
+              16,
+              7
+            ],
+            [
+              16,
+              8
+            ],
+            [
+              16,
+              9
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              18,
+              11
+            ],
+            [
+              19,
+              11
+            ],
+            [
+              20,
+              11
+            ],
+            [
+              21,
+              11
+            ],
+            [
+              22,
+              11
+            ],
+            [
+              23,
+              11
+            ],
+            [
+              24,
+              11
+            ],
+            [
+              25,
+              11
+            ],
+            [
+              26,
+              11
+            ],
+            [
+              27,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R4",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M5",
+            "port": 1
+          },
+          "path": [
+            [
+              39,
+              11
+            ],
+            [
+              40,
+              11
+            ],
+            [
+              41,
+              11
+            ],
+            [
+              42,
+              11
+            ],
+            [
+              43,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R5",
+          "from": {
+            "id": "M6",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 2
+          },
+          "path": [
+            [
+              16,
+              16
+            ],
+            [
+              16,
+              15
+            ],
+            [
+              16,
+              14
+            ],
+            [
+              16,
+              13
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "rates": {
+            "钛合金锭": "4",
+            "合金板": "2"
+          }
+        }
+      ]
+    },
+    "proof": {
+      "machineRates": [
+        {
+          "machine": "M1",
+          "rate": "2/15",
+          "proven": true,
+          "method": "merger-functional-free-terminal-clearance"
+        },
+        {
+          "machine": "M3",
+          "rate": "1/2",
+          "proven": true,
+          "method": "permanently-ready-merger-root-ordinal-graph"
+        }
+      ],
+      "roundRobin": [
+        {
+          "machine": "M2",
+          "kind": "merger",
+          "ports": [
+            "R0",
+            "R1",
+            "R5"
+          ],
+          "unskipped": [
+            "R0",
+            "R5"
+          ],
+          "commonRoute": "R2",
+          "totalRate": null
+        }
+      ],
+      "trees": [
+        {
+          "machines": [
+            "M3",
+            null
+          ],
+          "stages": [
+            {
+              "b": 1,
+              "T": 1.5,
+              "length": 5,
+              "to": null,
+              "a": 0
+            },
+            {
+              "b": 1,
+              "T": 1,
+              "length": 10,
+              "to": 0,
+              "a": 2,
+              "readyRoot": true
+            }
+          ],
+          "status": "proved",
+          "blockTime": "2",
+          "batchCounts": [
+            1,
+            2
+          ],
+          "packetCounts": [
+            1,
+            2
+          ],
+          "stageRates": [
+            "1/2",
+            "1"
+          ],
+          "routeRates": [
+            "1/2",
+            "1"
+          ],
+          "vertices": 7,
+          "expandedVertices": 44,
+          "unitEdges": 81,
+          "criticalCircuit": true,
+          "scope": "ideal-continuous-event"
+        }
+      ],
+      "refused": []
+    },
+    "unique": 59,
+    "unknown": 0,
+    "actual": {
+      "M0": {
+        "钛合金锭": 26
+      },
+      "M1": {
+        "钛合金锭": 8
+      },
+      "M2": {
+        "钛合金锭": 60
+      },
+      "M3": {
+        "齿轮组": 30
+      },
+      "M5": {},
+      "M6": {
+        "钛合金锭": 26
+      }
+    }
+  }
+]

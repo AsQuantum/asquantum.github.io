@@ -1,0 +1,1254 @@
+[
+  {
+    "id": "H001",
+    "actual": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "feed-forward-ordinal-results.json#$.records.0.layout"
+    ],
+    "validation": {
+      "checks": 14,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H002",
+    "actual": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "feed-forward-ordinal-results.json#$.records.1.layout"
+    ],
+    "validation": {
+      "checks": 14,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H003",
+    "actual": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "feed-forward-ordinal-results.json#$.records.2.layout"
+    ],
+    "validation": {
+      "checks": 14,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H004",
+    "actual": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "feed-forward-ordinal-results.json#$.records.3.layout"
+    ],
+    "validation": {
+      "checks": 14,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H005",
+    "actual": {
+      "total": 38,
+      "known": 38,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 38,
+      "known": 38,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "feed-forward-ordinal-results.json#$.records.6.layout"
+    ],
+    "validation": {
+      "checks": 17,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H006",
+    "actual": {
+      "total": 45,
+      "known": 26,
+      "unknown": 19
+    },
+    "overdraft": {
+      "total": 45,
+      "known": 45,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆",
+      "total:inflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "feed-forward-ordinal-results.json#$.records.7.layout"
+    ],
+    "validation": {
+      "checks": 14,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H007",
+    "actual": {
+      "total": 53,
+      "known": 53,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 53,
+      "known": 53,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "merger-recipe-tree-results.json#$.0.layout"
+    ],
+    "validation": {
+      "checks": 22,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H008",
+    "actual": {
+      "total": 57,
+      "known": 57,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 57,
+      "known": 57,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "merger-recipe-tree-results.json#$.1.layout"
+    ],
+    "validation": {
+      "checks": 25,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H009",
+    "actual": {
+      "total": 45,
+      "known": 45,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 45,
+      "known": 45,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "merger-recipe-tree-results.json#$.2.layout"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H010",
+    "actual": {
+      "total": 55,
+      "known": 37,
+      "unknown": 18
+    },
+    "overdraft": {
+      "total": 55,
+      "known": 37,
+      "unknown": 18
+    },
+    "unknownMetrics": [
+      "outflow:钛合金锭",
+      "net:钛合金锭",
+      "potential:钛合金锭",
+      "overdraft:钛合金锭",
+      "total:outflow",
+      "total:net",
+      "total:potential",
+      "total:overdraft"
+    ],
+    "origins": [
+      "merger-recipe-tree-results.json#$.3.layout"
+    ],
+    "validation": {
+      "checks": 15,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H011",
+    "actual": {
+      "total": 47,
+      "known": 47,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 47,
+      "known": 47,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "merger-recipe-tree-results.json#$.4.layout"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H012",
+    "actual": {
+      "total": 51,
+      "known": 51,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 51,
+      "known": 51,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "merger-recipe-tree-results.json#$.5.layout"
+    ],
+    "validation": {
+      "checks": 22,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H013",
+    "actual": {
+      "total": 51,
+      "known": 51,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 51,
+      "known": 51,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "mixed-count-results.json#$.layout"
+    ],
+    "validation": {
+      "checks": 24,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H014",
+    "actual": {
+      "total": 31,
+      "known": 31,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 31,
+      "known": 31,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "recipe-tree-results.json#$.layout"
+    ],
+    "validation": {
+      "checks": 12,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H015",
+    "actual": {
+      "total": 39,
+      "known": 39,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 39,
+      "known": 39,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "recipe-tree-results.json#$.deep.layout"
+    ],
+    "validation": {
+      "checks": 15,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H016",
+    "actual": {
+      "total": 68,
+      "known": 64,
+      "unknown": 4
+    },
+    "overdraft": {
+      "total": 68,
+      "known": 64,
+      "unknown": 4
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "saturated-transfer-regions-results.json#$.actual.layout"
+    ],
+    "validation": {
+      "checks": 25,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H017",
+    "actual": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 30,
+      "known": 30,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "shared-recipe-input-results.json#$.cases.0.layout"
+    ],
+    "validation": {
+      "checks": 12,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H018",
+    "actual": {
+      "total": 36,
+      "known": 36,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 36,
+      "known": 36,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "shared-recipe-input-results.json#$.cases.1.layout"
+    ],
+    "validation": {
+      "checks": 15,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H019",
+    "actual": {
+      "total": 47,
+      "known": 39,
+      "unknown": 8
+    },
+    "overdraft": {
+      "total": 47,
+      "known": 39,
+      "unknown": 8
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "shared-recipe-input-results.json#$.cases.2.layout"
+    ],
+    "validation": {
+      "checks": 13,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H020",
+    "actual": {
+      "total": 66,
+      "known": 66,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 66,
+      "known": 66,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "split-recipe-branch-results.json#$.extended.allBlocked.layout"
+    ],
+    "validation": {
+      "checks": 28,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H021",
+    "actual": {
+      "total": 65,
+      "known": 65,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 65,
+      "known": 65,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "split-recipe-branch-results.json#$.extended.functional.layout"
+    ],
+    "validation": {
+      "checks": 27,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H022",
+    "actual": {
+      "total": 54,
+      "known": 54,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 54,
+      "known": 54,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "split-recipe-branch-results.json#$.layout"
+    ],
+    "validation": {
+      "checks": 22,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H023",
+    "actual": {
+      "total": 58,
+      "known": 58,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 58,
+      "known": 58,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "split-recipe-branch-results.json#$.three"
+    ],
+    "validation": {
+      "checks": 25,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H024",
+    "actual": {
+      "total": 32,
+      "known": 32,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 32,
+      "known": 32,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "tandem-count-results.json#$.layout"
+    ],
+    "validation": {
+      "checks": 12,
+      "bad": [],
+      "maxError": 0.3333333333333428
+    }
+  },
+  {
+    "id": "H025",
+    "actual": {
+      "total": 68,
+      "known": 68,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 68,
+      "known": 68,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-burst-counterexample.json#$.layout"
+    ],
+    "validation": {
+      "checks": 31,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H026",
+    "actual": {
+      "total": 68,
+      "known": 68,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 68,
+      "known": 68,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-burst-counterexample.json#$.staggered.layout"
+    ],
+    "validation": {
+      "checks": 31,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H027",
+    "actual": {
+      "total": 25,
+      "known": 6,
+      "unknown": 19
+    },
+    "overdraft": {
+      "total": 25,
+      "known": 25,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆",
+      "total:inflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-frozen-component-results.json#$.0.layout"
+    ],
+    "validation": {
+      "checks": 4,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H028",
+    "actual": {
+      "total": 42,
+      "known": 6,
+      "unknown": 36
+    },
+    "overdraft": {
+      "total": 42,
+      "known": 42,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "inflow:齿轮组",
+      "net:齿轮组",
+      "potential:齿轮组",
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆",
+      "inflow:星尘粒子",
+      "net:星尘粒子",
+      "potential:星尘粒子",
+      "total:inflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-frozen-component-results.json#$.1.layout"
+    ],
+    "validation": {
+      "checks": 6,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H029",
+    "actual": {
+      "total": 44,
+      "known": 6,
+      "unknown": 38
+    },
+    "overdraft": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "inflow:齿轮组",
+      "net:齿轮组",
+      "potential:齿轮组",
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆",
+      "total:inflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-frozen-component-results.json#$.2.layout"
+    ],
+    "validation": {
+      "checks": 6,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H030",
+    "actual": {
+      "total": 35,
+      "known": 16,
+      "unknown": 19
+    },
+    "overdraft": {
+      "total": 35,
+      "known": 35,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆",
+      "total:inflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-frozen-component-results.json#$.3.layout"
+    ],
+    "validation": {
+      "checks": 8,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H031",
+    "actual": {
+      "total": 34,
+      "known": 5,
+      "unknown": 29
+    },
+    "overdraft": {
+      "total": 34,
+      "known": 34,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "outflow:钛合金锭",
+      "net:钛合金锭",
+      "potential:钛合金锭",
+      "outflow:合金板",
+      "net:合金板",
+      "potential:合金板",
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆",
+      "inflow:星尘粒子",
+      "net:星尘粒子",
+      "potential:星尘粒子",
+      "total:inflow",
+      "total:outflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-frozen-component-results.json#$.4.layout"
+    ],
+    "validation": {
+      "checks": 5,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H032",
+    "actual": {
+      "total": 25,
+      "known": 6,
+      "unknown": 19
+    },
+    "overdraft": {
+      "total": 25,
+      "known": 25,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆",
+      "total:inflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-frozen-component-results.json#$.5.layout"
+    ],
+    "validation": {
+      "checks": 4,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H033",
+    "actual": {
+      "total": 62,
+      "known": 62,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 62,
+      "known": 62,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-frozen-component-results.json#$.6.layout"
+    ],
+    "validation": {
+      "checks": 23,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H034",
+    "actual": {
+      "total": 72,
+      "known": 72,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 72,
+      "known": 72,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-overlap-results.json#$.layout"
+    ],
+    "validation": {
+      "checks": 34,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H035",
+    "actual": {
+      "total": 53,
+      "known": 53,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 53,
+      "known": 53,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-service-capacity-results.json#$.0.layout"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H036",
+    "actual": {
+      "total": 53,
+      "known": 53,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 53,
+      "known": 53,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-service-capacity-results.json#$.1.layout"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H037",
+    "actual": {
+      "total": 53,
+      "known": 9,
+      "unknown": 44
+    },
+    "overdraft": {
+      "total": 53,
+      "known": 53,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "inflow:合金板",
+      "net:合金板",
+      "potential:合金板",
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆"
+    ],
+    "origins": [
+      "warehouse-service-capacity-results.json#$.2.layout"
+    ],
+    "validation": {
+      "checks": 5,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H038",
+    "actual": {
+      "total": 39,
+      "known": 7,
+      "unknown": 32
+    },
+    "overdraft": {
+      "total": 39,
+      "known": 39,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "inflow:能量电池",
+      "net:能量电池",
+      "potential:能量电池",
+      "inflow:硅晶圆",
+      "net:硅晶圆",
+      "potential:硅晶圆",
+      "total:inflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-service-capacity-results.json#$.3.layout"
+    ],
+    "validation": {
+      "checks": 5,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H039",
+    "actual": {
+      "total": 0,
+      "known": 0,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 40,
+      "known": 40,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.layout"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H040",
+    "actual": {
+      "total": 0,
+      "known": 0,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 49,
+      "known": 49,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "potential:合金板",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.blocked"
+    ],
+    "validation": {
+      "checks": 24,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H041",
+    "actual": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.records.0"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H042",
+    "actual": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.records.1"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H043",
+    "actual": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.records.2"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H044",
+    "actual": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.records.3"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H045",
+    "actual": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "overdraft": {
+      "total": 44,
+      "known": 44,
+      "unknown": 0
+    },
+    "unknownMetrics": [],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.records.4"
+    ],
+    "validation": {
+      "checks": 19,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H046",
+    "actual": {
+      "total": 55,
+      "known": 10,
+      "unknown": 45
+    },
+    "overdraft": {
+      "total": 55,
+      "known": 55,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "outflow:合金板",
+      "net:合金板",
+      "potential:合金板",
+      "inflow:复合装甲板",
+      "net:复合装甲板",
+      "potential:复合装甲板",
+      "total:inflow",
+      "total:outflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.backpressure.0"
+    ],
+    "validation": {
+      "checks": 7,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H047",
+    "actual": {
+      "total": 55,
+      "known": 10,
+      "unknown": 45
+    },
+    "overdraft": {
+      "total": 55,
+      "known": 55,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "outflow:合金板",
+      "net:合金板",
+      "potential:合金板",
+      "inflow:复合装甲板",
+      "net:复合装甲板",
+      "potential:复合装甲板",
+      "total:inflow",
+      "total:outflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.backpressure.1"
+    ],
+    "validation": {
+      "checks": 7,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H048",
+    "actual": {
+      "total": 55,
+      "known": 10,
+      "unknown": 45
+    },
+    "overdraft": {
+      "total": 55,
+      "known": 55,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "outflow:合金板",
+      "net:合金板",
+      "potential:合金板",
+      "inflow:复合装甲板",
+      "net:复合装甲板",
+      "potential:复合装甲板",
+      "total:inflow",
+      "total:outflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.backpressure.2"
+    ],
+    "validation": {
+      "checks": 7,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H049",
+    "actual": {
+      "total": 55,
+      "known": 10,
+      "unknown": 45
+    },
+    "overdraft": {
+      "total": 55,
+      "known": 55,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "outflow:合金板",
+      "net:合金板",
+      "potential:合金板",
+      "inflow:复合装甲板",
+      "net:复合装甲板",
+      "potential:复合装甲板",
+      "total:inflow",
+      "total:outflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.backpressure.3"
+    ],
+    "validation": {
+      "checks": 7,
+      "bad": [],
+      "maxError": 0
+    }
+  },
+  {
+    "id": "H050",
+    "actual": {
+      "total": 55,
+      "known": 10,
+      "unknown": 45
+    },
+    "overdraft": {
+      "total": 55,
+      "known": 55,
+      "unknown": 0
+    },
+    "unknownMetrics": [
+      "outflow:合金板",
+      "net:合金板",
+      "potential:合金板",
+      "inflow:复合装甲板",
+      "net:复合装甲板",
+      "potential:复合装甲板",
+      "total:inflow",
+      "total:outflow",
+      "total:net",
+      "total:potential"
+    ],
+    "origins": [
+      "warehouse-smooth-priority-results.json#$.backpressure.4"
+    ],
+    "validation": {
+      "checks": 7,
+      "bad": [],
+      "maxError": 0
+    }
+  }
+]

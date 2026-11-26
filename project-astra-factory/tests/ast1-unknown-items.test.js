@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.resolve(__dirname,'..');
 const scripts=['data/catalog','blueprints/machine-ids','blueprints/item-ids',
  'core/state','core/machines','core/routing','core/audit','core/selection-transform',
- 'core/editor','engine/steady-flow','core/compact-json','blueprints/ast1-codec'];
+ 'core/editor','engine/math/arithmetic/rational','engine/steady-flow','core/compact-json','blueprints/ast1-codec'];
 const bundle=scripts.map(f=>fs.readFileSync(path.join(root,'scripts',f+'.js'),'utf8')).join('\n;\n');
 function run(fn){
  const document={getElementById(id){return id==='map'?{getContext(){return{}}}:{style:{},textContent:'',classList:{add(){},remove(){}}};},querySelectorAll(){return[];}};

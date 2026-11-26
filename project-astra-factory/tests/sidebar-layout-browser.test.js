@@ -38,7 +38,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const root=$('inspector');
    const outFilters=root.querySelectorAll('[data-out-filter]');
    const details=root.querySelector('.machine-port-details');
-   const live=root.querySelector('.machine-live-detail');
+   const live=root.querySelector('.machine-buffer-details');
    const audit=document.getElementById('auditPanel'),logs=document.getElementById('logsPanel');
    const style=getComputedStyle(first);
    const info={btnCount:buttons.length,firstVisible:!!firstBox&&firstBox.top<bottom&&firstBox.bottom>left.getBoundingClientRect().top,
@@ -49,7 +49,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
     rightFilters:outFilters.length,portDetailsClosed:!details.open,liveDetailsClosed:!live.open,
     auditFolded:!audit.open,logsFolded:!logs.open,
     theoryTotals:root.querySelectorAll('.machine-flow-tile').length,
-    liveTotals:root.querySelectorAll('.machine-live-summary > div').length};
+    liveTotals:root.querySelectorAll('.machine-live-history').length};
    // Expand port and live details without losing editable filters.
    details.open=true;live.open=true;
    const portOutputRows=details.querySelectorAll('.machine-port-detail-row.is-out').length;
@@ -65,7 +65,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   console.log('SIDEBAR FULL SCREEN',JSON.stringify(baseline));
   assert(baseline.btnCount>10&&baseline.firstVisible&&baseline.libraryCanScroll&&baseline.asideFixedScroll&&
    baseline.searchFixed&&baseline.rightFilters===3&&baseline.portDetailsClosed&&baseline.liveDetailsClosed&&
-   baseline.auditFolded&&baseline.logsFolded&&baseline.theoryTotals===2&&baseline.liveTotals===2&&
+   baseline.auditFolded&&baseline.logsFolded&&baseline.theoryTotals===2&&baseline.liveTotals===1&&
    baseline.portOutputRows===3&&baseline.detailsRemainOpen&&baseline.toolPositionStable,
    'sidebar must keep machine buttons visible, preserve filters and show compact expandable analysis');
   console.log('PASS: machine buttons visible on first screen with independent scroll, right details folded and filters retained');

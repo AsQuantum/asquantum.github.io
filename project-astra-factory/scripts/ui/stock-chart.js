@@ -3,6 +3,8 @@
 // The chart is read-only; neither the simulated inventory nor the LP is modified.
 const stockChartHiddenItems=new Set();
 let stockChartWindow='all',stockChartLastDraw=-Infinity,stockChartHoverData=null;
+const STOCK_CHART_WINDOW_KEY='factory-lab.stock-chart.window.v1';
+try{const saved=localStorage.getItem(STOCK_CHART_WINDOW_KEY);if(['all','60','180'].includes(saved))stockChartWindow=saved;}catch(e){}
 
 // Floating chart geometry is independent of the factory map and its simulation.
 // Save it only after a successful drag or corner resize.
@@ -133,6 +135,7 @@ function stockChartHistory(){
   for(const key of Object.keys(b.inbound||{}))names.add(key);
   for(const key of Object.keys(b.outbound||{}))names.add(key);
   for(const key of Object.keys(b.manualStock||{}))names.add(key);
+  for(const key of Object.keys(b.editReturns||{}))names.add(key);
  }
  const items=[...names].filter(Boolean).sort(factoryItemCompare);
  const current=Object.fromEntries(items.map(item=>[item,0]));
@@ -143,6 +146,7 @@ function stockChartHistory(){
   for(const [item,n] of Object.entries(b.inbound||{}))current[item]=(current[item]||0)+n;
   for(const [item,n] of Object.entries(b.outbound||{}))current[item]=(current[item]||0)-n;
   for(const [item,n] of Object.entries(b.manualStock||{}))current[item]=(current[item]||0)+n;
+  for(const [item,n] of Object.entries(b.editReturns||{}))current[item]=(current[item]||0)+n;
  };
  for(let i=0;i<completed;i++){
   apply(buckets[i]);
@@ -314,7 +318,7 @@ document.addEventListener('click',event=>{
  if(open){stockChartOpen(true);return;}
  if(event.target.closest('[data-stock-chart-close]')){stockChartOpen(false);return;}
  const windowButton=event.target.closest('[data-stock-window]');
- if(windowButton){stockChartWindow=windowButton.dataset.stockWindow;stockChartRender();return;}
+ if(windowButton){const value=windowButton.dataset.stockWindow;if(['all','60','180'].includes(value)){stockChartWindow=value;try{localStorage.setItem(STOCK_CHART_WINDOW_KEY,value);}catch(e){}stockChartRender();}return;}
  const legend=event.target.closest('[data-stock-item]');
  if(legend){
   const item=decodeURIComponent(legend.dataset.stockItem);

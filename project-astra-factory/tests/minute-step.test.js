@@ -11,7 +11,8 @@ const tail=source.slice(start);
 
 function setup(){
  const elements={simSpeed:{value:'1'},stepMinute:{textContent:'',title:'',disabled:false}};
- const notes=[],ctx={running:true,simTime:0,simulationSpeed:1,steps:0,notifications:notes,
+ const notes=[],ctx={running:true,simTime:0,simulationSpeed:1,steps:0,clockResets:0,notifications:notes,
+  resetBeltMotionClock(){ctx.clockResets++;},
   $:id=>elements[id],setTimeout:callback=>{callback();return 1},
   warehouseRefreshLive(){},inspectorRefreshLive(){},stockChartMaybeRefresh(){},draw(){},
   notify:msg=>notes.push(msg)};
@@ -41,6 +42,7 @@ test('speed change selects 1, 2 or 60 minute button labels and advances exact pe
  assert.equal(elements.stepMinute.disabled,false);
  assert.equal(ctx.running,true);
  assert(ctx.notifications.at(-1).includes('60 分钟'));
+ assert.equal(ctx.clockResets,2);
 });
 
 test('while a long fast forward runs, repeated taps cannot duplicate time advancement',async()=>{

@@ -1,0 +1,1908 @@
+{
+  "normal": {
+    "status": "planned",
+    "components": [
+      {
+        "id": "C0",
+        "machines": [
+          "source"
+        ],
+        "routes": [
+          "d0"
+        ],
+        "deposits": [
+          {
+            "route": "d0",
+            "item": "a"
+          }
+        ],
+        "withdrawals": []
+      },
+      {
+        "id": "C1",
+        "machines": [
+          "out1",
+          "craft1"
+        ],
+        "routes": [
+          "r1",
+          "d1"
+        ],
+        "deposits": [
+          {
+            "route": "d1",
+            "item": "b"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out1",
+            "route": "r1",
+            "item": "a"
+          }
+        ]
+      },
+      {
+        "id": "C2",
+        "machines": [
+          "out2",
+          "craft2"
+        ],
+        "routes": [
+          "r2",
+          "d2"
+        ],
+        "deposits": [
+          {
+            "route": "d2",
+            "item": "c"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out2",
+            "route": "r2",
+            "item": "a"
+          }
+        ]
+      },
+      {
+        "id": "C3",
+        "machines": [
+          "out3",
+          "craft3"
+        ],
+        "routes": [
+          "r3",
+          "d3"
+        ],
+        "deposits": [
+          {
+            "route": "d3",
+            "item": "d"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out3",
+            "route": "r3",
+            "item": "b"
+          }
+        ]
+      },
+      {
+        "id": "C4",
+        "machines": [
+          "out4",
+          "craft4"
+        ],
+        "routes": [
+          "r4",
+          "d4"
+        ],
+        "deposits": [
+          {
+            "route": "d4",
+            "item": "v"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out4",
+            "route": "r4",
+            "item": "z"
+          }
+        ]
+      }
+    ],
+    "pools": [
+      {
+        "id": "W:a",
+        "item": "a",
+        "producers": [
+          {
+            "id": "C0",
+            "route": "d0"
+          },
+          {
+            "id": "F:sourceA",
+            "factory": "sourceA",
+            "rate": "1/2"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "C1",
+            "machine": "out1",
+            "route": "r1"
+          },
+          {
+            "id": "C2",
+            "machine": "out2",
+            "route": "r2"
+          }
+        ],
+        "order": [
+          "out2",
+          "out1"
+        ],
+        "frozenOrder": [],
+        "supplyLower": "1/2",
+        "demandUpper": "2",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:b",
+        "item": "b",
+        "producers": [
+          {
+            "id": "C1",
+            "route": "d1"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "C3",
+            "machine": "out3",
+            "route": "r3"
+          },
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "-1/4"
+          }
+        ],
+        "order": [
+          "out3"
+        ],
+        "frozenOrder": [
+          "converter"
+        ],
+        "supplyLower": "0",
+        "demandUpper": "5/4",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:c",
+        "item": "c",
+        "producers": [
+          {
+            "id": "C2",
+            "route": "d2"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "-1/2"
+          }
+        ],
+        "order": [],
+        "frozenOrder": [
+          "converter"
+        ],
+        "supplyLower": "0",
+        "demandUpper": "1/2",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:d",
+        "item": "d",
+        "producers": [
+          {
+            "id": "C3",
+            "route": "d3"
+          }
+        ],
+        "consumers": [],
+        "order": [],
+        "frozenOrder": [],
+        "supplyLower": "0",
+        "demandUpper": "0",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:z",
+        "item": "z",
+        "producers": [
+          {
+            "id": "F:sourceZ",
+            "factory": "sourceZ",
+            "rate": "1/2"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "C4",
+            "machine": "out4",
+            "route": "r4"
+          }
+        ],
+        "order": [
+          "out4"
+        ],
+        "frozenOrder": [],
+        "supplyLower": "1/2",
+        "demandUpper": "1",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:v",
+        "item": "v",
+        "producers": [
+          {
+            "id": "C4",
+            "route": "d4"
+          }
+        ],
+        "consumers": [],
+        "order": [],
+        "frozenOrder": [],
+        "supplyLower": "0",
+        "demandUpper": "0",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:e",
+        "item": "e",
+        "producers": [
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "1"
+          }
+        ],
+        "consumers": [],
+        "order": [],
+        "frozenOrder": [],
+        "supplyLower": "0",
+        "demandUpper": "0",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      }
+    ],
+    "frozen": [
+      {
+        "id": "F:sourceZ",
+        "factory": "sourceZ",
+        "order": 0,
+        "constantDuty": "1",
+        "inputs": [],
+        "outputs": [
+          {
+            "item": "z",
+            "rate": "1/2"
+          }
+        ],
+        "nonlimitingInputs": [],
+        "possibleLimitingInputs": [],
+        "serviceEventuallyUnconstrained": true
+      },
+      {
+        "id": "F:converter",
+        "factory": "converter",
+        "order": 1,
+        "constantDuty": null,
+        "inputs": [
+          {
+            "item": "c",
+            "rate": "-1/2"
+          },
+          {
+            "item": "b",
+            "rate": "-1/4"
+          }
+        ],
+        "outputs": [
+          {
+            "item": "e",
+            "rate": "1"
+          }
+        ],
+        "nonlimitingInputs": [],
+        "possibleLimitingInputs": [
+          "c",
+          "b"
+        ],
+        "serviceEventuallyUnconstrained": false
+      },
+      {
+        "id": "F:sourceA",
+        "factory": "sourceA",
+        "order": 2,
+        "constantDuty": "1",
+        "inputs": [],
+        "outputs": [
+          {
+            "item": "a",
+            "rate": "1/2"
+          }
+        ],
+        "nonlimitingInputs": [],
+        "possibleLimitingInputs": [],
+        "serviceEventuallyUnconstrained": true
+      }
+    ],
+    "stages": [
+      {
+        "id": 4,
+        "members": [
+          "C0"
+        ],
+        "predecessors": [],
+        "successors": [
+          3
+        ],
+        "physical": [
+          "C0"
+        ],
+        "frozen": [],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "warehouse-independent-physical"
+      },
+      {
+        "id": 7,
+        "members": [
+          "F:sourceZ"
+        ],
+        "predecessors": [],
+        "successors": [
+          6
+        ],
+        "physical": [],
+        "frozen": [
+          "sourceZ"
+        ],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "constant-frozen-source"
+      },
+      {
+        "id": 8,
+        "members": [
+          "F:sourceA"
+        ],
+        "predecessors": [],
+        "successors": [
+          3
+        ],
+        "physical": [],
+        "frozen": [
+          "sourceA"
+        ],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "constant-frozen-source"
+      },
+      {
+        "id": 6,
+        "members": [
+          "W:z",
+          "C4"
+        ],
+        "predecessors": [
+          7
+        ],
+        "successors": [
+          5
+        ],
+        "physical": [
+          "C4"
+        ],
+        "frozen": [],
+        "stock": [
+          "z"
+        ],
+        "incoming": [
+          {
+            "item": "z",
+            "id": "F:sourceZ",
+            "factory": "sourceZ",
+            "rate": "1/2"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "joint-resource-equations"
+      },
+      {
+        "id": 3,
+        "members": [
+          "C2",
+          "C1",
+          "W:a"
+        ],
+        "predecessors": [
+          4,
+          8
+        ],
+        "successors": [
+          2
+        ],
+        "physical": [
+          "C1",
+          "C2"
+        ],
+        "frozen": [],
+        "stock": [
+          "a"
+        ],
+        "incoming": [
+          {
+            "item": "a",
+            "id": "C0",
+            "route": "d0"
+          },
+          {
+            "item": "a",
+            "id": "F:sourceA",
+            "factory": "sourceA",
+            "rate": "1/2"
+          }
+        ],
+        "coupled": true,
+        "feedback": false,
+        "kind": "joint-resource-equations"
+      },
+      {
+        "id": 5,
+        "members": [
+          "W:v"
+        ],
+        "predecessors": [
+          6
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "v"
+        ],
+        "incoming": [
+          {
+            "item": "v",
+            "id": "C4",
+            "route": "d4"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      },
+      {
+        "id": 2,
+        "members": [
+          "W:c",
+          "F:converter",
+          "C3",
+          "W:b"
+        ],
+        "predecessors": [
+          3
+        ],
+        "successors": [
+          0,
+          1
+        ],
+        "physical": [
+          "C3"
+        ],
+        "frozen": [
+          "converter"
+        ],
+        "stock": [
+          "b",
+          "c"
+        ],
+        "incoming": [
+          {
+            "item": "b",
+            "id": "C1",
+            "route": "d1"
+          },
+          {
+            "item": "c",
+            "id": "C2",
+            "route": "d2"
+          }
+        ],
+        "coupled": true,
+        "feedback": false,
+        "kind": "joint-resource-equations"
+      },
+      {
+        "id": 0,
+        "members": [
+          "W:d"
+        ],
+        "predecessors": [
+          2
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "d"
+        ],
+        "incoming": [
+          {
+            "item": "d",
+            "id": "C3",
+            "route": "d3"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      },
+      {
+        "id": 1,
+        "members": [
+          "W:e"
+        ],
+        "predecessors": [
+          2
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "e"
+        ],
+        "incoming": [
+          {
+            "item": "e",
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "1"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      }
+    ],
+    "scope": "safe structural decomposition; certified surplus cuts are eventual only; boundary timing and initial-state selection may still be needed"
+  },
+  "feedback": {
+    "status": "planned",
+    "components": [
+      {
+        "id": "C0",
+        "machines": [
+          "source"
+        ],
+        "routes": [
+          "d0"
+        ],
+        "deposits": [
+          {
+            "route": "d0",
+            "item": "a"
+          }
+        ],
+        "withdrawals": []
+      },
+      {
+        "id": "C1",
+        "machines": [
+          "out1",
+          "craft1"
+        ],
+        "routes": [
+          "r1",
+          "d1"
+        ],
+        "deposits": [
+          {
+            "route": "d1",
+            "item": "b"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out1",
+            "route": "r1",
+            "item": "a"
+          }
+        ]
+      },
+      {
+        "id": "C2",
+        "machines": [
+          "out2",
+          "craft2"
+        ],
+        "routes": [
+          "r2",
+          "d2"
+        ],
+        "deposits": [
+          {
+            "route": "d2",
+            "item": "c"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out2",
+            "route": "r2",
+            "item": "a"
+          }
+        ]
+      },
+      {
+        "id": "C3",
+        "machines": [
+          "out3",
+          "craft3"
+        ],
+        "routes": [
+          "r3",
+          "d3"
+        ],
+        "deposits": [
+          {
+            "route": "d3",
+            "item": "d"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out3",
+            "route": "r3",
+            "item": "b"
+          }
+        ]
+      },
+      {
+        "id": "C4",
+        "machines": [
+          "out4",
+          "craft4"
+        ],
+        "routes": [
+          "r4",
+          "d4"
+        ],
+        "deposits": [
+          {
+            "route": "d4",
+            "item": "v"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out4",
+            "route": "r4",
+            "item": "z"
+          }
+        ]
+      }
+    ],
+    "pools": [
+      {
+        "id": "W:a",
+        "item": "a",
+        "producers": [
+          {
+            "id": "C0",
+            "route": "d0"
+          },
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "1"
+          },
+          {
+            "id": "F:sourceA",
+            "factory": "sourceA",
+            "rate": "1/2"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "C1",
+            "machine": "out1",
+            "route": "r1"
+          },
+          {
+            "id": "C2",
+            "machine": "out2",
+            "route": "r2"
+          }
+        ],
+        "order": [
+          "out2",
+          "out1"
+        ],
+        "frozenOrder": [],
+        "supplyLower": "1/2",
+        "demandUpper": "2",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:b",
+        "item": "b",
+        "producers": [
+          {
+            "id": "C1",
+            "route": "d1"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "C3",
+            "machine": "out3",
+            "route": "r3"
+          },
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "-1/4"
+          }
+        ],
+        "order": [
+          "out3"
+        ],
+        "frozenOrder": [
+          "converter"
+        ],
+        "supplyLower": "0",
+        "demandUpper": "5/4",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:c",
+        "item": "c",
+        "producers": [
+          {
+            "id": "C2",
+            "route": "d2"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "-1/2"
+          }
+        ],
+        "order": [],
+        "frozenOrder": [
+          "converter"
+        ],
+        "supplyLower": "0",
+        "demandUpper": "1/2",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:d",
+        "item": "d",
+        "producers": [
+          {
+            "id": "C3",
+            "route": "d3"
+          }
+        ],
+        "consumers": [],
+        "order": [],
+        "frozenOrder": [],
+        "supplyLower": "0",
+        "demandUpper": "0",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:z",
+        "item": "z",
+        "producers": [
+          {
+            "id": "F:sourceZ",
+            "factory": "sourceZ",
+            "rate": "1/2"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "C4",
+            "machine": "out4",
+            "route": "r4"
+          }
+        ],
+        "order": [
+          "out4"
+        ],
+        "frozenOrder": [],
+        "supplyLower": "1/2",
+        "demandUpper": "1",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:v",
+        "item": "v",
+        "producers": [
+          {
+            "id": "C4",
+            "route": "d4"
+          }
+        ],
+        "consumers": [],
+        "order": [],
+        "frozenOrder": [],
+        "supplyLower": "0",
+        "demandUpper": "0",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:e",
+        "item": "e",
+        "producers": [
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "1"
+          }
+        ],
+        "consumers": [],
+        "order": [],
+        "frozenOrder": [],
+        "supplyLower": "0",
+        "demandUpper": "0",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      }
+    ],
+    "frozen": [
+      {
+        "id": "F:sourceZ",
+        "factory": "sourceZ",
+        "order": 0,
+        "constantDuty": "1",
+        "inputs": [],
+        "outputs": [
+          {
+            "item": "z",
+            "rate": "1/2"
+          }
+        ],
+        "nonlimitingInputs": [],
+        "possibleLimitingInputs": [],
+        "serviceEventuallyUnconstrained": true
+      },
+      {
+        "id": "F:converter",
+        "factory": "converter",
+        "order": 1,
+        "constantDuty": null,
+        "inputs": [
+          {
+            "item": "c",
+            "rate": "-1/2"
+          },
+          {
+            "item": "b",
+            "rate": "-1/4"
+          }
+        ],
+        "outputs": [
+          {
+            "item": "e",
+            "rate": "1"
+          },
+          {
+            "item": "a",
+            "rate": "1"
+          }
+        ],
+        "nonlimitingInputs": [],
+        "possibleLimitingInputs": [
+          "c",
+          "b"
+        ],
+        "serviceEventuallyUnconstrained": false
+      },
+      {
+        "id": "F:sourceA",
+        "factory": "sourceA",
+        "order": 2,
+        "constantDuty": "1",
+        "inputs": [],
+        "outputs": [
+          {
+            "item": "a",
+            "rate": "1/2"
+          }
+        ],
+        "nonlimitingInputs": [],
+        "possibleLimitingInputs": [],
+        "serviceEventuallyUnconstrained": true
+      }
+    ],
+    "stages": [
+      {
+        "id": 3,
+        "members": [
+          "C0"
+        ],
+        "predecessors": [],
+        "successors": [
+          2
+        ],
+        "physical": [
+          "C0"
+        ],
+        "frozen": [],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "warehouse-independent-physical"
+      },
+      {
+        "id": 6,
+        "members": [
+          "F:sourceZ"
+        ],
+        "predecessors": [],
+        "successors": [
+          5
+        ],
+        "physical": [],
+        "frozen": [
+          "sourceZ"
+        ],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "constant-frozen-source"
+      },
+      {
+        "id": 7,
+        "members": [
+          "F:sourceA"
+        ],
+        "predecessors": [],
+        "successors": [
+          2
+        ],
+        "physical": [],
+        "frozen": [
+          "sourceA"
+        ],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "constant-frozen-source"
+      },
+      {
+        "id": 5,
+        "members": [
+          "W:z",
+          "C4"
+        ],
+        "predecessors": [
+          6
+        ],
+        "successors": [
+          4
+        ],
+        "physical": [
+          "C4"
+        ],
+        "frozen": [],
+        "stock": [
+          "z"
+        ],
+        "incoming": [
+          {
+            "item": "z",
+            "id": "F:sourceZ",
+            "factory": "sourceZ",
+            "rate": "1/2"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "joint-resource-equations"
+      },
+      {
+        "id": 2,
+        "members": [
+          "C2",
+          "W:c",
+          "F:converter",
+          "C3",
+          "W:b",
+          "C1",
+          "W:a"
+        ],
+        "predecessors": [
+          3,
+          7
+        ],
+        "successors": [
+          0,
+          1
+        ],
+        "physical": [
+          "C1",
+          "C2",
+          "C3"
+        ],
+        "frozen": [
+          "converter"
+        ],
+        "stock": [
+          "a",
+          "b",
+          "c"
+        ],
+        "incoming": [
+          {
+            "item": "a",
+            "id": "C0",
+            "route": "d0"
+          },
+          {
+            "item": "a",
+            "id": "F:sourceA",
+            "factory": "sourceA",
+            "rate": "1/2"
+          }
+        ],
+        "coupled": true,
+        "feedback": true,
+        "kind": "joint-resource-equations"
+      },
+      {
+        "id": 4,
+        "members": [
+          "W:v"
+        ],
+        "predecessors": [
+          5
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "v"
+        ],
+        "incoming": [
+          {
+            "item": "v",
+            "id": "C4",
+            "route": "d4"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      },
+      {
+        "id": 0,
+        "members": [
+          "W:d"
+        ],
+        "predecessors": [
+          2
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "d"
+        ],
+        "incoming": [
+          {
+            "item": "d",
+            "id": "C3",
+            "route": "d3"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      },
+      {
+        "id": 1,
+        "members": [
+          "W:e"
+        ],
+        "predecessors": [
+          2
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "e"
+        ],
+        "incoming": [
+          {
+            "item": "e",
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "1"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      }
+    ],
+    "scope": "safe structural decomposition; certified surplus cuts are eventual only; boundary timing and initial-state selection may still be needed"
+  },
+  "surplus": {
+    "status": "planned",
+    "components": [
+      {
+        "id": "C0",
+        "machines": [
+          "source"
+        ],
+        "routes": [
+          "d0"
+        ],
+        "deposits": [
+          {
+            "route": "d0",
+            "item": "a"
+          }
+        ],
+        "withdrawals": []
+      },
+      {
+        "id": "C1",
+        "machines": [
+          "out1",
+          "craft1"
+        ],
+        "routes": [
+          "r1",
+          "d1"
+        ],
+        "deposits": [
+          {
+            "route": "d1",
+            "item": "b"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out1",
+            "route": "r1",
+            "item": "a"
+          }
+        ]
+      },
+      {
+        "id": "C2",
+        "machines": [
+          "out2",
+          "craft2"
+        ],
+        "routes": [
+          "r2",
+          "d2"
+        ],
+        "deposits": [
+          {
+            "route": "d2",
+            "item": "c"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out2",
+            "route": "r2",
+            "item": "a"
+          }
+        ]
+      },
+      {
+        "id": "C3",
+        "machines": [
+          "out3",
+          "craft3"
+        ],
+        "routes": [
+          "r3",
+          "d3"
+        ],
+        "deposits": [
+          {
+            "route": "d3",
+            "item": "d"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out3",
+            "route": "r3",
+            "item": "b"
+          }
+        ]
+      },
+      {
+        "id": "C4",
+        "machines": [
+          "out4",
+          "craft4"
+        ],
+        "routes": [
+          "r4",
+          "d4"
+        ],
+        "deposits": [
+          {
+            "route": "d4",
+            "item": "v"
+          }
+        ],
+        "withdrawals": [
+          {
+            "machine": "out4",
+            "route": "r4",
+            "item": "z"
+          }
+        ]
+      }
+    ],
+    "pools": [
+      {
+        "id": "W:a",
+        "item": "a",
+        "producers": [
+          {
+            "id": "C0",
+            "route": "d0"
+          },
+          {
+            "id": "F:sourceA",
+            "factory": "sourceA",
+            "rate": "3"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "C1",
+            "machine": "out1",
+            "route": "r1"
+          },
+          {
+            "id": "C2",
+            "machine": "out2",
+            "route": "r2"
+          }
+        ],
+        "order": [
+          "out2",
+          "out1"
+        ],
+        "frozenOrder": [],
+        "supplyLower": "3",
+        "demandUpper": "2",
+        "netLower": null,
+        "permanentAbundance": true,
+        "abundanceMethod": "independent-supply-exceeds-capacity"
+      },
+      {
+        "id": "W:b",
+        "item": "b",
+        "producers": [
+          {
+            "id": "C1",
+            "route": "d1"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "C3",
+            "machine": "out3",
+            "route": "r3"
+          },
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "-1/4"
+          }
+        ],
+        "order": [
+          "out3"
+        ],
+        "frozenOrder": [
+          "converter"
+        ],
+        "supplyLower": "0",
+        "demandUpper": "5/4",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:c",
+        "item": "c",
+        "producers": [
+          {
+            "id": "C2",
+            "route": "d2"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "-1/2"
+          }
+        ],
+        "order": [],
+        "frozenOrder": [
+          "converter"
+        ],
+        "supplyLower": "0",
+        "demandUpper": "1/2",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:d",
+        "item": "d",
+        "producers": [
+          {
+            "id": "C3",
+            "route": "d3"
+          }
+        ],
+        "consumers": [],
+        "order": [],
+        "frozenOrder": [],
+        "supplyLower": "0",
+        "demandUpper": "0",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:z",
+        "item": "z",
+        "producers": [
+          {
+            "id": "F:sourceZ",
+            "factory": "sourceZ",
+            "rate": "1/2"
+          }
+        ],
+        "consumers": [
+          {
+            "id": "C4",
+            "machine": "out4",
+            "route": "r4"
+          }
+        ],
+        "order": [
+          "out4"
+        ],
+        "frozenOrder": [],
+        "supplyLower": "1/2",
+        "demandUpper": "1",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:v",
+        "item": "v",
+        "producers": [
+          {
+            "id": "C4",
+            "route": "d4"
+          }
+        ],
+        "consumers": [],
+        "order": [],
+        "frozenOrder": [],
+        "supplyLower": "0",
+        "demandUpper": "0",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      },
+      {
+        "id": "W:e",
+        "item": "e",
+        "producers": [
+          {
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "1"
+          }
+        ],
+        "consumers": [],
+        "order": [],
+        "frozenOrder": [],
+        "supplyLower": "0",
+        "demandUpper": "0",
+        "netLower": null,
+        "permanentAbundance": false,
+        "abundanceMethod": null
+      }
+    ],
+    "frozen": [
+      {
+        "id": "F:sourceZ",
+        "factory": "sourceZ",
+        "order": 0,
+        "constantDuty": "1",
+        "inputs": [],
+        "outputs": [
+          {
+            "item": "z",
+            "rate": "1/2"
+          }
+        ],
+        "nonlimitingInputs": [],
+        "possibleLimitingInputs": [],
+        "serviceEventuallyUnconstrained": true
+      },
+      {
+        "id": "F:converter",
+        "factory": "converter",
+        "order": 1,
+        "constantDuty": null,
+        "inputs": [
+          {
+            "item": "c",
+            "rate": "-1/2"
+          },
+          {
+            "item": "b",
+            "rate": "-1/4"
+          }
+        ],
+        "outputs": [
+          {
+            "item": "e",
+            "rate": "1"
+          }
+        ],
+        "nonlimitingInputs": [],
+        "possibleLimitingInputs": [
+          "c",
+          "b"
+        ],
+        "serviceEventuallyUnconstrained": false
+      },
+      {
+        "id": "F:sourceA",
+        "factory": "sourceA",
+        "order": 2,
+        "constantDuty": "1",
+        "inputs": [],
+        "outputs": [
+          {
+            "item": "a",
+            "rate": "3"
+          }
+        ],
+        "nonlimitingInputs": [],
+        "possibleLimitingInputs": [],
+        "serviceEventuallyUnconstrained": true
+      }
+    ],
+    "stages": [
+      {
+        "id": 1,
+        "members": [
+          "C0"
+        ],
+        "predecessors": [],
+        "successors": [
+          0
+        ],
+        "physical": [
+          "C0"
+        ],
+        "frozen": [],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "warehouse-independent-physical"
+      },
+      {
+        "id": 5,
+        "members": [
+          "C1"
+        ],
+        "predecessors": [],
+        "successors": [
+          0,
+          4
+        ],
+        "physical": [
+          "C1"
+        ],
+        "frozen": [],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "eventually-unconstrained-physical"
+      },
+      {
+        "id": 6,
+        "members": [
+          "C2"
+        ],
+        "predecessors": [],
+        "successors": [
+          0,
+          4
+        ],
+        "physical": [
+          "C2"
+        ],
+        "frozen": [],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "eventually-unconstrained-physical"
+      },
+      {
+        "id": 9,
+        "members": [
+          "F:sourceZ"
+        ],
+        "predecessors": [],
+        "successors": [
+          8
+        ],
+        "physical": [],
+        "frozen": [
+          "sourceZ"
+        ],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "constant-frozen-source"
+      },
+      {
+        "id": 10,
+        "members": [
+          "F:sourceA"
+        ],
+        "predecessors": [],
+        "successors": [
+          0
+        ],
+        "physical": [],
+        "frozen": [
+          "sourceA"
+        ],
+        "stock": [],
+        "incoming": [],
+        "coupled": false,
+        "feedback": false,
+        "kind": "constant-frozen-source"
+      },
+      {
+        "id": 4,
+        "members": [
+          "W:c",
+          "F:converter",
+          "C3",
+          "W:b"
+        ],
+        "predecessors": [
+          5,
+          6
+        ],
+        "successors": [
+          2,
+          3
+        ],
+        "physical": [
+          "C3"
+        ],
+        "frozen": [
+          "converter"
+        ],
+        "stock": [
+          "b",
+          "c"
+        ],
+        "incoming": [
+          {
+            "item": "b",
+            "id": "C1",
+            "route": "d1"
+          },
+          {
+            "item": "c",
+            "id": "C2",
+            "route": "d2"
+          }
+        ],
+        "coupled": true,
+        "feedback": false,
+        "kind": "joint-resource-equations"
+      },
+      {
+        "id": 8,
+        "members": [
+          "W:z",
+          "C4"
+        ],
+        "predecessors": [
+          9
+        ],
+        "successors": [
+          7
+        ],
+        "physical": [
+          "C4"
+        ],
+        "frozen": [],
+        "stock": [
+          "z"
+        ],
+        "incoming": [
+          {
+            "item": "z",
+            "id": "F:sourceZ",
+            "factory": "sourceZ",
+            "rate": "1/2"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "joint-resource-equations"
+      },
+      {
+        "id": 0,
+        "members": [
+          "W:a"
+        ],
+        "predecessors": [
+          1,
+          5,
+          6,
+          10
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "a"
+        ],
+        "incoming": [
+          {
+            "item": "a",
+            "id": "C0",
+            "route": "d0"
+          },
+          {
+            "item": "a",
+            "id": "F:sourceA",
+            "factory": "sourceA",
+            "rate": "3"
+          }
+        ],
+        "coupled": true,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      },
+      {
+        "id": 2,
+        "members": [
+          "W:d"
+        ],
+        "predecessors": [
+          4
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "d"
+        ],
+        "incoming": [
+          {
+            "item": "d",
+            "id": "C3",
+            "route": "d3"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      },
+      {
+        "id": 3,
+        "members": [
+          "W:e"
+        ],
+        "predecessors": [
+          4
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "e"
+        ],
+        "incoming": [
+          {
+            "item": "e",
+            "id": "F:converter",
+            "factory": "converter",
+            "rate": "1"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      },
+      {
+        "id": 7,
+        "members": [
+          "W:v"
+        ],
+        "predecessors": [
+          8
+        ],
+        "successors": [],
+        "physical": [],
+        "frozen": [],
+        "stock": [
+          "v"
+        ],
+        "incoming": [
+          {
+            "item": "v",
+            "id": "C4",
+            "route": "d4"
+          }
+        ],
+        "coupled": false,
+        "feedback": false,
+        "kind": "stock-aggregate"
+      }
+    ],
+    "scope": "safe structural decomposition; certified surplus cuts are eventual only; boundary timing and initial-state selection may still be needed"
+  },
+  "critical": {
+    "id": "W:a",
+    "item": "a",
+    "producers": [
+      {
+        "id": "C0",
+        "route": "d0"
+      },
+      {
+        "id": "F:sourceA",
+        "factory": "sourceA",
+        "rate": "2"
+      }
+    ],
+    "consumers": [
+      {
+        "id": "C1",
+        "machine": "out1",
+        "route": "r1"
+      },
+      {
+        "id": "C2",
+        "machine": "out2",
+        "route": "r2"
+      }
+    ],
+    "order": [
+      "out2",
+      "out1"
+    ],
+    "frozenOrder": [],
+    "supplyLower": "2",
+    "demandUpper": "2",
+    "netLower": null,
+    "permanentAbundance": false,
+    "abundanceMethod": null
+  },
+  "provedDeposit": {
+    "id": "W:a",
+    "item": "a",
+    "producers": [
+      {
+        "id": "C0",
+        "route": "d0"
+      },
+      {
+        "id": "F:sourceA",
+        "factory": "sourceA",
+        "rate": "1/2"
+      }
+    ],
+    "consumers": [
+      {
+        "id": "C1",
+        "machine": "out1",
+        "route": "r1"
+      },
+      {
+        "id": "C2",
+        "machine": "out2",
+        "route": "r2"
+      }
+    ],
+    "order": [
+      "out2",
+      "out1"
+    ],
+    "frozenOrder": [],
+    "supplyLower": "3/2",
+    "demandUpper": "2",
+    "netLower": null,
+    "permanentAbundance": false,
+    "abundanceMethod": null
+  }
+}

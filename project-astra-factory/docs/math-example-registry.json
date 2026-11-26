@@ -1,0 +1,615 @@
+{
+  "currentExamples": [
+    {
+      "id": "EX-RATIONAL",
+      "description": "文本0.1、-12.345、1/3、科学计数精确约分及JSON存储",
+      "test": "tests/math/arithmetic/rational-input.test.js",
+      "marker": "literal decimal, scientific notation and fractions are reduced exactly"
+    },
+    {
+      "id": "EX-ALGEBRA",
+      "description": "精确仿射消元、独立因子与内点；未知不选任意可行解",
+      "test": "tests/math/algebra/factored-projection.test.js",
+      "marker": ""
+    },
+    {
+      "id": "EX-FIFO",
+      "description": "不兼容永久队首阻塞和悬空带结构零；分流可绕行时拒证",
+      "test": "tests/math/topology/permanent-fifo-blockage.test.js",
+      "marker": "splitter can divert wrong material"
+    },
+    {
+      "id": "EX-MERGER",
+      "description": "三饱和输入汇流各1/3；两级汇流上游两路各1/4、第三路1/2",
+      "test": "tests/math/topology/router-readiness-and-capacity.test.js",
+      "marker": "cascaded saturated mergers"
+    },
+    {
+      "id": "EX-SPLITTER",
+      "description": "两自由出口及一慢支路：各9/20、9/20、1/10",
+      "test": "tests/math/topology/router-readiness-and-capacity.test.js",
+      "marker": "two free outputs and one blocked or slow branch"
+    },
+    {
+      "id": "EX-ORDINAL",
+      "description": "原始带权序号图避免长滞后展开；最快与最慢斜率不等不发唯一证书",
+      "test": "tests/math/topology/router-readiness-and-capacity.test.js",
+      "marker": "original weighted lag avoids expansion"
+    },
+    {
+      "id": "EX-DEPTH",
+      "description": "长短支路汇合按最长依赖深度；环缩成SCC；记录逆序不改变层次",
+      "test": "tests/math/topology/subgraph-depth-composition.test.js",
+      "marker": "depth follows the longest dependency"
+    },
+    {
+      "id": "EX-REVERSE",
+      "description": "1/s源经两路分流，一路直入仓，一路两级加工；支路各1/2，最终1/4",
+      "test": "tests/math/topology/subgraph-depth-composition.test.js",
+      "marker": "reverse acceptance certificates traverse transforming recipes"
+    },
+    {
+      "id": "EX-BOUND",
+      "description": "共享分流根及慢源独占输入服务下界1/5；缺料或不兼容拒证",
+      "test": "tests/math/topology/subgraph-depth-composition.test.js",
+      "marker": "shared saturated root and slow autonomous source"
+    },
+    {
+      "id": "EX-CADENCE",
+      "description": "周期4秒反压加工：每批3原料，高优先2件、低优先1件；矿石余量3/4/s",
+      "test": "tests/math/topology/subgraph-depth-composition.test.js",
+      "marker": "backward cadence and fixed-frame shared-cache refill"
+    },
+    {
+      "id": "EX-LOOP",
+      "description": "二口汇流分流回流：主干1/s、支路各1/2/s；带长1、3、7、40",
+      "test": "tests/math/topology/subgraph-depth-composition.test.js",
+      "marker": "two-port splitter and merger feedback"
+    },
+    {
+      "id": "EX-STOCK",
+      "description": "真实仓出补料优先、物理入库与冻结来源相位区别、反压不能假定长期绝对优先",
+      "test": "tests/math/warehouse/physical-refill-priority.test.js",
+      "marker": "blocked high-priority outlet does not falsely monopolize"
+    },
+    {
+      "id": "EX-NET",
+      "description": "A收入1/2、B收入3/4、满速各需1/s：A三净值0、-1/4、-1/2；B为1/4、1/4、-1/4",
+      "test": "tests/math/warehouse/net-value-semantics.test.js",
+      "marker": "zero net does not imply zero potential"
+    },
+    {
+      "id": "EX-POSITIVE",
+      "description": "库存长期正净值时，当前稳态解除该物品缺料限制不改变其需求",
+      "test": "tests/math/warehouse/net-value-semantics.test.js",
+      "marker": "positive stock slope removes its own gate"
+    },
+    {
+      "id": "EX-JOINT",
+      "description": "两原料收入1/4、1/3，独占加工满速各需1/2：实际批率1/4，潜在净值-1/12与1/12",
+      "test": "tests/math/integration/strict-worker-contract.test.js",
+      "marker": "joint warehouse tree "
+    },
+    {
+      "id": "EX-RELAY",
+      "description": "仓出2/5/s经一进一出分汇流加工：批率1/5；充足时2/5",
+      "test": "tests/math/integration/strict-worker-contract.test.js",
+      "marker": "relay chain "
+    },
+    {
+      "id": "EX-FROZEN",
+      "description": "冻结独占链两消费者占空比3/8；40级反序链末端1/7",
+      "test": "tests/math/integration/strict-worker-contract.test.js",
+      "marker": "documented exclusive forty-stage chain"
+    },
+    {
+      "id": "EX-FEEDBACK",
+      "description": "有损/等量/增益冻结反馈、无源环、多原料反馈、多个生产者",
+      "test": "tests/math/integration/strict-worker-contract.test.js",
+      "marker": "documented multiple frozen producers"
+    },
+    {
+      "id": "EX-PRIORITY",
+      "description": "稀疏单源及快速冻结消费者优先；实体仓出先补货",
+      "test": "tests/math/integration/strict-worker-contract.test.js",
+      "marker": "sparse shared frozen scarcity; exact priority"
+    },
+    {
+      "id": "EX-AST",
+      "description": "115/71/8/6机真实AST，固定分式及独立模拟回归；两小图全解",
+      "test": "tests/math/validation/ast-long-run-parity.test.js",
+      "marker": "ast1-warehouse-feedback-loop-v1.txt"
+    },
+    {
+      "id": "EX-HISTORICAL",
+      "description": "50份恢复的历史布局，每个H编号分别重算并独立检查已证实际计数",
+      "test": "tests/math/validation/historical-document-examples.test.js",
+      "marker": "historical-layouts.json"
+    },
+    {
+      "id": "EX-CALENDAR",
+      "description": "独立链到货周期9秒，最高优先仓出1/3件/s；交换优先、稀疏和不兼容拒证",
+      "test": "tests/math/warehouse/priority-deposit-calendar.test.js",
+      "marker": "priority calendar certifies slow tree under arbitrary lower-priority consumption"
+    },
+    {
+      "id": "EX-SUBGRAPHS",
+      "description": "仓入逐线反向追踪、共享分流合并、独立仓出库存耦合、循环和真实115机12子图",
+      "test": "tests/math/topology/terminal-subgraphs.test.js",
+      "marker": "independent warehouse inlet ports are not a physical dependency"
+    },
+    {
+      "id": "EX-RELATIVE",
+      "description": "三路分流相对批率下界1/6，低库存条件证明/拒证，以及自由仓出剩余供给饱和",
+      "test": "tests/math/topology/relative-splitter-service.test.js",
+      "marker": "relative splitter clock plus last-low stock implication"
+    },
+    {
+      "id": "EX-EXHAUSTION",
+      "description": "高库存条件需求覆盖收入，净值为零；缺料、供给过量、重复计入拒证",
+      "test": "tests/math/topology/relative-splitter-service.test.js",
+      "marker": "high stock service covers income: zero net without guessing withdrawal allocation"
+    },
+    {
+      "id": "EX-BROWSER",
+      "description": "HTTP和file://真实HTML的严格Worker，实际蓝图、故障恢复和冻结配置",
+      "test": "tests/steady-worker-browser.test.js",
+      "marker": "ast1-warehouse-feedback-loop-v1.txt"
+    },
+    {
+      "id": "EX-ELEMENT",
+      "description": "自由混料分流的总率等式与条件拒证",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "unfiltered mixed splitter has exact total division but not per-material division"
+    },
+    {
+      "id": "EX-WORD",
+      "description": "有序词精确组合及实际模拟相位反例",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "ordered word formula uses gcd/lcm, not material mean proportions"
+    },
+    {
+      "id": "EX-WATERLEVEL",
+      "description": "周期单件源条件均分与慢支路饱和，五组公式及带长变化",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "periodic unit supply water level is exact under explicit slow and fast branch contracts"
+    },
+    {
+      "id": "EX-BURST",
+      "description": "同质平均供给相同但批量供给产生不同分配的反例",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "equal mean supply does not guarantee the water-level law with burst supply"
+    },
+    {
+      "id": "EX-PACKET",
+      "description": "周期批量及独立串联供给下的分段分流等式",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "periodic batch and tandem calendar supports exact conditional split without averaging bursts"
+    },
+    {
+      "id": "EX-ENVELOPE",
+      "description": "精确周期窗口上下界、重复相位及真实日历",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "calendar envelopes count simultaneous packets and all integer window phases exactly"
+    },
+    {
+      "id": "EX-MULTIACCEPT",
+      "description": "多原料独占入口的严格接受合同与精确分流等式",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "multi-ingredient accepting ports follow strict ordinal underload and compose into equal split equations"
+    },
+    {
+      "id": "EX-MERGERWORD",
+      "description": "非重叠周期汇流与空启动分流相位的精确组合",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "disjoint periodic merger composes the exact material word and splitter startup phase"
+    },
+    {
+      "id": "EX-PACED",
+      "description": "优先仓出完整启动日历及最终发送相位",
+      "test": "tests/math/warehouse/priority-deposit-calendar.test.js",
+      "marker": "priority-paced recipe has an exact startup calendar and eventual dispatch phase"
+    },
+    {
+      "id": "EX-RESIDUAL",
+      "description": "优先仓出剩余词与最终自由支路等式",
+      "test": "tests/math/warehouse/priority-deposit-calendar.test.js",
+      "marker": "priority residual word proves free sibling equality without choosing a mean allocation"
+    },
+    {
+      "id": "EX-PACEDSPLIT",
+      "description": "饱和三路轮询及下游节拍专用加工",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "saturated three-port service with a downstream-paced private feeder is exact"
+    },
+    {
+      "id": "EX-SOLEOUTLET",
+      "description": "单仓出完整突发日历与冷却最大值公式",
+      "test": "tests/math/warehouse/priority-deposit-calendar.test.js",
+      "marker": "sole free warehouse outlet cools a complete burst calendar by exact ordinal max"
+    },
+    {
+      "id": "EX-DEPOSIT",
+      "description": "销毁日历不得计入库存收入",
+      "test": "tests/math/warehouse/priority-deposit-calendar.test.js",
+      "marker": "complete deposit calendars never count certified destruction as stock income"
+    },
+    {
+      "id": "EX-ELIGIBILITY",
+      "description": "独立可用词有限指针组合及计数反例",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "conditional eligibility word gives exact success and skip counts by finite composition"
+    },
+    {
+      "id": "EX-SPAN",
+      "description": "独立批次头时钟与下游序号跨度组合",
+      "test": "tests/math/warehouse/priority-deposit-calendar.test.js",
+      "marker": "ordinal span composition proves downstream equal split using an independent batch head tree"
+    },
+    {
+      "id": "EX-RECORD",
+      "description": "三路周期库存累计缺额双边闭合及短带拒证",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "periodic sole-stock three-way splitter closes paired long-run deficits without a free sibling"
+    },
+    {
+      "id": "EX-SATRESIDUAL",
+      "description": "饱和分流剩余窗口及容量条件",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "saturated residual envelope proves a long enough branch absorbs spare throughput"
+    },
+    {
+      "id": "EX-SHAREDCACHE",
+      "description": "共享原料缓存首拒绝、独立周期链及过载拒证",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "shared ingredient cache calendar has exact multi-port throughput and rejects overload"
+    },
+    {
+      "id": "EX-DIAMOND",
+      "description": "同质恒定分后汇组合及相撞、带长变化与拒证",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "uniform split rejoin is exact for unequal lengths and coincident merger heads"
+    },
+    {
+      "id": "EX-FILTERCYCLE",
+      "description": "固定过滤自由终点轮询等式、比例矛盾及正常运行反例",
+      "test": "tests/math/topology/element-laws.test.js",
+      "marker": "filtered free terminal cycle detects impossible material ratios but does not assert all mixed streams stop"
+    },
+    {
+      "id": "EX-PRESSURE",
+      "description": "当前服务边界条件需求、临界负载及实际图不变",
+      "test": "tests/math/warehouse/net-value-semantics.test.js",
+      "marker": "current boundary pressure preserves actual graph and income, with distinct conditional demand counts"
+    },
+    {
+      "id": "EX-PARALLEL",
+      "description": "周期自由并行仓出优先前缀序号代数",
+      "test": "tests/math/warehouse/priority-deposit-calendar.test.js",
+      "marker": "parallel free outlets: periodic priority-prefix ordinal algebra, including overlapping bursts"
+    },
+    {
+      "id": "EX-FROZENCALENDAR",
+      "description": "无消耗冻结源的精确整数入库日历",
+      "test": "tests/math/warehouse/priority-deposit-calendar.test.js",
+      "marker": "unconditional frozen sources provide exact next-tick deposit calendars"
+    }
+  ],
+  "historicalDocument": "archive/math-20261125/docs/generic-machine-rate-model.md",
+  "historicalLayouts": "tests/fixtures/math/historical-layouts.json",
+  "historicalCoverage": "tests/fixtures/math/historical-layout-coverage.json",
+  "historicalTestReferences": [
+    {
+      "name": "test_ast_focused_research.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_ast_focused_research.js",
+      "currentRelatedCases": [
+        "EX-AST"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_asymptotic_guard_algebra.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_asymptotic_guard_algebra.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_browser_certified.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_browser_certified.js",
+      "currentRelatedCases": [
+        "EX-BROWSER"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_cadence_backpressure.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_cadence_backpressure.js",
+      "currentRelatedCases": [
+        "EX-CADENCE",
+        "EX-AST"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_certified_preview.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_certified_preview.js",
+      "currentRelatedCases": [
+        "EX-JOINT",
+        "EX-FROZEN",
+        "EX-PRIORITY"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_count_factored_projection.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_count_factored_projection.js",
+      "currentRelatedCases": [
+        "EX-ALGEBRA"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_count_proofs.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_count_proofs.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_empty_start_count.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_empty_start_count.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_exact_event_parity.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_exact_event_parity.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_feed_forward_ordinals.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_feed_forward_ordinals.js",
+      "currentRelatedCases": [
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_frozen_exclusive_proof.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_frozen_exclusive_proof.js",
+      "currentRelatedCases": [
+        "EX-FROZEN"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_frozen_finite_components.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_frozen_finite_components.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_frozen_network_proof.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_frozen_network_proof.js",
+      "currentRelatedCases": [
+        "EX-FEEDBACK"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_frozen_protected_item.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_frozen_protected_item.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_frozen_single_item_finite.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_frozen_single_item_finite.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_frozen_token_rings.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_frozen_token_rings.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_html_large_exact.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_html_large_exact.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_html_research_queries.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_html_research_queries.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_joint_service_clocks.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_joint_service_clocks.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_local_mean_certificate.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_local_mean_certificate.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_merger_recipe_tree.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_merger_recipe_tree.js",
+      "currentRelatedCases": [
+        "EX-MERGER",
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_mixed_count_proof.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_mixed_count_proof.js",
+      "currentRelatedCases": [
+        "EX-HISTORICAL",
+        "EX-FIFO"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_permanent_fifo_blockage.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_permanent_fifo_blockage.js",
+      "currentRelatedCases": [
+        "EX-FIFO"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_proof_generality_audit.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_proof_generality_audit.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_real_refill_priority_proof.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_real_refill_priority_proof.js",
+      "currentRelatedCases": [
+        "EX-STOCK"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_recipe_tree_proof.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_recipe_tree_proof.js",
+      "currentRelatedCases": [
+        "EX-ORDINAL",
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_saturated_router_proof.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_saturated_router_proof.js",
+      "currentRelatedCases": [
+        "EX-MERGER",
+        "EX-SPLITTER",
+        "EX-BOUND"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_saturated_router_validation.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_saturated_router_validation.js",
+      "currentRelatedCases": [
+        "EX-MERGER",
+        "EX-AST"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_saturated_transfer_regions.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_saturated_transfer_regions.js",
+      "currentRelatedCases": [
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_shared_recipe_inputs.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_shared_recipe_inputs.js",
+      "currentRelatedCases": [
+        "EX-CADENCE",
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_shared_stock_proof.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_shared_stock_proof.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_split_recipe_branches.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_split_recipe_branches.js",
+      "currentRelatedCases": [
+        "EX-SPLITTER",
+        "EX-BOUND",
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_symbolic_mean_algebra.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_symbolic_mean_algebra.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_symbolic_relation_algebra.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_symbolic_relation_algebra.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_tandem_count_proof.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_tandem_count_proof.js",
+      "currentRelatedCases": [
+        "EX-ORDINAL",
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_warehouse_burst_proof.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_warehouse_burst_proof.js",
+      "currentRelatedCases": [
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_warehouse_dependency_plan.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_warehouse_dependency_plan.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_warehouse_frozen_components.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_warehouse_frozen_components.js",
+      "currentRelatedCases": [
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_warehouse_mode_facts.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_warehouse_mode_facts.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_warehouse_multi_topic.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_warehouse_multi_topic.js",
+      "currentRelatedCases": [],
+      "status": "archived-review-pending"
+    },
+    {
+      "name": "test_warehouse_service_capacity.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_warehouse_service_capacity.js",
+      "currentRelatedCases": [
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    },
+    {
+      "name": "test_warehouse_smooth_priority.js",
+      "archive": "archive/math-20261125/research/long-run-rates/test_warehouse_smooth_priority.js",
+      "currentRelatedCases": [
+        "EX-HISTORICAL"
+      ],
+      "status": "related-current-regression-not-full-migration"
+    }
+  ],
+  "retainedExampleDocument": "archive/math-20261125/element-model-transition/generic-machine-rate-model.md"
+}

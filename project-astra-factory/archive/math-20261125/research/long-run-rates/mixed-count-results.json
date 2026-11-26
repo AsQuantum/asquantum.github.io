@@ -1,0 +1,592 @@
+{
+  "blocked": {
+    "proof": {
+      "roundRobin": [
+        {
+          "machine": "M2",
+          "kind": "merger",
+          "rule": "mixed-saturated-input-count",
+          "ports": [
+            "R0",
+            "R1"
+          ],
+          "unskipped": [
+            "R0",
+            "R1"
+          ],
+          "commonRoute": "R2",
+          "totalRate": null
+        },
+        {
+          "machine": "M3",
+          "kind": "splitter",
+          "rule": "mixed-free-outputs-or-permanent-head-stop",
+          "ports": [
+            "R3",
+            "R4",
+            "R5"
+          ],
+          "unskipped": [
+            "R3",
+            "R4",
+            "R5"
+          ],
+          "commonRoute": "R2",
+          "totalRate": null
+        }
+      ],
+      "materialRatios": [],
+      "materialRatioBounds": [],
+      "refused": []
+    },
+    "unique": 62,
+    "unknown": 0
+  },
+  "pass": {
+    "proof": {
+      "roundRobin": [
+        {
+          "machine": "M2",
+          "kind": "merger",
+          "rule": "mixed-saturated-input-count",
+          "ports": [
+            "R0",
+            "R1"
+          ],
+          "unskipped": [
+            "R0",
+            "R1"
+          ],
+          "commonRoute": "R2",
+          "totalRate": "1"
+        },
+        {
+          "machine": "M3",
+          "kind": "splitter",
+          "rule": "compatible-free-splitter-tree",
+          "ports": [
+            "R3",
+            "R4",
+            "R5"
+          ],
+          "unskipped": [
+            "R3",
+            "R4",
+            "R5"
+          ],
+          "commonRoute": "R2",
+          "totalRate": null
+        }
+      ],
+      "materialRatios": [
+        {
+          "proven": true,
+          "route": "R3",
+          "item": "小行星矿石",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R3",
+          "item": "星尘粒子",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R4",
+          "item": "小行星矿石",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R4",
+          "item": "星尘粒子",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R5",
+          "item": "小行星矿石",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R5",
+          "item": "星尘粒子",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        }
+      ],
+      "materialRatioBounds": [],
+      "refused": []
+    },
+    "unique": 68,
+    "unknown": 0
+  },
+  "equal": {
+    "unknown": 47
+  },
+  "noncoprime": {
+    "unknown": 8
+  },
+  "tree": {
+    "unique": 91,
+    "proof": {
+      "roundRobin": [
+        {
+          "machine": "M2",
+          "kind": "merger",
+          "rule": "mixed-saturated-input-count",
+          "ports": [
+            "R0",
+            "R1"
+          ],
+          "unskipped": [
+            "R0",
+            "R1"
+          ],
+          "commonRoute": "R2",
+          "totalRate": "1"
+        },
+        {
+          "machine": "M3",
+          "kind": "splitter",
+          "rule": "compatible-free-splitter-tree",
+          "ports": [
+            "R3",
+            "R4",
+            "R5"
+          ],
+          "unskipped": [
+            "R3",
+            "R4",
+            "R5"
+          ],
+          "commonRoute": "R2",
+          "totalRate": null
+        },
+        {
+          "machine": "M4",
+          "kind": "splitter",
+          "rule": "compatible-free-splitter-tree",
+          "ports": [
+            "R6",
+            "R7",
+            "R8"
+          ],
+          "unskipped": [
+            "R6",
+            "R7",
+            "R8"
+          ],
+          "commonRoute": "R3",
+          "totalRate": null
+        }
+      ],
+      "materialRatios": [
+        {
+          "proven": true,
+          "route": "R3",
+          "item": "小行星矿石",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R3",
+          "item": "星尘粒子",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R6",
+          "item": "小行星矿石",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R6",
+          "item": "星尘粒子",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R7",
+          "item": "小行星矿石",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R7",
+          "item": "星尘粒子",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R8",
+          "item": "小行星矿石",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R8",
+          "item": "星尘粒子",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R4",
+          "item": "小行星矿石",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R4",
+          "item": "星尘粒子",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R5",
+          "item": "小行星矿石",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        },
+        {
+          "proven": true,
+          "route": "R5",
+          "item": "星尘粒子",
+          "numerator": 1,
+          "denominator": 2,
+          "method": "periodic-fifo-splitter-tree"
+        }
+      ],
+      "materialRatioBounds": [],
+      "refused": []
+    },
+    "actual": {
+      "M7": {
+        "小行星矿石": 3.3333333333333335,
+        "星尘粒子": 3.3333333333333335
+      },
+      "M8": {
+        "小行星矿石": 3.3333333333333335,
+        "星尘粒子": 3.3333333333333335
+      },
+      "M9": {
+        "小行星矿石": 3.3333333333333335,
+        "星尘粒子": 3.3333333333333335
+      }
+    }
+  },
+  "layout": {
+    "name": "Mixed FIFO: incompatible required proportions",
+    "recordIndexed": true,
+    "machines": [
+      {
+        "id": "M0",
+        "type": "采矿",
+        "x": 2,
+        "y": 9,
+        "face": "E",
+        "mode": 0
+      },
+      {
+        "id": "M1",
+        "type": "粒子",
+        "x": 14,
+        "y": 1,
+        "face": "S",
+        "mode": 0
+      },
+      {
+        "id": "M2",
+        "type": "汇流",
+        "x": 15,
+        "y": 10,
+        "face": "E"
+      },
+      {
+        "id": "M3",
+        "type": "分流",
+        "x": 24,
+        "y": 10,
+        "face": "E",
+        "outFilters": [
+          "小行星矿石",
+          "小行星矿石",
+          "星尘粒子"
+        ]
+      },
+      {
+        "id": "M4",
+        "type": "仓入",
+        "x": 35,
+        "y": 9,
+        "face": "E"
+      },
+      {
+        "id": "M5",
+        "type": "仓入",
+        "x": 23,
+        "y": 1,
+        "face": "N"
+      },
+      {
+        "id": "M6",
+        "type": "仓入",
+        "x": 23,
+        "y": 17,
+        "face": "S"
+      }
+    ],
+    "routes": [
+      {
+        "id": "R0",
+        "from": {
+          "id": "M0",
+          "port": 0
+        },
+        "to": {
+          "id": "M2",
+          "port": 0
+        },
+        "path": [
+          [
+            7,
+            11
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            14,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R1",
+        "from": {
+          "id": "M1",
+          "port": 0
+        },
+        "to": {
+          "id": "M2",
+          "port": 1
+        },
+        "path": [
+          [
+            16,
+            6
+          ],
+          [
+            16,
+            7
+          ],
+          [
+            16,
+            8
+          ],
+          [
+            16,
+            9
+          ]
+        ]
+      },
+      {
+        "id": "R2",
+        "from": {
+          "id": "M2",
+          "port": 0
+        },
+        "to": {
+          "id": "M3",
+          "port": 0
+        },
+        "path": [
+          [
+            18,
+            11
+          ],
+          [
+            19,
+            11
+          ],
+          [
+            20,
+            11
+          ],
+          [
+            21,
+            11
+          ],
+          [
+            22,
+            11
+          ],
+          [
+            23,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R3",
+        "from": {
+          "id": "M3",
+          "port": 0
+        },
+        "to": {
+          "id": "M4",
+          "port": 1
+        },
+        "path": [
+          [
+            27,
+            11
+          ],
+          [
+            28,
+            11
+          ],
+          [
+            29,
+            11
+          ],
+          [
+            30,
+            11
+          ],
+          [
+            31,
+            11
+          ],
+          [
+            32,
+            11
+          ],
+          [
+            33,
+            11
+          ],
+          [
+            34,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R4",
+        "from": {
+          "id": "M3",
+          "port": 1
+        },
+        "to": {
+          "id": "M5",
+          "port": 1
+        },
+        "path": [
+          [
+            25,
+            9
+          ],
+          [
+            25,
+            8
+          ],
+          [
+            25,
+            7
+          ],
+          [
+            25,
+            6
+          ]
+        ]
+      },
+      {
+        "id": "R5",
+        "from": {
+          "id": "M3",
+          "port": 2
+        },
+        "to": {
+          "id": "M6",
+          "port": 1
+        },
+        "path": [
+          [
+            25,
+            13
+          ],
+          [
+            25,
+            14
+          ],
+          [
+            25,
+            15
+          ],
+          [
+            25,
+            16
+          ]
+        ]
+      }
+    ],
+    "frozenFactories": []
+  }
+}

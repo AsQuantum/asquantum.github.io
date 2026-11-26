@@ -1,0 +1,24 @@
+{
+  "structural": 360,
+  "scanChecks": 141950,
+  "original": [
+    {
+      "reference": "R2",
+      "equal": [],
+      "upper": [
+        [
+          "R1",
+          "R2"
+        ]
+      ],
+      "conservation": {
+        "total": "R0",
+        "parts": [
+          "R1",
+          "R2"
+        ]
+      },
+      "totalRate": "1"
+    }
+  ]
+}

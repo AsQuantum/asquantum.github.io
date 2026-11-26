@@ -1,0 +1,275 @@
+{
+  "records": [
+    {
+      "name": "competing two ingredients",
+      "proof": [
+        {
+          "items": [
+            "钛合金锭",
+            "合金板"
+          ],
+          "states": 648,
+          "caps": [
+            8,
+            8
+          ],
+          "thresholds": [
+            4,
+            4
+          ],
+          "clockStates": 2,
+          "clockPrefix": 0,
+          "certifiedPhysicalWords": 0,
+          "cycleTicks": 4,
+          "cycleClasses": 2,
+          "duties": [
+            {
+              "factory": "a",
+              "duty": "1/2",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            },
+            {
+              "factory": "b",
+              "duty": "0",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            }
+          ],
+          "outlets": [],
+          "sourceRates": [],
+          "joint": null
+        }
+      ],
+      "unique": 33,
+      "actual": {
+        "s": 1.0000000000025668,
+        "a": 0.49999999999998984,
+        "b": 0
+      }
+    },
+    {
+      "name": "surplus tracked ingredient",
+      "proof": [
+        {
+          "items": [
+            "钛合金锭",
+            "合金板"
+          ],
+          "states": 324,
+          "caps": [
+            8,
+            8
+          ],
+          "thresholds": [
+            4,
+            4
+          ],
+          "clockStates": 1,
+          "clockPrefix": 0,
+          "certifiedPhysicalWords": 0,
+          "cycleTicks": 2,
+          "cycleClasses": 4,
+          "duties": [
+            {
+              "factory": "a",
+              "duty": "1",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            },
+            {
+              "factory": "b",
+              "duty": "0",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            }
+          ],
+          "outlets": [],
+          "sourceRates": [],
+          "joint": null
+        }
+      ],
+      "unique": 33,
+      "actual": {
+        "s": 1.0000000000025668,
+        "a": 1.0000000000025668,
+        "b": 0
+      }
+    },
+    {
+      "name": "feedback and competing sink",
+      "proof": [
+        {
+          "items": [
+            "钛合金锭",
+            "合金板"
+          ],
+          "states": 720,
+          "caps": [
+            8,
+            9
+          ],
+          "thresholds": [
+            2,
+            4
+          ],
+          "clockStates": 2,
+          "clockPrefix": 0,
+          "certifiedPhysicalWords": 0,
+          "cycleTicks": 2,
+          "cycleClasses": 256,
+          "duties": [
+            {
+              "factory": "a",
+              "duty": "1",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            },
+            {
+              "factory": "b",
+              "duty": "1",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            },
+            {
+              "factory": "c",
+              "duty": "1",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            }
+          ],
+          "outlets": [],
+          "sourceRates": [],
+          "joint": null
+        }
+      ],
+      "unique": 28,
+      "actual": {
+        "s": 1.0000000000025668,
+        "a": 1.0000000000025666,
+        "b": 1.0000000000025666,
+        "c": 1.0000000000025664
+      }
+    },
+    {
+      "name": "nonintegral coupled service",
+      "proof": [
+        {
+          "items": [
+            "钛合金锭",
+            "合金板"
+          ],
+          "states": 2160,
+          "caps": [
+            9,
+            8
+          ],
+          "thresholds": [
+            5,
+            4
+          ],
+          "clockStates": 2,
+          "clockPrefix": 0,
+          "certifiedPhysicalWords": 0,
+          "cycleTicks": 4,
+          "cycleClasses": 2,
+          "duties": [
+            {
+              "factory": "a",
+              "duty": "1/2",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            },
+            {
+              "factory": "b",
+              "duty": "0",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            }
+          ],
+          "outlets": [],
+          "sourceRates": [],
+          "joint": null
+        }
+      ],
+      "unique": 33,
+      "actual": {
+        "s": 1.0000000000025668,
+        "a": 0.49999999999998984,
+        "b": 0
+      }
+    },
+    {
+      "name": "unseeded shared cycle",
+      "proof": [
+        {
+          "items": [
+            "钛合金锭",
+            "合金板"
+          ],
+          "states": 126,
+          "caps": [
+            8,
+            6
+          ],
+          "thresholds": [
+            4,
+            2
+          ],
+          "clockStates": 1,
+          "clockPrefix": 0,
+          "certifiedPhysicalWords": 0,
+          "cycleTicks": 1,
+          "cycleClasses": 2,
+          "duties": [
+            {
+              "factory": "a",
+              "duty": "0",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            },
+            {
+              "factory": "b",
+              "duty": "0",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            },
+            {
+              "factory": "c",
+              "duty": "0",
+              "proven": true,
+              "method": "exact-fixed-tick-certified-frozen-component-quotient"
+            }
+          ],
+          "outlets": [],
+          "sourceRates": [],
+          "joint": null
+        }
+      ],
+      "unique": 27,
+      "actual": {
+        "a": 0,
+        "b": 0,
+        "c": 0
+      }
+    }
+  ],
+  "random": {
+    "total": 20,
+    "certified": 20,
+    "refused": 0,
+    "queries": 559,
+    "maxStates": 72576
+  },
+  "capReport": {
+    "smallCapRejected": [
+      {
+        "items": [
+          "钛合金锭",
+          "合金板"
+        ],
+        "reason": "clipped stock can later affect eligibility: 钛合金锭"
+      }
+    ]
+  }
+}

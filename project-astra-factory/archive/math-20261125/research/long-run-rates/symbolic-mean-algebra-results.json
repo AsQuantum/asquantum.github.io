@@ -1,0 +1,165 @@
+[
+  {
+    "name": "multiple recurrent classes (initial mode 0)",
+    "values": {
+      "reward": "0",
+      "pulse": "1/2"
+    },
+    "states": "4",
+    "gram": 8
+  },
+  {
+    "name": "multiple recurrent classes (initial mode 1)",
+    "values": {
+      "reward": "1/2",
+      "pulse": "1/2"
+    },
+    "states": "4",
+    "gram": 8
+  },
+  {
+    "name": "two competing frozen consumers, half-frame source",
+    "status": "proved",
+    "duty": {
+      "s": "1",
+      "a": "1/2",
+      "b": "0",
+      "sum": "1/2"
+    },
+    "unknown": [],
+    "bits": 5,
+    "states": "2",
+    "gram": 18,
+    "basis": 8,
+    "nodes": 322,
+    "lift": [
+      {
+        "item": "k",
+        "mode": "no-clipping"
+      }
+    ],
+    "automaticRelations": null
+  },
+  {
+    "name": "interleaved frozen sources",
+    "status": "proved",
+    "duty": {
+      "s1": "1",
+      "a": "1",
+      "s2": "1",
+      "b": "1",
+      "sum": "2"
+    },
+    "unknown": [],
+    "bits": 4,
+    "states": "1",
+    "gram": 4,
+    "basis": 1,
+    "nodes": 115,
+    "lift": [
+      {
+        "item": "k",
+        "mode": "no-clipping"
+      }
+    ],
+    "automaticRelations": null
+  },
+  {
+    "name": "unseeded feedback",
+    "status": "proved",
+    "duty": {
+      "a": "0",
+      "b": "0",
+      "c": "0",
+      "sum": "0"
+    },
+    "unknown": [],
+    "bits": 8,
+    "states": "2",
+    "gram": 20,
+    "basis": 9,
+    "nodes": 661,
+    "lift": [
+      {
+        "item": "k",
+        "mode": "no-clipping"
+      },
+      {
+        "item": "x",
+        "mode": "no-clipping"
+      }
+    ],
+    "automaticRelations": null
+  },
+  {
+    "name": "two slow consumers",
+    "status": "partial",
+    "duty": {
+      "s": "1",
+      "sum": "3/2"
+    },
+    "unknown": [
+      "service:a",
+      "service:b"
+    ],
+    "bits": 19,
+    "states": "108000",
+    "gram": 27,
+    "basis": 25,
+    "nodes": 98362,
+    "lift": [
+      {
+        "item": "k",
+        "mode": "no-clipping"
+      }
+    ],
+    "automaticRelations": {
+      "rank": 2,
+      "columns": 30,
+      "relations": [
+        {
+          "coefficients": {
+            "service:s": "1"
+          },
+          "constant": "1"
+        },
+        {
+          "coefficients": {
+            "service:s": "3/32",
+            "service:a": "-1/16",
+            "service:b": "-1/16"
+          },
+          "constant": "0"
+        }
+      ],
+      "unit": "1"
+    }
+  },
+  {
+    "name": "multi-resource shared competition",
+    "status": "proved",
+    "duty": {
+      "s": "1",
+      "a": "1/2",
+      "b": "0",
+      "sum": "1/2"
+    },
+    "unknown": [],
+    "bits": 11,
+    "states": "80",
+    "gram": 52,
+    "basis": 25,
+    "nodes": 11860,
+    "lift": [
+      {
+        "item": "k",
+        "mode": "no-clipping"
+      },
+      {
+        "item": "x",
+        "mode": "inductive-permanent-abundance"
+      }
+    ],
+    "automaticRelations": null
+  }
+]

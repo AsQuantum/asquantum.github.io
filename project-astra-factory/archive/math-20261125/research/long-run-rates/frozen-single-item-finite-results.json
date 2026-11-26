@@ -1,0 +1,229 @@
+[
+  {
+    "name": "two slow consumers",
+    "proof": {
+      "item": "钛合金锭",
+      "method": "finite-state-recurrent-class",
+      "income": "1",
+      "demand": "4/3",
+      "stockBound": "8",
+      "states": 162000,
+      "cycleClasses": 11,
+      "cycleTicks": 60,
+      "consumptions": [
+        {
+          "factory": "a",
+          "items": "2"
+        },
+        {
+          "factory": "b",
+          "items": "1"
+        }
+      ],
+      "duties": [
+        {
+          "factory": "a",
+          "duty": "1",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        },
+        {
+          "factory": "b",
+          "duty": "1/2",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        }
+      ]
+    },
+    "unique": 27,
+    "actual": {
+      "s": 1.0000000000025668,
+      "a": 1.0000000000025655,
+      "b": 0.49999999999998856
+    }
+  },
+  {
+    "name": "multiple sources interleaved",
+    "proof": {
+      "item": "钛合金锭",
+      "method": "finite-state-recurrent-class",
+      "income": "9",
+      "demand": "10",
+      "stockBound": "10",
+      "states": 3520,
+      "cycleClasses": 6,
+      "cycleTicks": 20,
+      "consumptions": [
+        {
+          "factory": "a",
+          "items": "5"
+        },
+        {
+          "factory": "b",
+          "items": "4"
+        }
+      ],
+      "duties": [
+        {
+          "factory": "a",
+          "duty": "1",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        },
+        {
+          "factory": "b",
+          "duty": "4/5",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        }
+      ]
+    },
+    "unique": 28,
+    "actual": {
+      "s1": 1.0000000000025668,
+      "a": 1.0000000000025666,
+      "s2": 1.0000000000025668,
+      "b": 0.8000000000015358
+    }
+  },
+  {
+    "name": "three slow consumers",
+    "proof": {
+      "item": "钛合金锭",
+      "method": "finite-state-recurrent-class",
+      "income": "3",
+      "demand": "6",
+      "stockBound": "11",
+      "states": 240000,
+      "cycleClasses": 101,
+      "cycleTicks": 20,
+      "consumptions": [
+        {
+          "factory": "a",
+          "items": "2"
+        },
+        {
+          "factory": "b",
+          "items": "1"
+        },
+        {
+          "factory": "c",
+          "items": "0"
+        }
+      ],
+      "duties": [
+        {
+          "factory": "a",
+          "duty": "1",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        },
+        {
+          "factory": "b",
+          "duty": "1/2",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        },
+        {
+          "factory": "c",
+          "duty": "0",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        }
+      ]
+    },
+    "unique": 34,
+    "actual": {
+      "s": 1.0000000000025668,
+      "a": 1.0000000000025664,
+      "b": 0.4999999999999894,
+      "c": 0
+    }
+  },
+  {
+    "name": "completion-tick collision",
+    "proof": {
+      "item": "钛合金锭",
+      "method": "finite-state-recurrent-class",
+      "income": "1",
+      "demand": "122/41",
+      "stockBound": "8",
+      "states": 73800,
+      "cycleClasses": 2,
+      "cycleTicks": 180,
+      "consumptions": [
+        {
+          "factory": "a",
+          "items": "8"
+        },
+        {
+          "factory": "b",
+          "items": "1"
+        }
+      ],
+      "duties": [
+        {
+          "factory": "a",
+          "duty": "41/45",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        },
+        {
+          "factory": "b",
+          "duty": "1/18",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        }
+      ]
+    },
+    "unique": 27,
+    "actual": {
+      "s": 1.0000000000025668,
+      "a": 0.9111111111132189,
+      "b": 0.055555555555563324
+    }
+  },
+  {
+    "name": "source later in list",
+    "proof": {
+      "item": "钛合金锭",
+      "method": "finite-state-recurrent-class",
+      "income": "1",
+      "demand": "2",
+      "stockBound": "8",
+      "states": 72000,
+      "cycleClasses": 41,
+      "cycleTicks": 20,
+      "consumptions": [
+        {
+          "factory": "a",
+          "items": "1"
+        },
+        {
+          "factory": "b",
+          "items": "0"
+        }
+      ],
+      "duties": [
+        {
+          "factory": "a",
+          "duty": "1",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        },
+        {
+          "factory": "b",
+          "duty": "0",
+          "proven": true,
+          "method": "exact-fixed-tick-single-item-state-quotient"
+        }
+      ]
+    },
+    "unique": 27,
+    "actual": {
+      "a": 1.0000000000025655,
+      "b": 0,
+      "s": 1.0000000000025668
+    }
+  }
+]

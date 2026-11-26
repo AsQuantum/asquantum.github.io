@@ -222,8 +222,8 @@ function mobileCase(){
    const hover=await evalJS('(()=>{const o=document.querySelector("#stampSplitFilter0 option:nth-child(2)");'+
     'const c=getComputedStyle(o);return {background:c.backgroundColor,color:c.color};})()');
    await send('CSS.forcePseudoState',{nodeId:optionNode.result.nodeId,forcedPseudoClasses:[]});
-   assert.equal(hover.background,'rgb(43, 89, 113)','hover background must be theme blue, not white');
-   assert.equal(hover.color,'rgb(248, 255, 255)','hover text must remain light, not black');
+   assert.equal(hover.background,'rgb(43, 64, 88)','hover background must be theme blue, not white');
+   assert.equal(hover.color,'rgb(244, 246, 249)','hover text must remain light, not black');
    console.log('PASS DESKTOP picker option hover uses dark blue background and light text');
   }
 
@@ -248,7 +248,7 @@ function mobileCase(){
    assert.equal(m.display,'flex',m.sel+' needs one-line flex layout');
    assert.equal(m.align,'center',m.sel+' selected label must be centered vertically');
    assert(m.iconWidth<16,m.sel+' picker icon must be compact rather than full width');
-   assert.equal(m.bg,'rgb(22, 43, 61)',m.sel+' uses unified closed-box theme');
+   assert.equal(m.bg,'rgb(23, 37, 56)',m.sel+' uses unified closed-box theme');
   }
   console.log('PASS DESKTOP closed dropdowns: speed 30px, left 34px, right 35px and centered labels; mobile quick tools hidden');
   // Test a real mouse moving through the expanded right-hand picker, not just
@@ -282,8 +282,8 @@ function mobileCase(){
   const realHover=await evalJS('(()=>{const o=document.querySelector("#inspector [data-out-filter] option:nth-child(3)");'+
    'const c=getComputedStyle(o);return {hover:o.matches(":hover"),bg:c.backgroundColor,color:c.color};})()');
   assert(realHover.hover,'actual mouse must hover right Inspector option');
-  assert.equal(realHover.bg,'rgb(43, 89, 113)','right Inspector hovered background must be dark blue');
-  assert.equal(realHover.color,'rgb(248, 255, 255)','right Inspector hovered text must be light');
+  assert.equal(realHover.bg,'rgb(43, 64, 88)','right Inspector hovered background must be dark blue');
+  assert.equal(realHover.color,'rgb(244, 246, 249)','right Inspector hovered text must be light');
   // Click the same select to close its picker without clearing machine
   // selection (Escape intentionally exits the editor's selection mode).
   await send('Input.dispatchMouseEvent',{type:'mousePressed',x:point.x,y:point.y,button:'left',clickCount:1});

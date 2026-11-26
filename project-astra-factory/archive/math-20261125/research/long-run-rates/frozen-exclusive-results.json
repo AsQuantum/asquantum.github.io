@@ -1,0 +1,17 @@
+{
+  "duties": {
+    "sourceA": "1",
+    "sourceB": "1",
+    "consumer": "3/8",
+    "later": "3/8"
+  },
+  "unique": 34,
+  "depth": 40,
+  "actual": {
+    "consumer": 0.37491666666575346,
+    "later": 0.37488888888797567,
+    "sourceA": 1,
+    "sourceB": 1
+  },
+  "rejections": 2
+}

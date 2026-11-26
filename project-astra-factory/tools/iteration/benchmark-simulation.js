@@ -1,0 +1,9 @@
+'use strict';
+const fs=require('node:fs');
+const src=fs.readFileSync('tools/iteration/model-environment.js','utf8');
+const names=JSON.parse(src.match(/for\(const f of (\[.*?\])\)/)[1].replaceAll("'",'"'));
+const body=names.map(n=>fs.readFileSync('scripts/'+n+'.js','utf8')).join('\n');
+const el={getContext(){return{}},classList:{add(){},remove(){}}};
+const make=new Function('document','requestAnimationFrame','ast','frozen',body+'\nfunction stockChartReset(){}function warehouseRefresh(){}function draw(){}function recordWarehouseMovement(){};state=ast1Decode(ast);state.frozenFactories=normalizeFrozenFactories(frozen);const A={q:steadyRegionQ,add:steadyExactAdd,sub:steadyExactSub,mul:steadyExactMul,div:steadyExactDiv,cmp:steadyExactCmp,txt:steadyExactText,Z:STEADY_ZERO,U:STEADY_ONE};return {bench:()=>{resetSimulation();let t=performance.now();simulateBatchSteps(288000,.05);const before={...sim.inbound},out={...sim.outbound};simulateBatchSteps(72000,.05);const simMs=performance.now()-t,net=Object.fromEntries([...new Set([...Object.keys(sim.inbound),...Object.keys(sim.outbound)])].map(k=>[k,((sim.inbound[k]||0)-(before[k]||0)-(sim.outbound[k]||0)+(out[k]||0))/60]));t=performance.now();const actual=iterationSolveComponents(factoryCompileSymbolicSpec(),A,{ms:20000,maxTicks:2160000});const actualMs=performance.now()-t;t=performance.now();const all=iterationResearchPreview(state,A,{ms:60000,maxTicks:2160000});return {simMs,simTime,actualMs,actualStatus:actual.status,allMs:performance.now()-t,allStatus:all.status,net,exact:Object.fromEntries(Object.entries(all.rows).map(([k,v])=>[k,steadyExactNumber(steadyRegionQ(v.net))*60]))}}}');
+const e=make({getElementById(){return el}},()=>{},fs.readFileSync('tests/fixtures/ast1-user-84-78-v1.txt','utf8').trim(),[]);
+console.log(JSON.stringify(e.bench()));

@@ -4,7 +4,7 @@ const root=path.join(__dirname,'..'),file=fs.readFileSync(path.join(__dirname,'f
 function setup(){
  const c=vm.createContext({console,performance,atob,btoa,document:{getElementById(){return{getContext(){return{}}}}},localStorage:{getItem(){},setItem(){}}});
  vm.runInContext(fs.readFileSync(path.join(__dirname,'support/legacy-rate-reference.js'),'utf8'),c);
- for(const f of ['data/catalog','blueprints/machine-ids','blueprints/item-ids','core/state','core/machines','core/routing','core/audit','engine/steady-flow','core/compact-json','blueprints/ast1-codec'])vm.runInContext(read(f),c);
+ for(const f of ['data/catalog','blueprints/machine-ids','blueprints/item-ids','core/state','core/machines','core/routing','core/audit','engine/math/arithmetic/rational','engine/steady-flow','core/compact-json','blueprints/ast1-codec'])vm.runInContext(read(f),c);
  c.ast=file;vm.runInContext('state=ast1Decode(ast)',c);return c;
 }
 test('AST1 warehouse outlet displays 1s nominal and does not invent an effective period',()=>{

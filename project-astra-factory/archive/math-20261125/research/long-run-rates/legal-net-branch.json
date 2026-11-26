@@ -1,0 +1,1472 @@
+{
+  "layout": {
+    "name": "Shared input branch (real recipes)",
+    "recordIndexed": true,
+    "machines": [
+      {
+        "id": "M0",
+        "type": "采矿",
+        "x": 2,
+        "y": 3,
+        "face": "E",
+        "mode": 0
+      },
+      {
+        "id": "M1",
+        "type": "分流",
+        "x": 13,
+        "y": 5,
+        "face": "E"
+      },
+      {
+        "id": "M2",
+        "type": "采矿",
+        "x": 2,
+        "y": 14,
+        "face": "E",
+        "mode": 0
+      },
+      {
+        "id": "M3",
+        "type": "仓出",
+        "x": 35,
+        "y": 22,
+        "face": "E",
+        "item": "合金板"
+      },
+      {
+        "id": "M4",
+        "type": "冶炼",
+        "x": 30,
+        "y": 12,
+        "face": "E",
+        "mode": "钛合金锭"
+      },
+      {
+        "id": "M5",
+        "type": "仓入",
+        "x": 22,
+        "y": 1,
+        "face": "E"
+      },
+      {
+        "id": "M6",
+        "type": "组装",
+        "x": 45,
+        "y": 12,
+        "face": "E",
+        "mode": "复合装甲板"
+      },
+      {
+        "id": "M7",
+        "type": "仓入",
+        "x": 62,
+        "y": 13,
+        "face": "E"
+      }
+    ],
+    "routes": [
+      {
+        "id": "R0",
+        "from": {
+          "id": "M0",
+          "port": 0
+        },
+        "to": {
+          "id": "M1",
+          "port": 0
+        },
+        "path": [
+          [
+            7,
+            5
+          ],
+          [
+            8,
+            5
+          ],
+          [
+            9,
+            5
+          ],
+          [
+            10,
+            5
+          ],
+          [
+            10,
+            6
+          ],
+          [
+            11,
+            6
+          ],
+          [
+            12,
+            6
+          ]
+        ]
+      },
+      {
+        "id": "R1",
+        "from": {
+          "id": "M1",
+          "port": 0
+        },
+        "to": {
+          "id": "M4",
+          "port": 0
+        },
+        "path": [
+          [
+            16,
+            6
+          ],
+          [
+            17,
+            6
+          ],
+          [
+            18,
+            6
+          ],
+          [
+            19,
+            6
+          ],
+          [
+            20,
+            6
+          ],
+          [
+            21,
+            6
+          ],
+          [
+            22,
+            6
+          ],
+          [
+            23,
+            6
+          ],
+          [
+            24,
+            6
+          ],
+          [
+            25,
+            6
+          ],
+          [
+            26,
+            6
+          ],
+          [
+            27,
+            6
+          ],
+          [
+            27,
+            7
+          ],
+          [
+            27,
+            8
+          ],
+          [
+            27,
+            9
+          ],
+          [
+            27,
+            10
+          ],
+          [
+            27,
+            11
+          ],
+          [
+            27,
+            12
+          ],
+          [
+            27,
+            13
+          ],
+          [
+            27,
+            14
+          ],
+          [
+            27,
+            15
+          ],
+          [
+            28,
+            15
+          ],
+          [
+            29,
+            15
+          ]
+        ]
+      },
+      {
+        "id": "R2",
+        "from": {
+          "id": "M1",
+          "port": 1
+        },
+        "to": {
+          "id": "M5",
+          "port": 0
+        },
+        "path": [
+          [
+            14,
+            4
+          ],
+          [
+            14,
+            3
+          ],
+          [
+            14,
+            2
+          ],
+          [
+            15,
+            2
+          ],
+          [
+            16,
+            2
+          ],
+          [
+            17,
+            2
+          ],
+          [
+            18,
+            2
+          ],
+          [
+            19,
+            2
+          ],
+          [
+            20,
+            2
+          ],
+          [
+            21,
+            2
+          ]
+        ]
+      },
+      {
+        "id": "R3",
+        "from": {
+          "id": "M2",
+          "port": 0
+        },
+        "to": {
+          "id": "M4",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            16
+          ],
+          [
+            8,
+            16
+          ],
+          [
+            9,
+            16
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            12,
+            16
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            14,
+            16
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            19,
+            16
+          ],
+          [
+            20,
+            16
+          ],
+          [
+            21,
+            16
+          ],
+          [
+            22,
+            16
+          ],
+          [
+            23,
+            16
+          ],
+          [
+            24,
+            16
+          ],
+          [
+            25,
+            16
+          ],
+          [
+            26,
+            16
+          ],
+          [
+            27,
+            16
+          ],
+          [
+            28,
+            16
+          ],
+          [
+            29,
+            16
+          ]
+        ]
+      },
+      {
+        "id": "R4",
+        "from": {
+          "id": "M3",
+          "port": 0
+        },
+        "to": {
+          "id": "M6",
+          "port": 2
+        },
+        "path": [
+          [
+            40,
+            24
+          ],
+          [
+            41,
+            24
+          ],
+          [
+            42,
+            24
+          ],
+          [
+            43,
+            24
+          ],
+          [
+            43,
+            23
+          ],
+          [
+            43,
+            22
+          ],
+          [
+            43,
+            21
+          ],
+          [
+            43,
+            20
+          ],
+          [
+            43,
+            19
+          ],
+          [
+            43,
+            18
+          ],
+          [
+            43,
+            17
+          ],
+          [
+            43,
+            16
+          ],
+          [
+            44,
+            16
+          ]
+        ]
+      },
+      {
+        "id": "R5",
+        "from": {
+          "id": "M4",
+          "port": 0
+        },
+        "to": {
+          "id": "M6",
+          "port": 1
+        },
+        "path": [
+          [
+            39,
+            15
+          ],
+          [
+            40,
+            15
+          ],
+          [
+            41,
+            15
+          ],
+          [
+            42,
+            15
+          ],
+          [
+            43,
+            15
+          ],
+          [
+            44,
+            15
+          ]
+        ]
+      },
+      {
+        "id": "R6",
+        "from": {
+          "id": "M6",
+          "port": 0
+        },
+        "to": {
+          "id": "M7",
+          "port": 1
+        },
+        "path": [
+          [
+            56,
+            15
+          ],
+          [
+            57,
+            15
+          ],
+          [
+            58,
+            15
+          ],
+          [
+            59,
+            15
+          ],
+          [
+            60,
+            15
+          ],
+          [
+            61,
+            15
+          ]
+        ]
+      }
+    ],
+    "frozenFactories": [
+      {
+        "id": "supply",
+        "name": "独立供给",
+        "enabled": true,
+        "rates": {
+          "合金板": "1"
+        }
+      }
+    ]
+  },
+  "graph": {
+    "status": "compiled",
+    "issues": [],
+    "unlimited": false,
+    "nodes": [
+      {
+        "id": "M0",
+        "type": "采矿",
+        "recipe": {
+          "output": "小行星矿石",
+          "qty": 3,
+          "seconds": 3,
+          "inputs": {}
+        },
+        "face": "E",
+        "inputPriority": []
+      },
+      {
+        "id": "M1",
+        "type": "分流",
+        "recipe": null,
+        "face": "E",
+        "inputPriority": [
+          0
+        ]
+      },
+      {
+        "id": "M2",
+        "type": "采矿",
+        "recipe": {
+          "output": "小行星矿石",
+          "qty": 3,
+          "seconds": 3,
+          "inputs": {}
+        },
+        "face": "E",
+        "inputPriority": []
+      },
+      {
+        "id": "M3",
+        "type": "仓出",
+        "recipe": null,
+        "item": "合金板",
+        "face": "E",
+        "inputPriority": []
+      },
+      {
+        "id": "M4",
+        "type": "冶炼",
+        "recipe": {
+          "output": "钛合金锭",
+          "qty": 1,
+          "seconds": 2,
+          "inputs": {
+            "小行星矿石": 3
+          }
+        },
+        "face": "E",
+        "inputPriority": [
+          1,
+          0
+        ]
+      },
+      {
+        "id": "M5",
+        "type": "仓入",
+        "recipe": null,
+        "face": "E",
+        "inputPriority": [
+          2,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "M6",
+        "type": "组装",
+        "recipe": {
+          "output": "复合装甲板",
+          "qty": 1,
+          "seconds": 4,
+          "inputs": {
+            "合金板": 4,
+            "钛合金锭": 1
+          }
+        },
+        "face": "E",
+        "inputPriority": [
+          2,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "M7",
+        "type": "仓入",
+        "recipe": null,
+        "face": "E",
+        "inputPriority": [
+          2,
+          1,
+          0
+        ]
+      }
+    ],
+    "lines": [
+      {
+        "id": "R0",
+        "from": "M0",
+        "to": "M1",
+        "toPort": 0,
+        "fromPort": 0,
+        "materials": [
+          "小行星矿石"
+        ],
+        "active": true
+      },
+      {
+        "id": "R1",
+        "from": "M1",
+        "to": "M4",
+        "toPort": 0,
+        "fromPort": 0,
+        "materials": [
+          "小行星矿石"
+        ],
+        "active": true
+      },
+      {
+        "id": "R2",
+        "from": "M1",
+        "to": "M5",
+        "toPort": 0,
+        "fromPort": 1,
+        "materials": [
+          "小行星矿石"
+        ],
+        "active": true
+      },
+      {
+        "id": "R3",
+        "from": "M2",
+        "to": "M4",
+        "toPort": 1,
+        "fromPort": 0,
+        "materials": [
+          "小行星矿石"
+        ],
+        "active": true
+      },
+      {
+        "id": "R4",
+        "from": "M3",
+        "to": "M6",
+        "toPort": 2,
+        "fromPort": 0,
+        "materials": [
+          "合金板"
+        ],
+        "active": true
+      },
+      {
+        "id": "R5",
+        "from": "M4",
+        "to": "M6",
+        "toPort": 1,
+        "fromPort": 0,
+        "materials": [
+          "钛合金锭"
+        ],
+        "active": true
+      },
+      {
+        "id": "R6",
+        "from": "M6",
+        "to": "M7",
+        "toPort": 1,
+        "fromPort": 0,
+        "materials": [
+          "复合装甲板"
+        ],
+        "active": true
+      }
+    ],
+    "pools": [
+      {
+        "item": "合金板",
+        "order": [
+          "M3"
+        ]
+      },
+      {
+        "item": "小行星矿石",
+        "order": []
+      },
+      {
+        "item": "复合装甲板",
+        "order": []
+      }
+    ],
+    "frozen": [
+      {
+        "id": "supply",
+        "name": "独立供给",
+        "enabled": true,
+        "rates": {
+          "合金板": "1"
+        },
+        "reachable": true
+      }
+    ]
+  },
+  "relaxed": {
+    "status": "sat",
+    "method": "exact symbolic branches + rational affine elimination",
+    "stats": {
+      "branches": 9,
+      "leaves": 5,
+      "contradictions": 0,
+      "forced": 28,
+      "free": 0,
+      "initialGroups": [
+        5
+      ],
+      "initialChoices": 5,
+      "initialFree": 5
+    },
+    "unique": {
+      "inflow:合金板": "1",
+      "outflow:合金板": "1",
+      "net:合金板": "0",
+      "potential:合金板": "0",
+      "withdrawalDemand:合金板": "1",
+      "localIn:合金板": "0",
+      "localOut:合金板": "1",
+      "localNet:合金板": "-1",
+      "frozenIn:合金板": "1",
+      "frozenOut:合金板": "0",
+      "outflow:小行星矿石": "0",
+      "withdrawalDemand:小行星矿石": "0",
+      "localOut:小行星矿石": "0",
+      "frozenIn:小行星矿石": "0",
+      "frozenOut:小行星矿石": "0",
+      "inflow:复合装甲板": "1/4",
+      "outflow:复合装甲板": "0",
+      "net:复合装甲板": "1/4",
+      "potential:复合装甲板": "1/4",
+      "withdrawalDemand:复合装甲板": "0",
+      "localIn:复合装甲板": "1/4",
+      "localOut:复合装甲板": "0",
+      "localNet:复合装甲板": "1/4",
+      "frozenIn:复合装甲板": "0",
+      "frozenOut:复合装甲板": "0",
+      "total:outflow": "1",
+      "total:withdrawalDemand": "1",
+      "total:localOut": "1",
+      "total:frozenIn": "1",
+      "total:frozenOut": "0",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "1",
+      "machineMaterial:M0|out|小行星矿石": "1",
+      "machineTotal:M1|in": "1",
+      "machineMaterial:M1|in|小行星矿石": "1",
+      "machineTotal:M1|out": "1",
+      "machineMaterial:M1|out|小行星矿石": "1",
+      "machineTotal:M2|in": "0",
+      "machineTotal:M3|in": "0",
+      "machineTotal:M3|out": "1",
+      "machineMaterial:M3|out|合金板": "1",
+      "machineTotal:M4|in": "3/4",
+      "machineMaterial:M4|in|小行星矿石": "3/4",
+      "machineTotal:M4|out": "1/4",
+      "machineMaterial:M4|out|钛合金锭": "1/4",
+      "machineTotal:M5|out": "0",
+      "machineTotal:M6|in": "5/4",
+      "machineMaterial:M6|in|合金板": "1",
+      "machineMaterial:M6|in|钛合金锭": "1/4",
+      "machineTotal:M6|out": "1/4",
+      "machineMaterial:M6|out|复合装甲板": "1/4",
+      "machineTotal:M7|in": "1/4",
+      "machineMaterial:M7|in|复合装甲板": "1/4",
+      "machineTotal:M7|out": "0",
+      "cycle:M0": "1/3",
+      "cycle:M4": "1/4",
+      "cycle:M6": "1/4",
+      "flow:R0|小行星矿石": "1",
+      "routeTotal:R0": "1",
+      "offer:R0": "1",
+      "demand:R0": "1",
+      "offer:R1": "1/2",
+      "demand:R2": "1",
+      "offer:R3": "1",
+      "flow:R4|合金板": "1",
+      "routeTotal:R4": "1",
+      "offer:R4": "1",
+      "demand:R4": "1",
+      "flow:R5|钛合金锭": "1/4",
+      "routeTotal:R5": "1/4",
+      "offer:R5": "1/2",
+      "demand:R5": "1/4",
+      "flow:R6|复合装甲板": "1/4",
+      "routeTotal:R6": "1/4",
+      "offer:R6": "1/4",
+      "demand:R6": "1",
+      "duty:supply": "1"
+    },
+    "multiple": [
+      "inflow:小行星矿石",
+      "net:小行星矿石",
+      "potential:小行星矿石",
+      "localIn:小行星矿石",
+      "localNet:小行星矿石",
+      "total:inflow",
+      "total:net",
+      "total:potential",
+      "total:localIn",
+      "total:localNet",
+      "machineTotal:M2|out",
+      "machineMaterial:M2|out|小行星矿石",
+      "machineTotal:M5|in",
+      "machineMaterial:M5|in|小行星矿石",
+      "cycle:M2",
+      "flow:R1|小行星矿石",
+      "routeTotal:R1",
+      "demand:R1",
+      "flow:R2|小行星矿石",
+      "routeTotal:R2",
+      "offer:R2",
+      "flow:R3|小行星矿石",
+      "routeTotal:R3",
+      "demand:R3"
+    ],
+    "witness": {
+      "inflow:合金板": "1",
+      "outflow:合金板": "1",
+      "net:合金板": "0",
+      "potential:合金板": "0",
+      "withdrawalDemand:合金板": "1",
+      "localIn:合金板": "0",
+      "localOut:合金板": "1",
+      "localNet:合金板": "-1",
+      "frozenIn:合金板": "1",
+      "frozenOut:合金板": "0",
+      "inflow:小行星矿石": "1",
+      "outflow:小行星矿石": "0",
+      "net:小行星矿石": "1",
+      "potential:小行星矿石": "1",
+      "withdrawalDemand:小行星矿石": "0",
+      "localIn:小行星矿石": "1",
+      "localOut:小行星矿石": "0",
+      "localNet:小行星矿石": "1",
+      "frozenIn:小行星矿石": "0",
+      "frozenOut:小行星矿石": "0",
+      "inflow:复合装甲板": "1/4",
+      "outflow:复合装甲板": "0",
+      "net:复合装甲板": "1/4",
+      "potential:复合装甲板": "1/4",
+      "withdrawalDemand:复合装甲板": "0",
+      "localIn:复合装甲板": "1/4",
+      "localOut:复合装甲板": "0",
+      "localNet:复合装甲板": "1/4",
+      "frozenIn:复合装甲板": "0",
+      "frozenOut:复合装甲板": "0",
+      "total:inflow": "9/4",
+      "total:outflow": "1",
+      "total:net": "5/4",
+      "total:potential": "5/4",
+      "total:withdrawalDemand": "1",
+      "total:localIn": "5/4",
+      "total:localOut": "1",
+      "total:localNet": "1/4",
+      "total:frozenIn": "1",
+      "total:frozenOut": "0",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "1",
+      "machineMaterial:M0|out|小行星矿石": "1",
+      "machineTotal:M1|in": "1",
+      "machineMaterial:M1|in|小行星矿石": "1",
+      "machineTotal:M1|out": "1",
+      "machineMaterial:M1|out|小行星矿石": "1",
+      "machineTotal:M2|in": "0",
+      "machineTotal:M2|out": "3/4",
+      "machineMaterial:M2|out|小行星矿石": "3/4",
+      "machineTotal:M3|in": "0",
+      "machineTotal:M3|out": "1",
+      "machineMaterial:M3|out|合金板": "1",
+      "machineTotal:M4|in": "3/4",
+      "machineMaterial:M4|in|小行星矿石": "3/4",
+      "machineTotal:M4|out": "1/4",
+      "machineMaterial:M4|out|钛合金锭": "1/4",
+      "machineTotal:M5|in": "1",
+      "machineMaterial:M5|in|小行星矿石": "1",
+      "machineTotal:M5|out": "0",
+      "machineTotal:M6|in": "5/4",
+      "machineMaterial:M6|in|合金板": "1",
+      "machineMaterial:M6|in|钛合金锭": "1/4",
+      "machineTotal:M6|out": "1/4",
+      "machineMaterial:M6|out|复合装甲板": "1/4",
+      "machineTotal:M7|in": "1/4",
+      "machineMaterial:M7|in|复合装甲板": "1/4",
+      "machineTotal:M7|out": "0",
+      "cycle:M0": "1/3",
+      "cycle:M2": "1/4",
+      "cycle:M4": "1/4",
+      "cycle:M6": "1/4",
+      "flow:R0|小行星矿石": "1",
+      "routeTotal:R0": "1",
+      "offer:R0": "1",
+      "demand:R0": "1",
+      "flow:R1|小行星矿石": "0",
+      "routeTotal:R1": "0",
+      "offer:R1": "1/2",
+      "demand:R1": "0",
+      "flow:R2|小行星矿石": "1",
+      "routeTotal:R2": "1",
+      "offer:R2": "1",
+      "demand:R2": "1",
+      "flow:R3|小行星矿石": "3/4",
+      "routeTotal:R3": "3/4",
+      "offer:R3": "1",
+      "demand:R3": "3/4",
+      "flow:R4|合金板": "1",
+      "routeTotal:R4": "1",
+      "offer:R4": "1",
+      "demand:R4": "1",
+      "flow:R5|钛合金锭": "1/4",
+      "routeTotal:R5": "1/4",
+      "offer:R5": "1/2",
+      "demand:R5": "1/4",
+      "flow:R6|复合装甲板": "1/4",
+      "routeTotal:R6": "1/4",
+      "offer:R6": "1/4",
+      "demand:R6": "1",
+      "duty:supply": "1"
+    },
+    "ms": 13
+  },
+  "fair": {
+    "status": "sat",
+    "method": "exact symbolic branches + rational affine elimination",
+    "stats": {
+      "branches": 1,
+      "leaves": 1,
+      "contradictions": 0,
+      "forced": 17,
+      "free": 0,
+      "initialGroups": [],
+      "initialChoices": 0,
+      "initialFree": 0
+    },
+    "unique": {
+      "inflow:合金板": "1",
+      "outflow:合金板": "1",
+      "net:合金板": "0",
+      "potential:合金板": "0",
+      "withdrawalDemand:合金板": "1",
+      "localIn:合金板": "0",
+      "localOut:合金板": "1",
+      "localNet:合金板": "-1",
+      "frozenIn:合金板": "1",
+      "frozenOut:合金板": "0",
+      "inflow:小行星矿石": "5/8",
+      "outflow:小行星矿石": "0",
+      "net:小行星矿石": "5/8",
+      "potential:小行星矿石": "5/8",
+      "withdrawalDemand:小行星矿石": "0",
+      "localIn:小行星矿石": "5/8",
+      "localOut:小行星矿石": "0",
+      "localNet:小行星矿石": "5/8",
+      "frozenIn:小行星矿石": "0",
+      "frozenOut:小行星矿石": "0",
+      "inflow:复合装甲板": "1/4",
+      "outflow:复合装甲板": "0",
+      "net:复合装甲板": "1/4",
+      "potential:复合装甲板": "1/4",
+      "withdrawalDemand:复合装甲板": "0",
+      "localIn:复合装甲板": "1/4",
+      "localOut:复合装甲板": "0",
+      "localNet:复合装甲板": "1/4",
+      "frozenIn:复合装甲板": "0",
+      "frozenOut:复合装甲板": "0",
+      "total:inflow": "15/8",
+      "total:outflow": "1",
+      "total:net": "7/8",
+      "total:potential": "7/8",
+      "total:withdrawalDemand": "1",
+      "total:localIn": "7/8",
+      "total:localOut": "1",
+      "total:localNet": "-1/8",
+      "total:frozenIn": "1",
+      "total:frozenOut": "0",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "1",
+      "machineMaterial:M0|out|小行星矿石": "1",
+      "machineTotal:M1|in": "1",
+      "machineMaterial:M1|in|小行星矿石": "1",
+      "machineTotal:M1|out": "1",
+      "machineMaterial:M1|out|小行星矿石": "1",
+      "machineTotal:M2|in": "0",
+      "machineTotal:M2|out": "3/8",
+      "machineMaterial:M2|out|小行星矿石": "3/8",
+      "machineTotal:M3|in": "0",
+      "machineTotal:M3|out": "1",
+      "machineMaterial:M3|out|合金板": "1",
+      "machineTotal:M4|in": "3/4",
+      "machineMaterial:M4|in|小行星矿石": "3/4",
+      "machineTotal:M4|out": "1/4",
+      "machineMaterial:M4|out|钛合金锭": "1/4",
+      "machineTotal:M5|in": "5/8",
+      "machineMaterial:M5|in|小行星矿石": "5/8",
+      "machineTotal:M5|out": "0",
+      "machineTotal:M6|in": "5/4",
+      "machineMaterial:M6|in|合金板": "1",
+      "machineMaterial:M6|in|钛合金锭": "1/4",
+      "machineTotal:M6|out": "1/4",
+      "machineMaterial:M6|out|复合装甲板": "1/4",
+      "machineTotal:M7|in": "1/4",
+      "machineMaterial:M7|in|复合装甲板": "1/4",
+      "machineTotal:M7|out": "0",
+      "cycle:M0": "1/3",
+      "cycle:M2": "1/8",
+      "cycle:M4": "1/4",
+      "cycle:M6": "1/4",
+      "flow:R0|小行星矿石": "1",
+      "routeTotal:R0": "1",
+      "offer:R0": "1",
+      "demand:R0": "1",
+      "flow:R1|小行星矿石": "3/8",
+      "routeTotal:R1": "3/8",
+      "offer:R1": "1/2",
+      "demand:R1": "3/8",
+      "flow:R2|小行星矿石": "5/8",
+      "routeTotal:R2": "5/8",
+      "offer:R2": "5/8",
+      "demand:R2": "1",
+      "flow:R3|小行星矿石": "3/8",
+      "routeTotal:R3": "3/8",
+      "offer:R3": "1",
+      "demand:R3": "3/8",
+      "flow:R4|合金板": "1",
+      "routeTotal:R4": "1",
+      "offer:R4": "1",
+      "demand:R4": "1",
+      "flow:R5|钛合金锭": "1/4",
+      "routeTotal:R5": "1/4",
+      "offer:R5": "1/2",
+      "demand:R5": "1/4",
+      "flow:R6|复合装甲板": "1/4",
+      "routeTotal:R6": "1/4",
+      "offer:R6": "1/4",
+      "demand:R6": "1",
+      "duty:supply": "1"
+    },
+    "multiple": [],
+    "witness": {
+      "inflow:合金板": "1",
+      "outflow:合金板": "1",
+      "net:合金板": "0",
+      "potential:合金板": "0",
+      "withdrawalDemand:合金板": "1",
+      "localIn:合金板": "0",
+      "localOut:合金板": "1",
+      "localNet:合金板": "-1",
+      "frozenIn:合金板": "1",
+      "frozenOut:合金板": "0",
+      "inflow:小行星矿石": "5/8",
+      "outflow:小行星矿石": "0",
+      "net:小行星矿石": "5/8",
+      "potential:小行星矿石": "5/8",
+      "withdrawalDemand:小行星矿石": "0",
+      "localIn:小行星矿石": "5/8",
+      "localOut:小行星矿石": "0",
+      "localNet:小行星矿石": "5/8",
+      "frozenIn:小行星矿石": "0",
+      "frozenOut:小行星矿石": "0",
+      "inflow:复合装甲板": "1/4",
+      "outflow:复合装甲板": "0",
+      "net:复合装甲板": "1/4",
+      "potential:复合装甲板": "1/4",
+      "withdrawalDemand:复合装甲板": "0",
+      "localIn:复合装甲板": "1/4",
+      "localOut:复合装甲板": "0",
+      "localNet:复合装甲板": "1/4",
+      "frozenIn:复合装甲板": "0",
+      "frozenOut:复合装甲板": "0",
+      "total:inflow": "15/8",
+      "total:outflow": "1",
+      "total:net": "7/8",
+      "total:potential": "7/8",
+      "total:withdrawalDemand": "1",
+      "total:localIn": "7/8",
+      "total:localOut": "1",
+      "total:localNet": "-1/8",
+      "total:frozenIn": "1",
+      "total:frozenOut": "0",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "1",
+      "machineMaterial:M0|out|小行星矿石": "1",
+      "machineTotal:M1|in": "1",
+      "machineMaterial:M1|in|小行星矿石": "1",
+      "machineTotal:M1|out": "1",
+      "machineMaterial:M1|out|小行星矿石": "1",
+      "machineTotal:M2|in": "0",
+      "machineTotal:M2|out": "3/8",
+      "machineMaterial:M2|out|小行星矿石": "3/8",
+      "machineTotal:M3|in": "0",
+      "machineTotal:M3|out": "1",
+      "machineMaterial:M3|out|合金板": "1",
+      "machineTotal:M4|in": "3/4",
+      "machineMaterial:M4|in|小行星矿石": "3/4",
+      "machineTotal:M4|out": "1/4",
+      "machineMaterial:M4|out|钛合金锭": "1/4",
+      "machineTotal:M5|in": "5/8",
+      "machineMaterial:M5|in|小行星矿石": "5/8",
+      "machineTotal:M5|out": "0",
+      "machineTotal:M6|in": "5/4",
+      "machineMaterial:M6|in|合金板": "1",
+      "machineMaterial:M6|in|钛合金锭": "1/4",
+      "machineTotal:M6|out": "1/4",
+      "machineMaterial:M6|out|复合装甲板": "1/4",
+      "machineTotal:M7|in": "1/4",
+      "machineMaterial:M7|in|复合装甲板": "1/4",
+      "machineTotal:M7|out": "0",
+      "cycle:M0": "1/3",
+      "cycle:M2": "1/8",
+      "cycle:M4": "1/4",
+      "cycle:M6": "1/4",
+      "flow:R0|小行星矿石": "1",
+      "routeTotal:R0": "1",
+      "offer:R0": "1",
+      "demand:R0": "1",
+      "flow:R1|小行星矿石": "3/8",
+      "routeTotal:R1": "3/8",
+      "offer:R1": "1/2",
+      "demand:R1": "3/8",
+      "flow:R2|小行星矿石": "5/8",
+      "routeTotal:R2": "5/8",
+      "offer:R2": "5/8",
+      "demand:R2": "1",
+      "flow:R3|小行星矿石": "3/8",
+      "routeTotal:R3": "3/8",
+      "offer:R3": "1",
+      "demand:R3": "3/8",
+      "flow:R4|合金板": "1",
+      "routeTotal:R4": "1",
+      "offer:R4": "1",
+      "demand:R4": "1",
+      "flow:R5|钛合金锭": "1/4",
+      "routeTotal:R5": "1/4",
+      "offer:R5": "1/2",
+      "demand:R5": "1/4",
+      "flow:R6|复合装甲板": "1/4",
+      "routeTotal:R6": "1/4",
+      "offer:R6": "1/4",
+      "demand:R6": "1",
+      "duty:supply": "1"
+    },
+    "ms": 6
+  },
+  "strict": {
+    "status": "sat",
+    "method": "exact symbolic branches + rational affine elimination",
+    "stats": {
+      "branches": 1,
+      "leaves": 1,
+      "contradictions": 0,
+      "forced": 18,
+      "free": 0,
+      "initialGroups": [],
+      "initialChoices": 0,
+      "initialFree": 0
+    },
+    "unique": {
+      "inflow:合金板": "1",
+      "outflow:合金板": "1",
+      "net:合金板": "0",
+      "potential:合金板": "0",
+      "withdrawalDemand:合金板": "1",
+      "localIn:合金板": "0",
+      "localOut:合金板": "1",
+      "localNet:合金板": "-1",
+      "frozenIn:合金板": "1",
+      "frozenOut:合金板": "0",
+      "inflow:小行星矿石": "1",
+      "outflow:小行星矿石": "0",
+      "net:小行星矿石": "1",
+      "potential:小行星矿石": "1",
+      "withdrawalDemand:小行星矿石": "0",
+      "localIn:小行星矿石": "1",
+      "localOut:小行星矿石": "0",
+      "localNet:小行星矿石": "1",
+      "frozenIn:小行星矿石": "0",
+      "frozenOut:小行星矿石": "0",
+      "inflow:复合装甲板": "1/4",
+      "outflow:复合装甲板": "0",
+      "net:复合装甲板": "1/4",
+      "potential:复合装甲板": "1/4",
+      "withdrawalDemand:复合装甲板": "0",
+      "localIn:复合装甲板": "1/4",
+      "localOut:复合装甲板": "0",
+      "localNet:复合装甲板": "1/4",
+      "frozenIn:复合装甲板": "0",
+      "frozenOut:复合装甲板": "0",
+      "total:inflow": "9/4",
+      "total:outflow": "1",
+      "total:net": "5/4",
+      "total:potential": "5/4",
+      "total:withdrawalDemand": "1",
+      "total:localIn": "5/4",
+      "total:localOut": "1",
+      "total:localNet": "1/4",
+      "total:frozenIn": "1",
+      "total:frozenOut": "0",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "1",
+      "machineMaterial:M0|out|小行星矿石": "1",
+      "machineTotal:M1|in": "1",
+      "machineMaterial:M1|in|小行星矿石": "1",
+      "machineTotal:M1|out": "1",
+      "machineMaterial:M1|out|小行星矿石": "1",
+      "machineTotal:M2|in": "0",
+      "machineTotal:M2|out": "3/4",
+      "machineMaterial:M2|out|小行星矿石": "3/4",
+      "machineTotal:M3|in": "0",
+      "machineTotal:M3|out": "1",
+      "machineMaterial:M3|out|合金板": "1",
+      "machineTotal:M4|in": "3/4",
+      "machineMaterial:M4|in|小行星矿石": "3/4",
+      "machineTotal:M4|out": "1/4",
+      "machineMaterial:M4|out|钛合金锭": "1/4",
+      "machineTotal:M5|in": "1",
+      "machineMaterial:M5|in|小行星矿石": "1",
+      "machineTotal:M5|out": "0",
+      "machineTotal:M6|in": "5/4",
+      "machineMaterial:M6|in|合金板": "1",
+      "machineMaterial:M6|in|钛合金锭": "1/4",
+      "machineTotal:M6|out": "1/4",
+      "machineMaterial:M6|out|复合装甲板": "1/4",
+      "machineTotal:M7|in": "1/4",
+      "machineMaterial:M7|in|复合装甲板": "1/4",
+      "machineTotal:M7|out": "0",
+      "cycle:M0": "1/3",
+      "cycle:M2": "1/4",
+      "cycle:M4": "1/4",
+      "cycle:M6": "1/4",
+      "flow:R0|小行星矿石": "1",
+      "routeTotal:R0": "1",
+      "offer:R0": "1",
+      "demand:R0": "1",
+      "flow:R1|小行星矿石": "0",
+      "routeTotal:R1": "0",
+      "offer:R1": "1/2",
+      "demand:R1": "0",
+      "flow:R2|小行星矿石": "1",
+      "routeTotal:R2": "1",
+      "offer:R2": "1",
+      "demand:R2": "1",
+      "flow:R3|小行星矿石": "3/4",
+      "routeTotal:R3": "3/4",
+      "offer:R3": "1",
+      "demand:R3": "3/4",
+      "flow:R4|合金板": "1",
+      "routeTotal:R4": "1",
+      "offer:R4": "1",
+      "demand:R4": "1",
+      "flow:R5|钛合金锭": "1/4",
+      "routeTotal:R5": "1/4",
+      "offer:R5": "1/2",
+      "demand:R5": "1/4",
+      "flow:R6|复合装甲板": "1/4",
+      "routeTotal:R6": "1/4",
+      "offer:R6": "1/4",
+      "demand:R6": "1",
+      "duty:supply": "1"
+    },
+    "multiple": [],
+    "witness": {
+      "inflow:合金板": "1",
+      "outflow:合金板": "1",
+      "net:合金板": "0",
+      "potential:合金板": "0",
+      "withdrawalDemand:合金板": "1",
+      "localIn:合金板": "0",
+      "localOut:合金板": "1",
+      "localNet:合金板": "-1",
+      "frozenIn:合金板": "1",
+      "frozenOut:合金板": "0",
+      "inflow:小行星矿石": "1",
+      "outflow:小行星矿石": "0",
+      "net:小行星矿石": "1",
+      "potential:小行星矿石": "1",
+      "withdrawalDemand:小行星矿石": "0",
+      "localIn:小行星矿石": "1",
+      "localOut:小行星矿石": "0",
+      "localNet:小行星矿石": "1",
+      "frozenIn:小行星矿石": "0",
+      "frozenOut:小行星矿石": "0",
+      "inflow:复合装甲板": "1/4",
+      "outflow:复合装甲板": "0",
+      "net:复合装甲板": "1/4",
+      "potential:复合装甲板": "1/4",
+      "withdrawalDemand:复合装甲板": "0",
+      "localIn:复合装甲板": "1/4",
+      "localOut:复合装甲板": "0",
+      "localNet:复合装甲板": "1/4",
+      "frozenIn:复合装甲板": "0",
+      "frozenOut:复合装甲板": "0",
+      "total:inflow": "9/4",
+      "total:outflow": "1",
+      "total:net": "5/4",
+      "total:potential": "5/4",
+      "total:withdrawalDemand": "1",
+      "total:localIn": "5/4",
+      "total:localOut": "1",
+      "total:localNet": "1/4",
+      "total:frozenIn": "1",
+      "total:frozenOut": "0",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "1",
+      "machineMaterial:M0|out|小行星矿石": "1",
+      "machineTotal:M1|in": "1",
+      "machineMaterial:M1|in|小行星矿石": "1",
+      "machineTotal:M1|out": "1",
+      "machineMaterial:M1|out|小行星矿石": "1",
+      "machineTotal:M2|in": "0",
+      "machineTotal:M2|out": "3/4",
+      "machineMaterial:M2|out|小行星矿石": "3/4",
+      "machineTotal:M3|in": "0",
+      "machineTotal:M3|out": "1",
+      "machineMaterial:M3|out|合金板": "1",
+      "machineTotal:M4|in": "3/4",
+      "machineMaterial:M4|in|小行星矿石": "3/4",
+      "machineTotal:M4|out": "1/4",
+      "machineMaterial:M4|out|钛合金锭": "1/4",
+      "machineTotal:M5|in": "1",
+      "machineMaterial:M5|in|小行星矿石": "1",
+      "machineTotal:M5|out": "0",
+      "machineTotal:M6|in": "5/4",
+      "machineMaterial:M6|in|合金板": "1",
+      "machineMaterial:M6|in|钛合金锭": "1/4",
+      "machineTotal:M6|out": "1/4",
+      "machineMaterial:M6|out|复合装甲板": "1/4",
+      "machineTotal:M7|in": "1/4",
+      "machineMaterial:M7|in|复合装甲板": "1/4",
+      "machineTotal:M7|out": "0",
+      "cycle:M0": "1/3",
+      "cycle:M2": "1/4",
+      "cycle:M4": "1/4",
+      "cycle:M6": "1/4",
+      "flow:R0|小行星矿石": "1",
+      "routeTotal:R0": "1",
+      "offer:R0": "1",
+      "demand:R0": "1",
+      "flow:R1|小行星矿石": "0",
+      "routeTotal:R1": "0",
+      "offer:R1": "1/2",
+      "demand:R1": "0",
+      "flow:R2|小行星矿石": "1",
+      "routeTotal:R2": "1",
+      "offer:R2": "1",
+      "demand:R2": "1",
+      "flow:R3|小行星矿石": "3/4",
+      "routeTotal:R3": "3/4",
+      "offer:R3": "1",
+      "demand:R3": "3/4",
+      "flow:R4|合金板": "1",
+      "routeTotal:R4": "1",
+      "offer:R4": "1",
+      "demand:R4": "1",
+      "flow:R5|钛合金锭": "1/4",
+      "routeTotal:R5": "1/4",
+      "offer:R5": "1/2",
+      "demand:R5": "1/4",
+      "flow:R6|复合装甲板": "1/4",
+      "routeTotal:R6": "1/4",
+      "offer:R6": "1/4",
+      "demand:R6": "1",
+      "duty:supply": "1"
+    },
+    "ms": 5
+  },
+  "measured": {
+    "inbound": {
+      "合金板": 60,
+      "小行星矿石": 45,
+      "复合装甲板": 15
+    },
+    "outbound": {
+      "合金板": 60
+    },
+    "machines": {
+      "M0": {
+        "sent": {
+          "小行星矿石": 60
+        },
+        "received": {}
+      },
+      "M1": {
+        "sent": {
+          "小行星矿石": 60
+        },
+        "received": {
+          "小行星矿石": 60
+        }
+      },
+      "M2": {
+        "sent": {
+          "小行星矿石": 30
+        },
+        "received": {}
+      },
+      "M3": {
+        "sent": {
+          "合金板": 60
+        },
+        "received": {}
+      },
+      "M4": {
+        "sent": {
+          "钛合金锭": 15
+        },
+        "received": {
+          "小行星矿石": 45
+        }
+      },
+      "M5": {
+        "sent": {},
+        "received": {
+          "小行星矿石": 45
+        }
+      },
+      "M6": {
+        "sent": {
+          "复合装甲板": 15
+        },
+        "received": {
+          "合金板": 60,
+          "钛合金锭": 15
+        }
+      },
+      "M7": {
+        "sent": {},
+        "received": {
+          "复合装甲板": 15
+        }
+      }
+    }
+  }
+}

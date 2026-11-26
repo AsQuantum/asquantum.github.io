@@ -66,7 +66,7 @@ test('merger scanner moves input BELT heads into its only three-item OUTPUT FIFO
   path:[[2,2],[3,2]]
  }));
  const sources=ports.map((_,i)=>machine('source'+i,'仓出',{item:''}));
- const {step}=start(c,[...sources,m],[...incoming,route('out','merge')]);
+ const {step}=start(c,[...sources,m,machine('sink','仓入')],[...incoming,route('out','merge','sink')]);
  const items=['太空垃圾','合金板','太空垃圾'];
  for(let i=0;i<3;i++)c.sim.routes['in'+i].push({item:items[i],distance:2});
  const s=c.sim.byMachine.merge;s.lastSend[0]=100;
@@ -93,7 +93,7 @@ test('merger backpressure holds fourth parcel ON INPUT BELT, never in extra inle
   path:[[2,2],[3,2]]
  }));
  const sources=ports.map((_,i)=>machine('source'+i,'仓出',{item:''}));
- const {step}=start(c,[...sources,m],[...incoming,route('out','merge')]);
+ const {step}=start(c,[...sources,m,machine('sink','仓入')],[...incoming,route('out','merge','sink')]);
  c.sim.routes.in0.push({item:'太空垃圾',distance:2},{item:'合金板',distance:1});
  c.sim.routes.in1.push({item:'太空垃圾',distance:2});
  c.sim.routes.in2.push({item:'合金板',distance:2});
@@ -115,25 +115,65 @@ test('merger backpressure holds fourth parcel ON INPUT BELT, never in extra inle
  assert.equal(c.sim.routes.in0.length,0);
  assert.equal(Object.values(s.inputs).reduce((a,b)=>a+b,0),3);
 });
-test('two warehouse outputs reserve shared stock without double-claiming and debit only on physical send',()=>{
- const c=setup(),a=machine('a','仓出',{item:'太空垃圾'}),b=machine('b','仓出',{item:'太空垃圾'});
- const {step}=start(c,[a,b],[route('out-a','a'),route('out-b','b')]);
- c.sim.routes['out-a'].push({item:'合金板',distance:0});
- c.sim.routes['out-b'].push({item:'合金板',distance:0});
- c.ware={'太空垃圾':3};
- vm.runInContext('ware=data',Object.assign(c,{data:c.ware}));
- step(.05);
- assert.equal(c.sim.byMachine.a.warehouseQueue.length,3);
- assert.equal(c.sim.byMachine.b.warehouseQueue.length,0);
- assert.equal(c.sim.warehouseReserved['太空垃圾'],3);
- assert.equal(c.ware['太空垃圾'],3,'stock remains until actual outbound dispatch');
- assert.equal(c.sim.outbound['太空垃圾']||0,0);
- c.sim.routes['out-a'].length=0;
- step(.05);
- assert.equal(c.ware['太空垃圾'],2);
+test('unwired warehouse output refills real FIFO at one item per second, debits immediately and stops at three',()=>{
+ const c=setup(),a=machine('M1','仓出',{item:'太空垃圾'});
+ const {step}=start(c,[a],[]);
+ c.ware={'太空垃圾':10};vm.runInContext('ware=data',Object.assign(c,{data:c.ware}));
+ for(let i=0;i<19;i++)step(.05);
+ assert.equal(c.sim.byMachine.M1.warehouseQueue.length,0);
+ for(let j=1;j<=4;j++){
+  for(let i=0;i<(j===1?1:20);i++)step(.05);
+  assert.equal(c.sim.byMachine.M1.warehouseQueue.length,Math.min(j,3));
+  assert.equal(c.ware['太空垃圾'],10-Math.min(j,3));
+  assert.equal(c.sim.outbound['太空垃圾'],Math.min(j,3));
+ }
+ assert.equal(c.sim.byMachine.M1.sent['太空垃圾']||0,0);
+});
+test('same-frame refill is numeric ID ordered, independent of wiring or dispatch; dispatch never debits twice',()=>{
+ const c=setup(),a=machine('M2','仓出',{item:'太空垃圾'}),b=machine('M10','仓出',{item:'太空垃圾'});
+ const {step}=start(c,[b,a,machine('sink','仓入')],[route('out-a','M2','sink')]);
+ c.ware={'太空垃圾':1};vm.runInContext('ware=data',Object.assign(c,{data:c.ware}));
+ c.sim.byMachine.M2.lastSend[0]=100;
+ for(let i=0;i<20;i++)step(.05);
+ assert.equal(c.sim.byMachine.M2.warehouseQueue.length,1);
+ assert.equal(c.sim.byMachine.M10.warehouseQueue.length,0);
+ assert.equal(c.ware['太空垃圾'],0);
  assert.equal(c.sim.outbound['太空垃圾'],1);
- assert.equal(c.sim.warehouseReserved['太空垃圾'],2);
- assert.equal(c.sim.byMachine.a.warehouseQueue.length,2);
+ c.sim.byMachine.M2.lastSend[0]=-1e6;
+ step(.05);
+ assert.equal(c.sim.byMachine.M2.warehouseQueue.length,0);
+ assert.equal(c.sim.byMachine.M2.sent['太空垃圾'],1);
+ assert.equal(c.ware['太空垃圾'],0);
+ assert.equal(c.sim.outbound['太空垃圾'],1);
+});
+test('autonomous producer and input recipe fill twenty whole batches without an output belt',()=>{
+ const c=setup();
+ vm.runInContext("DEF.__source={w:3,h:3,ins:0,outs:1,recipes:{run:{output:'合金板',qty:2,seconds:1,inputs:{}}}};DEF.__craft={w:3,h:3,ins:1,outs:1,recipes:{run:{output:'齿轮组',qty:2,seconds:1,inputs:{'太空垃圾':1}}}}",c);
+ const {step,accept}=start(c,[machine('src','__source'),machine('craft','__craft')],[]);
+ const m=c.layout.machines[1];
+ for(let j=0;j<45;j++){accept(m,0,'太空垃圾');for(let i=0;i<20;i++)step(.05);}
+ assert.equal(c.sim.byMachine.src.queue.length,40);
+ assert.equal(c.sim.byMachine.craft.queue.length,40);
+ assert.equal(c.sim.crafts['合金板'],40);
+ assert.equal(c.sim.crafts['齿轮组'],40);
+ assert.equal(c.sim.byMachine.craft.busy,0);
+});
+test('belt fills independent ingredient FIFO despite missing other ingredient and full output, then backpressures',()=>{
+ const c=setup();registerRecipe(c);
+ const src=machine('source','仓出',{item:'太空垃圾'}),m=machine('recipe','__ingredients');
+ const {step}=start(c,[src,m],[route('a','source','recipe')]);
+ c.ware={'太空垃圾':100};vm.runInContext('ware=data',Object.assign(c,{data:c.ware}));
+ const s=c.sim.byMachine.recipe;
+ for(let i=0;i<600;i++)step(.05);
+ assert.equal(s.inputs['太空垃圾'],3);assert.equal(s.inputs['合金板']||0,0);
+ assert.equal(s.queue.length,0);assert.equal(s.busy,0);
+ assert.equal(c.sim.routes.a[0].distance,6);
+ // Clear one ingredient slot with the real FIFO operation, then block
+ // production by filling the output FIFO. Reception must still resume.
+ vm.runInContext("removeBuffered(state.machines[1],sim.byMachine.recipe,'太空垃圾');sim.byMachine.recipe.queue=Array(20).fill('齿轮组')",c);
+ for(let i=0;i<40;i++)step(.05);
+ assert.equal(s.inputs['太空垃圾'],3);assert.equal(s.queue.length,20);assert.equal(s.busy,0);
+ assert.equal(s.received['太空垃圾'],4);
 });
 test('warehouse input credits stock immediately, without internal buffering',()=>{
  const c=setup(),m=machine('in','仓入');

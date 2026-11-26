@@ -58,3 +58,14 @@
 #warehouse .frozen-import-status{font-size:11px;line-height:1.5;color:var(--ui-muted);overflow-wrap:anywhere}
 #warehouse .frozen-import-status:empty{display:none}
 #warehouse .frozen-import-status.is-error{color:var(--ui-negative)}
+
+
+/* Elapsed calculation budget, not an estimated percentage solved. */
+:root{--factory-progress-height:5px;--factory-progress-track:#31465c;--factory-progress-fill:#69a7cf}
+.theory-progress{margin:0 0 7px;display:grid;gap:4px}
+.theory-progress-caption{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--muted,#91aabd);font-variant-numeric:tabular-nums}
+.theory-progress progress{display:block;width:100%;height:var(--factory-progress-height);border:0;border-radius:4px;overflow:hidden;background:var(--factory-progress-track);accent-color:var(--factory-progress-fill)}
+.theory-progress progress::-webkit-progress-bar{background:var(--factory-progress-track);border-radius:4px}
+.theory-progress progress::-webkit-progress-value{background:var(--factory-progress-fill);border-radius:4px}
+
+.theory-progress progress::-moz-progress-bar{background:var(--factory-progress-fill);border-radius:4px}

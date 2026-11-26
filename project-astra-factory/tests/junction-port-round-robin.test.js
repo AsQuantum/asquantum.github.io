@@ -11,7 +11,12 @@ function env(){
 }
 function node(id,type,x,y,face='E'){return{id,type,x,y,face,mode:0};}
 function install(c,machines,routes){
- c.layout={name:'port-queue-regression',machines,routes};
+ // These fixtures test dispatch, not unfinished construction. Attach
+ // a receiving warehouse to each intentionally free output.
+ const sinks=routes.filter(r=>!r.to).map((r,i)=>{
+  const id='test-sink-'+i;r.to={id,port:0};return node(id,'仓入',40+i*4,5);
+ });
+ c.layout={name:'port-queue-regression',machines:[...machines,...sinks],routes};
  vm.runInContext('state=layout;resetSimulation()',c);
  c.sim=vm.runInContext('sim',c);
  return {accept:vm.runInContext('acceptItem',c),step:vm.runInContext('simulate',c)};

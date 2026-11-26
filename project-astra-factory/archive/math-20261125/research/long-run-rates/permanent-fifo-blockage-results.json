@@ -1,0 +1,35 @@
+[
+  {
+    "case": "two mergers, autonomous incompatible source",
+    "witnesses": [
+      {
+        "source": "bad",
+        "item": "B",
+        "chain": [
+          "bad-in",
+          "inter",
+          "terminal"
+        ],
+        "blockedRoute": "terminal",
+        "receiver": "sink"
+      }
+    ],
+    "allLongRunRatesZero": true
+  },
+  {
+    "case": "compatible target, unproved source, or disconnected terminal",
+    "noFalseCertificate": true
+  },
+  {
+    "case": "splitter can divert wrong material, no unconditional blockage",
+    "noFalseCertificate": true
+  },
+  {
+    "case": "direct incompatible output",
+    "zero": true
+  },
+  {
+    "case": "actual editor open route is retained physically but has no active flow",
+    "zero": true
+  }
+]

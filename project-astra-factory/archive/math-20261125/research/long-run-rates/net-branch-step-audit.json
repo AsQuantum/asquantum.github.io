@@ -1,0 +1,494 @@
+[
+  {
+    "dt": 0.025,
+    "inbound": {
+      "合金板": 60,
+      "小行星矿石": 45,
+      "复合装甲板": 15
+    },
+    "outbound": {
+      "合金板": 60
+    },
+    "left": 15,
+    "right": 30,
+    "starts": 600,
+    "gaps": {
+      "4.00000": 599
+    },
+    "minLeft": 24,
+    "minRight": 24,
+    "minInput": 6,
+    "minOutput": 19,
+    "records": [
+      {
+        "time": 2.0499999999901775,
+        "gap": 0,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 6.050000000004729,
+        "gap": 4.000000000014552,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 10.050000000019281,
+        "gap": 4.000000000014552,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 14.050000000033833,
+        "gap": 4.000000000014552,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 18.050000000048385,
+        "gap": 4.000000000014552,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 22.050000000062937,
+        "gap": 4.000000000014552,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 26.05000000007749,
+        "gap": 4.000000000014552,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 30.05000000009204,
+        "gap": 4.000000000014552,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 34.05000000010659,
+        "gap": 4.000000000014552,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 38.050000000121145,
+        "gap": 4.000000000014552,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      }
+    ]
+  },
+  {
+    "dt": 0.05,
+    "inbound": {
+      "合金板": 60,
+      "小行星矿石": 45,
+      "复合装甲板": 15
+    },
+    "outbound": {
+      "合金板": 60
+    },
+    "left": 15,
+    "right": 30,
+    "starts": 600,
+    "gaps": {
+      "4.00000": 599
+    },
+    "minLeft": 24,
+    "minRight": 24,
+    "minInput": 6,
+    "minOutput": 19,
+    "records": [
+      {
+        "time": 2.0999999994544396,
+        "gap": 0,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 6.099999999450802,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 10.099999999447164,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 14.099999999443526,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 18.099999999439888,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 22.09999999943625,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 26.09999999943261,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 30.099999999428974,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 34.099999999425336,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 38.0999999994217,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      }
+    ]
+  },
+  {
+    "dt": 0.1,
+    "inbound": {
+      "合金板": 60,
+      "小行星矿石": 45,
+      "复合装甲板": 15
+    },
+    "outbound": {
+      "合金板": 60
+    },
+    "left": 15,
+    "right": 30,
+    "starts": 600,
+    "gaps": {
+      "4.00000": 599
+    },
+    "minLeft": 24,
+    "minRight": 24,
+    "minInput": 6,
+    "minOutput": 19,
+    "records": [
+      {
+        "time": 2.200000000002092,
+        "gap": 0,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 6.199999999998454,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 10.199999999994816,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 14.199999999991178,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 18.19999999998754,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 22.199999999983902,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 26.199999999980264,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 30.199999999976626,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 34.19999999997299,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 38.19999999996935,
+        "gap": 3.999999999996362,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      }
+    ]
+  },
+  {
+    "dt": 0.2,
+    "inbound": {
+      "合金板": 60,
+      "小行星矿石": 45,
+      "复合装甲板": 15
+    },
+    "outbound": {
+      "合金板": 60
+    },
+    "left": 15,
+    "right": 30,
+    "starts": 600,
+    "gaps": {
+      "4.00000": 599
+    },
+    "minLeft": 24,
+    "minRight": 24,
+    "minInput": 6,
+    "minOutput": 19,
+    "records": [
+      {
+        "time": 2.6000000001363333,
+        "gap": 0,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 6.600000000137243,
+        "gap": 4.0000000000009095,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 10.600000000138152,
+        "gap": 4.0000000000009095,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 14.600000000139062,
+        "gap": 4.0000000000009095,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 18.60000000013997,
+        "gap": 4.0000000000009095,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 22.60000000014088,
+        "gap": 4.0000000000009095,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 26.60000000014179,
+        "gap": 4.0000000000009095,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 30.6000000001427,
+        "gap": 4.0000000000009095,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 34.60000000014361,
+        "gap": 4.0000000000009095,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 38.60000000014452,
+        "gap": 4.0000000000009095,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      }
+    ]
+  }
+]

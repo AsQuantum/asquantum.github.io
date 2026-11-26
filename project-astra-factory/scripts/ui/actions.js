@@ -22,7 +22,11 @@ for(let slot=0;slot<3;slot++)$('stampSplitFilter'+slot).onchange=e=>{
  saveStampPreference();updateStampControls();draw();
 };
 $('stampPanel').onchange=e=>{stampPanel=Number(e.target.value);saveStampPreference();updateStampControls();draw();};$('undoBend').onclick=undoDraftBend;$('cancelBelt').onclick=cancelDraft;
-$('inspector').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.rotate)rotateSelected(Number(b.dataset.rotate));else if(b.dataset.selectRoute){selection={routeId:b.dataset.selectRoute,crossAt:selection?.crossAt||null};inspectorRefresh();draw();}else if(b.dataset.deleteRoute)deleteRoute(b.dataset.deleteRoute);};
+$('inspector').onclick=e=>{let b=e.target.closest('button');if(!b)return;if(b.dataset.stackDirection){
+ const n=transferMachineStack(b.dataset.stackMachine,b.dataset.stackItem,b.dataset.stackDirection);
+ if(n){warehouseRefreshLive();inspectorRefreshLive();stockChartRender();draw(true);}
+ else inspectorRefreshLive();
+ }else if(b.dataset.rotate)rotateSelected(Number(b.dataset.rotate));else if(b.dataset.selectRoute){selection={routeId:b.dataset.selectRoute};inspectorRefresh();draw();}else if(b.dataset.deleteRoute)deleteRoute(b.dataset.deleteRoute);};
 $('inspector').onchange=e=>{let m=machineById(selection?.machineId);if(!m)return; if(e.target.id==='modeSelect'){
   const mode=parseRecipeMode(m.type,e.target.value);
   if(!Object.prototype.hasOwnProperty.call(DEF[m.type]?.recipes||{},mode))return;
@@ -59,10 +63,13 @@ $('fit').onclick=autoFit;$('clearRoutes').onclick=()=>{if(!state.routes.length)r
  };
 
 // Simulation controls are independent of the removed acceptance/check panels.
-$('run').onclick=()=>{warehouseRefreshLive();running=!running;if(running)setTool('select');$('run').textContent=running?'❚❚ 暂停模拟':'▶ 继续模拟';$('run').classList.add('primary');$('run').classList.toggle('sim-running',running);notify(running?'模拟已开始：仓库每60秒保存一份真实收支记录':'模拟已暂停');};
+$('run').onclick=()=>{warehouseRefreshLive();running=!running;if(running)setTool('select');$('run').textContent=running?'❚❚ 暂停模拟':'▶ 继续模拟';$('run').classList.add('primary');$('run').classList.toggle('sim-running',running);inspectorRefreshLive();notify(running?'模拟已开始：仓库每60秒保存一份真实收支记录':'模拟已暂停');};
 $('simSpeed').onchange=e=>{simulationSpeed=Number(e.target.value)||1;updateStepMinuteButton();notify(`模拟速度已设为 ${simulationSpeed}×`);};
 $('stepMinute').onclick=advanceSimulationMinute;
 $('addTestStock').onclick=addWarehouseTestStock;
 $('warehouse').addEventListener('change',e=>{if(e.target?.id==='warehouseNetWindow')warehouseSetNetWindow(e.target.value);});
+$('warehouse').addEventListener('click',e=>{if(e.target.closest('[data-theory-retry]'))retryTheoryCalculation();});
 updateStepMinuteButton();
 $('resetSim').onclick=()=>{resetSimulation();inspectorRefreshLive();notify('已清空模拟库存、生产队列和分钟统计记录');};
+
+$('audit').addEventListener('click',e=>{const b=e.target.closest('[data-audit-kind][data-audit-id]');if(b)auditFocus(b.dataset.auditKind,b.dataset.auditId);});

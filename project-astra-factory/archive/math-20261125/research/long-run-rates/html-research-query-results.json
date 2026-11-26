@@ -1,0 +1,400 @@
+[
+  {
+    "name": "blocked warehouse tree and negative frozen 1",
+    "status": "proved-for-contract",
+    "actualUnknown": 0,
+    "metricUnknown": [],
+    "rows": {
+      "小行星矿石": {
+        "inflow": "1",
+        "outflow": "11/12",
+        "net": "1/12",
+        "potential": "1/12",
+        "overdraft": "1/12",
+        "withdrawalDemand": "11/12",
+        "localNet": "-2/3"
+      },
+      "合金板": {
+        "inflow": "2/3",
+        "outflow": "0",
+        "net": "2/3",
+        "potential": "2/3",
+        "overdraft": "2/3",
+        "withdrawalDemand": "0",
+        "localNet": "2/3"
+      },
+      "硅晶圆": {
+        "inflow": "1/4",
+        "outflow": "0",
+        "net": "1/4",
+        "potential": "1/4",
+        "overdraft": "1/4",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "total": {
+      "inflow": "23/12",
+      "outflow": "11/12",
+      "net": "1",
+      "potential": "1",
+      "overdraft": "1",
+      "withdrawalDemand": "11/12"
+    },
+    "machineTimes": {
+      "M0": "3",
+      "M1": "3",
+      "M2": "3/2",
+      "M3": "3"
+    },
+    "proofSources": {
+      "fixed-recipe-tree": 0,
+      "fixed-priority-tree": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 4,
+      "feed-forward": 0,
+      "stock": 2,
+      "stock-free-exits": 1,
+      "proved-stock-tree": 3,
+      "proved-stock-region": 0,
+      "return": 0
+    },
+    "orbit": null,
+    "unlimitedOrbit": null,
+    "demandScope": "actual-boundary-conditional-demand"
+  },
+  {
+    "name": "blocked warehouse tree and negative frozen 11/12",
+    "status": "proved-for-contract",
+    "actualUnknown": 0,
+    "metricUnknown": [],
+    "rows": {
+      "小行星矿石": {
+        "inflow": "11/12",
+        "outflow": "11/12",
+        "net": "0",
+        "potential": "0",
+        "overdraft": "0",
+        "withdrawalDemand": "11/12",
+        "localNet": "-2/3"
+      },
+      "合金板": {
+        "inflow": "2/3",
+        "outflow": "0",
+        "net": "2/3",
+        "potential": "2/3",
+        "overdraft": "2/3",
+        "withdrawalDemand": "0",
+        "localNet": "2/3"
+      },
+      "硅晶圆": {
+        "inflow": "1/4",
+        "outflow": "0",
+        "net": "1/4",
+        "potential": "1/4",
+        "overdraft": "1/4",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "total": {
+      "inflow": "11/6",
+      "outflow": "11/12",
+      "net": "11/12",
+      "potential": "11/12",
+      "overdraft": "11/12",
+      "withdrawalDemand": "11/12"
+    },
+    "machineTimes": {
+      "M0": "3",
+      "M1": "3",
+      "M2": "3/2",
+      "M3": "3"
+    },
+    "proofSources": {
+      "fixed-recipe-tree": 0,
+      "fixed-priority-tree": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 4,
+      "feed-forward": 0,
+      "stock": 2,
+      "stock-free-exits": 0,
+      "return": 0
+    },
+    "orbit": null,
+    "unlimitedOrbit": null,
+    "demandScope": "actual-boundary-conditional-demand"
+  },
+  {
+    "name": "blocked warehouse tree and negative frozen 1/2",
+    "status": "proved-for-contract",
+    "actualUnknown": 0,
+    "metricUnknown": [],
+    "rows": {
+      "小行星矿石": {
+        "inflow": "1/2",
+        "outflow": "1/2",
+        "net": "0",
+        "potential": "-5/12",
+        "overdraft": "-5/12",
+        "withdrawalDemand": "11/12",
+        "localNet": "-1/4"
+      },
+      "合金板": {
+        "inflow": "1/4",
+        "outflow": "0",
+        "net": "1/4",
+        "potential": "1/4",
+        "overdraft": "2/3",
+        "withdrawalDemand": "0",
+        "localNet": "1/4"
+      },
+      "硅晶圆": {
+        "inflow": "1/4",
+        "outflow": "0",
+        "net": "1/4",
+        "potential": "1/4",
+        "overdraft": "1/4",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "total": {
+      "inflow": "1",
+      "outflow": "1/2",
+      "net": "1/2",
+      "potential": "1/12",
+      "overdraft": "1/2",
+      "withdrawalDemand": "11/12"
+    },
+    "machineTimes": {
+      "M0": "8",
+      "M1": "8",
+      "M2": "4",
+      "M3": "8"
+    },
+    "proofSources": {
+      "fixed-recipe-tree": 0,
+      "fixed-priority-tree": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 4,
+      "feed-forward": 0,
+      "stock": 2,
+      "stock-free-exits": 0,
+      "return": 0,
+      "exact-event-recurrent-state": 9
+    },
+    "orbit": {
+      "status": "proved",
+      "method": "integer-event-boundary-repeated-state",
+      "prefixTicks": 4801,
+      "periodTicks": 160,
+      "periodSeconds": "8",
+      "events": 4961,
+      "elapsedMs": 78,
+      "clipped": [],
+      "stockCaps": {
+        "小行星矿石": "46"
+      }
+    },
+    "unlimitedOrbit": null,
+    "demandScope": "actual-boundary-conditional-demand"
+  },
+  {
+    "name": "conditional warehouse battery 1/2",
+    "status": "proved-for-contract",
+    "actualUnknown": 0,
+    "metricUnknown": [],
+    "rows": {
+      "废金属": {
+        "inflow": "7/10",
+        "outflow": "7/10",
+        "net": "0",
+        "potential": "-201/10",
+        "overdraft": "-201/10",
+        "withdrawalDemand": "104/5",
+        "localNet": "-1/2"
+      },
+      "能量电池": {
+        "inflow": "1/4",
+        "outflow": "0",
+        "net": "1/4",
+        "potential": "1/4",
+        "overdraft": "2/5",
+        "withdrawalDemand": "0",
+        "localNet": "1/4"
+      },
+      "硅晶圆": {
+        "inflow": "1/5",
+        "outflow": "0",
+        "net": "1/5",
+        "potential": "1/5",
+        "overdraft": "20",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "total": {
+      "inflow": "23/20",
+      "outflow": "7/10",
+      "net": "9/20",
+      "potential": "-393/20",
+      "overdraft": "3/10",
+      "withdrawalDemand": "104/5"
+    },
+    "machineTimes": {
+      "M0": "2",
+      "M1": "4"
+    },
+    "proofSources": {
+      "fixed-recipe-tree": 0,
+      "fixed-priority-tree": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 2,
+      "feed-forward": 0,
+      "stock": 4,
+      "stock-free-exits": 0,
+      "return": 0,
+      "frozen-finite-components": 1,
+      "warehouse-finite-components": 4
+    },
+    "orbit": null,
+    "unlimitedOrbit": null,
+    "demandScope": "actual-boundary-conditional-demand"
+  },
+  {
+    "name": "saturated reconverging lens region",
+    "status": "proved-for-contract",
+    "actualUnknown": 0,
+    "metricUnknown": [],
+    "rows": {
+      "框架模块": {
+        "inflow": "2",
+        "outflow": "1/15",
+        "net": "29/15",
+        "potential": "29/15",
+        "overdraft": "29/15",
+        "withdrawalDemand": "1/15",
+        "localNet": "-1/15"
+      },
+      "共鸣水晶": {
+        "inflow": "2",
+        "outflow": "1/15",
+        "net": "29/15",
+        "potential": "29/15",
+        "overdraft": "29/15",
+        "withdrawalDemand": "1/15",
+        "localNet": "-1/15"
+      },
+      "等离子电池": {
+        "inflow": "2",
+        "outflow": "2/15",
+        "net": "28/15",
+        "potential": "28/15",
+        "overdraft": "28/15",
+        "withdrawalDemand": "2/15",
+        "localNet": "-2/15"
+      },
+      "引力透镜": {
+        "inflow": "1/15",
+        "outflow": "0",
+        "net": "1/15",
+        "potential": "1/15",
+        "overdraft": "1/15",
+        "withdrawalDemand": "0",
+        "localNet": "1/15"
+      }
+    },
+    "total": {
+      "inflow": "91/15",
+      "outflow": "4/15",
+      "net": "29/5",
+      "potential": "29/5",
+      "overdraft": "29/5",
+      "withdrawalDemand": "4/15"
+    },
+    "machineTimes": {
+      "M0": "15",
+      "M3": "15",
+      "M4": "15",
+      "M5": "15/2"
+    },
+    "proofSources": {
+      "fixed-recipe-tree": 0,
+      "fixed-priority-tree": 0,
+      "saturated-transfer": 2,
+      "unlimited-free": 0,
+      "ordinal-capacity": 0,
+      "feed-forward": 0
+    },
+    "orbit": null,
+    "unlimitedOrbit": null,
+    "demandScope": "actual-boundary-conditional-demand"
+  },
+  {
+    "name": "multi-resource frozen potential envelope",
+    "status": "proved-for-contract",
+    "actualUnknown": 0,
+    "metricUnknown": [],
+    "rows": {
+      "小行星矿石": {
+        "inflow": "1",
+        "outflow": "1",
+        "net": "0",
+        "potential": "-1",
+        "overdraft": "-1",
+        "withdrawalDemand": "2",
+        "localNet": "0"
+      },
+      "合金板": {
+        "inflow": "4",
+        "outflow": "1",
+        "net": "3",
+        "potential": "3",
+        "overdraft": "2",
+        "withdrawalDemand": "1",
+        "localNet": "0"
+      },
+      "硅晶圆": {
+        "inflow": "1/2",
+        "outflow": "0",
+        "net": "1/2",
+        "potential": "1/2",
+        "overdraft": "1",
+        "withdrawalDemand": "0",
+        "localNet": "0"
+      }
+    },
+    "total": {
+      "inflow": "11/2",
+      "outflow": "2",
+      "net": "7/2",
+      "potential": "5/2",
+      "overdraft": "2",
+      "withdrawalDemand": "3"
+    },
+    "machineTimes": {},
+    "proofSources": {
+      "fixed-recipe-tree": 0,
+      "fixed-priority-tree": 0,
+      "saturated-transfer": 0,
+      "unlimited-free": 0,
+      "ordinal-capacity": 0,
+      "frozen-fixed-tick": 0,
+      "frozen-finite-single-item": 0,
+      "feed-forward": 0,
+      "stock": 2,
+      "stock-free-exits": 0,
+      "proved-stock-tree": 0,
+      "proved-stock-region": 0,
+      "return": 0
+    },
+    "orbit": null,
+    "unlimitedOrbit": null,
+    "demandScope": "actual-boundary-conditional-demand"
+  }
+]

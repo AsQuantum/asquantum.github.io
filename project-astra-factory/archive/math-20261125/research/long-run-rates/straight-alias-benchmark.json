@@ -1,0 +1,52 @@
+[
+  {
+    "fixture": "tests/fixtures/ast1-warehouse-port-balance-v1.txt",
+    "before": {
+      "cols": 848,
+      "assertions": 1221,
+      "straight": 0,
+      "actual": {
+        "total": 626,
+        "known": 191,
+        "unknown": 435
+      },
+      "ms": 730.7035999999999
+    },
+    "after": {
+      "cols": 243,
+      "assertions": 512,
+      "straight": 0,
+      "actual": {
+        "total": 626,
+        "known": 191,
+        "unknown": 435
+      },
+      "ms": 598.5267
+    }
+  },
+  {
+    "fixture": "research/long-run-rates/user-new-layout.ast1.txt",
+    "before": {
+      "cols": 560,
+      "assertions": 799,
+      "straight": 0,
+      "actual": {
+        "total": 410,
+        "known": 173,
+        "unknown": 237
+      },
+      "ms": 297.47389999999996
+    },
+    "after": {
+      "cols": 164,
+      "assertions": 338,
+      "straight": 4,
+      "actual": {
+        "total": 410,
+        "known": 173,
+        "unknown": 237
+      },
+      "ms": 244.9835999999998
+    }
+  }
+]

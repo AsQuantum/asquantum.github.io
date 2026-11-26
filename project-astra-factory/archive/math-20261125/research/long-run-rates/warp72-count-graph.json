@@ -1,0 +1,2437 @@
+{
+  "status": "compiled",
+  "issues": [],
+  "unlimited": false,
+  "completePhysicalRoutes": true,
+  "emptyStartProof": {
+    "method": "monotone item-labelled reachability least fixed point; independent of physical cycles",
+    "initialWarehouseItems": [],
+    "routeItems": {
+      "R0": [
+        "太空垃圾"
+      ],
+      "R1": [
+        "遐想物质"
+      ],
+      "R2": [
+        "古代芯片"
+      ],
+      "R3": [
+        "燃料罐"
+      ],
+      "R4": [
+        "框架模块"
+      ],
+      "R5": [
+        "共鸣水晶"
+      ],
+      "R6": [
+        "等离子电池"
+      ],
+      "R7": [
+        "电动机"
+      ],
+      "R8": [
+        "量子处理器"
+      ],
+      "R9": [
+        "引力透镜"
+      ],
+      "R10": [
+        "星尘粒子"
+      ],
+      "R11": [
+        "星尘粒子"
+      ],
+      "R12": [
+        "星尘粒子"
+      ],
+      "R13": [
+        "相位粒子"
+      ],
+      "R14": [
+        "相位粒子"
+      ],
+      "R15": [
+        "相位粒子"
+      ],
+      "R16": [
+        "小行星矿石"
+      ],
+      "R17": [
+        "小行星矿石"
+      ],
+      "R18": [
+        "小行星矿石"
+      ],
+      "R19": [
+        "小行星矿石"
+      ],
+      "R20": [
+        "废金属"
+      ],
+      "R21": [
+        "废金属"
+      ],
+      "R22": [
+        "废金属"
+      ],
+      "R23": [
+        "能量电池"
+      ],
+      "R24": [
+        "能量电池"
+      ],
+      "R25": [
+        "能量电池"
+      ],
+      "R26": [
+        "能量电池"
+      ],
+      "R27": [
+        "能量电池"
+      ],
+      "R28": [
+        "能量电池"
+      ],
+      "R29": [
+        "钛合金锭"
+      ],
+      "R30": [
+        "钛合金锭"
+      ],
+      "R31": [
+        "钛合金锭"
+      ],
+      "R32": [
+        "硅晶圆"
+      ],
+      "R33": [
+        "硅晶圆"
+      ],
+      "R34": [
+        "硅晶圆"
+      ],
+      "R35": [
+        "合金板"
+      ],
+      "R36": [
+        "合金板"
+      ],
+      "R37": [
+        "合金板"
+      ],
+      "R38": [
+        "合金板"
+      ],
+      "R39": [
+        "合金板"
+      ],
+      "R40": [
+        "合金板"
+      ],
+      "R41": [
+        "齿轮组"
+      ],
+      "R42": [
+        "齿轮组"
+      ],
+      "R43": [
+        "齿轮组"
+      ],
+      "R44": [
+        "导线线圈"
+      ],
+      "R45": [
+        "导线线圈"
+      ],
+      "R46": [
+        "导线线圈"
+      ],
+      "R47": [
+        "导线线圈"
+      ],
+      "R48": [
+        "曲速线圈"
+      ]
+    },
+    "cannotProduce": [],
+    "stocked": [
+      "曲速线圈"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "M0",
+      "type": "共鸣",
+      "recipe": {
+        "output": "共鸣水晶",
+        "qty": 1,
+        "seconds": 6,
+        "inputs": {
+          "遐想物质": 1,
+          "相位粒子": 1,
+          "能量电池": 2,
+          "合金板": 2
+        }
+      },
+      "face": "S",
+      "physicalInCount": 4,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "M1",
+      "type": "量装",
+      "recipe": {
+        "output": "曲速线圈",
+        "qty": 1,
+        "seconds": 22.5,
+        "inputs": {
+          "电动机": 4,
+          "量子处理器": 2,
+          "引力透镜": 1
+        }
+      },
+      "face": "E",
+      "physicalInCount": 3,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "M2",
+      "type": "量装",
+      "recipe": {
+        "output": "等离子电池",
+        "qty": 1,
+        "seconds": 5,
+        "inputs": {
+          "能量电池": 2,
+          "燃料罐": 2,
+          "相位粒子": 1
+        }
+      },
+      "face": "E",
+      "physicalInCount": 3,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "M3",
+      "type": "组装",
+      "recipe": {
+        "output": "古代芯片",
+        "qty": 1,
+        "seconds": 7.5,
+        "inputs": {
+          "硅晶圆": 3,
+          "导线线圈": 2,
+          "能量电池": 2
+        }
+      },
+      "face": "E",
+      "physicalInCount": 3,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "M4",
+      "type": "量装",
+      "recipe": {
+        "output": "引力透镜",
+        "qty": 1,
+        "seconds": 15,
+        "inputs": {
+          "框架模块": 1,
+          "共鸣水晶": 1,
+          "等离子电池": 2
+        }
+      },
+      "face": "S",
+      "physicalInCount": 3,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "M5",
+      "type": "量装",
+      "recipe": {
+        "output": "量子处理器",
+        "qty": 1,
+        "seconds": 10,
+        "inputs": {
+          "硅晶圆": 4,
+          "导线线圈": 4,
+          "古代芯片": 1
+        }
+      },
+      "face": "N",
+      "physicalInCount": 3,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "M6",
+      "type": "组装",
+      "recipe": {
+        "output": "电动机",
+        "qty": 1,
+        "seconds": 5,
+        "inputs": {
+          "齿轮组": 2,
+          "导线线圈": 3,
+          "合金板": 1
+        }
+      },
+      "face": "E",
+      "physicalInCount": 3,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "M7",
+      "type": "组装",
+      "recipe": {
+        "output": "框架模块",
+        "qty": 1,
+        "seconds": 6,
+        "inputs": {
+          "钛合金锭": 6,
+          "合金板": 4,
+          "齿轮组": 2
+        }
+      },
+      "face": "E",
+      "physicalInCount": 3,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "M8",
+      "type": "分流",
+      "recipe": null,
+      "face": "E",
+      "physicalInCount": 1,
+      "physicalOutCount": 3,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M9",
+      "type": "分流",
+      "recipe": null,
+      "face": "S",
+      "physicalInCount": 1,
+      "physicalOutCount": 3,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M10",
+      "type": "冶炼",
+      "recipe": {
+        "output": "合金板",
+        "qty": 2,
+        "seconds": 2.5,
+        "inputs": {
+          "小行星矿石": 2,
+          "废金属": 2
+        }
+      },
+      "face": "N",
+      "physicalInCount": 2,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "M11",
+      "type": "分流",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 1,
+      "physicalOutCount": 3,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M12",
+      "type": "组装",
+      "recipe": {
+        "output": "导线线圈",
+        "qty": 2,
+        "seconds": 2,
+        "inputs": {
+          "合金板": 1,
+          "能量电池": 1
+        }
+      },
+      "face": "E",
+      "physicalInCount": 2,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "M13",
+      "type": "分流",
+      "recipe": null,
+      "face": "E",
+      "physicalInCount": 1,
+      "physicalOutCount": 3,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M14",
+      "type": "冶炼",
+      "recipe": {
+        "output": "硅晶圆",
+        "qty": 1,
+        "seconds": 2.5,
+        "inputs": {
+          "小行星矿石": 2,
+          "星尘粒子": 4
+        }
+      },
+      "face": "E",
+      "physicalInCount": 2,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "M15",
+      "type": "分流",
+      "recipe": null,
+      "face": "E",
+      "physicalInCount": 1,
+      "physicalOutCount": 2,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M16",
+      "type": "分流",
+      "recipe": null,
+      "face": "N",
+      "physicalInCount": 1,
+      "physicalOutCount": 2,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M17",
+      "type": "分流",
+      "recipe": null,
+      "face": "S",
+      "physicalInCount": 1,
+      "physicalOutCount": 2,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M18",
+      "type": "分流",
+      "recipe": null,
+      "face": "E",
+      "physicalInCount": 1,
+      "physicalOutCount": 2,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M19",
+      "type": "组装",
+      "recipe": {
+        "output": "齿轮组",
+        "qty": 1,
+        "seconds": 1.5,
+        "inputs": {
+          "钛合金锭": 2
+        }
+      },
+      "face": "S",
+      "physicalInCount": 1,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "M20",
+      "type": "燃料",
+      "recipe": {
+        "output": "燃料罐",
+        "qty": 1,
+        "seconds": 3,
+        "inputs": {
+          "星尘粒子": 5
+        }
+      },
+      "face": "N",
+      "physicalInCount": 1,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M21",
+      "type": "废料",
+      "recipe": {
+        "output": "废金属",
+        "qty": 2,
+        "seconds": 2,
+        "inputs": {
+          "太空垃圾": 3
+        }
+      },
+      "face": "N",
+      "physicalInCount": 1,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M22",
+      "type": "冶炼",
+      "recipe": {
+        "output": "钛合金锭",
+        "qty": 1,
+        "seconds": 2,
+        "inputs": {
+          "小行星矿石": 3
+        }
+      },
+      "face": "S",
+      "physicalInCount": 1,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "M23",
+      "type": "电池",
+      "recipe": {
+        "output": "能量电池",
+        "qty": 1,
+        "seconds": 2.5,
+        "inputs": {
+          "废金属": 2
+        }
+      },
+      "face": "E",
+      "physicalInCount": 1,
+      "physicalOutCount": 1,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M24",
+      "type": "分流",
+      "recipe": null,
+      "face": "E",
+      "physicalInCount": 1,
+      "physicalOutCount": 2,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M25",
+      "type": "分流",
+      "recipe": null,
+      "face": "E",
+      "physicalInCount": 1,
+      "physicalOutCount": 2,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M26",
+      "type": "分流",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 1,
+      "physicalOutCount": 2,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M27",
+      "type": "分流",
+      "recipe": null,
+      "face": "E",
+      "physicalInCount": 1,
+      "physicalOutCount": 2,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M28",
+      "type": "垃圾",
+      "recipe": {
+        "output": "太空垃圾",
+        "qty": 3,
+        "seconds": 3,
+        "inputs": {}
+      },
+      "face": "N",
+      "physicalInCount": 0,
+      "physicalOutCount": 1,
+      "inputPriority": []
+    },
+    {
+      "id": "M29",
+      "type": "仓入",
+      "recipe": null,
+      "face": "E",
+      "physicalInCount": 1,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "M30",
+      "type": "垃圾",
+      "recipe": {
+        "output": "遐想物质",
+        "qty": 1,
+        "seconds": 7.5,
+        "inputs": {}
+      },
+      "face": "E",
+      "physicalInCount": 0,
+      "physicalOutCount": 1,
+      "inputPriority": []
+    },
+    {
+      "id": "M31",
+      "type": "粒子",
+      "recipe": {
+        "output": "星尘粒子",
+        "qty": 1,
+        "seconds": 1,
+        "inputs": {}
+      },
+      "face": "N",
+      "physicalInCount": 0,
+      "physicalOutCount": 1,
+      "inputPriority": []
+    },
+    {
+      "id": "M32",
+      "type": "采矿",
+      "recipe": {
+        "output": "小行星矿石",
+        "qty": 3,
+        "seconds": 3,
+        "inputs": {}
+      },
+      "face": "E",
+      "physicalInCount": 0,
+      "physicalOutCount": 1,
+      "inputPriority": []
+    },
+    {
+      "id": "M33",
+      "type": "粒子",
+      "recipe": {
+        "output": "相位粒子",
+        "qty": 1,
+        "seconds": 6,
+        "inputs": {}
+      },
+      "face": "N",
+      "physicalInCount": 0,
+      "physicalOutCount": 1,
+      "inputPriority": []
+    },
+    {
+      "id": "M34",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M35",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M36",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M37",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M38",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M39",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M40",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M41",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M42",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M43",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M44",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M45",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M46",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M47",
+      "type": "发电",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": []
+    },
+    {
+      "id": "M48",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M49",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M50",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M51",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M52",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M53",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M54",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M55",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M56",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M57",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M58",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M59",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M60",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M61",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M62",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M63",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M64",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M65",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M66",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M67",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M68",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M69",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M70",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    },
+    {
+      "id": "M71",
+      "type": "电脑",
+      "recipe": null,
+      "face": "W",
+      "physicalInCount": 0,
+      "physicalOutCount": 0,
+      "inputPriority": [
+        0
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "id": "R0",
+      "from": "M28",
+      "to": "M21",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "太空垃圾"
+      ],
+      "active": true,
+      "length": 5,
+      "rawMaterials": [
+        "太空垃圾"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "太空垃圾"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R1",
+      "from": "M30",
+      "to": "M0",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "遐想物质"
+      ],
+      "active": true,
+      "length": 58,
+      "rawMaterials": [
+        "遐想物质"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "合金板",
+        "遐想物质",
+        "相位粒子"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R2",
+      "from": "M3",
+      "to": "M5",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "古代芯片"
+      ],
+      "active": true,
+      "length": 29,
+      "rawMaterials": [
+        "古代芯片"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "硅晶圆",
+        "导线线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R3",
+      "from": "M20",
+      "to": "M2",
+      "toPort": 1,
+      "fromPort": 0,
+      "materials": [
+        "燃料罐"
+      ],
+      "active": true,
+      "length": 21,
+      "rawMaterials": [
+        "燃料罐"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "燃料罐",
+        "相位粒子"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R4",
+      "from": "M7",
+      "to": "M4",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "框架模块"
+      ],
+      "active": true,
+      "length": 33,
+      "rawMaterials": [
+        "框架模块"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "共鸣水晶",
+        "框架模块",
+        "等离子电池"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R5",
+      "from": "M0",
+      "to": "M4",
+      "toPort": 1,
+      "fromPort": 0,
+      "materials": [
+        "共鸣水晶"
+      ],
+      "active": true,
+      "length": 41,
+      "rawMaterials": [
+        "共鸣水晶"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "共鸣水晶",
+        "框架模块",
+        "等离子电池"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R6",
+      "from": "M2",
+      "to": "M4",
+      "toPort": 2,
+      "fromPort": 0,
+      "materials": [
+        "等离子电池"
+      ],
+      "active": true,
+      "length": 56,
+      "rawMaterials": [
+        "等离子电池"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "共鸣水晶",
+        "框架模块",
+        "等离子电池"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R7",
+      "from": "M6",
+      "to": "M1",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "电动机"
+      ],
+      "active": true,
+      "length": 39,
+      "rawMaterials": [
+        "电动机"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "电动机",
+        "量子处理器",
+        "引力透镜"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R8",
+      "from": "M5",
+      "to": "M1",
+      "toPort": 1,
+      "fromPort": 0,
+      "materials": [
+        "量子处理器"
+      ],
+      "active": true,
+      "length": 11,
+      "rawMaterials": [
+        "量子处理器"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "电动机",
+        "量子处理器",
+        "引力透镜"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R9",
+      "from": "M4",
+      "to": "M1",
+      "toPort": 2,
+      "fromPort": 0,
+      "materials": [
+        "引力透镜"
+      ],
+      "active": true,
+      "length": 36,
+      "rawMaterials": [
+        "引力透镜"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "电动机",
+        "量子处理器",
+        "引力透镜"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R10",
+      "from": "M31",
+      "to": "M15",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "星尘粒子"
+      ],
+      "active": true,
+      "length": 9,
+      "rawMaterials": [
+        "星尘粒子"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R11",
+      "from": "M15",
+      "to": "M20",
+      "toPort": 0,
+      "fromPort": 1,
+      "materials": [
+        "星尘粒子"
+      ],
+      "active": true,
+      "length": 21,
+      "rawMaterials": [
+        "星尘粒子"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "星尘粒子"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R12",
+      "from": "M15",
+      "to": "M14",
+      "toPort": 1,
+      "fromPort": 0,
+      "materials": [
+        "星尘粒子"
+      ],
+      "active": true,
+      "length": 14,
+      "rawMaterials": [
+        "星尘粒子"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "星尘粒子",
+        "小行星矿石"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R13",
+      "from": "M33",
+      "to": "M24",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "相位粒子"
+      ],
+      "active": true,
+      "length": 36,
+      "rawMaterials": [
+        "相位粒子"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R14",
+      "from": "M24",
+      "to": "M0",
+      "toPort": 1,
+      "fromPort": 0,
+      "materials": [
+        "相位粒子"
+      ],
+      "active": true,
+      "length": 26,
+      "rawMaterials": [
+        "相位粒子"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "合金板",
+        "遐想物质",
+        "相位粒子"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R15",
+      "from": "M24",
+      "to": "M2",
+      "toPort": 2,
+      "fromPort": 2,
+      "materials": [
+        "相位粒子"
+      ],
+      "active": true,
+      "length": 10,
+      "rawMaterials": [
+        "相位粒子"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "燃料罐",
+        "相位粒子"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R16",
+      "from": "M32",
+      "to": "M13",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "小行星矿石"
+      ],
+      "active": true,
+      "length": 11,
+      "rawMaterials": [
+        "小行星矿石"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R17",
+      "from": "M13",
+      "to": "M22",
+      "toPort": 0,
+      "fromPort": 1,
+      "materials": [
+        "小行星矿石"
+      ],
+      "active": true,
+      "length": 47,
+      "rawMaterials": [
+        "小行星矿石"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "小行星矿石"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R18",
+      "from": "M13",
+      "to": "M14",
+      "toPort": 0,
+      "fromPort": 2,
+      "materials": [
+        "小行星矿石"
+      ],
+      "active": true,
+      "length": 33,
+      "rawMaterials": [
+        "小行星矿石"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "星尘粒子",
+        "小行星矿石"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R19",
+      "from": "M13",
+      "to": "M10",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "小行星矿石"
+      ],
+      "active": true,
+      "length": 5,
+      "rawMaterials": [
+        "小行星矿石"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "废金属",
+        "小行星矿石"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R20",
+      "from": "M21",
+      "to": "M16",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "废金属"
+      ],
+      "active": true,
+      "length": 17,
+      "rawMaterials": [
+        "废金属"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R21",
+      "from": "M16",
+      "to": "M23",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "废金属"
+      ],
+      "active": true,
+      "length": 57,
+      "rawMaterials": [
+        "废金属"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "废金属"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R22",
+      "from": "M16",
+      "to": "M10",
+      "toPort": 1,
+      "fromPort": 1,
+      "materials": [
+        "废金属"
+      ],
+      "active": true,
+      "length": 17,
+      "rawMaterials": [
+        "废金属"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "废金属",
+        "小行星矿石"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R23",
+      "from": "M23",
+      "to": "M9",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "能量电池"
+      ],
+      "active": true,
+      "length": 26,
+      "rawMaterials": [
+        "能量电池"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R24",
+      "from": "M9",
+      "to": "M12",
+      "toPort": 1,
+      "fromPort": 1,
+      "materials": [
+        "能量电池"
+      ],
+      "active": true,
+      "length": 46,
+      "rawMaterials": [
+        "能量电池"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "合金板"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R25",
+      "from": "M9",
+      "to": "M3",
+      "toPort": 2,
+      "fromPort": 2,
+      "materials": [
+        "能量电池"
+      ],
+      "active": true,
+      "length": 39,
+      "rawMaterials": [
+        "能量电池"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "硅晶圆",
+        "导线线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R26",
+      "from": "M9",
+      "to": "M25",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "能量电池"
+      ],
+      "active": true,
+      "length": 69,
+      "rawMaterials": [
+        "能量电池"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R27",
+      "from": "M25",
+      "to": "M0",
+      "toPort": 2,
+      "fromPort": 0,
+      "materials": [
+        "能量电池"
+      ],
+      "active": true,
+      "length": 37,
+      "rawMaterials": [
+        "能量电池"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "合金板",
+        "遐想物质",
+        "相位粒子"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R28",
+      "from": "M25",
+      "to": "M2",
+      "toPort": 0,
+      "fromPort": 2,
+      "materials": [
+        "能量电池"
+      ],
+      "active": true,
+      "length": 16,
+      "rawMaterials": [
+        "能量电池"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "燃料罐",
+        "相位粒子"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R29",
+      "from": "M22",
+      "to": "M17",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "钛合金锭"
+      ],
+      "active": true,
+      "length": 28,
+      "rawMaterials": [
+        "钛合金锭"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R30",
+      "from": "M17",
+      "to": "M19",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "钛合金锭"
+      ],
+      "active": true,
+      "length": 15,
+      "rawMaterials": [
+        "钛合金锭"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "钛合金锭"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R31",
+      "from": "M17",
+      "to": "M7",
+      "toPort": 0,
+      "fromPort": 1,
+      "materials": [
+        "钛合金锭"
+      ],
+      "active": true,
+      "length": 13,
+      "rawMaterials": [
+        "钛合金锭"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "合金板",
+        "钛合金锭",
+        "齿轮组"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R32",
+      "from": "M14",
+      "to": "M27",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "硅晶圆"
+      ],
+      "active": true,
+      "length": 43,
+      "rawMaterials": [
+        "硅晶圆"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R33",
+      "from": "M27",
+      "to": "M3",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "硅晶圆"
+      ],
+      "active": true,
+      "length": 18,
+      "rawMaterials": [
+        "硅晶圆"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "硅晶圆",
+        "导线线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R34",
+      "from": "M27",
+      "to": "M5",
+      "toPort": 2,
+      "fromPort": 2,
+      "materials": [
+        "硅晶圆"
+      ],
+      "active": true,
+      "length": 15,
+      "rawMaterials": [
+        "硅晶圆"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "硅晶圆",
+        "导线线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R35",
+      "from": "M10",
+      "to": "M11",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "合金板"
+      ],
+      "active": true,
+      "length": 45,
+      "rawMaterials": [
+        "合金板"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R36",
+      "from": "M11",
+      "to": "M12",
+      "toPort": 0,
+      "fromPort": 2,
+      "materials": [
+        "合金板"
+      ],
+      "active": true,
+      "length": 47,
+      "rawMaterials": [
+        "合金板"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "合金板"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R37",
+      "from": "M11",
+      "to": "M7",
+      "toPort": 1,
+      "fromPort": 0,
+      "materials": [
+        "合金板"
+      ],
+      "active": true,
+      "length": 74,
+      "rawMaterials": [
+        "合金板"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "合金板",
+        "钛合金锭",
+        "齿轮组"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R38",
+      "from": "M11",
+      "to": "M18",
+      "toPort": 0,
+      "fromPort": 1,
+      "materials": [
+        "合金板"
+      ],
+      "active": true,
+      "length": 47,
+      "rawMaterials": [
+        "合金板"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R39",
+      "from": "M18",
+      "to": "M6",
+      "toPort": 2,
+      "fromPort": 1,
+      "materials": [
+        "合金板"
+      ],
+      "active": true,
+      "length": 7,
+      "rawMaterials": [
+        "合金板"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "合金板",
+        "齿轮组",
+        "导线线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R40",
+      "from": "M18",
+      "to": "M0",
+      "toPort": 3,
+      "fromPort": 2,
+      "materials": [
+        "合金板"
+      ],
+      "active": true,
+      "length": 2,
+      "rawMaterials": [
+        "合金板"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "合金板",
+        "遐想物质",
+        "相位粒子"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R41",
+      "from": "M19",
+      "to": "M26",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "齿轮组"
+      ],
+      "active": true,
+      "length": 36,
+      "rawMaterials": [
+        "齿轮组"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R42",
+      "from": "M26",
+      "to": "M7",
+      "toPort": 2,
+      "fromPort": 1,
+      "materials": [
+        "齿轮组"
+      ],
+      "active": true,
+      "length": 21,
+      "rawMaterials": [
+        "齿轮组"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "合金板",
+        "钛合金锭",
+        "齿轮组"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R43",
+      "from": "M26",
+      "to": "M6",
+      "toPort": 0,
+      "fromPort": 2,
+      "materials": [
+        "齿轮组"
+      ],
+      "active": true,
+      "length": 25,
+      "rawMaterials": [
+        "齿轮组"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "合金板",
+        "齿轮组",
+        "导线线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R44",
+      "from": "M12",
+      "to": "M8",
+      "toPort": 0,
+      "fromPort": 0,
+      "materials": [
+        "导线线圈"
+      ],
+      "active": true,
+      "length": 35,
+      "rawMaterials": [
+        "导线线圈"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R45",
+      "from": "M8",
+      "to": "M3",
+      "toPort": 1,
+      "fromPort": 0,
+      "materials": [
+        "导线线圈"
+      ],
+      "active": true,
+      "length": 29,
+      "rawMaterials": [
+        "导线线圈"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "能量电池",
+        "硅晶圆",
+        "导线线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R46",
+      "from": "M8",
+      "to": "M6",
+      "toPort": 1,
+      "fromPort": 1,
+      "materials": [
+        "导线线圈"
+      ],
+      "active": true,
+      "length": 39,
+      "rawMaterials": [
+        "导线线圈"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "合金板",
+        "齿轮组",
+        "导线线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R47",
+      "from": "M8",
+      "to": "M5",
+      "toPort": 1,
+      "fromPort": 2,
+      "materials": [
+        "导线线圈"
+      ],
+      "active": true,
+      "length": 32,
+      "rawMaterials": [
+        "导线线圈"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "硅晶圆",
+        "导线线圈"
+      ],
+      "compatible": true
+    },
+    {
+      "id": "R48",
+      "from": "M1",
+      "to": "M29",
+      "toPort": 1,
+      "fromPort": 0,
+      "materials": [
+        "曲速线圈"
+      ],
+      "active": true,
+      "length": 25,
+      "rawMaterials": [
+        "曲速线圈"
+      ],
+      "outFilter": "",
+      "acceptedMaterials": [
+        "古代芯片",
+        "能量电池",
+        "共鸣水晶",
+        "废金属",
+        "燃料罐",
+        "合金板",
+        "复合装甲板",
+        "太空垃圾",
+        "星尘粒子",
+        "遐想物质",
+        "相位粒子",
+        "小行星矿石",
+        "钛合金锭",
+        "硅晶圆",
+        "齿轮组",
+        "导线线圈",
+        "隔热泡沫",
+        "电动机",
+        "框架模块",
+        "等离子电池",
+        "量子处理器",
+        "引力透镜",
+        "曲速线圈"
+      ],
+      "compatible": true
+    }
+  ],
+  "pools": [
+    {
+      "item": "曲速线圈",
+      "order": []
+    }
+  ],
+  "frozen": []
+}

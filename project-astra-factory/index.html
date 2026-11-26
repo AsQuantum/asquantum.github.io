@@ -20,13 +20,13 @@
 <link rel="stylesheet" href="styles/changelog.css?v=20261123-039"/>
 <link rel="stylesheet" href="styles/select-theme.css?v=20261124-theme-1"/>
 <link rel="stylesheet" href="styles/sidebar-resize.css?v=20261124-frozen-041-ui2"/>
-<link rel="stylesheet" href="styles/frozen-factories.css?v=20261124-import-fix"/>
+<link rel="stylesheet" href="styles/frozen-factories.css?v=20261126-progress-1"/>
 <link rel="stylesheet" href="styles/checkbox-theme.css?v=20261124-theme-1"/>
-<link rel="stylesheet" href="styles/theme.css?v=20261124-factory-audit-041"/>
+<link rel="stylesheet" href="styles/theme.css?v=20261126-progress-1"/>
 </head>
 <body>
 <div class="app">
-<header class="top"><div class="brand"><img class="brand-mark" src="favicon.svg" alt="" aria-hidden="true"/> <span>Factory</span> Lab <button id="changelogOpen" class="changelog-trigger" type="button" aria-haspopup="dialog" aria-controls="changelogPanel" aria-label="查看 Factory Lab 版本更新记录" title="查看版本更新记录">v0.41 <span aria-hidden="true">▾</span></button></div>
+<header class="top"><div class="brand"><img class="brand-mark" src="favicon.svg" alt="" aria-hidden="true"/> <span>Factory</span> Lab <button id="changelogOpen" class="changelog-trigger" type="button" aria-haspopup="dialog" aria-controls="changelogPanel" aria-label="查看 Factory Lab 版本更新记录" title="查看版本更新记录">v0.42 <span aria-hidden="true">▾</span></button></div>
  <div class="preset-manager" id="presetDropdown" aria-label="求解器方案管理">
   <div class="preset-combo">
    <input id="presetName" type="text" maxlength="64" placeholder="方案名称" role="combobox" aria-label="方案名称，可编辑；点击显示方案列表" aria-haspopup="dialog" aria-expanded="false" aria-controls="presetList" autocomplete="off" title="点击显示方案列表，修改文字可重命名"/>
@@ -285,28 +285,27 @@
 <footer class="status"><span id="statusText">准备就绪</span><span id="cursorText">格子坐标 —</span><span id="beltText"></span><span style="margin-left:auto">离线单文件 · localStorage 自动保存 · JSON 导入导出</span></footer>
 </div>
 <script src="scripts/data/warp-preset.js?v=20261123-039"></script>
-<script src="scripts/data/catalog.js?v=20261124-frozen-041-ui2"></script>
+<script src="scripts/data/catalog.js?v=20261125-rational-worker-11"></script>
 <script src="scripts/core/state.js?v=20261123-039"></script>
-<script src="scripts/core/machines.js?v=20261124-041-fix"></script>
-<script src="scripts/core/routing.js?v=20261124-mr-mobile-priority-1"></script>
-<script src="scripts/core/editor.js?v=20261124-port-warn-041"></script>
-<script src="scripts/core/audit.js?v=20261124-release-041-final"></script>
-<script src="scripts/ui/inspector.js?v=20261124-overdraft-period-1"></script>
+<script src="scripts/core/machines.js?v=20261125-strict-counts-1"></script>
+<script src="scripts/core/routing.js?v=20261125-soft-material-wiring"></script>
+<script src="scripts/core/editor.js?v=20261125-strict-counts-1"></script>
+<script src="scripts/core/audit.js?v=20261125-audit-focus"></script>
+<script src="scripts/ui/inspector.js?v=20261126-iteration-58"></script>
 <script src="scripts/core/layout-io.js?v=20261124-frozen-041-ui2"></script>
-<script src="scripts/ui/editor-controls.js?v=20261124-posttrim-select-only-1"></script>
+<script src="scripts/ui/editor-controls.js?v=20261125-completed-belt-two-tap-exit"></script>
 <script src="scripts/core/selection-transform.js?v=20261124-port-warn-041"></script>
-<script src="scripts/ui/canvas.js?v=20261124-continuous-belt"></script>
-<script src="scripts/engine/steady-flow.js?v=20261124-frozen-041-ui2"></script>
-<script src="scripts/engine/steady-equations.js?v=20261124-simulator-contract-1"></script>
-<script src="scripts/engine/steady-generic-network.js?v=20261124-frozen-041-ui2"></script>
-<script src="scripts/engine/steady-bounds.js?v=20261124-rational-upper-1"></script>
-<script src="scripts/engine/steady-auto-fluid.js?v=20261124-frozen-041-ui2"></script>
-<script src="scripts/ui/theory-worker.js?v=20261124-frozen-041-ui2"></script>
-<script src="scripts/ui/warehouse.js?v=20261124-continuous-belt"></script>
-<script src="scripts/ui/frozen-factories.js?v=20261124-continuous-belt"></script>
-<script src="scripts/engine/simulation.js?v=20261124-frozen-041-ui2"></script>
-<script src="scripts/ui/stock-chart.js?v=20261124-live-edit-stock-id-2"></script>
-<script src="scripts/ui/actions.js?v=20261124-warehouse-window-totals-1"></script>
+<script src="scripts/ui/canvas.js?v=20261125-batched-belt-performance"></script>
+<script src="scripts/engine/math/arithmetic/rational.js?v=20261126-iteration-58"></script>
+<script src="scripts/engine/steady-flow.js?v=20261126-iteration-58"></script>
+<script src="scripts/engine/math/graph/symbolic_physical_spec.js?v=20261126-iteration-58"></script>
+<script src="scripts/engine/iteration-display.js?v=20261126-iteration-58"></script>
+<script src="scripts/ui/theory-worker.js?v=20261126-iteration-58"></script>
+<script src="scripts/ui/warehouse.js?v=20261126-iteration-58"></script>
+<script src="scripts/ui/frozen-factories.js?v=20261126-iteration-58"></script>
+<script src="scripts/engine/simulation.js?v=20261126-iteration-58"></script>
+<script src="scripts/ui/stock-chart.js?v=20261125-edit-stock-returns"></script>
+<script src="scripts/ui/actions.js?v=20261126-iteration-58"></script>
 <script src="scripts/blueprints/machine-ids.js?v=20261123-039"></script>
 <script src="scripts/blueprints/item-ids.js?v=20261124-live-edit-stock-id-2"></script>
 <script src="scripts/core/old.js?v=20261124-json13-route-select-1"></script>
@@ -315,7 +314,7 @@
 <script src="scripts/blueprints/ast1-ui.js?v=20261123-039"></script>
 <script src="scripts/ui/presets.js?v=20261124-frozen-041-ui2"></script>
 <script src="scripts/ui/edit-menu.js?v=20261123-039"></script>
-<script src="scripts/data/changelog.js?v=20261124-041-fix"></script>
+<script src="scripts/data/changelog.js?v=20261126-042"></script>
 <script src="scripts/ui/changelog.js?v=20261123-039"></script>
 <script src="scripts/ui/startup.js?v=20261124-json13-route-select-1"></script>
 <script src="scripts/ui/sidebar-resize.js?v=20261124-1"></script>

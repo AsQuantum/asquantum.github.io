@@ -75,7 +75,7 @@ function getStampMachine(x=0,y=0){
 function updateStampControls(){
  const panel=$('stampControls');
  if(!stampType){panel.style.display='none';return;}
- const d=DEF[stampType],modes=factoryRecipeModesByItem(stampType,recipeModes(stampType)),rec=d.recipes?.[stampMode];
+ const d=DEF[stampType],modes=recipeModes(stampType),rec=d.recipes?.[stampMode];
  panel.style.display='block';
  $('configContext').textContent='放置设置';
  $('stampName').textContent=d.name;
@@ -124,6 +124,7 @@ function effectiveCycle(m){
  const cycles=budget.machineCycles;
  if(!cycles||!Object.prototype.hasOwnProperty.call(cycles,m.id))return null;
  const rate=cycles[m.id];
+ if(rate===null||rate===undefined)return null;
  if(!(rate>0))return Infinity;
  return Math.max(rec.seconds,1/rate);
 }
@@ -170,8 +171,8 @@ function theoryMachinePeriodHint(m){
 function timeLabel(m){
  const rec=getRecipe(m);if(!rec)return '';
  const nominal=String(rec.seconds)+'s';
- if(!machineWiredForTheory(m))return nominal+'(待接线)';
  const period=effectiveCycle(m);
+ if(period===null&&!machineWiredForTheory(m))return nominal+'(待接线)';
  if(period!==null)return nominal+'('+(Number.isFinite(period)?fmtT(period)+'s':'∞')+')';
  const hint=theoryMachinePeriodHint(m);
  return nominal+'('+(hint||(!theoreticalBudget||theoreticalBudget.calculating?'计算中':theoreticalBudget.calculationTimedOut?'超时':'待证明'))+')';
@@ -187,7 +188,7 @@ function warehouseOutletTimeLabel(m){
  const budget=typeof steadyDisplayRateBudget==='function'?steadyDisplayRateBudget(theoreticalBudget):theoreticalBudget;
  if(budget&&!budget.error){
   const flows=budget.routeFlows||{};
-  if(connected.length&&connected.every(r=>Object.prototype.hasOwnProperty.call(flows,r.id))){
+  if(connected.length&&connected.every(r=>Object.prototype.hasOwnProperty.call(flows,r.id)&&flows[r.id]?.[m.item]!==null&&(budget.proofMode!=='strict-counts'||Object.hasOwn(flows[r.id],m.item)))){
    const rate=connected.reduce((sum,r)=>sum+Number(flows[r.id]?.[m.item]||0),0);
    return label+'('+(rate>0?fmtT(Math.max(nominal,1/rate))+'s':'∞')+')';
   }
@@ -292,6 +293,22 @@ function getPorts(m){
  if(m.ast1GamePorts&&m.ast1PortProfile!=='standard'&&m.type==='冶炼'&&f==='N')offsets=offsets.map(off=>off-1);
  if(m.ast1GamePorts&&m.ast1PortProfile!=='standard'&&m.type==='共鸣'&&f==='S')offsets=offsets.map(off=>off+1);
  offsets.forEach((off,i)=>ports.push(one(back,off,'in',i)));if(no)ports.push(one(f,Math.floor(sideLength(f)/2),'out',0));}return ports;}
+// Physical input precedence for simultaneous arrivals: game-relative right
+// to left, independent of belt creation / serialization order. AST1 mirrors
+// the game coordinates, so reflection reverses the displayed handedness.
+// Shared physical port order: simulator and direct mathematical compiler.
+function mergerInputOrder(m){
+ const face=m.face||'E';
+ const left={E:'N',N:'W',W:'S',S:'E'}[face];
+ const right={E:'S',S:'W',W:'N',N:'E'}[face];
+ const priority=[left,OPP[face],right];
+ return getPorts(m).filter(p=>p.kind==='in').sort((a,b)=>priority.indexOf(a.side)-priority.indexOf(b.side));
+}
+function machineInputPriority(m){
+ const [dx,dy]=V[m.face||'E'],hand=m.ast1Mirrored?-1:1;
+ const lateral=p=>hand*(-dy*p.x+dx*p.y);
+ return getPorts(m).filter(p=>p.kind==='in').sort((a,b)=>lateral(b)-lateral(a)||a.index-b.index);
+}
 // 配方机器的所有输入口均自动接收配方所需材料；输入口手动过滤已停用。
 function inPort(m,i){return getPorts(m).find(p=>p.kind==='in'&&p.index===i)}function outPort(m,i){return getPorts(m).find(p=>p.kind==='out'&&p.index===i)}
 function inMap(x,y){return x>=0&&y>=0&&x<W&&y<H}

@@ -1,0 +1,1525 @@
+{
+  "layout": {
+    "name": "Synchronous independent titanium deposits, finite warehouse reservations",
+    "recordIndexed": true,
+    "machines": [
+      {
+        "id": "M0",
+        "type": "采矿",
+        "x": 2,
+        "y": 1,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M1",
+        "type": "仓入",
+        "x": 11,
+        "y": 1,
+        "face": "E"
+      },
+      {
+        "id": "M2",
+        "type": "采矿",
+        "x": 2,
+        "y": 9,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M3",
+        "type": "仓入",
+        "x": 11,
+        "y": 9,
+        "face": "E"
+      },
+      {
+        "id": "M4",
+        "type": "采矿",
+        "x": 2,
+        "y": 17,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M5",
+        "type": "仓入",
+        "x": 11,
+        "y": 17,
+        "face": "E"
+      },
+      {
+        "id": "M6",
+        "type": "采矿",
+        "x": 2,
+        "y": 25,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M7",
+        "type": "仓入",
+        "x": 11,
+        "y": 25,
+        "face": "E"
+      },
+      {
+        "id": "M8",
+        "type": "仓出",
+        "x": 18,
+        "y": 1,
+        "face": "E",
+        "item": "钛合金锭"
+      },
+      {
+        "id": "M9",
+        "type": "仓出",
+        "x": 18,
+        "y": 10,
+        "face": "E",
+        "item": "钛合金锭"
+      },
+      {
+        "id": "M10",
+        "type": "组装",
+        "x": 28,
+        "y": 0,
+        "face": "E",
+        "mode": "齿轮组"
+      },
+      {
+        "id": "M11",
+        "type": "电脑",
+        "x": 27,
+        "y": 11,
+        "face": "E"
+      },
+      {
+        "id": "M12",
+        "type": "仓入",
+        "x": 43,
+        "y": 1,
+        "face": "E"
+      }
+    ],
+    "routes": [
+      {
+        "id": "R0",
+        "from": {
+          "id": "M0",
+          "port": 0
+        },
+        "to": {
+          "id": "M1",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            3
+          ],
+          [
+            8,
+            3
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            10,
+            3
+          ]
+        ]
+      },
+      {
+        "id": "R1",
+        "from": {
+          "id": "M2",
+          "port": 0
+        },
+        "to": {
+          "id": "M3",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            11
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            10,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R2",
+        "from": {
+          "id": "M4",
+          "port": 0
+        },
+        "to": {
+          "id": "M5",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            19
+          ],
+          [
+            8,
+            19
+          ],
+          [
+            9,
+            19
+          ],
+          [
+            10,
+            19
+          ]
+        ]
+      },
+      {
+        "id": "R3",
+        "from": {
+          "id": "M6",
+          "port": 0
+        },
+        "to": {
+          "id": "M7",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            27
+          ],
+          [
+            8,
+            27
+          ],
+          [
+            9,
+            27
+          ],
+          [
+            10,
+            27
+          ]
+        ]
+      },
+      {
+        "id": "R4",
+        "from": {
+          "id": "M8",
+          "port": 0
+        },
+        "to": {
+          "id": "M10",
+          "port": 1
+        },
+        "path": [
+          [
+            23,
+            3
+          ],
+          [
+            24,
+            3
+          ],
+          [
+            25,
+            3
+          ],
+          [
+            26,
+            3
+          ],
+          [
+            27,
+            3
+          ]
+        ]
+      },
+      {
+        "id": "R5",
+        "from": {
+          "id": "M9",
+          "port": 0
+        },
+        "to": {
+          "id": "M11",
+          "port": 0
+        },
+        "path": [
+          [
+            23,
+            12
+          ],
+          [
+            24,
+            12
+          ],
+          [
+            25,
+            12
+          ],
+          [
+            26,
+            12
+          ]
+        ]
+      },
+      {
+        "id": "R6",
+        "from": {
+          "id": "M10",
+          "port": 0
+        },
+        "to": {
+          "id": "M12",
+          "port": 1
+        },
+        "path": [
+          [
+            39,
+            3
+          ],
+          [
+            40,
+            3
+          ],
+          [
+            41,
+            3
+          ],
+          [
+            42,
+            3
+          ]
+        ]
+      }
+    ],
+    "frozenFactories": []
+  },
+  "ast1": "AST1:BA0ADAIBAAABAAoLAQMAAAAMAgkAAAEACgsJAwAAAAwCEQAAAQAKCxEDAAAADAIZAAABAAoLGQMAAAALEgEBAAABvQELEgoBAAABvQEOHAAAAAAAERsLAAAAAQAACisBAwAAAAcAAAAAAQABBBUCAAADAAEEFQQAAAUAAQQVBgAABwABBBUIAAAKAAEFVQkAAAsAAAQVCgAADAABBBU=",
+  "graph": {
+    "status": "compiled",
+    "issues": [],
+    "unlimited": false,
+    "completePhysicalRoutes": true,
+    "nodes": [
+      {
+        "id": "M0",
+        "type": "采矿",
+        "recipe": {
+          "output": "钛合金锭",
+          "qty": 1,
+          "seconds": 7.5,
+          "inputs": {}
+        },
+        "face": "E",
+        "physicalInCount": 0,
+        "physicalOutCount": 1,
+        "inputPriority": []
+      },
+      {
+        "id": "M1",
+        "type": "仓入",
+        "recipe": null,
+        "face": "E",
+        "physicalInCount": 1,
+        "physicalOutCount": 0,
+        "inputPriority": [
+          2,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "M2",
+        "type": "采矿",
+        "recipe": {
+          "output": "钛合金锭",
+          "qty": 1,
+          "seconds": 7.5,
+          "inputs": {}
+        },
+        "face": "E",
+        "physicalInCount": 0,
+        "physicalOutCount": 1,
+        "inputPriority": []
+      },
+      {
+        "id": "M3",
+        "type": "仓入",
+        "recipe": null,
+        "face": "E",
+        "physicalInCount": 1,
+        "physicalOutCount": 0,
+        "inputPriority": [
+          2,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "M4",
+        "type": "采矿",
+        "recipe": {
+          "output": "钛合金锭",
+          "qty": 1,
+          "seconds": 7.5,
+          "inputs": {}
+        },
+        "face": "E",
+        "physicalInCount": 0,
+        "physicalOutCount": 1,
+        "inputPriority": []
+      },
+      {
+        "id": "M5",
+        "type": "仓入",
+        "recipe": null,
+        "face": "E",
+        "physicalInCount": 1,
+        "physicalOutCount": 0,
+        "inputPriority": [
+          2,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "M6",
+        "type": "采矿",
+        "recipe": {
+          "output": "钛合金锭",
+          "qty": 1,
+          "seconds": 7.5,
+          "inputs": {}
+        },
+        "face": "E",
+        "physicalInCount": 0,
+        "physicalOutCount": 1,
+        "inputPriority": []
+      },
+      {
+        "id": "M7",
+        "type": "仓入",
+        "recipe": null,
+        "face": "E",
+        "physicalInCount": 1,
+        "physicalOutCount": 0,
+        "inputPriority": [
+          2,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "M8",
+        "type": "仓出",
+        "recipe": null,
+        "item": "钛合金锭",
+        "face": "E",
+        "physicalInCount": 0,
+        "physicalOutCount": 1,
+        "inputPriority": []
+      },
+      {
+        "id": "M9",
+        "type": "仓出",
+        "recipe": null,
+        "item": "钛合金锭",
+        "face": "E",
+        "physicalInCount": 0,
+        "physicalOutCount": 1,
+        "inputPriority": []
+      },
+      {
+        "id": "M10",
+        "type": "组装",
+        "recipe": {
+          "output": "齿轮组",
+          "qty": 1,
+          "seconds": 1.5,
+          "inputs": {
+            "钛合金锭": 2
+          }
+        },
+        "face": "E",
+        "physicalInCount": 1,
+        "physicalOutCount": 1,
+        "inputPriority": [
+          2,
+          1,
+          0
+        ]
+      },
+      {
+        "id": "M11",
+        "type": "电脑",
+        "recipe": null,
+        "face": "E",
+        "physicalInCount": 1,
+        "physicalOutCount": 0,
+        "inputPriority": [
+          0
+        ]
+      },
+      {
+        "id": "M12",
+        "type": "仓入",
+        "recipe": null,
+        "face": "E",
+        "physicalInCount": 1,
+        "physicalOutCount": 0,
+        "inputPriority": [
+          2,
+          1,
+          0
+        ]
+      }
+    ],
+    "lines": [
+      {
+        "id": "R0",
+        "from": "M0",
+        "to": "M1",
+        "toPort": 1,
+        "fromPort": 0,
+        "materials": [
+          "钛合金锭"
+        ],
+        "active": true,
+        "length": 4,
+        "rawMaterials": [
+          "钛合金锭"
+        ],
+        "outFilter": "",
+        "acceptedMaterials": [
+          "古代芯片",
+          "能量电池",
+          "共鸣水晶",
+          "废金属",
+          "燃料罐",
+          "合金板",
+          "复合装甲板",
+          "太空垃圾",
+          "星尘粒子",
+          "遐想物质",
+          "相位粒子",
+          "小行星矿石",
+          "钛合金锭",
+          "硅晶圆",
+          "齿轮组",
+          "导线线圈",
+          "隔热泡沫",
+          "电动机",
+          "框架模块",
+          "等离子电池",
+          "量子处理器",
+          "引力透镜",
+          "曲速线圈"
+        ],
+        "compatible": true
+      },
+      {
+        "id": "R1",
+        "from": "M2",
+        "to": "M3",
+        "toPort": 1,
+        "fromPort": 0,
+        "materials": [
+          "钛合金锭"
+        ],
+        "active": true,
+        "length": 4,
+        "rawMaterials": [
+          "钛合金锭"
+        ],
+        "outFilter": "",
+        "acceptedMaterials": [
+          "古代芯片",
+          "能量电池",
+          "共鸣水晶",
+          "废金属",
+          "燃料罐",
+          "合金板",
+          "复合装甲板",
+          "太空垃圾",
+          "星尘粒子",
+          "遐想物质",
+          "相位粒子",
+          "小行星矿石",
+          "钛合金锭",
+          "硅晶圆",
+          "齿轮组",
+          "导线线圈",
+          "隔热泡沫",
+          "电动机",
+          "框架模块",
+          "等离子电池",
+          "量子处理器",
+          "引力透镜",
+          "曲速线圈"
+        ],
+        "compatible": true
+      },
+      {
+        "id": "R2",
+        "from": "M4",
+        "to": "M5",
+        "toPort": 1,
+        "fromPort": 0,
+        "materials": [
+          "钛合金锭"
+        ],
+        "active": true,
+        "length": 4,
+        "rawMaterials": [
+          "钛合金锭"
+        ],
+        "outFilter": "",
+        "acceptedMaterials": [
+          "古代芯片",
+          "能量电池",
+          "共鸣水晶",
+          "废金属",
+          "燃料罐",
+          "合金板",
+          "复合装甲板",
+          "太空垃圾",
+          "星尘粒子",
+          "遐想物质",
+          "相位粒子",
+          "小行星矿石",
+          "钛合金锭",
+          "硅晶圆",
+          "齿轮组",
+          "导线线圈",
+          "隔热泡沫",
+          "电动机",
+          "框架模块",
+          "等离子电池",
+          "量子处理器",
+          "引力透镜",
+          "曲速线圈"
+        ],
+        "compatible": true
+      },
+      {
+        "id": "R3",
+        "from": "M6",
+        "to": "M7",
+        "toPort": 1,
+        "fromPort": 0,
+        "materials": [
+          "钛合金锭"
+        ],
+        "active": true,
+        "length": 4,
+        "rawMaterials": [
+          "钛合金锭"
+        ],
+        "outFilter": "",
+        "acceptedMaterials": [
+          "古代芯片",
+          "能量电池",
+          "共鸣水晶",
+          "废金属",
+          "燃料罐",
+          "合金板",
+          "复合装甲板",
+          "太空垃圾",
+          "星尘粒子",
+          "遐想物质",
+          "相位粒子",
+          "小行星矿石",
+          "钛合金锭",
+          "硅晶圆",
+          "齿轮组",
+          "导线线圈",
+          "隔热泡沫",
+          "电动机",
+          "框架模块",
+          "等离子电池",
+          "量子处理器",
+          "引力透镜",
+          "曲速线圈"
+        ],
+        "compatible": true
+      },
+      {
+        "id": "R4",
+        "from": "M8",
+        "to": "M10",
+        "toPort": 1,
+        "fromPort": 0,
+        "materials": [
+          "钛合金锭"
+        ],
+        "active": true,
+        "length": 5,
+        "rawMaterials": [
+          "钛合金锭"
+        ],
+        "outFilter": "",
+        "acceptedMaterials": [
+          "钛合金锭"
+        ],
+        "compatible": true
+      },
+      {
+        "id": "R5",
+        "from": "M9",
+        "to": "M11",
+        "toPort": 0,
+        "fromPort": 0,
+        "materials": [
+          "钛合金锭"
+        ],
+        "active": true,
+        "length": 4,
+        "rawMaterials": [
+          "钛合金锭"
+        ],
+        "outFilter": "",
+        "acceptedMaterials": [
+          "古代芯片",
+          "能量电池",
+          "共鸣水晶",
+          "废金属",
+          "燃料罐",
+          "合金板",
+          "复合装甲板",
+          "太空垃圾",
+          "星尘粒子",
+          "遐想物质",
+          "相位粒子",
+          "小行星矿石",
+          "钛合金锭",
+          "硅晶圆",
+          "齿轮组",
+          "导线线圈",
+          "隔热泡沫",
+          "电动机",
+          "框架模块",
+          "等离子电池",
+          "量子处理器",
+          "引力透镜",
+          "曲速线圈"
+        ],
+        "compatible": true
+      },
+      {
+        "id": "R6",
+        "from": "M10",
+        "to": "M12",
+        "toPort": 1,
+        "fromPort": 0,
+        "materials": [
+          "齿轮组"
+        ],
+        "active": true,
+        "length": 4,
+        "rawMaterials": [
+          "齿轮组"
+        ],
+        "outFilter": "",
+        "acceptedMaterials": [
+          "古代芯片",
+          "能量电池",
+          "共鸣水晶",
+          "废金属",
+          "燃料罐",
+          "合金板",
+          "复合装甲板",
+          "太空垃圾",
+          "星尘粒子",
+          "遐想物质",
+          "相位粒子",
+          "小行星矿石",
+          "钛合金锭",
+          "硅晶圆",
+          "齿轮组",
+          "导线线圈",
+          "隔热泡沫",
+          "电动机",
+          "框架模块",
+          "等离子电池",
+          "量子处理器",
+          "引力透镜",
+          "曲速线圈"
+        ],
+        "compatible": true
+      }
+    ],
+    "pools": [
+      {
+        "item": "钛合金锭",
+        "order": [
+          "M8",
+          "M9"
+        ]
+      },
+      {
+        "item": "齿轮组",
+        "order": []
+      }
+    ],
+    "frozen": []
+  },
+  "proof": {
+    "proven": true,
+    "item": "钛合金锭",
+    "method": "separated-finite-reservation-bursts",
+    "period": "15/2",
+    "burst": 4,
+    "bursts": [
+      {
+        "phase": "2",
+        "count": 4,
+        "gap": "15/2",
+        "allocation": [
+          3,
+          1
+        ]
+      }
+    ],
+    "queueCapacity": 3,
+    "sourceRates": [
+      {
+        "machine": "M0",
+        "rate": "2/15",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M2",
+        "rate": "2/15",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M4",
+        "rate": "2/15",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M6",
+        "rate": "2/15",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      }
+    ],
+    "inflow": "8/15",
+    "outlets": [
+      {
+        "machine": "M8",
+        "route": "R4",
+        "count": 3,
+        "rate": "2/5"
+      },
+      {
+        "machine": "M9",
+        "route": "R5",
+        "count": 1,
+        "rate": "2/15"
+      }
+    ]
+  },
+  "actual": {
+    "unique": {
+      "flow:R0|钛合金锭": "2/15",
+      "routeTotal:R0": "2/15",
+      "flow:R1|钛合金锭": "2/15",
+      "routeTotal:R1": "2/15",
+      "flow:R2|钛合金锭": "2/15",
+      "routeTotal:R2": "2/15",
+      "flow:R3|钛合金锭": "2/15",
+      "routeTotal:R3": "2/15",
+      "flow:R4|钛合金锭": "2/5",
+      "routeTotal:R4": "2/5",
+      "flow:R5|钛合金锭": "2/15",
+      "routeTotal:R5": "2/15",
+      "flow:R6|齿轮组": "1/5",
+      "routeTotal:R6": "1/5",
+      "cycle:M0": "2/15",
+      "duty:M0": "1",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "2/15",
+      "machineMaterial:M0|out|钛合金锭": "2/15",
+      "machineTotal:M1|in": "2/15",
+      "machineMaterial:M1|in|钛合金锭": "2/15",
+      "machineTotal:M1|out": "0",
+      "cycle:M2": "2/15",
+      "duty:M2": "1",
+      "machineTotal:M2|in": "0",
+      "machineTotal:M2|out": "2/15",
+      "machineMaterial:M2|out|钛合金锭": "2/15",
+      "machineTotal:M3|in": "2/15",
+      "machineMaterial:M3|in|钛合金锭": "2/15",
+      "machineTotal:M3|out": "0",
+      "cycle:M4": "2/15",
+      "duty:M4": "1",
+      "machineTotal:M4|in": "0",
+      "machineTotal:M4|out": "2/15",
+      "machineMaterial:M4|out|钛合金锭": "2/15",
+      "machineTotal:M5|in": "2/15",
+      "machineMaterial:M5|in|钛合金锭": "2/15",
+      "machineTotal:M5|out": "0",
+      "cycle:M6": "2/15",
+      "duty:M6": "1",
+      "machineTotal:M6|in": "0",
+      "machineTotal:M6|out": "2/15",
+      "machineMaterial:M6|out|钛合金锭": "2/15",
+      "machineTotal:M7|in": "2/15",
+      "machineMaterial:M7|in|钛合金锭": "2/15",
+      "machineTotal:M7|out": "0",
+      "machineTotal:M8|in": "0",
+      "machineTotal:M8|out": "2/5",
+      "machineMaterial:M8|out|钛合金锭": "2/5",
+      "machineTotal:M9|in": "0",
+      "machineTotal:M9|out": "2/15",
+      "machineMaterial:M9|out|钛合金锭": "2/15",
+      "cycle:M10": "1/5",
+      "duty:M10": "3/10",
+      "machineTotal:M10|in": "2/5",
+      "machineMaterial:M10|in|钛合金锭": "2/5",
+      "machineTotal:M10|out": "1/5",
+      "machineMaterial:M10|out|齿轮组": "1/5",
+      "machineTotal:M11|in": "2/15",
+      "machineMaterial:M11|in|钛合金锭": "2/15",
+      "machineTotal:M11|out": "0",
+      "machineTotal:M12|in": "1/5",
+      "machineMaterial:M12|in|齿轮组": "1/5",
+      "machineTotal:M12|out": "0",
+      "inflow:钛合金锭": "8/15",
+      "outflow:钛合金锭": "8/15",
+      "net:钛合金锭": "0",
+      "localIn:钛合金锭": "8/15",
+      "localOut:钛合金锭": "8/15",
+      "localNet:钛合金锭": "0",
+      "inflow:齿轮组": "1/5",
+      "outflow:齿轮组": "0",
+      "net:齿轮组": "1/5",
+      "localIn:齿轮组": "1/5",
+      "localOut:齿轮组": "0",
+      "localNet:齿轮组": "1/5",
+      "total:inflow": "11/15",
+      "total:outflow": "8/15",
+      "total:net": "1/5",
+      "total:localIn": "11/15",
+      "total:localOut": "8/15",
+      "total:localNet": "1/5"
+    },
+    "unknown": []
+  },
+  "old": {
+    "unique": {
+      "inflow:钛合金锭": "8/15",
+      "outflow:钛合金锭": "8/15",
+      "net:钛合金锭": "0",
+      "potential:钛合金锭": "-22/15",
+      "withdrawalDemand:钛合金锭": "2",
+      "localIn:钛合金锭": "8/15",
+      "localOut:钛合金锭": "8/15",
+      "localNet:钛合金锭": "0",
+      "frozenIn:钛合金锭": "0",
+      "frozenOut:钛合金锭": "0",
+      "inflow:齿轮组": "4/15",
+      "outflow:齿轮组": "0",
+      "net:齿轮组": "4/15",
+      "potential:齿轮组": "4/15",
+      "withdrawalDemand:齿轮组": "0",
+      "localIn:齿轮组": "4/15",
+      "localOut:齿轮组": "0",
+      "localNet:齿轮组": "4/15",
+      "frozenIn:齿轮组": "0",
+      "frozenOut:齿轮组": "0",
+      "total:inflow": "4/5",
+      "total:outflow": "8/15",
+      "total:net": "4/15",
+      "total:potential": "-6/5",
+      "total:withdrawalDemand": "2",
+      "total:localIn": "4/5",
+      "total:localOut": "8/15",
+      "total:localNet": "4/15",
+      "total:frozenIn": "0",
+      "total:frozenOut": "0",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "2/15",
+      "machineMaterial:M0|out|钛合金锭": "2/15",
+      "machineTotal:M1|in": "2/15",
+      "machineMaterial:M1|in|钛合金锭": "2/15",
+      "machineTotal:M1|out": "0",
+      "machineTotal:M2|in": "0",
+      "machineTotal:M2|out": "2/15",
+      "machineMaterial:M2|out|钛合金锭": "2/15",
+      "machineTotal:M3|in": "2/15",
+      "machineMaterial:M3|in|钛合金锭": "2/15",
+      "machineTotal:M3|out": "0",
+      "machineTotal:M4|in": "0",
+      "machineTotal:M4|out": "2/15",
+      "machineMaterial:M4|out|钛合金锭": "2/15",
+      "machineTotal:M5|in": "2/15",
+      "machineMaterial:M5|in|钛合金锭": "2/15",
+      "machineTotal:M5|out": "0",
+      "machineTotal:M6|in": "0",
+      "machineTotal:M6|out": "2/15",
+      "machineMaterial:M6|out|钛合金锭": "2/15",
+      "machineTotal:M7|in": "2/15",
+      "machineMaterial:M7|in|钛合金锭": "2/15",
+      "machineTotal:M7|out": "0",
+      "machineTotal:M8|in": "0",
+      "machineTotal:M8|out": "8/15",
+      "machineMaterial:M8|out|钛合金锭": "8/15",
+      "machineTotal:M9|in": "0",
+      "machineTotal:M9|out": "0",
+      "machineMaterial:M9|out|钛合金锭": "0",
+      "machineTotal:M10|in": "8/15",
+      "machineMaterial:M10|in|钛合金锭": "8/15",
+      "machineTotal:M10|out": "4/15",
+      "machineMaterial:M10|out|齿轮组": "4/15",
+      "machineTotal:M11|in": "0",
+      "machineMaterial:M11|in|钛合金锭": "0",
+      "machineTotal:M11|out": "0",
+      "machineTotal:M12|in": "4/15",
+      "machineMaterial:M12|in|齿轮组": "4/15",
+      "machineTotal:M12|out": "0",
+      "cycle:M0": "2/15",
+      "cycle:M2": "2/15",
+      "cycle:M4": "2/15",
+      "cycle:M6": "2/15",
+      "cycle:M10": "4/15",
+      "flow:R0|钛合金锭": "2/15",
+      "routeTotal:R0": "2/15",
+      "offer:R0": "2/15",
+      "demand:R0": "1",
+      "flow:R1|钛合金锭": "2/15",
+      "routeTotal:R1": "2/15",
+      "offer:R1": "2/15",
+      "demand:R1": "1",
+      "flow:R2|钛合金锭": "2/15",
+      "routeTotal:R2": "2/15",
+      "offer:R2": "2/15",
+      "demand:R2": "1",
+      "flow:R3|钛合金锭": "2/15",
+      "routeTotal:R3": "2/15",
+      "offer:R3": "2/15",
+      "demand:R3": "1",
+      "flow:R4|钛合金锭": "8/15",
+      "routeTotal:R4": "8/15",
+      "offer:R4": "8/15",
+      "demand:R4": "1",
+      "flow:R5|钛合金锭": "0",
+      "routeTotal:R5": "0",
+      "offer:R5": "0",
+      "demand:R5": "1",
+      "flow:R6|齿轮组": "4/15",
+      "routeTotal:R6": "4/15",
+      "offer:R6": "4/15",
+      "demand:R6": "1"
+    },
+    "unknown": []
+  },
+  "measured": {
+    "income": 32,
+    "high": 24,
+    "low": 8,
+    "gear": 12
+  },
+  "staggered": {
+    "layout": {
+      "name": "Synchronous independent titanium deposits, finite warehouse reservations",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "采矿",
+          "x": 2,
+          "y": 1,
+          "face": "E",
+          "mode": 1
+        },
+        {
+          "id": "M1",
+          "type": "仓入",
+          "x": 11,
+          "y": 1,
+          "face": "E"
+        },
+        {
+          "id": "M2",
+          "type": "采矿",
+          "x": 2,
+          "y": 9,
+          "face": "E",
+          "mode": 1
+        },
+        {
+          "id": "M3",
+          "type": "仓入",
+          "x": 14,
+          "y": 9,
+          "face": "E"
+        },
+        {
+          "id": "M4",
+          "type": "采矿",
+          "x": 2,
+          "y": 17,
+          "face": "E",
+          "mode": 1
+        },
+        {
+          "id": "M5",
+          "type": "仓入",
+          "x": 17,
+          "y": 17,
+          "face": "E"
+        },
+        {
+          "id": "M6",
+          "type": "采矿",
+          "x": 2,
+          "y": 25,
+          "face": "E",
+          "mode": 1
+        },
+        {
+          "id": "M7",
+          "type": "仓入",
+          "x": 20,
+          "y": 25,
+          "face": "E"
+        },
+        {
+          "id": "M8",
+          "type": "仓出",
+          "x": 18,
+          "y": 1,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M9",
+          "type": "仓出",
+          "x": 23,
+          "y": 10,
+          "face": "E",
+          "item": "钛合金锭"
+        },
+        {
+          "id": "M10",
+          "type": "组装",
+          "x": 28,
+          "y": 0,
+          "face": "E",
+          "mode": "齿轮组"
+        },
+        {
+          "id": "M11",
+          "type": "电脑",
+          "x": 31,
+          "y": 11,
+          "face": "E"
+        },
+        {
+          "id": "M12",
+          "type": "仓入",
+          "x": 43,
+          "y": 1,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M1",
+            "port": 1
+          },
+          "path": [
+            [
+              7,
+              3
+            ],
+            [
+              8,
+              3
+            ],
+            [
+              9,
+              3
+            ],
+            [
+              10,
+              3
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              7,
+              11
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              12,
+              11
+            ],
+            [
+              13,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M4",
+            "port": 0
+          },
+          "to": {
+            "id": "M5",
+            "port": 1
+          },
+          "path": [
+            [
+              7,
+              19
+            ],
+            [
+              8,
+              19
+            ],
+            [
+              9,
+              19
+            ],
+            [
+              10,
+              19
+            ],
+            [
+              11,
+              19
+            ],
+            [
+              12,
+              19
+            ],
+            [
+              13,
+              19
+            ],
+            [
+              14,
+              19
+            ],
+            [
+              15,
+              19
+            ],
+            [
+              16,
+              19
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M6",
+            "port": 0
+          },
+          "to": {
+            "id": "M7",
+            "port": 1
+          },
+          "path": [
+            [
+              7,
+              27
+            ],
+            [
+              8,
+              27
+            ],
+            [
+              9,
+              27
+            ],
+            [
+              10,
+              27
+            ],
+            [
+              11,
+              27
+            ],
+            [
+              12,
+              27
+            ],
+            [
+              13,
+              27
+            ],
+            [
+              14,
+              27
+            ],
+            [
+              15,
+              27
+            ],
+            [
+              16,
+              27
+            ],
+            [
+              17,
+              27
+            ],
+            [
+              18,
+              27
+            ],
+            [
+              19,
+              27
+            ]
+          ]
+        },
+        {
+          "id": "R4",
+          "from": {
+            "id": "M8",
+            "port": 0
+          },
+          "to": {
+            "id": "M10",
+            "port": 1
+          },
+          "path": [
+            [
+              23,
+              3
+            ],
+            [
+              24,
+              3
+            ],
+            [
+              25,
+              3
+            ],
+            [
+              26,
+              3
+            ],
+            [
+              27,
+              3
+            ]
+          ]
+        },
+        {
+          "id": "R5",
+          "from": {
+            "id": "M9",
+            "port": 0
+          },
+          "to": {
+            "id": "M11",
+            "port": 0
+          },
+          "path": [
+            [
+              28,
+              12
+            ],
+            [
+              29,
+              12
+            ],
+            [
+              30,
+              12
+            ]
+          ]
+        },
+        {
+          "id": "R6",
+          "from": {
+            "id": "M10",
+            "port": 0
+          },
+          "to": {
+            "id": "M12",
+            "port": 1
+          },
+          "path": [
+            [
+              39,
+              3
+            ],
+            [
+              40,
+              3
+            ],
+            [
+              41,
+              3
+            ],
+            [
+              42,
+              3
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": []
+    },
+    "ast1": "AST1:BA0ADAIBAAABAAoLAQMAAAAMAgkAAAEACg4JAwAAAAwCEQAAAQAKEREDAAAADAIZAAABAAoUGQMAAAALEgEBAAABvQELFwoBAAABvQEOHAAAAAAAER8LAAAAAQAACisBAwAAAAcAAAAAAQABBBUCAAADAAEHVQUEAAAFAAEKVVUBBgAABwABDVVVVQgAAAoAAQVVCQAACwAAAwUKAAAMAAEEFQ==",
+    "proof": {
+      "proven": true,
+      "item": "钛合金锭",
+      "method": "separated-finite-reservation-bursts",
+      "period": "15/2",
+      "burst": 4,
+      "bursts": [
+        {
+          "phase": "2",
+          "count": 1,
+          "gap": "3/2",
+          "allocation": [
+            1,
+            0
+          ]
+        },
+        {
+          "phase": "7/2",
+          "count": 1,
+          "gap": "3/2",
+          "allocation": [
+            1,
+            0
+          ]
+        },
+        {
+          "phase": "5",
+          "count": 1,
+          "gap": "3/2",
+          "allocation": [
+            1,
+            0
+          ]
+        },
+        {
+          "phase": "13/2",
+          "count": 1,
+          "gap": "3",
+          "allocation": [
+            1,
+            0
+          ]
+        }
+      ],
+      "queueCapacity": 3,
+      "sourceRates": [
+        {
+          "machine": "M0",
+          "rate": "2/15",
+          "proven": true,
+          "method": "independent-free-deposit-generator"
+        },
+        {
+          "machine": "M2",
+          "rate": "2/15",
+          "proven": true,
+          "method": "independent-free-deposit-generator"
+        },
+        {
+          "machine": "M4",
+          "rate": "2/15",
+          "proven": true,
+          "method": "independent-free-deposit-generator"
+        },
+        {
+          "machine": "M6",
+          "rate": "2/15",
+          "proven": true,
+          "method": "independent-free-deposit-generator"
+        }
+      ],
+      "inflow": "8/15",
+      "outlets": [
+        {
+          "machine": "M8",
+          "route": "R4",
+          "count": 4,
+          "rate": "8/15"
+        },
+        {
+          "machine": "M9",
+          "route": "R5",
+          "count": 0,
+          "rate": "0"
+        }
+      ]
+    },
+    "measured": {
+      "income": 32,
+      "high": 32,
+      "low": 0,
+      "gear": 16
+    },
+    "unique": 82
+  }
+}

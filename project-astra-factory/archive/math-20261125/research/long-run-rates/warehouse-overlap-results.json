@@ -1,0 +1,637 @@
+{
+  "tested": 3000,
+  "proved": 2884,
+  "rejected": 116,
+  "layout": {
+    "name": "Overlapping phase particle deposits",
+    "recordIndexed": true,
+    "machines": [
+      {
+        "id": "M0",
+        "type": "粒子",
+        "x": 2,
+        "y": 1,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M1",
+        "type": "仓入",
+        "x": 11,
+        "y": 1,
+        "face": "E"
+      },
+      {
+        "id": "M2",
+        "type": "粒子",
+        "x": 2,
+        "y": 9,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M3",
+        "type": "仓入",
+        "x": 11,
+        "y": 9,
+        "face": "E"
+      },
+      {
+        "id": "M4",
+        "type": "粒子",
+        "x": 2,
+        "y": 17,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M5",
+        "type": "仓入",
+        "x": 11,
+        "y": 17,
+        "face": "E"
+      },
+      {
+        "id": "M6",
+        "type": "粒子",
+        "x": 2,
+        "y": 25,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M7",
+        "type": "仓入",
+        "x": 13,
+        "y": 25,
+        "face": "E"
+      },
+      {
+        "id": "M8",
+        "type": "粒子",
+        "x": 2,
+        "y": 33,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M9",
+        "type": "仓入",
+        "x": 13,
+        "y": 33,
+        "face": "E"
+      },
+      {
+        "id": "M10",
+        "type": "粒子",
+        "x": 2,
+        "y": 41,
+        "face": "E",
+        "mode": 1
+      },
+      {
+        "id": "M11",
+        "type": "仓入",
+        "x": 13,
+        "y": 41,
+        "face": "E"
+      },
+      {
+        "id": "M12",
+        "type": "仓出",
+        "x": 20,
+        "y": 1,
+        "face": "E",
+        "item": "相位粒子"
+      },
+      {
+        "id": "M13",
+        "type": "仓出",
+        "x": 20,
+        "y": 10,
+        "face": "E",
+        "item": "相位粒子"
+      },
+      {
+        "id": "M14",
+        "type": "电脑",
+        "x": 30,
+        "y": 2,
+        "face": "E"
+      },
+      {
+        "id": "M15",
+        "type": "电脑",
+        "x": 30,
+        "y": 11,
+        "face": "E"
+      }
+    ],
+    "routes": [
+      {
+        "id": "R0",
+        "from": {
+          "id": "M0",
+          "port": 0
+        },
+        "to": {
+          "id": "M1",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            3
+          ],
+          [
+            8,
+            3
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            10,
+            3
+          ]
+        ]
+      },
+      {
+        "id": "R1",
+        "from": {
+          "id": "M2",
+          "port": 0
+        },
+        "to": {
+          "id": "M3",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            11
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            10,
+            11
+          ]
+        ]
+      },
+      {
+        "id": "R2",
+        "from": {
+          "id": "M4",
+          "port": 0
+        },
+        "to": {
+          "id": "M5",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            19
+          ],
+          [
+            8,
+            19
+          ],
+          [
+            9,
+            19
+          ],
+          [
+            10,
+            19
+          ]
+        ]
+      },
+      {
+        "id": "R3",
+        "from": {
+          "id": "M6",
+          "port": 0
+        },
+        "to": {
+          "id": "M7",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            27
+          ],
+          [
+            8,
+            27
+          ],
+          [
+            9,
+            27
+          ],
+          [
+            10,
+            27
+          ],
+          [
+            11,
+            27
+          ],
+          [
+            12,
+            27
+          ]
+        ]
+      },
+      {
+        "id": "R4",
+        "from": {
+          "id": "M8",
+          "port": 0
+        },
+        "to": {
+          "id": "M9",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            35
+          ],
+          [
+            8,
+            35
+          ],
+          [
+            9,
+            35
+          ],
+          [
+            10,
+            35
+          ],
+          [
+            11,
+            35
+          ],
+          [
+            12,
+            35
+          ]
+        ]
+      },
+      {
+        "id": "R5",
+        "from": {
+          "id": "M10",
+          "port": 0
+        },
+        "to": {
+          "id": "M11",
+          "port": 1
+        },
+        "path": [
+          [
+            7,
+            43
+          ],
+          [
+            8,
+            43
+          ],
+          [
+            9,
+            43
+          ],
+          [
+            10,
+            43
+          ],
+          [
+            11,
+            43
+          ],
+          [
+            12,
+            43
+          ]
+        ]
+      },
+      {
+        "id": "R6",
+        "from": {
+          "id": "M12",
+          "port": 0
+        },
+        "to": {
+          "id": "M14",
+          "port": 0
+        },
+        "path": [
+          [
+            25,
+            3
+          ],
+          [
+            26,
+            3
+          ],
+          [
+            27,
+            3
+          ],
+          [
+            28,
+            3
+          ],
+          [
+            29,
+            3
+          ]
+        ]
+      },
+      {
+        "id": "R7",
+        "from": {
+          "id": "M13",
+          "port": 0
+        },
+        "to": {
+          "id": "M15",
+          "port": 0
+        },
+        "path": [
+          [
+            25,
+            12
+          ],
+          [
+            26,
+            12
+          ],
+          [
+            27,
+            12
+          ],
+          [
+            28,
+            12
+          ],
+          [
+            29,
+            12
+          ]
+        ]
+      }
+    ],
+    "frozenFactories": []
+  },
+  "ast1": "AST1:BBAAAQIBAAABAAoLAQMAAAABAgkAAAEACgsJAwAAAAECEQAAAQAKCxEDAAAAAQIZAAABAAoNGQMAAAABAiEAAAEACg0hAwAAAAECKQAAAQAKDSkDAAAACxQBAQAAARQACxQKAQAAARQAER4CAAAAAQAAER4LAAAAAQAACAAAAAABAAEEFQIAAAMAAQQVBAAABQABBBUGAAAHAAEGVQEIAAAJAAEGVQEKAAALAAEGVQEMAAAOAAAFVQ0AAA8AAAVV",
+  "proof": {
+    "proven": true,
+    "item": "相位粒子",
+    "method": "overlapping-reservation-closed-composition",
+    "period": "6",
+    "inflow": "1",
+    "groups": [
+      {
+        "phase": 2,
+        "count": 3,
+        "gap": 1
+      },
+      {
+        "phase": 3,
+        "count": 3,
+        "gap": 5
+      }
+    ],
+    "sourceRates": [
+      {
+        "machine": "M0",
+        "rate": "1/6",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M2",
+        "rate": "1/6",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M4",
+        "rate": "1/6",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M6",
+        "rate": "1/6",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M8",
+        "rate": "1/6",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M10",
+        "rate": "1/6",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      }
+    ],
+    "outlets": [
+      {
+        "machine": "M12",
+        "route": "R6",
+        "rate": "2/3",
+        "count": 4
+      },
+      {
+        "machine": "M13",
+        "route": "R7",
+        "rate": "1/3",
+        "count": 2
+      }
+    ],
+    "proof": {
+      "status": "proved",
+      "outlets": [
+        {
+          "capacity": 3,
+          "count": 4,
+          "fixed": 0,
+          "composition": {
+            "A": 0,
+            "L": 0,
+            "U": 0
+          },
+          "queue": [
+            0,
+            2
+          ],
+          "admitted": [
+            3,
+            1
+          ],
+          "overflow": [
+            0,
+            2
+          ]
+        },
+        {
+          "capacity": 3,
+          "count": 2,
+          "fixed": 0,
+          "composition": {
+            "A": -4,
+            "L": 0,
+            "U": 0
+          },
+          "queue": [
+            0,
+            0
+          ],
+          "admitted": [
+            0,
+            2
+          ],
+          "overflow": [
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "measured": {
+    "income": 60,
+    "high": 40,
+    "low": 20
+  },
+  "unique": 88,
+  "overloaded": {
+    "proven": true,
+    "item": "相位粒子",
+    "method": "free-outlet-aggregate-saturation",
+    "inflow": "3",
+    "sourceRates": [
+      {
+        "machine": "M0",
+        "rate": "1/2",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M2",
+        "rate": "1/2",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M4",
+        "rate": "1/2",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M6",
+        "rate": "1/2",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M8",
+        "rate": "1/2",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M10",
+        "rate": "1/2",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      }
+    ],
+    "outlets": [
+      {
+        "machine": "M12",
+        "route": "R6",
+        "rate": "1"
+      },
+      {
+        "machine": "M13",
+        "route": "R7",
+        "rate": "1"
+      }
+    ]
+  },
+  "critical": {
+    "proven": true,
+    "item": "相位粒子",
+    "method": "free-outlet-aggregate-saturation",
+    "inflow": "2",
+    "sourceRates": [
+      {
+        "machine": "M0",
+        "rate": "1/3",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M2",
+        "rate": "1/3",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M4",
+        "rate": "1/3",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M6",
+        "rate": "1/3",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M8",
+        "rate": "1/3",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      },
+      {
+        "machine": "M10",
+        "rate": "1/3",
+        "proven": true,
+        "method": "independent-free-deposit-generator"
+      }
+    ],
+    "outlets": [
+      {
+        "machine": "M12",
+        "route": "R6",
+        "rate": "1"
+      },
+      {
+        "machine": "M13",
+        "route": "R7",
+        "rate": "1"
+      }
+    ]
+  }
+}

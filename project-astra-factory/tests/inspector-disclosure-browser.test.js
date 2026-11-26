@@ -35,26 +35,26 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    if(!theoreticalBudget)warehouseRefresh();
    selection={machineId:first.id};inspectorRefresh();
    const get=()=>({theory:$('inspector').querySelector('.machine-port-details'),
-     live:$('inspector').querySelector('.machine-live-detail'),
+     buffer:$('inspector').querySelector('.machine-buffer-details'),
      history:$('inspector').querySelector('.machine-live-history')});
    const a=get();
-   if(!a.theory||!a.live||!a.history)return {error:'Expected theory/live detail elements',types:[first.type,second.type]};
-   a.theory.open=true;a.live.open=true;a.history.open=true;
+   if(!a.theory||!a.buffer||!a.history)return {error:'Expected theory/live detail elements',types:[first.type,second.type]};
+   a.theory.open=true;a.buffer.open=true;a.history.open=true;
    selection={machineId:second.id};inspectorRefresh();
    const b=get();
-   const switchedOpen=b.theory?.open&&b.live?.open&&b.history?.open;
+   const switchedOpen=b.theory?.open&&b.history?.open;
    inspectorRefreshLive();
-   const afterLive=!!get().theory?.open&&!!get().live?.open&&!!get().history?.open;
+   const afterLive=!!get().theory?.open&&!!get().history?.open;
    const route=state.routes[0];
    if(route){selection={routeId:route.id};inspectorRefresh();}
    selection={machineId:first.id};inspectorRefresh();
-   const afterRoute=get().theory?.open&&get().live?.open&&get().history?.open;
-   const panel=$('inspector').querySelector('.machine-analysis-panel');
+   const afterRoute=get().theory?.open&&get().buffer?.open&&get().history?.open;
+   const panel=$('inspector').querySelector('.machine-logistics-panel');
    const css=element=>getComputedStyle(element);
    const tiles=[...panel.querySelectorAll('.machine-flow-tile')];
    const duties=[...panel.querySelectorAll('.machine-duty-grid>div')];
-   const counts=[...panel.querySelectorAll('.machine-live-summary>div')];
-   const noNestedTiles=[...tiles,...duties,...counts].every(el=>{
+   const livePresent=!!panel.querySelector('.machine-live-head')&&!!panel.querySelector('.machine-live-history');
+   const noNestedTiles=[...tiles,...duties].every(el=>{
     const st=css(el);
     return st.backgroundColor==='rgba(0, 0, 0, 0)'&&
      st.borderTopWidth==='0px'&&st.borderLeftWidth==='0px'&&
@@ -76,17 +76,17 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    // Closing one disclosure must also stay closed across selection, not just opened.
    get().theory.open=false;
    selection={machineId:second.id};inspectorRefresh();
-   const respectsManualClose=!get().theory.open&&get().live.open&&get().history.open;
+   const respectsManualClose=!get().theory.open&&get().history.open;
    // Restore defaults to avoid influencing other tests within this run.
-   get().theory.open=false;get().live.open=false;get().history.open=false;
+   get().theory.open=false;get().history.open=false;
    return {types:[first.type,second.type],switchedOpen,afterLive,afterRoute,
     noNestedTiles,oneCard,aligned,flowStacked,flowRects:rows.map(r=>({x:r.x,y:r.y,w:r.width,h:r.height})),valueRight:values.map(r=>r.right),flowDisplay:css(panel.querySelector('.machine-flow-summary')).display,machineRows,respectsManualClose,
-    tileCount:tiles.length,dutyCount:duties.length,countRows:counts.length};
+    tileCount:tiles.length,dutyCount:duties.length,livePresent};
   })()`);
   console.log('FLAT INSPECTOR PERSISTENCE',JSON.stringify(result));
   assert(!result.error&&result.switchedOpen&&result.afterLive&&result.afterRoute&&
    result.noNestedTiles&&result.oneCard&&result.aligned&&result.flowStacked&&result.machineRows&&
-   result.respectsManualClose&&result.tileCount===2&&result.countRows===2,
+   result.respectsManualClose&&result.tileCount===2&&result.livePresent,
    'inspector must be one row-based card and keep user disclosure state across machine/route selections');
   assert.equal(exceptions.length,0,'uncaught Edge exceptions: '+exceptions.join(' | '));
   console.log('PASS: flat row/number inspector and open/closed details persist on machine switch and live refresh');

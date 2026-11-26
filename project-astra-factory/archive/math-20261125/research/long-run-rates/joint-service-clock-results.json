@@ -1,0 +1,90 @@
+[
+  {
+    "type": "physical recipe guard identity",
+    "T": 40,
+    "fields": 3,
+    "guards": [
+      "working:craft",
+      "waitInput:craft",
+      "waitOutput:craft",
+      "batchStart:craft"
+    ],
+    "nodes": 642
+  },
+  {
+    "type": "physical port saturation and phase rotation",
+    "P": 20,
+    "bits": 25,
+    "nodes": 1452
+  },
+  {
+    "type": "automatic phase class quotient",
+    "classes": 10,
+    "groups": 2,
+    "largeCoprime": "1",
+    "largeLCM": "1000000049000000591000002079"
+  },
+  {
+    "type": "joint saturated clock relations",
+    "aligned": {
+      "compatible": true,
+      "residue": "0",
+      "period": "60",
+      "density": "1/60"
+    },
+    "offset": {
+      "compatible": false,
+      "density": "0"
+    },
+    "equations": {
+      "status": "proved-conditional",
+      "relations": [
+        {
+          "coefficients": {
+            "@phaseClass:aligned": "1",
+            "@phaseClass:offset": "1"
+          },
+          "constant": "1"
+        },
+        {
+          "coefficients": {
+            "both": "1",
+            "@phaseClass:aligned": "-1/60"
+          },
+          "constant": "0"
+        },
+        {
+          "coefficients": {
+            "either": "1",
+            "@phaseClass:aligned": "-1/15",
+            "@phaseClass:offset": "-1/12"
+          },
+          "constant": "0"
+        }
+      ],
+      "bounds": {
+        "@phaseClass:aligned": [
+          "0",
+          "1"
+        ],
+        "@phaseClass:offset": [
+          "0",
+          "1"
+        ],
+        "both": [
+          "0",
+          "1"
+        ],
+        "either": [
+          "0",
+          "1"
+        ]
+      },
+      "weights": [
+        "@phaseClass:aligned",
+        "@phaseClass:offset"
+      ]
+    },
+    "largeLCM": "1000000049000000591000002079"
+  }
+]

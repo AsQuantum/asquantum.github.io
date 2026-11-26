@@ -1,0 +1,257 @@
+[
+  {
+    "name": "saturated cyclic service with arbitrary rare resets",
+    "phases": 2,
+    "proofs": [
+      {
+        "pass": 0,
+        "rank": 4,
+        "domainStates": "8",
+        "excludedAtoms": 1,
+        "values": {
+          "throughput": "1",
+          "exception": "0",
+          "@atom:0": "1",
+          "@atom:1": "0"
+        },
+        "why": {
+          "throughput": "given exact bound",
+          "exception": "rational elimination",
+          "@atom:0": "rational elimination",
+          "@atom:1": "rational elimination"
+        }
+      },
+      {
+        "pass": 1,
+        "rank": 6,
+        "domainStates": "2",
+        "excludedAtoms": 1,
+        "values": {
+          "throughput": "1",
+          "phase0": "1/2",
+          "phase1": "1/2",
+          "exception": "0",
+          "@atom:0": "1",
+          "@atom:1": "0"
+        },
+        "why": {
+          "throughput": "given exact bound",
+          "phase0": "rational elimination",
+          "phase1": "rational elimination",
+          "exception": "rational elimination",
+          "@atom:0": "rational elimination",
+          "@atom:1": "rational elimination"
+        }
+      }
+    ],
+    "unknownWithoutSaturation": [
+      "phase0",
+      "phase1",
+      "throughput"
+    ]
+  },
+  {
+    "name": "saturated cyclic service with arbitrary rare resets",
+    "phases": 3,
+    "proofs": [
+      {
+        "pass": 0,
+        "rank": 4,
+        "domainStates": "12",
+        "excludedAtoms": 1,
+        "values": {
+          "throughput": "1",
+          "exception": "0",
+          "@atom:0": "1",
+          "@atom:1": "0"
+        },
+        "why": {
+          "throughput": "given exact bound",
+          "exception": "rational elimination",
+          "@atom:0": "rational elimination",
+          "@atom:1": "rational elimination"
+        }
+      },
+      {
+        "pass": 1,
+        "rank": 7,
+        "domainStates": "3",
+        "excludedAtoms": 1,
+        "values": {
+          "throughput": "1",
+          "phase0": "1/3",
+          "phase1": "1/3",
+          "phase2": "1/3",
+          "exception": "0",
+          "@atom:0": "1",
+          "@atom:1": "0"
+        },
+        "why": {
+          "throughput": "given exact bound",
+          "phase0": "rational elimination",
+          "phase1": "rational elimination",
+          "phase2": "rational elimination",
+          "exception": "rational elimination",
+          "@atom:0": "rational elimination",
+          "@atom:1": "rational elimination"
+        }
+      }
+    ],
+    "unknownWithoutSaturation": [
+      "phase0",
+      "phase1",
+      "phase2",
+      "throughput"
+    ]
+  },
+  {
+    "name": "saturated cyclic service with arbitrary rare resets",
+    "phases": 4,
+    "proofs": [
+      {
+        "pass": 0,
+        "rank": 4,
+        "domainStates": "16",
+        "excludedAtoms": 1,
+        "values": {
+          "throughput": "1",
+          "exception": "0",
+          "@atom:0": "1",
+          "@atom:1": "0"
+        },
+        "why": {
+          "throughput": "given exact bound",
+          "exception": "rational elimination",
+          "@atom:0": "rational elimination",
+          "@atom:1": "rational elimination"
+        }
+      },
+      {
+        "pass": 1,
+        "rank": 8,
+        "domainStates": "4",
+        "excludedAtoms": 1,
+        "values": {
+          "throughput": "1",
+          "phase0": "1/4",
+          "phase1": "1/4",
+          "phase2": "1/4",
+          "phase3": "1/4",
+          "exception": "0",
+          "@atom:0": "1",
+          "@atom:1": "0"
+        },
+        "why": {
+          "throughput": "given exact bound",
+          "phase0": "rational elimination",
+          "phase1": "rational elimination",
+          "phase2": "rational elimination",
+          "phase3": "rational elimination",
+          "exception": "rational elimination",
+          "@atom:0": "rational elimination",
+          "@atom:1": "rational elimination"
+        }
+      }
+    ],
+    "unknownWithoutSaturation": [
+      "phase0",
+      "phase1",
+      "phase2",
+      "phase3",
+      "throughput"
+    ]
+  },
+  {
+    "name": "saturated cyclic service with arbitrary rare resets",
+    "phases": 7,
+    "proofs": [
+      {
+        "pass": 0,
+        "rank": 4,
+        "domainStates": "28",
+        "excludedAtoms": 1,
+        "values": {
+          "throughput": "1",
+          "exception": "0",
+          "@atom:0": "1",
+          "@atom:1": "0"
+        },
+        "why": {
+          "throughput": "given exact bound",
+          "exception": "rational elimination",
+          "@atom:0": "rational elimination",
+          "@atom:1": "rational elimination"
+        }
+      },
+      {
+        "pass": 1,
+        "rank": 11,
+        "domainStates": "7",
+        "excludedAtoms": 1,
+        "values": {
+          "throughput": "1",
+          "phase0": "1/7",
+          "phase1": "1/7",
+          "phase2": "1/7",
+          "phase3": "1/7",
+          "phase4": "1/7",
+          "phase5": "1/7",
+          "phase6": "1/7",
+          "exception": "0",
+          "@atom:0": "1",
+          "@atom:1": "0"
+        },
+        "why": {
+          "throughput": "given exact bound",
+          "phase0": "rational elimination",
+          "phase1": "rational elimination",
+          "phase2": "rational elimination",
+          "phase3": "rational elimination",
+          "phase4": "rational elimination",
+          "phase5": "rational elimination",
+          "phase6": "rational elimination",
+          "exception": "rational elimination",
+          "@atom:0": "rational elimination",
+          "@atom:1": "rational elimination"
+        }
+      }
+    ],
+    "unknownWithoutSaturation": [
+      "phase0",
+      "phase1",
+      "phase2",
+      "phase3",
+      "phase4",
+      "phase5",
+      "phase6",
+      "throughput"
+    ]
+  },
+  {
+    "name": "correlated inter-component readiness",
+    "marginalOnly": [
+      "join",
+      "union"
+    ],
+    "same": {
+      "union": "1/2",
+      "a": "1/2",
+      "c": "1/2",
+      "join": "1/2",
+      "@atom:0": "1/2",
+      "@atom:1": "0",
+      "@atom:2": "0",
+      "@atom:3": "1/2"
+    },
+    "opposite": {
+      "union": "1",
+      "a": "1/2",
+      "c": "1/2",
+      "join": "0",
+      "@atom:0": "0",
+      "@atom:1": "1/2",
+      "@atom:2": "1/2",
+      "@atom:3": "0"
+    }
+  }
+]

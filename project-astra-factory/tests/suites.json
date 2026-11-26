@@ -1,0 +1,163 @@
+{
+  "groups": {
+    "rational": [
+      "tests/math/arithmetic/rational-input.test.js"
+    ],
+    "algebra": [
+      "tests/math/algebra/factored-projection.test.js"
+    ],
+    "topology": [
+      "tests/math/topology/router-readiness-and-capacity.test.js",
+      "tests/math/topology/permanent-fifo-blockage.test.js",
+      "tests/math/topology/subgraph-depth-composition.test.js",
+      "tests/math/topology/terminal-subgraphs.test.js",
+      "tests/math/topology/relative-splitter-service.test.js",
+      "tests/math/topology/element-laws.test.js"
+    ],
+    "warehouse": [
+      "tests/math/warehouse/physical-refill-priority.test.js",
+      "tests/math/warehouse/net-value-semantics.test.js",
+      "tests/math/warehouse/priority-deposit-calendar.test.js"
+    ],
+    "worker": [
+      "tests/math/integration/worker-assets.test.js",
+      "tests/math/integration/strict-worker-contract.test.js",
+      "tests/math/integration/proof-registry.test.js",
+      "tests/math/integration/documentation-examples.test.js"
+    ],
+    "validation": [
+      "tests/math/validation/ast-long-run-parity.test.js",
+      "tests/math/validation/router-simulator-parity.test.js",
+      "tests/math/validation/historical-document-examples.test.js"
+    ],
+    "browser-math": [
+      "tests/steady-worker-browser.test.js",
+      {
+        "file": "tests/steady-worker-browser.test.js",
+        "args": [
+          "--file"
+        ]
+      },
+      "tests/frozen-factories-browser.test.js"
+    ],
+    "physical": [
+      "tests/live-edit-simulation.test.js",
+      "tests/open-belt.test.js",
+      "tests/minute-step.test.js",
+      "tests/junction-port-round-robin.test.js",
+      "tests/queue-semantics.test.js",
+      "tests/quantum-computer-consumer.test.js",
+      "tests/input-priority.test.js",
+      "tests/unknown-item-runtime.test.js",
+      "tests/warehouse-rolling-ten-minute.test.js",
+      "tests/warehouse-port-balance.test.js",
+      "tests/warehouse-source-stall.test.js",
+      "tests/frozen-runtime.test.js"
+    ],
+    "codec": [
+      "tests/ast1-machine-record-order.test.js",
+      "tests/ast1-unknown-items.test.js",
+      "tests/factory-record-ids.test.js",
+      "tests/json-v13-records.test.js"
+    ],
+    "ui": [
+      "tests/apple-touch-icon.test.js",
+      "tests/ast1-machine-record-order-browser.test.js",
+      "tests/ast1-mobile-clipboard.test.js",
+      "tests/audit-browser.test.js",
+      "tests/canvas-clipboard-browser.test.js",
+      "tests/canvas-label-browser.test.js",
+      "tests/canvas-zoom-visibility.test.js",
+      "tests/edit-menu-browser.test.js",
+      "tests/group-selection.test.js",
+      "tests/import-schemes-browser.test.js",
+      "tests/inspector-browser.test.js",
+      "tests/inspector-disclosure-browser.test.js",
+      "tests/mobile-belt-native-touch-browser.test.js",
+      "tests/mobile-belt-release-browser.test.js",
+      "tests/mobile-belt-touch-preview-browser.test.js",
+      "tests/mobile-copy-toolbar.test.js",
+      "tests/mobile-layout-browser.test.js",
+      "tests/mobile-marquee-gesture.test.js",
+      "tests/mobile-touch-gestures.test.js",
+      "tests/original-theme-browser.test.js",
+      "tests/placement-filters-browser.test.js",
+      "tests/presets-browser.test.js",
+      "tests/run-button-browser.test.js",
+      "tests/sidebar-layout-browser.test.js",
+      "tests/sidebar-resize-browser.test.js",
+      "tests/standalone-web-app.test.js",
+      "tests/startup-browser.test.js",
+      "tests/stock-chart-browser.test.js",
+      "tests/window-motion-browser.test.js"
+    ],
+    "iteration-unit": [
+      "tests/iteration/period-candidate.test.js",
+      "tests/iteration/probe-contract.test.js",
+      "tests/iteration/exact-kernel.test.js",
+      "tests/iteration/components.test.js",
+      "tests/iteration/boundary-pressure.test.js",
+      "tests/iteration/optimization.test.js",
+      "tests/iteration/p0-p5-research.test.js",
+      "tests/iteration/causal-calendar.test.js",
+      "tests/iteration/tree-events.test.js"
+    ],
+    "iteration-validation": [
+      "tests/iteration/slow-miner-validation.test.js",
+      "tests/iteration/direct-parity.test.js",
+      "tests/iteration/full-preview.test.js",
+      "tests/iteration/historical-optimization.test.js"
+    ],
+    "iteration-browser": [
+      "tests/iteration-worker-browser.test.js",
+      {
+        "file": "tests/iteration-worker-browser.test.js",
+        "args": [
+          "--file"
+        ]
+      },
+      {
+        "file": "tests/iteration-worker-browser.test.js",
+        "args": [
+          "--file",
+          "--user84"
+        ]
+      },
+      {
+        "file": "tests/iteration-worker-browser.test.js",
+        "args": [
+          "--file",
+          "--resonance"
+        ]
+      }
+    ]
+  },
+  "aliases": {
+    "math-quick": [
+      "rational",
+      "algebra",
+      "topology",
+      "warehouse",
+      "worker"
+    ],
+    "math": [
+      "math-quick",
+      "validation",
+      "browser-math"
+    ],
+    "current": [
+      "iteration",
+      "physical",
+      "codec",
+      "ui"
+    ],
+    "iteration-quick": [
+      "iteration-unit"
+    ],
+    "iteration": [
+      "iteration-quick",
+      "iteration-validation",
+      "iteration-browser"
+    ]
+  }
+}

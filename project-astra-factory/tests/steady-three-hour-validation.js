@@ -2,7 +2,7 @@
 const fs=require('fs'),vm=require('vm'),path=require('path');
 const root=path.resolve(__dirname,'..');
 const c=vm.createContext({console,atob,btoa,performance,document:{hidden:false,getElementById(){return{getContext(){return{}},classList:{add(){},remove(){}},style:{}}}},requestAnimationFrame(){}});
-for(const f of ['data/catalog','blueprints/machine-ids','blueprints/item-ids','core/state','core/machines','core/routing','core/audit','engine/steady-flow','engine/steady-equations','engine/steady-algebra','engine/steady-generic-network','engine/steady-rate-region','engine/steady-auto-fluid','ui/warehouse','engine/simulation','core/compact-json','blueprints/ast1-codec'])
+for(const f of ['data/catalog','blueprints/machine-ids','blueprints/item-ids','core/state','core/machines','core/routing','core/audit','engine/math/arithmetic/rational','engine/steady-flow','engine/steady-equations','engine/steady-algebra','engine/math/graph/startup_reachability','engine/steady-rate-region','engine/steady-auto-fluid','ui/warehouse','engine/simulation','core/compact-json','blueprints/ast1-codec'])
  vm.runInContext(fs.readFileSync(path.join(root,'scripts',f+'.js'),'utf8'),c,{filename:f});
 vm.runInContext('warehouseRefresh=()=>{};draw=()=>{};function stockChartReset(){};function notify(){}',c);
 c.ast=fs.readFileSync(path.join(root,'tests/fixtures/ast1-warehouse-port-balance-v1.txt'),'utf8').trim();

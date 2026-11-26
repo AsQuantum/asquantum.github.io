@@ -1,0 +1,44 @@
+[
+  {
+    "name": "under-supplied blocked warehouse + frozen",
+    "ticks": 4000,
+    "eventSteps": 4000,
+    "singleSteps": 4000,
+    "compared": 22
+  },
+  {
+    "name": "battery + frozen priority",
+    "ticks": 4000,
+    "eventSteps": 4000,
+    "singleSteps": 4000,
+    "compared": 17
+  },
+  {
+    "name": "saturated reconvergence",
+    "ticks": 4000,
+    "eventSteps": 4000,
+    "singleSteps": 4000,
+    "compared": 30
+  },
+  {
+    "name": "warp72",
+    "ticks": 10000,
+    "eventSteps": 2219,
+    "singleSteps": 10000,
+    "compared": 117
+  },
+  {
+    "name": "warp73",
+    "ticks": 10000,
+    "eventSteps": 2247,
+    "singleSteps": 10000,
+    "compared": 124
+  },
+  {
+    "name": "balance115",
+    "ticks": 10000,
+    "eventSteps": 3762,
+    "singleSteps": 10000,
+    "compared": 262
+  }
+]

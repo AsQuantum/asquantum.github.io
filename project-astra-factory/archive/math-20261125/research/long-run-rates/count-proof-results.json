@@ -1,0 +1,133 @@
+{
+  "base": {
+    "unique": 75,
+    "unknown": 0,
+    "ore": "3/4",
+    "armor": "1/4",
+    "bareUnknown": 63
+  },
+  "cases": [
+    {
+      "fast": 2,
+      "slow": 0,
+      "fastRate": "1/2",
+      "unique": 35
+    },
+    {
+      "fast": 2,
+      "slow": 1,
+      "fastRate": "13/28",
+      "unique": 42
+    },
+    {
+      "fast": 2,
+      "slow": 2,
+      "fastRate": "7/16",
+      "unique": 49
+    },
+    {
+      "fast": 3,
+      "slow": 0,
+      "fastRate": "1/3",
+      "unique": 42
+    },
+    {
+      "fast": 3,
+      "slow": 1,
+      "fastRate": "5/16",
+      "unique": 49
+    },
+    {
+      "fast": 3,
+      "slow": 2,
+      "fastRate": "8/27",
+      "unique": 56
+    },
+    {
+      "fast": 4,
+      "slow": 0,
+      "fastRate": "1/4",
+      "unique": 49
+    },
+    {
+      "fast": 4,
+      "slow": 1,
+      "fastRate": "17/72",
+      "unique": 56
+    },
+    {
+      "fast": 4,
+      "slow": 2,
+      "fastRate": "9/40",
+      "unique": 63
+    },
+    {
+      "fast": 6,
+      "slow": 0,
+      "fastRate": "1/6",
+      "unique": 63
+    },
+    {
+      "fast": 6,
+      "slow": 1,
+      "fastRate": "7/44",
+      "unique": 70
+    },
+    {
+      "fast": 6,
+      "slow": 2,
+      "fastRate": "11/72",
+      "unique": 77
+    },
+    {
+      "fast": 8,
+      "slow": 0,
+      "fastRate": "1/8",
+      "unique": 77
+    },
+    {
+      "fast": 8,
+      "slow": 1,
+      "fastRate": "25/208",
+      "unique": 84
+    },
+    {
+      "fast": 8,
+      "slow": 2,
+      "fastRate": "13/112",
+      "unique": 91
+    },
+    {
+      "fast": 12,
+      "slow": 0,
+      "fastRate": "1/12",
+      "unique": 105
+    },
+    {
+      "fast": 12,
+      "slow": 1,
+      "fastRate": "11/136",
+      "unique": 112
+    },
+    {
+      "fast": 12,
+      "slow": 2,
+      "fastRate": "17/216",
+      "unique": 119
+    }
+  ],
+  "deep": {
+    "routes": 16,
+    "source": {
+      "machine": "G2",
+      "route": "f2",
+      "rate": "1/344",
+      "flow": "1/86",
+      "method": "unthrottled-generator-by-clearance",
+      "proven": true,
+      "clearance": "117/2"
+    },
+    "unknown": 0
+  },
+  "rejections": 2
+}

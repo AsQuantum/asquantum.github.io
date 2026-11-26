@@ -1,0 +1,69 @@
+{
+  "results": [
+    {
+      "fixture": "new-warp.ast1.txt",
+      "ms": 451,
+      "normal": "1/99",
+      "unlimited": "1/99",
+      "unknown": 25
+    },
+    {
+      "fixture": "ast1-warp-coil-only.txt",
+      "ms": 229,
+      "normal": "1/128",
+      "unlimited": "1/128",
+      "unknown": 0
+    },
+    {
+      "fixture": "ast1-warehouse-port-balance-v1.txt",
+      "ms": 294,
+      "normal": "11/1440",
+      "unlimited": "1/80",
+      "unknown": 0
+    }
+  ],
+  "branch": {
+    "合金板": {
+      "inflow": null,
+      "outflow": null,
+      "net": "3/2",
+      "potential": "3/2",
+      "overdraft": "3/2",
+      "localNet": "-1/2"
+    },
+    "能量电池": {
+      "inflow": "1",
+      "outflow": "1/2",
+      "net": "1/2",
+      "potential": "1/2",
+      "overdraft": "1/2",
+      "localNet": "-1/2"
+    },
+    "导线线圈": {
+      "inflow": "1",
+      "outflow": "0",
+      "net": "1",
+      "potential": "1",
+      "overdraft": "1",
+      "localNet": "1"
+    }
+  },
+  "total": {
+    "inflow": null,
+    "outflow": null,
+    "net": "3",
+    "potential": "3",
+    "overdraft": "3"
+  },
+  "timeout": "unresolved",
+  "scientific": {
+    "合金板": {
+      "inflow": "1/1000",
+      "outflow": "0",
+      "net": "1/1000",
+      "potential": "1/1000",
+      "overdraft": "1/1000",
+      "localNet": "0"
+    }
+  }
+}

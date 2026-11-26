@@ -2,8 +2,8 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),scripts=[
  'data/catalog','blueprints/machine-ids','blueprints/item-ids','core/state',
- 'core/machines','core/routing','core/audit','core/editor','engine/steady-flow',
- 'engine/simulation','core/compact-json','blueprints/ast1-codec',
+ 'core/machines','core/routing','core/audit','core/editor','engine/math/arithmetic/rational','engine/steady-flow',
+ 'engine/simulation','core/compact-json','blueprints/ast1-codec','engine/math/graph/symbolic_physical_spec','engine/iteration-display',
  'ui/canvas','ui/inspector','ui/warehouse','ui/stock-chart'
 ];
 const bundle=scripts.map(f=>fs.readFileSync(path.join(root,'scripts',f+'.js'),'utf8')).join('\n;\n');
@@ -73,7 +73,7 @@ test('unknown imported material flows through warehouse out/in simulation, ledge
   {id:'r1',from:{id:out.id,port:p.index},to:{id:inbound.id,port:q.index},path:cells}
  ]};
  assert.equal(checkPath(cells,state.routes[0].from,state.routes[0].to,'r1'),null);
- theoreticalBudget={inflow:{},outflow:{}};
+ theoreticalBudget=certifiedEmptyBudget(state,{calculating:true});
  resetSimulation();
  ware['物品#462']=20;
  for(let i=0;i<1600;i++)simulate(.05);
@@ -81,7 +81,8 @@ test('unknown imported material flows through warehouse out/in simulation, ledge
  assert((sim.outbound['物品#462']||0)>0,'unknown item can be withdrawn');
  assert((sim.minuteBuckets[0]?.inbound?.['物品#462']||0)>0);
  const v=warehouseView(true),table=warehouseActualMarkup(v);
- assert(v.materials.includes('物品#462'),'warehouse materials includes imported ID');
+ assert(v.materials.includes('物品#462'),'structural theory materials includes imported ID');
+ assert(v.actualMaterials.includes('物品#462'),'actual ledger retains imported ID');
  assert(table.includes('物品#462')&&table.includes('aria-hidden="true"'),'actual ledger renders ID and color');
  const color=materialColor('物品#462');
  assert(table.includes(color));
@@ -158,8 +159,10 @@ test('direction labels use arrows in splitter canvas and inspector while AST1 po
  for(const p of out)assert(html.includes('· '+arrows[p.side]+'</span>'),'filter setting must display '+p.side+' as arrow');
  sim={byMachine:{[m.id]:{inputs:{},received:{},sent:{},portItems:{},queue:[],busy:0}}};
  simTime=0;
- const live=machineLiveInventory(m),inp=ports.filter(p=>p.kind==='in');
- for(const p of inp)assert(live.includes('入'+(p.index+1)+' ('+arrows[p.side]+')'));
+ // The old duplicated per-port live cache panel was removed. Verify
+ // current port labels and the actual read-only FIFO disclosure instead.
+ const buffers=machineLogisticsBuffers(m);
+ assert(buffers.includes('入口缓存物品')&&buffers.includes('machine-buffer-details'));
  assert.equal(ast1Encode(),original,'display-only change preserves exact AST1 bytes');
 }));
 

@@ -121,6 +121,23 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    'only the two simulation summary numbers must be bold 16px');
   assert.equal(visual.headingWeight,'600','ledger heading should be moderate, not bold');
   assert.equal(visual.headingColor,'rgb(201, 218, 235)','ledger heading should be muted blue, not bright white');
+  const focused=await evaluate(`(()=>{
+   const a={id:'M0',type:'采矿',mode:0,x:5,y:5,face:'E'},b={id:'M1',type:'冶炼',mode:'钛合金锭',x:30,y:30,face:'E'};
+   const p=outPort(a,0),path=[[p.ex,p.ey],[p.ex+1,p.ey],[p.ex+2,p.ey]];
+   state={name:'audit selection',machines:[a,b],routes:[{id:'R0',from:{id:a.id,port:0},to:null,path}]};
+   resetSimulation();refresh();$('auditPanel').open=true;
+   const root=$('audit'),get=k=>[...root.querySelectorAll('[data-audit-group]')].find(d=>d.dataset.auditGroup===k);
+   const machine=get('生产机器没有出线'),line=get('未连接终点（悬空）');
+   const closed=!machine.open&&!line.open;
+   machine.querySelector('summary').click();machine.querySelector('[data-audit-id="M1"]').click();
+   const m=machineById('M1'),[w,h]=dims(m);
+   const machineSelected=selection.machineId==='M1'&&Math.abs(camera.x+(m.x+w/2)*camera.z-pix.w/2)<.01&&Math.abs(camera.y+(m.y+h/2)*camera.z-pix.h/2)<.01&&$('inspector').textContent.includes('M1');
+   auditRefresh();const preserved=get('生产机器没有出线').open;
+   const route=get('未连接终点（悬空）');route.querySelector('summary').click();route.querySelector('[data-audit-id="R0"]').click();
+   const bnd=groupBounds([],state.routes),routeSelected=selection.routeId==='R0'&&Math.abs(camera.x+(bnd.x+bnd.w/2)*camera.z-pix.w/2)<.01&&Math.abs(camera.y+(bnd.y+bnd.h/2)*camera.z-pix.h/2)<.01&&$('inspector').textContent.includes('R0');
+   return {closed,preserved,machineSelected,routeSelected,allMachines:get('机器总数').querySelectorAll('button').length,allRoutes:get('已绘制的线路').querySelectorAll('button').length,noDuplicate:!root.querySelector('.audit-diagnostic'),oldStrings:warnings().noOutputLine.every(x=>typeof x==='string'),details:warnings(true).noOutputLine.some(x=>x.id==='M1')};
+  })()`);
+  assert.deepEqual(focused,{closed:true,preserved:true,machineSelected:true,routeSelected:true,allMachines:2,allRoutes:1,noDuplicate:true,oldStrings:true,details:true});
   assert.equal(exceptions.length,0,'uncaught Edge exceptions: '+exceptions.join(' | '));
   console.log('PASS: all 23 materials checked, no obsolete upper-bound block, four readable primary headings and two bold warehouse KPIs');
   ws.close();

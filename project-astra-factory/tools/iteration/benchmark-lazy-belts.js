@@ -1,0 +1,8 @@
+'use strict';
+const fs=require('node:fs');
+const src=fs.readFileSync('tools/iteration/model-environment.js','utf8');
+const names=JSON.parse(src.match(/for\(const f of (\[.*?\])\)/)[1].replaceAll("'",'"'));
+const body=names.map(n=>fs.readFileSync('scripts/'+n+'.js','utf8')).join('\n');
+const el={getContext(){return{}},classList:{add(){},remove(){}}};
+const run=new Function('document','requestAnimationFrame',body+'\nconst A={q:steadyRegionQ,add:steadyExactAdd,sub:steadyExactSub,mul:steadyExactMul,div:steadyExactDiv,cmp:steadyExactCmp,txt:steadyExactText,Z:STEADY_ZERO,U:STEADY_ONE};const m=(id,type,extra)=>({id,type,outPorts:[],inputPriority:[0],...extra}),spec={initial:"empty",machines:[m("a","仓出",{item:"ore",outPorts:[{index:0}]}),m("b","加工",{recipe:{seconds:13,qty:1,output:"plate",inputs:{ore:1}},outPorts:[{index:0}]}),m("c","仓入",{})],routes:[{id:"x",from:"a",fromPort:0,to:"b",toPort:0,length:180,accepted:["ore"]},{id:"y",from:"b",fromPort:0,to:"c",toPort:0,length:20,accepted:["plate"]}],priority:["a"],frozen:[]};const results=[];for(const length of [4,8,16,32,64,180])for(const lazyBelts of [false,true,false,true]){spec.routes[0].length=length;const k=iterationCreateKernel(spec,A,{lazyBelts,initialStock:{ore:100000}});const start=performance.now();for(let i=0;i<200000;i++)k.step();results.push({length,lazyBelts,ms:performance.now()-start,state:JSON.stringify(k.snapshot())})}return {same:results.every(x=>x.state===results.find(y=>y.length===x.length).state),runs:results.map(({state,...r})=>r),ticks:200000};');
+const result=run({getElementById(){return el}},()=>{});console.log(JSON.stringify(result));if(!result.same)process.exitCode=1;

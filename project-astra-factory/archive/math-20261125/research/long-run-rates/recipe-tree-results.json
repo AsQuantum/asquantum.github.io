@@ -1,0 +1,781 @@
+{
+  "layout": {
+    "name": "Silicon independent ingredient tree",
+    "recordIndexed": true,
+    "machines": [
+      {
+        "id": "M0",
+        "type": "采矿",
+        "x": 2,
+        "y": 11,
+        "face": "E",
+        "mode": 0
+      },
+      {
+        "id": "M1",
+        "type": "粒子",
+        "x": 12,
+        "y": 20,
+        "face": "N",
+        "mode": 0
+      },
+      {
+        "id": "M2",
+        "type": "冶炼",
+        "x": 18,
+        "y": 10,
+        "face": "E",
+        "mode": "硅晶圆"
+      },
+      {
+        "id": "M3",
+        "type": "仓入",
+        "x": 32,
+        "y": 11,
+        "face": "E",
+        "mode": 0
+      }
+    ],
+    "routes": [
+      {
+        "id": "R0",
+        "from": {
+          "id": "M0",
+          "port": 0
+        },
+        "to": {
+          "id": "M2",
+          "port": 0
+        },
+        "path": [
+          [
+            7,
+            13
+          ],
+          [
+            8,
+            13
+          ],
+          [
+            9,
+            13
+          ],
+          [
+            10,
+            13
+          ],
+          [
+            11,
+            13
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            15,
+            13
+          ],
+          [
+            16,
+            13
+          ],
+          [
+            17,
+            13
+          ]
+        ]
+      },
+      {
+        "id": "R1",
+        "from": {
+          "id": "M1",
+          "port": 0
+        },
+        "to": {
+          "id": "M2",
+          "port": 1
+        },
+        "path": [
+          [
+            14,
+            19
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            14,
+            16
+          ],
+          [
+            14,
+            15
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            15,
+            14
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            17,
+            14
+          ]
+        ]
+      },
+      {
+        "id": "R2",
+        "from": {
+          "id": "M2",
+          "port": 0
+        },
+        "to": {
+          "id": "M3",
+          "port": 1
+        },
+        "path": [
+          [
+            27,
+            13
+          ],
+          [
+            28,
+            13
+          ],
+          [
+            29,
+            13
+          ],
+          [
+            30,
+            13
+          ],
+          [
+            31,
+            13
+          ]
+        ]
+      }
+    ],
+    "frozenFactories": []
+  },
+  "deep": {
+    "layout": {
+      "name": "Alloy converging multi-layer recipe tree",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "垃圾",
+          "x": 2,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        },
+        {
+          "id": "M1",
+          "type": "废料",
+          "x": 11,
+          "y": 1,
+          "face": "E",
+          "mode": "标准"
+        },
+        {
+          "id": "M2",
+          "type": "采矿",
+          "x": 24,
+          "y": 10,
+          "face": "N",
+          "mode": 0
+        },
+        {
+          "id": "M3",
+          "type": "冶炼",
+          "x": 28,
+          "y": 1,
+          "face": "E",
+          "mode": "合金板"
+        },
+        {
+          "id": "M4",
+          "type": "仓入",
+          "x": 43,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M1",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              4
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              10,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 0
+          },
+          "path": [
+            [
+              20,
+              4
+            ],
+            [
+              21,
+              4
+            ],
+            [
+              22,
+              4
+            ],
+            [
+              23,
+              4
+            ],
+            [
+              24,
+              4
+            ],
+            [
+              25,
+              4
+            ],
+            [
+              26,
+              4
+            ],
+            [
+              27,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              26,
+              9
+            ],
+            [
+              26,
+              8
+            ],
+            [
+              26,
+              7
+            ],
+            [
+              26,
+              6
+            ],
+            [
+              26,
+              5
+            ],
+            [
+              27,
+              5
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M4",
+            "port": 1
+          },
+          "path": [
+            [
+              37,
+              4
+            ],
+            [
+              38,
+              4
+            ],
+            [
+              39,
+              4
+            ],
+            [
+              40,
+              4
+            ],
+            [
+              41,
+              4
+            ],
+            [
+              42,
+              4
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": []
+    },
+    "ast1": "AST1:BAUAAAICAAAAAAMLAQAAAAAMGAoBAAAADRwBAAABAAorAgMAAAAEAAAAAAEAAAQVAQAAAwABCFUVAgAAAwAABqoBAwAABAABBlUB",
+    "proof": {
+      "machines": [
+        "M3",
+        "M1",
+        "M0",
+        "M2"
+      ],
+      "stages": [
+        {
+          "b": 2,
+          "T": 2.5,
+          "length": 6,
+          "to": null,
+          "a": 0
+        },
+        {
+          "b": 2,
+          "T": 2,
+          "length": 8,
+          "to": 0,
+          "a": 2
+        },
+        {
+          "b": 3,
+          "T": 3,
+          "length": 4,
+          "to": 1,
+          "a": 3
+        },
+        {
+          "b": 3,
+          "T": 3,
+          "length": 6,
+          "to": 0,
+          "a": 2
+        }
+      ],
+      "status": "proved",
+      "blockTime": "9",
+      "batchCounts": [
+        3,
+        3,
+        3,
+        2
+      ],
+      "packetCounts": [
+        6,
+        6,
+        9,
+        6
+      ],
+      "stageRates": [
+        "1/3",
+        "1/3",
+        "1/3",
+        "2/9"
+      ],
+      "routeRates": [
+        "2/3",
+        "2/3",
+        "1",
+        "2/3"
+      ],
+      "vertices": 65,
+      "expandedVertices": 139,
+      "unitEdges": 1181,
+      "criticalCircuit": true,
+      "scope": "ideal-continuous-event"
+    },
+    "actual": [
+      60,
+      40,
+      40,
+      40
+    ],
+    "unique": 46
+  },
+  "ast1": "AST1:BAQADAILAAAAAAEMFAEAAAANEgoAAAIACiALAwAAAAMAAAAAAgABC1VVBQEAAAIAAAmqVgIAAAMAAQVV",
+  "proof": {
+    "machines": [
+      "M2",
+      "M0",
+      "M1"
+    ],
+    "stages": [
+      {
+        "b": 1,
+        "T": 2.5,
+        "length": 5,
+        "to": null,
+        "a": 0
+      },
+      {
+        "b": 3,
+        "T": 3,
+        "length": 11,
+        "to": 0,
+        "a": 2
+      },
+      {
+        "b": 1,
+        "T": 1,
+        "length": 9,
+        "to": 0,
+        "a": 4
+      }
+    ],
+    "status": "proved",
+    "blockTime": "12",
+    "batchCounts": [
+      3,
+      2,
+      12
+    ],
+    "packetCounts": [
+      3,
+      6,
+      12
+    ],
+    "stageRates": [
+      "1/4",
+      "1/6",
+      "1"
+    ],
+    "routeRates": [
+      "1/4",
+      "1/2",
+      "1"
+    ],
+    "vertices": 59,
+    "expandedVertices": 111,
+    "unitEdges": 941,
+    "criticalCircuit": true,
+    "scope": "ideal-continuous-event"
+  },
+  "unique": 38,
+  "actual": [
+    30,
+    60,
+    15
+  ],
+  "cases": [
+    {
+      "stages": [
+        {
+          "b": 1,
+          "T": 1,
+          "length": 1,
+          "to": 2,
+          "a": 1
+        },
+        {
+          "b": 1,
+          "T": 4,
+          "length": 2,
+          "to": 2,
+          "a": 2
+        },
+        {
+          "b": 1,
+          "T": 1,
+          "length": 1,
+          "to": null
+        }
+      ],
+      "proof": {
+        "status": "proved",
+        "blockTime": "8",
+        "batchCounts": [
+          1,
+          2,
+          1
+        ],
+        "packetCounts": [
+          1,
+          2,
+          1
+        ],
+        "stageRates": [
+          "1/8",
+          "1/4",
+          "1/8"
+        ],
+        "routeRates": [
+          "1/8",
+          "1/4",
+          "1/8"
+        ],
+        "vertices": 12,
+        "expandedVertices": 77,
+        "unitEdges": 163,
+        "criticalCircuit": true,
+        "scope": "ideal-continuous-event"
+      }
+    },
+    {
+      "stages": [
+        {
+          "b": 2,
+          "T": "3/2",
+          "length": 2,
+          "to": 2,
+          "a": 3
+        },
+        {
+          "b": 3,
+          "T": "7/2",
+          "length": 3,
+          "to": 2,
+          "a": 2
+        },
+        {
+          "b": 2,
+          "T": "5/2",
+          "length": 1,
+          "to": null
+        }
+      ],
+      "proof": {
+        "status": "proved",
+        "blockTime": "18",
+        "batchCounts": [
+          9,
+          4,
+          6
+        ],
+        "packetCounts": [
+          18,
+          12,
+          12
+        ],
+        "stageRates": [
+          "1/2",
+          "2/9",
+          "1/3"
+        ],
+        "routeRates": [
+          "1",
+          "2/3",
+          "2/3"
+        ],
+        "vertices": 103,
+        "expandedVertices": 144,
+        "unitEdges": 1833,
+        "criticalCircuit": true,
+        "scope": "ideal-continuous-event"
+      }
+    },
+    {
+      "stages": [
+        {
+          "b": 1,
+          "T": 1,
+          "length": 1,
+          "to": 2,
+          "a": 1
+        },
+        {
+          "b": 1,
+          "T": 1,
+          "length": 2,
+          "to": 2,
+          "a": 1
+        },
+        {
+          "b": 1,
+          "T": 2,
+          "length": 1,
+          "to": 4,
+          "a": 1
+        },
+        {
+          "b": 1,
+          "T": 5,
+          "length": 1,
+          "to": 4,
+          "a": 1
+        },
+        {
+          "b": 1,
+          "T": 1,
+          "length": 2,
+          "to": null
+        }
+      ],
+      "proof": {
+        "status": "proved",
+        "blockTime": "5",
+        "batchCounts": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "packetCounts": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "stageRates": [
+          "1/5",
+          "1/5",
+          "1/5",
+          "1/5",
+          "1/5"
+        ],
+        "routeRates": [
+          "1/5",
+          "1/5",
+          "1/5",
+          "1/5",
+          "1/5"
+        ],
+        "vertices": 15,
+        "expandedVertices": 125,
+        "unitEdges": 277,
+        "criticalCircuit": true,
+        "scope": "ideal-continuous-event"
+      }
+    },
+    {
+      "stages": [
+        {
+          "b": 1,
+          "T": 1,
+          "length": 1,
+          "to": 4,
+          "a": 1
+        },
+        {
+          "b": 1,
+          "T": 1,
+          "length": 1,
+          "to": 4,
+          "a": 2
+        },
+        {
+          "b": 1,
+          "T": 1,
+          "length": 1,
+          "to": 4,
+          "a": 3
+        },
+        {
+          "b": 1,
+          "T": 1,
+          "length": 1,
+          "to": 4,
+          "a": 4
+        },
+        {
+          "b": 1,
+          "T": 1,
+          "length": 1,
+          "to": null
+        }
+      ],
+      "proof": {
+        "status": "proved",
+        "blockTime": "4",
+        "batchCounts": [
+          1,
+          2,
+          3,
+          4,
+          1
+        ],
+        "packetCounts": [
+          1,
+          2,
+          3,
+          4,
+          1
+        ],
+        "stageRates": [
+          "1/4",
+          "1/2",
+          "3/4",
+          "1",
+          "1/4"
+        ],
+        "routeRates": [
+          "1/4",
+          "1/2",
+          "3/4",
+          "1",
+          "1/4"
+        ],
+        "vertices": 33,
+        "expandedVertices": 144,
+        "unitEdges": 400,
+        "criticalCircuit": true,
+        "scope": "ideal-continuous-event"
+      }
+    }
+  ],
+  "rejections": 3
+}

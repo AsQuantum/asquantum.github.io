@@ -225,13 +225,93 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  if(marquee){const m=marquee,a=m.fromWorld||m.from,b=m.toWorld||m.to,x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),w=Math.abs(b.x-a.x),h=Math.abs(b.y-a.y);ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
  if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=r.to&&plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?(plan.blockedPortsAdded?'rgba(243,216,117,.25)':'rgba(76,228,163,.3)'):'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?(plan.blockedPortsAdded?'#f3d875':'#6ef5b0'):'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
  ctx.strokeStyle='#637991';ctx.lineWidth=.1;ctx.strokeRect(0,0,72,72);ctx.restore();$('beltText').textContent=`${getBeltCount()}格传送带`;}
+// Visual-only belt tread phase, in meters. The simulation counters and
+// physical packet movement remain independent of this display clock.
+const beltMotionPhase=new Map();
+// Derived geometry is rebuilt only with the static layer. Keep the exact
+// tile centerline and its incoming/outgoing tangents as compact arrays.
+let beltVisualCache=null;
+function buildBeltVisualCache(){
+ const rows=[];
+ for(const r of state.routes){
+  const g=beltPathGeometry(r);if(!g)continue;
+  const connected=beltConnected(r),selected=selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id)||draft?.routeId===r.id||beltTrim?.routeId===r.id;
+  const tiles=g.path.map(([x,y],i)=>{const prev=g.path[i-1],next=g.path[i+1],ax=prev?x-prev[0]:g.sx,ay=prev?y-prev[1]:g.sy,bx=next?next[0]-x:g.tx,by=next?next[1]-y:g.ty;return [x+.5,y+.5,ax,ay,bx,by,ax*by-ay*bx];});
+  rows.push({r,g,tiles,connected,yellow:!connected||selected});
+ }
+ return {layout:state,routes:state.routes,rows};
+}
+function beltVisualRows(){return beltVisualCache?.layout===state&&beltVisualCache.routes===state.routes?beltVisualCache.rows:buildBeltVisualCache().rows;}
+
+let beltMotionLast=null,beltMotionSimLast=null;
+function resetBeltMotionClock(){beltMotionLast=null;beltMotionSimLast=simTime;}
+function advanceBeltMotion(t){
+ if(simAdvanceBusy){resetBeltMotionClock();return false;}
+ const realElapsed=beltMotionLast===null?0:Math.min(.12,Math.max(0,(t-beltMotionLast)/1000));beltMotionLast=t;
+ const now=simTime,simElapsed=beltMotionSimLast===null?0:Math.max(0,now-beltMotionSimLast);
+ beltMotionSimLast=now;
+ // During actual simulation, use the same completed game-time steps as
+ // packets, not a second wall clock. Before running, retain idle preview.
+ const elapsed=running?simElapsed:realElapsed;
+ let dirty=false;const live=new Set();
+ for(const r of state.routes){
+  if(!beltConnected(r))continue;
+  live.add(r.id);
+  const old=beltMotionPhase.get(r.id)??.5;
+  // A seven-tread repeat avoids the whole pattern appearing stationary
+  // when high-speed playback advances an integer number of meters per paint.
+  const phase=beltFullyBlocked(r,sim?.routes?.[r.id])?old:(old+elapsed*BELT_SPEED)%7;
+  if(phase!==old)dirty=true;
+  beltMotionPhase.set(r.id,phase);
+ }
+ for(const id of beltMotionPhase.keys())if(!live.has(id))beltMotionPhase.delete(id);
+ return dirty;
+}
+// Tread orientation is visual only: keep its center on the exact
+// piecewise-linear packet path and blend the incoming/outgoing tangent
+// across the middle 0.4m of a corner tile.
+function beltTreadPoint(g,d){
+ const [x,y,dx,dy]=beltPathPoint(g,d),i=Math.min(g.n-1,Math.max(0,Math.floor(d)));
+ const offset=d-(i+.5),half=.2;
+ if(Math.abs(offset)>=half)return [x,y,dx,dy];
+ const before=beltPathPoint(g,i+.5-half),after=beltPathPoint(g,i+.5+half);
+ const ax=before[2],ay=before[3],bx=after[2],by=after[3];
+ if(ax===bx&&ay===by)return [x,y,dx,dy];
+ const angle=Math.atan2(ay,ax)+Math.atan2(ax*by-ay*bx,ax*bx+ay*by)*(offset+half)/(2*half);
+ return [x,y,Math.cos(angle),Math.sin(angle)];
+}
+function paintBeltMotion(rows=beltVisualRows(),clipViewport=false){
+ ctx.lineWidth=.065;ctx.lineCap='butt';
+ const styles=['#23794f','#164e36','#8e7230','#654b20'];
+ // The four colors share paths across the entire canvas: four strokes,
+ // not two strokes per belt. No trig/allocation per tile.
+ for(let style=0;style<4;style++){
+  ctx.strokeStyle=styles[style];ctx.beginPath();
+  for(const {r,tiles,connected,yellow} of rows){
+   if(yellow!==(style>=2))continue;
+   const phase=connected?(beltMotionPhase.get(r.id)??.5):.5,first=Math.floor(phase),f=phase-first,u=f-.5;
+   const blend=Math.abs(u)<.2,angle=(u+.2)/.4*Math.PI/2,cs=blend?Math.cos(angle):0,sn=blend?Math.sin(angle):0;
+   for(let i=0;i<tiles.length;i++){
+    if((((i-first)%7+7)%7===0)!==(style%2===1))continue;
+    const t=tiles[i],ax=t[2],ay=t[3],bx=t[4],by=t[5],turn=t[6],vx=u<0?ax:bx,vy=u<0?ay:by;
+    const x=t[0]+vx*u,y=t[1]+vy*u;
+    // Skip offscreen marks; packet/line geometry is otherwise unchanged.
+    if(clipViewport&&pix.w>0&&pix.h>0&&(x*camera.z+camera.x< -2||y*camera.z+camera.y< -2||x*camera.z+camera.x>pix.w+2||y*camera.z+camera.y>pix.h+2))continue;
+    const dx=blend&&turn?ax*cs-ay*sn*turn:vx,dy=blend&&turn?ay*cs+ax*sn*turn:vy,w=.11;
+    ctx.moveTo(x-dy*w,y+dx*w);ctx.lineTo(x+dy*w,y-dx*w);
+   }
+  }
+  ctx.stroke();
+ }
+}
 function drawMovingPackets(){
- if(!sim)return;
  ctx.save();ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);
  ctx.translate(camera.x,camera.y);ctx.scale(camera.z,camera.z);
- for(const r of state.routes){
-  for(const packet of sim.routes[r.id]||[]){
-   const xy=packetCoords(r,packet);if(!xy)continue;
+ const rows=beltVisualRows();paintBeltMotion(rows,true);
+ for(const {r,g} of rows){
+  const packets=sim?.routes?.[r.id];if(!packets?.length)continue;
+  for(const packet of packets){
+   const xy=beltPathPoint(g,packet.distance);
    ctx.fillStyle=materialColor(packet.item);ctx.beginPath();ctx.arc(xy[0],xy[1],.25,0,2*Math.PI);ctx.fill();
   }
  }
@@ -246,17 +326,20 @@ function draw(animationOnly=false){
   cachedMapCtx=cachedMap.getContext('2d',{alpha:false});staticReady=false;
  }
  if(!animationOnly||!staticReady){
-  drawStaticScene();
+  drawStaticScene();beltVisualCache=buildBeltVisualCache();
   cachedMapCtx.setTransform(1,0,0,1,0,0);
   cachedMapCtx.clearRect(0,0,w,h);cachedMapCtx.drawImage(canvas,0,0);
   staticReady=true;
+ }else{
+  ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(cachedMap,0,0);
  }
- ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(cachedMap,0,0);
  drawMovingPackets();
 }
 
 function hexAlpha(h,a){const x=h.replace('#','');let r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16);return `rgba(${r},${g},${b},${a})`;}
-function materialColor(s){
+const materialColorCache=new Map();
+function materialColor(s){const key=String(s??'');if(!materialColorCache.has(key))materialColorCache.set(key,computeMaterialColor(key));return materialColorCache.get(key);}
+function computeMaterialColor(s){
  const label=String(s??'');
  // Imported unknown item colors are deterministic hashes of ItemID.
  // Unknown items never enter the selectable catalog.
@@ -397,10 +480,13 @@ function onPointerDown(e){
     selection=null;setTool('select');inspectorRefresh();draw();return;
    }
    if(selection?.routeId){
-     // A completed placement is not an active edit session.
-     const exiting=beltPostTrimRouteId===selection.routeId;
-     clearBeltTrimSelection({awaitExit:exiting});
-     if(exiting)return;
+     // Completed placement and existing-route editing share the same
+     // two-tap exit. A direct tap on a free output immediately after
+     // completion still starts the next belt without an extra tool tap.
+     const startNext=beltPostTrimRouteId!==selection.routeId&&
+      hit?.p.kind==='out'&&!routeFor(hit.m.id,'out',hit.p.index);
+     clearBeltTrimSelection({awaitExit:!startNext});
+     if(!startNext)return;
     }
    if(hit?.p.kind==='out'){
     if(routeFor(hit.m.id,'out',hit.p.index))

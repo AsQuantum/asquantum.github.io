@@ -7,7 +7,6 @@ function factoryItemCompare(a,b){
  const id=x=>{if(typeof ast1ItemNumber==='function'){const n=ast1ItemNumber(x);if(n!==undefined)return n;}const i=MATERIALS.indexOf(x);return i<0?Infinity:i;};
  const ai=id(a),bi=id(b);return (ai<bi?-1:ai>bi?1:0)||String(a).localeCompare(String(b),'zh-CN');
 }
-function factoryRecipeModesByItem(type,modes){return [...modes].sort((a,b)=>factoryItemCompare(DEF[type]?.recipes?.[a]?.output||a,DEF[type]?.recipes?.[b]?.output||b));}
 
 
 // Frozen factories are scheme metadata, not physical machines or AST1 records.
@@ -16,6 +15,26 @@ function frozenRateNumber(value){
  const s=String(value),p=s.split('/');
  return p.length===2?Number(p[0])/Number(p[1]):Number(s);
 }
+// Parse the literal decimal/fraction, never the IEEE-754 approximation.
+function factoryRateFraction(n,d=1n){
+ n=BigInt(n);d=BigInt(d);if(!d)throw Error('zero denominator');
+ if(d<0n){n=-n;d=-d;}
+ let a=n<0n?-n:n,b=d;while(b){const r=a%b;a=b;b=r;}
+ return {n:n/a,d:d/a};
+}
+function factoryParseRationalText(value){
+ if(typeof value==='number'&&(!Number.isFinite(value)||Number.isInteger(value)&&!Number.isSafeInteger(value)))throw Error('unsafe legacy numeric coefficient');
+ const s=String(value).trim();if(s.length>220)throw Error('coefficient too long');
+ const f=s.match(/^([+-]?\d+)\s*\/\s*([+-]?\d+)$/);
+ if(f)return factoryRateFraction(BigInt(f[1]),BigInt(f[2]));
+ const m=s.match(/^([+-]?)(?:(\d+)(?:\.(\d*))?|\.(\d+))(?:e([+-]?\d+))?$/i);
+ if(!m)throw Error('invalid physical coefficient: '+s);
+ const frac=m[3]??m[4]??'',exponent=BigInt(m[5]||'0')-BigInt(frac.length);
+ if(exponent>200n||exponent< -200n)throw Error('unsupported decimal exponent');
+ let n=BigInt((m[2]||'0')+frac);if(m[1]==='-')n=-n;
+ return exponent>=0n?factoryRateFraction(n*10n**exponent):factoryRateFraction(n,10n**(-exponent));
+}
+function factoryRationalText(r){return r.d===1n?String(r.n):String(r.n)+'/'+String(r.d);}
 function normalizeFrozenFactories(value){
  if(value==null)return [];
  if(!Array.isArray(value)||value.length>100)throw Error('冻结工厂列表无效或过长');
@@ -23,13 +42,16 @@ function normalizeFrozenFactories(value){
  return value.map((f,i)=>{
   if(!f||typeof f!=='object'||Array.isArray(f)||!f.rates||typeof f.rates!=='object'||Array.isArray(f.rates))throw Error('冻结工厂配置无效');
   let id=String(f.id||'f'+(i+1));if(!/^[A-Za-z0-9_-]{1,80}$/.test(id)||['__proto__','constructor','prototype'].includes(id))throw Error('冻结工厂编号无效');if(ids.has(id))throw Error('冻结工厂编号重复');ids.add(id);
-  const rates=Object.create(null);
+  const rates=Object.create(null),seenItems=new Set();
   if(Object.keys(f.rates).length>1000)throw Error('冻结工厂物品过多');
   for(const [item,value] of Object.entries(f.rates)){
    const key=typeof ast1CanonicalItem==='function'?ast1CanonicalItem(item):item,s=String(value).trim();
-   if(!key||key==='任意'||['__proto__','constructor','prototype'].includes(key)||!/^[-+]?(?:\d+(?:\.\d+)?(?:e[-+]?\d+)?|\d+\/[1-9]\d*)$/i.test(s)||s.length>100||!Number.isFinite(frozenRateNumber(s))||Math.abs(frozenRateNumber(s))>1e9)throw Error('冻结工厂流速无效：'+item);
-   if(Object.hasOwn(rates,key))throw Error('冻结工厂物品重复：'+key);
-   if(frozenRateNumber(s)!==0){const rate=s.replace(/^\+/,'');if(typeof steadyRegionQ==='function')steadyRegionQ(rate);rates[key]=rate;}
+   if(!key||key==='任意'||['__proto__','constructor','prototype'].includes(key))throw Error('冻结工厂流速无效：'+item);
+   if(seenItems.has(key))throw Error('冻结工厂物品重复：'+key);seenItems.add(key);
+   let rate;
+   try{rate=factoryParseRationalText(value);if((rate.n<0n?-rate.n:rate.n)>1000000000n*rate.d)throw Error('rate exceeds limit');}
+   catch(e){throw Error('冻结工厂流速无效：'+item+'（'+e.message+'）');}
+   if(rate.n!==0n){const canonical=factoryRationalText(rate);if(canonical.length>220)throw Error('冻结工厂流速无效：'+item+'（精确分式过长）');rates[key]=canonical;}
   }
   return {id,name:String(f.name||'冻结工厂 '+(i+1)).slice(0,80),enabled:f.enabled!==false,rates};
  });

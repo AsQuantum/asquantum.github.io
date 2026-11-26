@@ -1,0 +1,601 @@
+{
+  "actual": {
+    "unique": 73,
+    "proof": {
+      "machine": "M3",
+      "rate": "1/15",
+      "period": "15",
+      "regions": [
+        {
+          "item": "框架模块",
+          "demand": 1,
+          "source": "M0",
+          "devices": [
+            "M2",
+            "M1"
+          ],
+          "routes": [
+            "R3",
+            "R1",
+            "R0",
+            "R2"
+          ],
+          "storageDepth": 6,
+          "entryGap": "63/10",
+          "refillBound": "63/10",
+          "allMergerInputsReady": true
+        },
+        {
+          "item": "共鸣水晶",
+          "demand": 1,
+          "source": "M4",
+          "devices": [],
+          "routes": [
+            "R4"
+          ],
+          "storageDepth": 2,
+          "entryGap": "21/10",
+          "refillBound": "21/10",
+          "allMergerInputsReady": true
+        },
+        {
+          "item": "等离子电池",
+          "demand": 2,
+          "source": "M5",
+          "devices": [],
+          "routes": [
+            "R5"
+          ],
+          "storageDepth": 2,
+          "entryGap": "21/10",
+          "refillBound": "21/5",
+          "allMergerInputsReady": false
+        }
+      ],
+      "scope": "exact-rational-fixed-tick"
+    },
+    "rates": {
+      "flow:R0|框架模块": "1/15",
+      "routeTotal:R0": "1/15",
+      "flow:R1|框架模块": "1/30",
+      "routeTotal:R1": "1/30",
+      "flow:R2|框架模块": "1/30",
+      "routeTotal:R2": "1/30",
+      "flow:R3|框架模块": "1/15",
+      "routeTotal:R3": "1/15",
+      "flow:R4|共鸣水晶": "1/15",
+      "routeTotal:R4": "1/15",
+      "flow:R5|等离子电池": "2/15",
+      "routeTotal:R5": "2/15",
+      "flow:R6|引力透镜": "1/15",
+      "routeTotal:R6": "1/15",
+      "machineTotal:M0|in": "0",
+      "machineTotal:M0|out": "1/15",
+      "machineMaterial:M0|out|框架模块": "1/15",
+      "machineTotal:M1|in": "1/15",
+      "machineMaterial:M1|in|框架模块": "1/15",
+      "machineTotal:M1|out": "1/15",
+      "machineMaterial:M1|out|框架模块": "1/15",
+      "machineTotal:M2|in": "1/15",
+      "machineMaterial:M2|in|框架模块": "1/15",
+      "machineTotal:M2|out": "1/15",
+      "machineMaterial:M2|out|框架模块": "1/15",
+      "cycle:M3": "1/15",
+      "duty:M3": "1",
+      "machineTotal:M3|in": "4/15",
+      "machineMaterial:M3|in|框架模块": "1/15",
+      "machineMaterial:M3|in|共鸣水晶": "1/15",
+      "machineMaterial:M3|in|等离子电池": "2/15",
+      "machineTotal:M3|out": "1/15",
+      "machineMaterial:M3|out|引力透镜": "1/15",
+      "machineTotal:M4|in": "0",
+      "machineTotal:M4|out": "1/15",
+      "machineMaterial:M4|out|共鸣水晶": "1/15",
+      "machineTotal:M5|in": "0",
+      "machineTotal:M5|out": "2/15",
+      "machineMaterial:M5|out|等离子电池": "2/15",
+      "machineTotal:M6|in": "1/15",
+      "machineMaterial:M6|in|引力透镜": "1/15",
+      "machineTotal:M6|out": "0",
+      "duty:stock": "1",
+      "inflow:框架模块": "2",
+      "outflow:框架模块": "1/15",
+      "net:框架模块": "29/15",
+      "localIn:框架模块": "0",
+      "localOut:框架模块": "1/15",
+      "localNet:框架模块": "-1/15",
+      "inflow:共鸣水晶": "2",
+      "outflow:共鸣水晶": "1/15",
+      "net:共鸣水晶": "29/15",
+      "localIn:共鸣水晶": "0",
+      "localOut:共鸣水晶": "1/15",
+      "localNet:共鸣水晶": "-1/15",
+      "inflow:等离子电池": "2",
+      "outflow:等离子电池": "2/15",
+      "net:等离子电池": "28/15",
+      "localIn:等离子电池": "0",
+      "localOut:等离子电池": "2/15",
+      "localNet:等离子电池": "-2/15",
+      "inflow:引力透镜": "1/15",
+      "outflow:引力透镜": "0",
+      "net:引力透镜": "1/15",
+      "localIn:引力透镜": "1/15",
+      "localOut:引力透镜": "0",
+      "localNet:引力透镜": "1/15",
+      "total:inflow": "91/15",
+      "total:outflow": "4/15",
+      "total:net": "29/5",
+      "total:localIn": "1/15",
+      "total:localOut": "4/15",
+      "total:localNet": "-1/5"
+    },
+    "measured": 0.06666666666666667,
+    "layout": {
+      "name": "saturated reconverging lens region",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "仓出",
+          "x": 2,
+          "y": 9,
+          "face": "E",
+          "mode": 0,
+          "item": "框架模块"
+        },
+        {
+          "id": "M1",
+          "type": "分流",
+          "x": 15,
+          "y": 10,
+          "face": "E"
+        },
+        {
+          "id": "M2",
+          "type": "汇流",
+          "x": 32,
+          "y": 10,
+          "face": "E"
+        },
+        {
+          "id": "M3",
+          "type": "量装",
+          "x": 45,
+          "y": 7,
+          "face": "E",
+          "mode": "引力透镜"
+        },
+        {
+          "id": "M4",
+          "type": "仓出",
+          "x": 38,
+          "y": 1,
+          "face": "S",
+          "item": "共鸣水晶"
+        },
+        {
+          "id": "M5",
+          "type": "仓出",
+          "x": 38,
+          "y": 16,
+          "face": "N",
+          "item": "等离子电池"
+        },
+        {
+          "id": "M6",
+          "type": "仓入",
+          "x": 60,
+          "y": 9,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M1",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              11
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              12,
+              11
+            ],
+            [
+              13,
+              11
+            ],
+            [
+              14,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 0
+          },
+          "path": [
+            [
+              18,
+              11
+            ],
+            [
+              19,
+              11
+            ],
+            [
+              20,
+              11
+            ],
+            [
+              21,
+              11
+            ],
+            [
+              22,
+              11
+            ],
+            [
+              23,
+              11
+            ],
+            [
+              24,
+              11
+            ],
+            [
+              25,
+              11
+            ],
+            [
+              26,
+              11
+            ],
+            [
+              27,
+              11
+            ],
+            [
+              28,
+              11
+            ],
+            [
+              29,
+              11
+            ],
+            [
+              30,
+              11
+            ],
+            [
+              31,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M1",
+            "port": 1
+          },
+          "to": {
+            "id": "M2",
+            "port": 1
+          },
+          "path": [
+            [
+              16,
+              9
+            ],
+            [
+              16,
+              8
+            ],
+            [
+              16,
+              7
+            ],
+            [
+              17,
+              7
+            ],
+            [
+              18,
+              7
+            ],
+            [
+              19,
+              7
+            ],
+            [
+              20,
+              7
+            ],
+            [
+              21,
+              7
+            ],
+            [
+              22,
+              7
+            ],
+            [
+              23,
+              7
+            ],
+            [
+              24,
+              7
+            ],
+            [
+              25,
+              7
+            ],
+            [
+              26,
+              7
+            ],
+            [
+              27,
+              7
+            ],
+            [
+              28,
+              7
+            ],
+            [
+              29,
+              7
+            ],
+            [
+              30,
+              7
+            ],
+            [
+              31,
+              7
+            ],
+            [
+              32,
+              7
+            ],
+            [
+              33,
+              7
+            ],
+            [
+              33,
+              8
+            ],
+            [
+              33,
+              9
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              35,
+              11
+            ],
+            [
+              36,
+              11
+            ],
+            [
+              37,
+              11
+            ],
+            [
+              38,
+              11
+            ],
+            [
+              39,
+              11
+            ],
+            [
+              40,
+              11
+            ],
+            [
+              41,
+              11
+            ],
+            [
+              42,
+              11
+            ],
+            [
+              43,
+              11
+            ],
+            [
+              44,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R4",
+          "from": {
+            "id": "M4",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 0
+          },
+          "path": [
+            [
+              40,
+              6
+            ],
+            [
+              40,
+              7
+            ],
+            [
+              40,
+              8
+            ],
+            [
+              40,
+              9
+            ],
+            [
+              40,
+              10
+            ],
+            [
+              41,
+              10
+            ],
+            [
+              42,
+              10
+            ],
+            [
+              43,
+              10
+            ],
+            [
+              44,
+              10
+            ]
+          ]
+        },
+        {
+          "id": "R5",
+          "from": {
+            "id": "M5",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 2
+          },
+          "path": [
+            [
+              40,
+              15
+            ],
+            [
+              40,
+              14
+            ],
+            [
+              40,
+              13
+            ],
+            [
+              40,
+              12
+            ],
+            [
+              41,
+              12
+            ],
+            [
+              42,
+              12
+            ],
+            [
+              43,
+              12
+            ],
+            [
+              44,
+              12
+            ]
+          ]
+        },
+        {
+          "id": "R6",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M6",
+            "port": 1
+          },
+          "path": [
+            [
+              56,
+              11
+            ],
+            [
+              57,
+              11
+            ],
+            [
+              58,
+              11
+            ],
+            [
+              59,
+              11
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "stock",
+          "rates": {
+            "框架模块": "2",
+            "共鸣水晶": "2",
+            "等离子电池": "2"
+          }
+        }
+      ]
+    }
+  },
+  "random": {
+    "certified": 60,
+    "relabel": 60
+  }
+}

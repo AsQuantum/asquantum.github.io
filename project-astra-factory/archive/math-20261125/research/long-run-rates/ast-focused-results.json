@@ -1,0 +1,605 @@
+[
+  {
+    "machines": 115,
+    "queries": {
+      "total": 626,
+      "known": 225,
+      "unknown": 401
+    },
+    "unknownMetrics": 59,
+    "elapsedMs": 724.1205000000001,
+    "factors": [
+      [
+        {
+          "columns": 9,
+          "rows": 182,
+          "status": "feasible",
+          "strictInterior": true,
+          "origin": true
+        }
+      ],
+      [
+        {
+          "columns": 9,
+          "rows": 183,
+          "status": "unknown",
+          "strictInterior": false,
+          "origin": false
+        }
+      ]
+    ],
+    "checks": [
+      {
+        "item": "合金板",
+        "field": "inflow",
+        "predicted": 400,
+        "observed": 401
+      },
+      {
+        "item": "钛合金锭",
+        "field": "inflow",
+        "predicted": 800,
+        "observed": 800
+      },
+      {
+        "item": "能量电池",
+        "field": "inflow",
+        "predicted": 200,
+        "observed": 200
+      },
+      {
+        "item": "硅晶圆",
+        "field": "inflow",
+        "predicted": 300,
+        "observed": 300
+      },
+      {
+        "item": "燃料罐",
+        "field": "inflow",
+        "predicted": 120,
+        "observed": 120
+      },
+      {
+        "item": "燃料罐",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "共鸣水晶",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "框架模块",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "电动机",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "引力透镜",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "等离子电池",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "量子处理器",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "曲速线圈",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M0",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M1",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M4",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M5",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M13",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M15",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M16",
+        "predicted": 133.33333333333334,
+        "observed": 133
+      },
+      {
+        "machine": "M17",
+        "predicted": 133.33333333333334,
+        "observed": 133
+      },
+      {
+        "machine": "M18",
+        "predicted": 133.33333333333334,
+        "observed": 134
+      },
+      {
+        "machine": "M20",
+        "predicted": 120,
+        "observed": 120
+      },
+      {
+        "machine": "M21",
+        "predicted": 200,
+        "observed": 200
+      },
+      {
+        "machine": "M25",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M26",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M27",
+        "predicted": 300,
+        "observed": 300
+      },
+      {
+        "machine": "M28",
+        "predicted": 200,
+        "observed": 200
+      },
+      {
+        "machine": "M29",
+        "predicted": 200,
+        "observed": 200
+      },
+      {
+        "machine": "M30",
+        "predicted": 150,
+        "observed": 150
+      },
+      {
+        "machine": "M52",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M53",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M89",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M90",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M93",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M94",
+        "predicted": 200,
+        "observed": 200
+      },
+      {
+        "machine": "M95",
+        "predicted": 200,
+        "observed": 200
+      },
+      {
+        "machine": "M96",
+        "predicted": 150,
+        "observed": 150
+      },
+      {
+        "machine": "M97",
+        "predicted": 300,
+        "observed": 300
+      },
+      {
+        "machine": "M98",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M102",
+        "predicted": 600,
+        "observed": 600
+      }
+    ]
+  },
+  {
+    "machines": 71,
+    "queries": {
+      "total": 410,
+      "known": 323,
+      "unknown": 87
+    },
+    "unknownMetrics": 14,
+    "elapsedMs": 341.9150999999997,
+    "factors": [
+      [
+        {
+          "columns": 2,
+          "rows": 16,
+          "status": "feasible",
+          "strictInterior": false,
+          "origin": false
+        },
+        {
+          "columns": 5,
+          "rows": 37,
+          "status": "feasible",
+          "strictInterior": false,
+          "origin": false
+        },
+        {
+          "columns": 6,
+          "rows": 64,
+          "status": "feasible",
+          "strictInterior": false,
+          "origin": true
+        }
+      ],
+      [
+        {
+          "columns": 1,
+          "rows": 13,
+          "status": "feasible",
+          "strictInterior": true,
+          "origin": true
+        },
+        {
+          "columns": 2,
+          "rows": 16,
+          "status": "feasible",
+          "strictInterior": false,
+          "origin": false
+        },
+        {
+          "columns": 5,
+          "rows": 37,
+          "status": "feasible",
+          "strictInterior": false,
+          "origin": false
+        }
+      ],
+      [
+        {
+          "columns": 2,
+          "rows": 16,
+          "status": "feasible",
+          "strictInterior": false,
+          "origin": false
+        },
+        {
+          "columns": 5,
+          "rows": 37,
+          "status": "feasible",
+          "strictInterior": false,
+          "origin": false
+        }
+      ]
+    ],
+    "checks": [
+      {
+        "item": "废金属",
+        "field": "inflow",
+        "predicted": 2400,
+        "observed": 2400
+      },
+      {
+        "item": "废金属",
+        "field": "outflow",
+        "predicted": 2400,
+        "observed": 2400
+      },
+      {
+        "item": "合金板",
+        "field": "inflow",
+        "predicted": 1440,
+        "observed": 1440
+      },
+      {
+        "item": "合金板",
+        "field": "outflow",
+        "predicted": 300,
+        "observed": 300
+      },
+      {
+        "item": "能量电池",
+        "field": "inflow",
+        "predicted": 480,
+        "observed": 480
+      },
+      {
+        "item": "能量电池",
+        "field": "outflow",
+        "predicted": 300,
+        "observed": 300
+      },
+      {
+        "item": "燃料罐",
+        "field": "inflow",
+        "predicted": 240,
+        "observed": 240
+      },
+      {
+        "item": "燃料罐",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "齿轮组",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "导线线圈",
+        "field": "inflow",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "item": "导线线圈",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "item": "钛合金锭",
+        "field": "outflow",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M19",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M20",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M21",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M46",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M47",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M48",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M49",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M51",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M66",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M67",
+        "predicted": 0,
+        "observed": 0
+      },
+      {
+        "machine": "M6",
+        "predicted": 300,
+        "observed": 300
+      },
+      {
+        "machine": "M7",
+        "predicted": 300,
+        "observed": 300
+      },
+      {
+        "machine": "M9",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M10",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M11",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M13",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M14",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M15",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M16",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M17",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M18",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M23",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M24",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M25",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M26",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M27",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M28",
+        "predicted": 400,
+        "observed": 400
+      },
+      {
+        "machine": "M30",
+        "predicted": 480,
+        "observed": 480
+      },
+      {
+        "machine": "M31",
+        "predicted": 480,
+        "observed": 480
+      },
+      {
+        "machine": "M32",
+        "predicted": 480,
+        "observed": 480
+      },
+      {
+        "machine": "M33",
+        "predicted": 480,
+        "observed": 480
+      },
+      {
+        "machine": "M37",
+        "predicted": 480,
+        "observed": 480
+      },
+      {
+        "machine": "M38",
+        "predicted": 480,
+        "observed": 480
+      },
+      {
+        "machine": "M40",
+        "predicted": 240,
+        "observed": 240
+      },
+      {
+        "machine": "M41",
+        "predicted": 240,
+        "observed": 240
+      },
+      {
+        "machine": "M44",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M58",
+        "predicted": 120,
+        "observed": 120
+      },
+      {
+        "machine": "M59",
+        "predicted": 120,
+        "observed": 120
+      },
+      {
+        "machine": "M60",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M61",
+        "predicted": 600,
+        "observed": 600
+      },
+      {
+        "machine": "M69",
+        "predicted": 80,
+        "observed": 80
+      }
+    ]
+  }
+]

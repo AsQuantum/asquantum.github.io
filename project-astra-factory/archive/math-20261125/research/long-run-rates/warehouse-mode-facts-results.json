@@ -1,0 +1,477 @@
+[
+  {
+    "name": "joint scarcity reduces actual demand",
+    "netLower": {
+      "a": "1/2"
+    },
+    "dutyBounds": {
+      "x": {
+        "lower": "0",
+        "upper": "1/10"
+      },
+      "y": {
+        "lower": "0",
+        "upper": "1/10"
+      }
+    },
+    "modes": [
+      {
+        "factory": "s",
+        "mode": "full-average-service",
+        "permanentlyAbundantInputs": [],
+        "possibleLimitingInputs": [],
+        "preserveProtectionCoupling": false
+      },
+      {
+        "factory": "x",
+        "mode": "undetermined-or-partial",
+        "permanentlyAbundantInputs": [
+          "a"
+        ],
+        "possibleLimitingInputs": [
+          "b"
+        ],
+        "preserveProtectionCoupling": true
+      },
+      {
+        "factory": "y",
+        "mode": "undetermined-or-partial",
+        "permanentlyAbundantInputs": [
+          "a"
+        ],
+        "possibleLimitingInputs": [
+          "b"
+        ],
+        "preserveProtectionCoupling": true
+      }
+    ],
+    "rounds": [
+      {
+        "stage": 0,
+        "abundant": [
+          "a"
+        ],
+        "fullDutyAdded": []
+      }
+    ],
+    "groupsBefore": [
+      [
+        "F:s"
+      ],
+      [
+        "F:y",
+        "W:b",
+        "F:x",
+        "W:a"
+      ],
+      [
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ],
+    "groupsAfter": [
+      [
+        "F:s"
+      ],
+      [
+        "F:y",
+        "F:x",
+        "W:b"
+      ],
+      [
+        "W:a"
+      ],
+      [
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ],
+    "densityOneGroups": [
+      [
+        "F:s"
+      ],
+      [
+        "F:y",
+        "F:x",
+        "W:b"
+      ],
+      [
+        "W:a"
+      ],
+      [
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ]
+  },
+  {
+    "name": "zero duty deletes direct service effects, not reachability graph",
+    "netLower": {},
+    "dutyBounds": {
+      "x": {
+        "lower": "0",
+        "upper": "0"
+      },
+      "y": {
+        "lower": "0",
+        "upper": "1"
+      }
+    },
+    "modes": [
+      {
+        "factory": "s",
+        "mode": "full-average-service",
+        "permanentlyAbundantInputs": [],
+        "possibleLimitingInputs": [],
+        "preserveProtectionCoupling": false
+      },
+      {
+        "factory": "x",
+        "mode": "zero-average-service",
+        "permanentlyAbundantInputs": [],
+        "possibleLimitingInputs": [
+          "a",
+          "b"
+        ],
+        "preserveProtectionCoupling": false
+      },
+      {
+        "factory": "y",
+        "mode": "undetermined-or-partial",
+        "permanentlyAbundantInputs": [],
+        "possibleLimitingInputs": [
+          "a"
+        ],
+        "preserveProtectionCoupling": true
+      }
+    ],
+    "rounds": [
+      {
+        "stage": 0,
+        "abundant": [],
+        "fullDutyAdded": []
+      }
+    ],
+    "groupsBefore": [
+      [
+        "F:s"
+      ],
+      [
+        "F:y",
+        "W:b",
+        "F:x",
+        "W:a"
+      ],
+      [
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ],
+    "groupsAfter": [
+      [
+        "F:s"
+      ],
+      [
+        "F:y",
+        "W:b",
+        "F:x",
+        "W:a"
+      ],
+      [
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ],
+    "densityOneGroups": [
+      [
+        "F:s"
+      ],
+      [
+        "F:y",
+        "W:a"
+      ],
+      [
+        "W:d"
+      ]
+    ]
+  },
+  {
+    "name": "full duty does not remove joint protection",
+    "netLower": {},
+    "dutyBounds": {
+      "x": {
+        "lower": "1",
+        "upper": "1"
+      },
+      "y": {
+        "lower": "0",
+        "upper": "0"
+      }
+    },
+    "modes": [
+      {
+        "factory": "s",
+        "mode": "full-average-service",
+        "permanentlyAbundantInputs": [],
+        "possibleLimitingInputs": [],
+        "preserveProtectionCoupling": false
+      },
+      {
+        "factory": "x",
+        "mode": "full-average-service",
+        "permanentlyAbundantInputs": [],
+        "possibleLimitingInputs": [
+          "a",
+          "b"
+        ],
+        "preserveProtectionCoupling": true
+      },
+      {
+        "factory": "y",
+        "mode": "zero-average-service",
+        "permanentlyAbundantInputs": [],
+        "possibleLimitingInputs": [
+          "a"
+        ],
+        "preserveProtectionCoupling": false
+      }
+    ],
+    "rounds": [
+      {
+        "stage": 0,
+        "abundant": [],
+        "fullDutyAdded": []
+      }
+    ],
+    "groupsBefore": [
+      [
+        "F:s"
+      ],
+      [
+        "F:y",
+        "W:b",
+        "F:x",
+        "W:a"
+      ],
+      [
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ],
+    "groupsAfter": [
+      [
+        "F:s"
+      ],
+      [
+        "F:y",
+        "W:b",
+        "F:x",
+        "W:a"
+      ],
+      [
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ],
+    "densityOneGroups": [
+      [
+        "F:s"
+      ],
+      [
+        "W:b",
+        "F:x",
+        "W:a"
+      ],
+      [
+        "W:c"
+      ]
+    ]
+  },
+  {
+    "name": "certified surplus propagates through dependent production",
+    "netLower": {
+      "a": "1",
+      "b": "1",
+      "c": "1"
+    },
+    "dutyBounds": {
+      "x": {
+        "lower": "1",
+        "upper": "1"
+      },
+      "y": {
+        "lower": "1",
+        "upper": "1"
+      },
+      "z": {
+        "lower": "1",
+        "upper": "1"
+      }
+    },
+    "modes": [
+      {
+        "factory": "s",
+        "mode": "full-average-service",
+        "permanentlyAbundantInputs": [],
+        "possibleLimitingInputs": [],
+        "preserveProtectionCoupling": false
+      },
+      {
+        "factory": "x",
+        "mode": "full-average-service",
+        "permanentlyAbundantInputs": [
+          "a"
+        ],
+        "possibleLimitingInputs": [],
+        "preserveProtectionCoupling": false
+      },
+      {
+        "factory": "y",
+        "mode": "full-average-service",
+        "permanentlyAbundantInputs": [
+          "b"
+        ],
+        "possibleLimitingInputs": [],
+        "preserveProtectionCoupling": false
+      },
+      {
+        "factory": "z",
+        "mode": "full-average-service",
+        "permanentlyAbundantInputs": [
+          "c"
+        ],
+        "possibleLimitingInputs": [],
+        "preserveProtectionCoupling": false
+      }
+    ],
+    "rounds": [
+      {
+        "stage": 0,
+        "abundant": [
+          "a"
+        ],
+        "fullDutyAdded": [
+          "x"
+        ]
+      },
+      {
+        "stage": 1,
+        "abundant": [
+          "a",
+          "b"
+        ],
+        "fullDutyAdded": [
+          "y"
+        ]
+      },
+      {
+        "stage": 2,
+        "abundant": [
+          "a",
+          "b",
+          "c"
+        ],
+        "fullDutyAdded": [
+          "z"
+        ]
+      },
+      {
+        "stage": 3,
+        "abundant": [
+          "a",
+          "b",
+          "c"
+        ],
+        "fullDutyAdded": []
+      }
+    ],
+    "groupsBefore": [
+      [
+        "F:s"
+      ],
+      [
+        "F:x"
+      ],
+      [
+        "W:a"
+      ],
+      [
+        "F:y",
+        "W:b"
+      ],
+      [
+        "F:z",
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ],
+    "groupsAfter": [
+      [
+        "F:s"
+      ],
+      [
+        "F:x"
+      ],
+      [
+        "F:y"
+      ],
+      [
+        "F:z"
+      ],
+      [
+        "W:a"
+      ],
+      [
+        "W:b"
+      ],
+      [
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ],
+    "densityOneGroups": [
+      [
+        "F:s"
+      ],
+      [
+        "F:x"
+      ],
+      [
+        "F:y"
+      ],
+      [
+        "F:z"
+      ],
+      [
+        "W:a"
+      ],
+      [
+        "W:b"
+      ],
+      [
+        "W:c"
+      ],
+      [
+        "W:d"
+      ]
+    ]
+  }
+]

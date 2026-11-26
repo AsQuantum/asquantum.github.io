@@ -1,0 +1,249 @@
+[
+  {
+    "dt": 0.016,
+    "inbound": {
+      "合金板": 60,
+      "小行星矿石": 44.6,
+      "复合装甲板": 14.95
+    },
+    "outbound": {
+      "合金板": 59.5
+    },
+    "left": 14.95,
+    "right": 29.85,
+    "starts": 299,
+    "gaps": {
+      "4.00000": 138,
+      "4.03200": 160
+    },
+    "minLeft": 24,
+    "minRight": 24,
+    "minInput": 6,
+    "minOutput": 19,
+    "records": [
+      {
+        "time": 2.0800000000480168,
+        "gap": 0,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 6.0800000000386945,
+        "gap": 3.9999999999906777,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 10.080000000029372,
+        "gap": 3.9999999999906777,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 14.08000000002005,
+        "gap": 3.9999999999906777,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 18.080000000010727,
+        "gap": 3.9999999999906777,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 22.080000000001405,
+        "gap": 3.9999999999906777,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 26.079999999992083,
+        "gap": 3.9999999999906777,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 30.07999999998276,
+        "gap": 3.9999999999906777,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 34.07999999997344,
+        "gap": 3.9999999999906777,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 38.079999999964116,
+        "gap": 3.9999999999906777,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      }
+    ]
+  },
+  {
+    "dt": 0.047,
+    "inbound": {
+      "合金板": 60,
+      "小行星矿石": 43.5,
+      "复合装甲板": 14.5
+    },
+    "outbound": {
+      "合金板": 58
+    },
+    "left": 14.55,
+    "right": 29.05,
+    "starts": 291,
+    "gaps": {
+      "4.13600": 290
+    },
+    "minLeft": 24,
+    "minRight": 24,
+    "minInput": 6,
+    "minOutput": 19,
+    "records": [
+      {
+        "time": 0.2840000001726821,
+        "gap": 0,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 4.420000000174923,
+        "gap": 4.136000000002241,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 8.556000000177164,
+        "gap": 4.136000000002241,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 12.692000000179405,
+        "gap": 4.136000000002241,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 16.828000000181646,
+        "gap": 4.136000000002241,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 20.964000000183887,
+        "gap": 4.136000000002241,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 25.100000000186128,
+        "gap": 4.136000000002241,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 29.23600000018837,
+        "gap": 4.136000000002241,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 33.37200000019061,
+        "gap": 4.136000000002241,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      },
+      {
+        "time": 37.50800000019285,
+        "gap": 4.136000000002241,
+        "left": 24,
+        "right": 24,
+        "input": 6,
+        "out": 19,
+        "headLeft": 23,
+        "headRight": 23
+      }
+    ]
+  }
+]

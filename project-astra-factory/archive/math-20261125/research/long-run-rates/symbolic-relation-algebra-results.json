@@ -1,0 +1,309 @@
+[
+  {
+    "type": "open dynamic scanner",
+    "ports": 2,
+    "states": "32",
+    "rank": 3,
+    "columns": 10,
+    "relations": [
+      {
+        "coefficients": {
+          "send0": "1",
+          "cross0": "-1",
+          "skip0": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "send1": "1",
+          "cross1": "-1",
+          "skip1": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "cross0": "1",
+          "cross1": "-1"
+        },
+        "constant": "0"
+      }
+    ]
+  },
+  {
+    "type": "open dynamic scanner",
+    "ports": 3,
+    "states": "192",
+    "rank": 5,
+    "columns": 14,
+    "relations": [
+      {
+        "coefficients": {
+          "send0": "1",
+          "cross0": "-1",
+          "skip0": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "send1": "1",
+          "cross1": "-1",
+          "skip1": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "send2": "1",
+          "cross2": "-1",
+          "skip2": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "cross0": "1",
+          "cross2": "-1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "cross0": "-1",
+          "cross1": "1"
+        },
+        "constant": "0"
+      }
+    ]
+  },
+  {
+    "type": "open dynamic scanner",
+    "ports": 4,
+    "states": "1024",
+    "rank": 7,
+    "columns": 18,
+    "relations": [
+      {
+        "coefficients": {
+          "send0": "1",
+          "cross0": "-1",
+          "skip0": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "send1": "1",
+          "cross1": "-1",
+          "skip1": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "send2": "1",
+          "cross2": "-1",
+          "skip2": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "send3": "1",
+          "cross3": "-1",
+          "skip3": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "cross0": "1",
+          "cross3": "-1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "cross0": "-1",
+          "cross1": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "cross1": "-1",
+          "cross2": "1"
+        },
+        "constant": "0"
+      }
+    ]
+  },
+  {
+    "type": "open recipe service clock",
+    "T": 2,
+    "states": "8",
+    "rank": 2,
+    "relations": [
+      {
+        "coefficients": {
+          "start": "1",
+          "busy": "1",
+          "waitInput": "1",
+          "waitOutput": "1"
+        },
+        "constant": "1"
+      },
+      {
+        "coefficients": {
+          "start": "-1",
+          "busy": "1"
+        },
+        "constant": "0"
+      }
+    ]
+  },
+  {
+    "type": "open recipe service clock",
+    "T": 3,
+    "states": "12",
+    "rank": 2,
+    "relations": [
+      {
+        "coefficients": {
+          "start": "1",
+          "busy": "1",
+          "waitInput": "1",
+          "waitOutput": "1"
+        },
+        "constant": "1"
+      },
+      {
+        "coefficients": {
+          "start": "-1",
+          "busy": "1/2"
+        },
+        "constant": "0"
+      }
+    ]
+  },
+  {
+    "type": "open recipe service clock",
+    "T": 7,
+    "states": "28",
+    "rank": 2,
+    "relations": [
+      {
+        "coefficients": {
+          "start": "1",
+          "busy": "1",
+          "waitInput": "1",
+          "waitOutput": "1"
+        },
+        "constant": "1"
+      },
+      {
+        "coefficients": {
+          "start": "-3/2",
+          "busy": "1/4"
+        },
+        "constant": "0"
+      }
+    ]
+  },
+  {
+    "type": "open recipe service clock",
+    "T": 20,
+    "states": "80",
+    "rank": 2,
+    "relations": [
+      {
+        "coefficients": {
+          "start": "1",
+          "busy": "1",
+          "waitInput": "1",
+          "waitOutput": "1"
+        },
+        "constant": "1"
+      },
+      {
+        "coefficients": {
+          "start": "-19/16",
+          "busy": "1/16"
+        },
+        "constant": "0"
+      }
+    ]
+  },
+  {
+    "type": "initial-specific gain",
+    "mode": 0,
+    "rank": 3,
+    "relations": [
+      {
+        "coefficients": {
+          "a": "-1",
+          "b": "-1",
+          "pulse": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "a": "2",
+          "b": "2"
+        },
+        "constant": "1"
+      },
+      {
+        "coefficients": {
+          "a": "2"
+        },
+        "constant": "0"
+      }
+    ]
+  },
+  {
+    "type": "initial-specific gain",
+    "mode": 1,
+    "rank": 3,
+    "relations": [
+      {
+        "coefficients": {
+          "a": "-1",
+          "b": "-1",
+          "pulse": "1"
+        },
+        "constant": "0"
+      },
+      {
+        "coefficients": {
+          "a": "2",
+          "b": "2"
+        },
+        "constant": "1"
+      },
+      {
+        "coefficients": {
+          "a": "2"
+        },
+        "constant": "1"
+      }
+    ]
+  },
+  {
+    "type": "compositional bounded queue",
+    "result": {
+      "status": "proved-equations",
+      "rank": 2,
+      "variables": 2,
+      "free": 0,
+      "values": {
+        "send": "1/2",
+        "receive": "1/2"
+      },
+      "unresolved": []
+    }
+  }
+]

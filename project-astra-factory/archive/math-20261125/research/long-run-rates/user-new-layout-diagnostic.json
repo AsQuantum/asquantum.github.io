@@ -1,0 +1,108 @@
+{
+  "status": "partial",
+  "known": 319,
+  "unknown": 237,
+  "structuralZeros": {
+    "cycles": [
+      "M19",
+      "M20",
+      "M21",
+      "M46",
+      "M47",
+      "M48",
+      "M49",
+      "M51",
+      "M66",
+      "M67"
+    ],
+    "routes": [
+      "R33",
+      "R34",
+      "R35"
+    ],
+    "passes": 1,
+    "materialZeros": 3
+  },
+  "rows": {
+    "废金属": {
+      "inflow": "4",
+      "outflow": null,
+      "net": null,
+      "potential": null,
+      "overdraft": null,
+      "withdrawalDemand": null,
+      "localNet": null
+    },
+    "合金板": {
+      "inflow": "12/5",
+      "outflow": null,
+      "net": null,
+      "potential": null,
+      "overdraft": null,
+      "withdrawalDemand": null,
+      "localNet": null
+    },
+    "能量电池": {
+      "inflow": null,
+      "outflow": null,
+      "net": null,
+      "potential": null,
+      "overdraft": null,
+      "withdrawalDemand": null,
+      "localNet": null
+    },
+    "燃料罐": {
+      "inflow": null,
+      "outflow": "0",
+      "net": null,
+      "potential": null,
+      "overdraft": null,
+      "withdrawalDemand": "0",
+      "localNet": null
+    },
+    "齿轮组": {
+      "inflow": null,
+      "outflow": "0",
+      "net": null,
+      "potential": null,
+      "overdraft": null,
+      "withdrawalDemand": "0",
+      "localNet": null
+    },
+    "导线线圈": {
+      "inflow": null,
+      "outflow": "0",
+      "net": null,
+      "potential": null,
+      "overdraft": null,
+      "withdrawalDemand": "0",
+      "localNet": null
+    },
+    "钛合金锭": {
+      "inflow": null,
+      "outflow": "0",
+      "net": null,
+      "potential": null,
+      "overdraft": null,
+      "withdrawalDemand": "0",
+      "localNet": null
+    }
+  },
+  "rounds": [
+    {
+      "unique": 258,
+      "factors": [
+        9,
+        7
+      ]
+    },
+    {
+      "unique": 319,
+      "factors": [
+        4,
+        9
+      ]
+    }
+  ],
+  "ms": 365.422
+}

@@ -1,0 +1,198 @@
+[
+  {
+    "dx": 0,
+    "reverse": false,
+    "lengths": [
+      14,
+      14,
+      5
+    ],
+    "perMinute": {
+      "a": 60,
+      "b": 30,
+      "w": 30
+    }
+  },
+  {
+    "dx": 0,
+    "reverse": true,
+    "lengths": [
+      14,
+      14,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    }
+  },
+  {
+    "dx": 1,
+    "reverse": false,
+    "lengths": [
+      14,
+      13,
+      5
+    ],
+    "perMinute": {
+      "a": 60,
+      "b": 30,
+      "w": 30
+    }
+  },
+  {
+    "dx": 1,
+    "reverse": true,
+    "lengths": [
+      14,
+      13,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    }
+  },
+  {
+    "dx": 2,
+    "reverse": false,
+    "lengths": [
+      14,
+      12,
+      5
+    ],
+    "perMinute": {
+      "a": 60,
+      "b": 30,
+      "w": 30
+    }
+  },
+  {
+    "dx": 2,
+    "reverse": true,
+    "lengths": [
+      14,
+      12,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    }
+  },
+  {
+    "dx": 3,
+    "reverse": false,
+    "lengths": [
+      14,
+      11,
+      5
+    ],
+    "perMinute": {
+      "a": 60,
+      "b": 30,
+      "w": 30
+    }
+  },
+  {
+    "dx": 3,
+    "reverse": true,
+    "lengths": [
+      14,
+      11,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    }
+  },
+  {
+    "dx": 4,
+    "reverse": false,
+    "lengths": [
+      14,
+      10,
+      5
+    ],
+    "perMinute": {
+      "a": 60,
+      "b": 30,
+      "w": 30
+    }
+  },
+  {
+    "dx": 4,
+    "reverse": true,
+    "lengths": [
+      14,
+      10,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    }
+  },
+  {
+    "dx": 5,
+    "reverse": false,
+    "lengths": [
+      14,
+      9,
+      5
+    ],
+    "perMinute": {
+      "a": 60,
+      "b": 30,
+      "w": 30
+    }
+  },
+  {
+    "dx": 5,
+    "reverse": true,
+    "lengths": [
+      14,
+      9,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    }
+  },
+  {
+    "dx": 6,
+    "reverse": false,
+    "lengths": [
+      14,
+      8,
+      5
+    ],
+    "perMinute": {
+      "a": 60,
+      "b": 30,
+      "w": 30
+    }
+  },
+  {
+    "dx": 6,
+    "reverse": true,
+    "lengths": [
+      14,
+      8,
+      5
+    ],
+    "perMinute": {
+      "a": 30,
+      "b": 60,
+      "w": 30
+    }
+  }
+]

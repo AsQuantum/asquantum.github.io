@@ -1,0 +1,932 @@
+[
+  {
+    "v": "1",
+    "net": "1/12",
+    "unique": 66,
+    "unknown": 0,
+    "actual": {
+      "net": 0.08333333333333333,
+      "duty": 1.0000000000025655,
+      "alloy": 0.6666666666666666
+    },
+    "capacity": {
+      "route": "R2",
+      "machine": "M2",
+      "item": "小行星矿石",
+      "rate": "2/3",
+      "otherItems": [],
+      "proven": true,
+      "method": "fixed-tick-ordinal-service-capacity"
+    },
+    "stock": {
+      "item": "小行星矿石",
+      "income": "1",
+      "outflow": "11/12",
+      "net": "1/12",
+      "capacity": "11/12",
+      "proven": true,
+      "method": "aggregate-stock-work-conservation",
+      "routes": [
+        "R2"
+      ],
+      "factories": [
+        "a"
+      ]
+    },
+    "layout": {
+      "name": "blocked warehouse tree and negative frozen 1",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "垃圾",
+          "x": 2,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        },
+        {
+          "id": "M1",
+          "type": "废料",
+          "x": 11,
+          "y": 1,
+          "face": "E",
+          "mode": "标准"
+        },
+        {
+          "id": "M2",
+          "type": "仓出",
+          "x": 24,
+          "y": 10,
+          "face": "N",
+          "mode": 0,
+          "item": "小行星矿石"
+        },
+        {
+          "id": "M3",
+          "type": "冶炼",
+          "x": 28,
+          "y": 1,
+          "face": "E",
+          "mode": "合金板"
+        },
+        {
+          "id": "M4",
+          "type": "仓入",
+          "x": 43,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M1",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              4
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              10,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 0
+          },
+          "path": [
+            [
+              20,
+              4
+            ],
+            [
+              21,
+              4
+            ],
+            [
+              22,
+              4
+            ],
+            [
+              23,
+              4
+            ],
+            [
+              24,
+              4
+            ],
+            [
+              25,
+              4
+            ],
+            [
+              26,
+              4
+            ],
+            [
+              27,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              26,
+              9
+            ],
+            [
+              26,
+              8
+            ],
+            [
+              26,
+              7
+            ],
+            [
+              26,
+              6
+            ],
+            [
+              26,
+              5
+            ],
+            [
+              27,
+              5
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M4",
+            "port": 1
+          },
+          "path": [
+            [
+              37,
+              4
+            ],
+            [
+              38,
+              4
+            ],
+            [
+              39,
+              4
+            ],
+            [
+              40,
+              4
+            ],
+            [
+              41,
+              4
+            ],
+            [
+              42,
+              4
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "小行星矿石": "1"
+          }
+        },
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "小行星矿石": "-1/4",
+            "硅晶圆": "1/4"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "v": "11/12",
+    "net": "0",
+    "unique": 66,
+    "unknown": 0,
+    "actual": {
+      "net": 0,
+      "duty": 1.0000000000025269,
+      "alloy": 0.6666666666666666
+    },
+    "capacity": {
+      "route": "R2",
+      "machine": "M2",
+      "item": "小行星矿石",
+      "rate": "2/3",
+      "otherItems": [],
+      "proven": true,
+      "method": "fixed-tick-ordinal-service-capacity"
+    },
+    "stock": {
+      "item": "小行星矿石",
+      "income": "11/12",
+      "outflow": "11/12",
+      "net": "0",
+      "capacity": "11/12",
+      "proven": true,
+      "method": "aggregate-stock-work-conservation",
+      "routes": [
+        "R2"
+      ],
+      "factories": [
+        "a"
+      ]
+    },
+    "layout": {
+      "name": "blocked warehouse tree and negative frozen 11/12",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "垃圾",
+          "x": 2,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        },
+        {
+          "id": "M1",
+          "type": "废料",
+          "x": 11,
+          "y": 1,
+          "face": "E",
+          "mode": "标准"
+        },
+        {
+          "id": "M2",
+          "type": "仓出",
+          "x": 24,
+          "y": 10,
+          "face": "N",
+          "mode": 0,
+          "item": "小行星矿石"
+        },
+        {
+          "id": "M3",
+          "type": "冶炼",
+          "x": 28,
+          "y": 1,
+          "face": "E",
+          "mode": "合金板"
+        },
+        {
+          "id": "M4",
+          "type": "仓入",
+          "x": 43,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M1",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              4
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              10,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 0
+          },
+          "path": [
+            [
+              20,
+              4
+            ],
+            [
+              21,
+              4
+            ],
+            [
+              22,
+              4
+            ],
+            [
+              23,
+              4
+            ],
+            [
+              24,
+              4
+            ],
+            [
+              25,
+              4
+            ],
+            [
+              26,
+              4
+            ],
+            [
+              27,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              26,
+              9
+            ],
+            [
+              26,
+              8
+            ],
+            [
+              26,
+              7
+            ],
+            [
+              26,
+              6
+            ],
+            [
+              26,
+              5
+            ],
+            [
+              27,
+              5
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M4",
+            "port": 1
+          },
+          "path": [
+            [
+              37,
+              4
+            ],
+            [
+              38,
+              4
+            ],
+            [
+              39,
+              4
+            ],
+            [
+              40,
+              4
+            ],
+            [
+              41,
+              4
+            ],
+            [
+              42,
+              4
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "小行星矿石": "11/12"
+          }
+        },
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "小行星矿石": "-1/4",
+            "硅晶圆": "1/4"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "v": "1/2",
+    "net": "0",
+    "unique": 22,
+    "unknown": 44,
+    "actual": {
+      "net": 0,
+      "duty": 1.0000000000025642,
+      "alloy": 0.25
+    },
+    "capacity": {
+      "route": "R2",
+      "machine": "M2",
+      "item": "小行星矿石",
+      "rate": "2/3",
+      "otherItems": [],
+      "proven": true,
+      "method": "fixed-tick-ordinal-service-capacity"
+    },
+    "stock": {
+      "item": "小行星矿石",
+      "income": "1/2",
+      "outflow": "1/2",
+      "net": "0",
+      "capacity": "11/12",
+      "proven": true,
+      "method": "aggregate-stock-work-conservation",
+      "routes": [
+        "R2"
+      ],
+      "factories": [
+        "a"
+      ]
+    },
+    "layout": {
+      "name": "blocked warehouse tree and negative frozen 1/2",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "垃圾",
+          "x": 2,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        },
+        {
+          "id": "M1",
+          "type": "废料",
+          "x": 11,
+          "y": 1,
+          "face": "E",
+          "mode": "标准"
+        },
+        {
+          "id": "M2",
+          "type": "仓出",
+          "x": 24,
+          "y": 10,
+          "face": "N",
+          "mode": 0,
+          "item": "小行星矿石"
+        },
+        {
+          "id": "M3",
+          "type": "冶炼",
+          "x": 28,
+          "y": 1,
+          "face": "E",
+          "mode": "合金板"
+        },
+        {
+          "id": "M4",
+          "type": "仓入",
+          "x": 43,
+          "y": 2,
+          "face": "E",
+          "mode": 0
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M1",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              4
+            ],
+            [
+              8,
+              4
+            ],
+            [
+              9,
+              4
+            ],
+            [
+              10,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 0
+          },
+          "path": [
+            [
+              20,
+              4
+            ],
+            [
+              21,
+              4
+            ],
+            [
+              22,
+              4
+            ],
+            [
+              23,
+              4
+            ],
+            [
+              24,
+              4
+            ],
+            [
+              25,
+              4
+            ],
+            [
+              26,
+              4
+            ],
+            [
+              27,
+              4
+            ]
+          ]
+        },
+        {
+          "id": "R2",
+          "from": {
+            "id": "M2",
+            "port": 0
+          },
+          "to": {
+            "id": "M3",
+            "port": 1
+          },
+          "path": [
+            [
+              26,
+              9
+            ],
+            [
+              26,
+              8
+            ],
+            [
+              26,
+              7
+            ],
+            [
+              26,
+              6
+            ],
+            [
+              26,
+              5
+            ],
+            [
+              27,
+              5
+            ]
+          ]
+        },
+        {
+          "id": "R3",
+          "from": {
+            "id": "M3",
+            "port": 0
+          },
+          "to": {
+            "id": "M4",
+            "port": 1
+          },
+          "path": [
+            [
+              37,
+              4
+            ],
+            [
+              38,
+              4
+            ],
+            [
+              39,
+              4
+            ],
+            [
+              40,
+              4
+            ],
+            [
+              41,
+              4
+            ],
+            [
+              42,
+              4
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "s",
+          "enabled": true,
+          "rates": {
+            "小行星矿石": "1/2"
+          }
+        },
+        {
+          "id": "a",
+          "enabled": true,
+          "rates": {
+            "小行星矿石": "-1/4",
+            "硅晶圆": "1/4"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "conditionally unblocked warehouse and frozen",
+    "unique": 51,
+    "proof": {
+      "items": [
+        "废金属"
+      ],
+      "states": 208000,
+      "caps": [
+        12
+      ],
+      "thresholds": [
+        6
+      ],
+      "clockStates": 200,
+      "clockPrefix": 0,
+      "certifiedPhysicalWords": 0,
+      "cycleTicks": 200,
+      "cycleClasses": 1,
+      "duties": [
+        {
+          "factory": "negative",
+          "duty": "1/100",
+          "proven": true,
+          "method": "exact-fixed-tick-certified-frozen-component-quotient"
+        }
+      ],
+      "outlets": [
+        {
+          "machine": "M0",
+          "route": "R0",
+          "item": "废金属",
+          "conditional": true,
+          "rate": "1/2"
+        }
+      ],
+      "sourceRates": [],
+      "joint": {
+        "routes": [
+          "R0",
+          "R1"
+        ],
+        "events": 5,
+        "words": [
+          {
+            "route": "R0",
+            "prefix": 0,
+            "events": 5,
+            "period": 200
+          }
+        ]
+      }
+    },
+    "layout": {
+      "name": "conditional warehouse battery 1/2",
+      "recordIndexed": true,
+      "machines": [
+        {
+          "id": "M0",
+          "type": "仓出",
+          "x": 2,
+          "y": 9,
+          "face": "E",
+          "item": "废金属"
+        },
+        {
+          "id": "M1",
+          "type": "电池",
+          "x": 14,
+          "y": 8,
+          "face": "E",
+          "mode": "标准"
+        },
+        {
+          "id": "M2",
+          "type": "仓入",
+          "x": 28,
+          "y": 9,
+          "face": "E"
+        }
+      ],
+      "routes": [
+        {
+          "id": "R0",
+          "from": {
+            "id": "M0",
+            "port": 0
+          },
+          "to": {
+            "id": "M1",
+            "port": 0
+          },
+          "path": [
+            [
+              7,
+              11
+            ],
+            [
+              8,
+              11
+            ],
+            [
+              9,
+              11
+            ],
+            [
+              10,
+              11
+            ],
+            [
+              11,
+              11
+            ],
+            [
+              12,
+              11
+            ],
+            [
+              13,
+              11
+            ]
+          ]
+        },
+        {
+          "id": "R1",
+          "from": {
+            "id": "M1",
+            "port": 0
+          },
+          "to": {
+            "id": "M2",
+            "port": 1
+          },
+          "path": [
+            [
+              23,
+              11
+            ],
+            [
+              24,
+              11
+            ],
+            [
+              25,
+              11
+            ],
+            [
+              26,
+              11
+            ],
+            [
+              27,
+              11
+            ]
+          ]
+        }
+      ],
+      "frozenFactories": [
+        {
+          "id": "early",
+          "enabled": true,
+          "rates": {
+            "废金属": "1/5"
+          }
+        },
+        {
+          "id": "negative",
+          "enabled": true,
+          "rates": {
+            "废金属": "-20",
+            "硅晶圆": "20"
+          }
+        },
+        {
+          "id": "late",
+          "enabled": true,
+          "rates": {
+            "废金属": "1/2"
+          }
+        }
+      ]
+    }
+  }
+]

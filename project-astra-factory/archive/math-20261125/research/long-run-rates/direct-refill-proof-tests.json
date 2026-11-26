@@ -1,0 +1,11 @@
+{
+  "phaseCases": 504630,
+  "invalidCases": 13,
+  "nonGridRational": true,
+  "relayDepth": 24,
+  "branchIntervals": [
+    "3",
+    "1"
+  ],
+  "quietBatch": true
+}

@@ -1,0 +1,68 @@
+{
+  "random": {
+    "total": 100,
+    "proved": 100,
+    "resourceRefused": 0,
+    "clockDifference": 0,
+    "relabel": 100,
+    "invalidRejected": 100
+  },
+  "legal": [
+    {
+      "machines": 4,
+      "extraBeltLength": 0,
+      "rate": "1/4",
+      "actual": 0.25,
+      "scope": "exact-rational-fixed-tick"
+    },
+    {
+      "machines": 4,
+      "extraBeltLength": 1,
+      "rate": "1/4",
+      "actual": 0.25,
+      "scope": "exact-rational-fixed-tick"
+    },
+    {
+      "machines": 4,
+      "extraBeltLength": 4,
+      "rate": "1/4",
+      "actual": 0.25,
+      "scope": "exact-rational-fixed-tick"
+    },
+    {
+      "machines": 4,
+      "extraBeltLength": 7,
+      "rate": "1/4",
+      "actual": 0.25,
+      "scope": "exact-rational-fixed-tick"
+    },
+    {
+      "machines": 5,
+      "extraBeltLength": 0,
+      "rate": "2/3",
+      "actual": 0.6666666666666666,
+      "scope": "exact-rational-fixed-tick"
+    },
+    {
+      "machines": 5,
+      "extraBeltLength": 1,
+      "rate": "2/3",
+      "actual": 0.6666666666666666,
+      "scope": "exact-rational-fixed-tick"
+    },
+    {
+      "machines": 5,
+      "extraBeltLength": 4,
+      "rate": "2/3",
+      "actual": 0.6666666666666666,
+      "scope": "exact-rational-fixed-tick"
+    },
+    {
+      "machines": 5,
+      "extraBeltLength": 7,
+      "rate": "2/3",
+      "actual": 0.6666666666666666,
+      "scope": "exact-rational-fixed-tick"
+    }
+  ]
+}

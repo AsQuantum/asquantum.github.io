@@ -1,0 +1,115 @@
+{
+  "base": {
+    "proof": {
+      "duties": [
+        {
+          "factory": "consumer",
+          "duty": "3/4",
+          "proven": true,
+          "method": "protected-single-item-arrival-count",
+          "item": "钛合金锭",
+          "arrivalPeriod": "1",
+          "servicePerItem": "3/2",
+          "arrivalsPerCycle": "2",
+          "cycle": "2",
+          "consumption": "1/2"
+        }
+      ],
+      "warehouseBursts": [
+        {
+          "item": "钛合金锭",
+          "proven": true,
+          "method": "protected-single-item-residual",
+          "inflow": "1",
+          "outlets": [
+            {
+              "machine": "M8",
+              "route": "R4",
+              "rate": "1/2"
+            }
+          ]
+        }
+      ],
+      "machineRates": [],
+      "refused": []
+    },
+    "unique": 42,
+    "duty": "3/4",
+    "gear": "1/4",
+    "oldDuty": "1",
+    "oldGear": "1/6",
+    "actual": {
+      "duty": 0.7500000000012778,
+      "gear": 15,
+      "silicon": 30,
+      "physical": 30
+    }
+  },
+  "cases": [
+    {
+      "rate": "2",
+      "duty": "1/2",
+      "flow": "0"
+    },
+    {
+      "rate": "2/5",
+      "duty": "5/6",
+      "flow": "2/3"
+    },
+    {
+      "rate": "2/7",
+      "duty": "7/8",
+      "flow": "3/4"
+    },
+    {
+      "rate": "4/5",
+      "duty": "5/8",
+      "flow": "1/2"
+    }
+  ],
+  "physical": {
+    "proof": {
+      "duties": [
+        {
+          "factory": "consumer",
+          "duty": "11/15",
+          "proven": true,
+          "method": "protected-single-item-arrival-count",
+          "item": "钛合金锭",
+          "arrivalPeriod": "15/2",
+          "servicePerItem": "11",
+          "arrivalsPerCycle": "2",
+          "cycle": "15",
+          "consumption": "1/15"
+        }
+      ],
+      "warehouseBursts": [
+        {
+          "item": "钛合金锭",
+          "proven": true,
+          "method": "protected-single-item-residual",
+          "inflow": "2/15",
+          "outlets": [
+            {
+              "machine": "M8",
+              "route": "R4",
+              "rate": "1/15"
+            }
+          ]
+        }
+      ],
+      "machineRates": [
+        {
+          "machine": "M0",
+          "rate": "2/15",
+          "proven": true,
+          "method": "independent-periodic-unit-deposit"
+        }
+      ],
+      "refused": []
+    },
+    "unique": 51,
+    "gear": "1/30"
+  },
+  "rejected": 4
+}

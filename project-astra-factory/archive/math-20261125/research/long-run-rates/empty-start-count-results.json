@@ -1,0 +1,25 @@
+{
+  "emptyStartUnique": 50,
+  "priorUnknown": 20,
+  "seededUnknown": 22,
+  "unlimitedDuty": "1",
+  "actual": {
+    "sent": {},
+    "active": {
+      "a": 0,
+      "b": 0
+    }
+  },
+  "positiveReturn": {
+    "unique": 51,
+    "inflow": "4/3",
+    "outflow": "1",
+    "net": "1/3",
+    "actual": {
+      "inbound": 80,
+      "outbound": 60,
+      "sent": 60
+    }
+  },
+  "refusedInsufficientSurplus": true
+}

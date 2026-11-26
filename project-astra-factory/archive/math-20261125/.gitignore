@@ -1,0 +1,6 @@
+research/long-run-rates/vendor/
+research/long-run-rates/cvc5-wasm/
+**/__pycache__/
+*.exe
+*.dll
+*.zip

@@ -1,0 +1,574 @@
+{
+  "trees": [
+    {
+      "v": "2/5",
+      "proof": {
+        "machines": [
+          "M10",
+          "M8"
+        ],
+        "stages": [
+          {
+            "b": 1,
+            "T": 1.5,
+            "length": 4,
+            "to": null,
+            "a": 0
+          },
+          {
+            "b": 1,
+            "T": 1,
+            "length": 5,
+            "to": 0,
+            "a": 2,
+            "readyRoot": true,
+            "rootGap": "5/2"
+          }
+        ],
+        "roots": [
+          {
+            "index": 1,
+            "item": "钛合金锭",
+            "gap": "5/2",
+            "limit": "2/5",
+            "kind": "first-smooth"
+          }
+        ],
+        "timeLower": "5",
+        "timeUpper": "5",
+        "exact": true,
+        "batchCounts": [
+          1,
+          2
+        ]
+      },
+      "unique": 51,
+      "unknown": 0,
+      "actual": 12
+    },
+    {
+      "v": "9/10",
+      "proof": {
+        "machines": [
+          "M10",
+          "M8"
+        ],
+        "stages": [
+          {
+            "b": 1,
+            "T": 1.5,
+            "length": 4,
+            "to": null,
+            "a": 0
+          },
+          {
+            "b": 1,
+            "T": 1,
+            "length": 5,
+            "to": 0,
+            "a": 2,
+            "readyRoot": true,
+            "rootGap": "10/9"
+          }
+        ],
+        "roots": [
+          {
+            "index": 1,
+            "item": "钛合金锭",
+            "gap": "10/9",
+            "limit": "9/10",
+            "kind": "first-smooth"
+          }
+        ],
+        "timeLower": "20/9",
+        "timeUpper": "20/9",
+        "exact": true,
+        "batchCounts": [
+          1,
+          2
+        ]
+      },
+      "unique": 51,
+      "unknown": 0,
+      "actual": 27
+    },
+    {
+      "v": "6/5",
+      "proof": {
+        "machines": [
+          "M10",
+          "M8"
+        ],
+        "stages": [
+          {
+            "b": 1,
+            "T": 1.5,
+            "length": 4,
+            "to": null,
+            "a": 0
+          },
+          {
+            "b": 1,
+            "T": 1,
+            "length": 5,
+            "to": 0,
+            "a": 2,
+            "readyRoot": true,
+            "rootGap": "1"
+          }
+        ],
+        "roots": [
+          {
+            "index": 1,
+            "item": "钛合金锭",
+            "gap": "1",
+            "limit": "6/5",
+            "kind": "first-smooth"
+          }
+        ],
+        "timeLower": "2",
+        "timeUpper": "2",
+        "exact": true,
+        "batchCounts": [
+          1,
+          2
+        ]
+      },
+      "unique": 31,
+      "unknown": 20,
+      "actual": 30
+    },
+    {
+      "v": "2/5",
+      "multilayer": true,
+      "proof": {
+        "machines": [
+          "M3",
+          "M1",
+          "M0",
+          "M2"
+        ],
+        "stages": [
+          {
+            "b": 2,
+            "T": 2.5,
+            "length": 6,
+            "to": null,
+            "a": 0
+          },
+          {
+            "b": 2,
+            "T": 2,
+            "length": 8,
+            "to": 0,
+            "a": 2
+          },
+          {
+            "b": 3,
+            "T": 3,
+            "length": 4,
+            "to": 1,
+            "a": 3
+          },
+          {
+            "b": 1,
+            "T": 1,
+            "length": 6,
+            "to": 0,
+            "a": 2,
+            "readyRoot": true,
+            "rootGap": "5/2"
+          }
+        ],
+        "roots": [
+          {
+            "index": 3,
+            "item": "小行星矿石",
+            "gap": "5/2",
+            "limit": "2/5",
+            "kind": "first-smooth"
+          }
+        ],
+        "timeLower": "5",
+        "timeUpper": "5",
+        "exact": true,
+        "batchCounts": [
+          1,
+          1,
+          1,
+          2
+        ]
+      },
+      "unique": 59,
+      "unknown": 0,
+      "combinedUnique": 59,
+      "combinedUnknown": 0,
+      "lowerPriority": "0",
+      "actual": 24,
+      "actualLower": 0
+    },
+    {
+      "v": "4/5",
+      "multilayer": true,
+      "proof": {
+        "machines": [
+          "M3",
+          "M1",
+          "M0",
+          "M2"
+        ],
+        "stages": [
+          {
+            "b": 2,
+            "T": 2.5,
+            "length": 6,
+            "to": null,
+            "a": 0
+          },
+          {
+            "b": 2,
+            "T": 2,
+            "length": 8,
+            "to": 0,
+            "a": 2
+          },
+          {
+            "b": 3,
+            "T": 3,
+            "length": 4,
+            "to": 1,
+            "a": 3
+          },
+          {
+            "b": 1,
+            "T": 1,
+            "length": 6,
+            "to": 0,
+            "a": 2,
+            "readyRoot": true,
+            "rootGap": "5/4"
+          }
+        ],
+        "roots": [
+          {
+            "index": 3,
+            "item": "小行星矿石",
+            "gap": "5/4",
+            "limit": "4/5",
+            "kind": "first-smooth"
+          }
+        ],
+        "timeLower": "3",
+        "timeUpper": "3",
+        "exact": true,
+        "batchCounts": [
+          1,
+          1,
+          1,
+          2
+        ]
+      },
+      "unique": 45,
+      "unknown": 14,
+      "combinedUnique": 59,
+      "combinedUnknown": 0,
+      "lowerPriority": "2/15",
+      "actual": 40,
+      "actualLower": 8
+    }
+  ],
+  "envelopes": [
+    {
+      "vs": [
+        "1/5",
+        "1/3"
+      ],
+      "proof": {
+        "proven": true,
+        "item": "钛合金锭",
+        "method": "phase-independent-no-overflow-envelope",
+        "envelope": {
+          "burst": 2,
+          "rate": "8/15"
+        },
+        "inflow": "8/15",
+        "frozenSources": [
+          "s0",
+          "s1"
+        ],
+        "sourceRates": [],
+        "outlets": [
+          {
+            "machine": "M8",
+            "route": "R4",
+            "rate": "8/15"
+          },
+          {
+            "machine": "M9",
+            "route": "R5",
+            "rate": "0"
+          },
+          {
+            "machine": "M13",
+            "route": "R7",
+            "rate": "0"
+          }
+        ]
+      },
+      "unique": 52,
+      "actual": 32
+    },
+    {
+      "vs": [
+        "1/3",
+        "1/4",
+        "1/5"
+      ],
+      "proof": {
+        "proven": true,
+        "item": "钛合金锭",
+        "method": "phase-independent-no-overflow-envelope",
+        "envelope": {
+          "burst": 3,
+          "rate": "47/60"
+        },
+        "inflow": "47/60",
+        "frozenSources": [
+          "s0",
+          "s1",
+          "s2"
+        ],
+        "sourceRates": [],
+        "outlets": [
+          {
+            "machine": "M8",
+            "route": "R4",
+            "rate": "47/60"
+          },
+          {
+            "machine": "M9",
+            "route": "R5",
+            "rate": "0"
+          },
+          {
+            "machine": "M13",
+            "route": "R7",
+            "rate": "0"
+          }
+        ]
+      },
+      "unique": 53,
+      "actual": 47
+    },
+    {
+      "vs": [
+        "1/2",
+        "1/2"
+      ],
+      "proof": {
+        "proven": true,
+        "item": "钛合金锭",
+        "method": "phase-independent-no-overflow-envelope",
+        "envelope": {
+          "burst": 2,
+          "rate": "1"
+        },
+        "inflow": "1",
+        "frozenSources": [
+          "s0",
+          "s1"
+        ],
+        "sourceRates": [],
+        "outlets": [
+          {
+            "machine": "M8",
+            "route": "R4",
+            "rate": "1"
+          },
+          {
+            "machine": "M9",
+            "route": "R5",
+            "rate": "0"
+          },
+          {
+            "machine": "M13",
+            "route": "R7",
+            "rate": "0"
+          }
+        ]
+      },
+      "unique": 52,
+      "actual": 60
+    },
+    {
+      "mixed": true,
+      "proof": {
+        "proven": true,
+        "item": "钛合金锭",
+        "method": "phase-independent-no-overflow-envelope",
+        "envelope": {
+          "burst": 3,
+          "rate": "2/3"
+        },
+        "inflow": "2/3",
+        "frozenSources": [
+          "s0",
+          "s1"
+        ],
+        "sourceRates": [
+          {
+            "machine": "M0",
+            "rate": "2/15",
+            "proven": true,
+            "method": "free-autonomous-deposit"
+          }
+        ],
+        "outlets": [
+          {
+            "machine": "M8",
+            "route": "R4",
+            "rate": "2/3"
+          },
+          {
+            "machine": "M9",
+            "route": "R5",
+            "rate": "0"
+          }
+        ]
+      },
+      "unique": 54,
+      "actual": 40
+    }
+  ],
+  "returns": [
+    {
+      "v": "1/3",
+      "proof": {
+        "proven": true,
+        "item": "钛合金锭",
+        "method": "augmented-stock-aggregate-return",
+        "externalIncome": "1/3",
+        "nonreturnOutflow": "1/3",
+        "net": "0",
+        "returns": [
+          "R0"
+        ],
+        "sinks": [
+          "R1"
+        ]
+      },
+      "unique": 15,
+      "unknown": 14,
+      "actual": {
+        "in": {
+          "钛合金锭": 80
+        },
+        "out": {
+          "钛合金锭": 80
+        },
+        "sent": {
+          "M0": {
+            "钛合金锭": 60
+          },
+          "M1": {},
+          "M2": {
+            "钛合金锭": 20
+          },
+          "M3": {}
+        }
+      }
+    },
+    {
+      "v": "1",
+      "proof": {
+        "proven": true,
+        "item": "钛合金锭",
+        "method": "augmented-stock-aggregate-return",
+        "externalIncome": "1",
+        "nonreturnOutflow": "1",
+        "net": "0",
+        "returns": [
+          "R0"
+        ],
+        "sinks": [
+          "R1"
+        ]
+      },
+      "unique": 15,
+      "unknown": 14,
+      "actual": {
+        "in": {
+          "钛合金锭": 120
+        },
+        "out": {
+          "钛合金锭": 120
+        },
+        "sent": {
+          "M0": {
+            "钛合金锭": 60
+          },
+          "M1": {},
+          "M2": {
+            "钛合金锭": 60
+          },
+          "M3": {}
+        }
+      }
+    },
+    {
+      "v": "4/3",
+      "proof": {
+        "proven": true,
+        "item": "钛合金锭",
+        "method": "augmented-stock-aggregate-return",
+        "externalIncome": "4/3",
+        "nonreturnOutflow": "1",
+        "net": "1/3",
+        "returns": [
+          "R0"
+        ],
+        "sinks": [
+          "R1"
+        ]
+      },
+      "unique": 29,
+      "unknown": 0,
+      "actual": {
+        "in": {
+          "钛合金锭": 140
+        },
+        "out": {
+          "钛合金锭": 120
+        },
+        "sent": {
+          "M0": {
+            "钛合金锭": 60
+          },
+          "M1": {},
+          "M2": {
+            "钛合金锭": 60
+          },
+          "M3": {}
+        }
+      }
+    }
+  ],
+  "counterfactual": {
+    "constrained": "1/5",
+    "overdraft": "-13/5",
+    "unlimitedGear": "1/2",
+    "potential": {
+      "钛合金锭": {
+        "potential": "-13/5",
+        "withdrawalDemand": "3",
+        "method": "structurally-independent-demand"
+      },
+      "齿轮组": {
+        "potential": "1/5",
+        "withdrawalDemand": "0",
+        "method": "structurally-independent-demand"
+      }
+    },
+    "unique": 51
+  }
+}

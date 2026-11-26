@@ -67,6 +67,9 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   assert(machineTypes.every(t=>t.correctProperties&&t.editCardTitle&&t.recipeInSummary&&t.noLooseRecipe&&t.allOnRight&&t.noLegacyInputs&&
     t.leftNotSelected&&t.noDuplicateActions&&t.leftSelectionActions&&t.analysisOrder&&t.fit),'all machine types need correct compact right-side properties');
 
+  const orders=await evaluate(`(()=>{const rows=[];for(const type of Object.keys(AST1_MODE)){const m={id:'recipe-order',type,mode:defaultModeFor(type),x:12,y:15,face:'E'};state={name:'配方ID排序',machines:[m],routes:[]};theoreticalBudget=null;resetSimulation();selection={machineId:m.id};inspectorRefresh();const right=Array.from($('modeSelect').options,o=>o.value);setStampType(type);const left=Array.from($('stampMode').options,o=>o.value);rows.push({type,right,left,expected:AST1_MODE[type].map(String)});}stampType=null;updateStampControls();return rows;})()`);
+  for(const row of orders){assert.deepEqual(row.left,row.expected,row.type+' placement recipe order');assert.deepEqual(row.right,row.expected,row.type+' inspector recipe order');}
+  console.log('PASS recipe ID order',JSON.stringify(orders));
   await send('Emulation.setDeviceMetricsOverride',{width:1000,height:840,deviceScaleFactor:1,mobile:false});
   const narrow=await evaluate(`(()=>{
    const m={id:'compact',type:'分流',x:15,y:13,face:'W',outFilters:{0:'太空垃圾'}};

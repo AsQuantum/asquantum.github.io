@@ -1,0 +1,211 @@
+{
+  "graph": {
+    "status": "compiled",
+    "nodes": [
+      {
+        "id": "a",
+        "type": "recipe",
+        "recipe": {
+          "output": "A",
+          "qty": 1,
+          "seconds": 1,
+          "inputs": {}
+        },
+        "item": null
+      },
+      {
+        "id": "b",
+        "type": "recipe",
+        "recipe": {
+          "output": "A",
+          "qty": 1,
+          "seconds": 1,
+          "inputs": {}
+        },
+        "item": null
+      },
+      {
+        "id": "s",
+        "type": "分流",
+        "recipe": null,
+        "item": null
+      },
+      {
+        "id": "r",
+        "type": "recipe",
+        "recipe": {
+          "output": "B",
+          "qty": 1,
+          "seconds": 1,
+          "inputs": {
+            "A": 1
+          }
+        },
+        "item": null
+      },
+      {
+        "id": "w",
+        "type": "仓入",
+        "recipe": null,
+        "item": null
+      }
+    ],
+    "lines": [
+      {
+        "id": "trunk",
+        "from_": "a",
+        "to": "s",
+        "materials": [
+          "A"
+        ],
+        "active": true,
+        "from": "a"
+      },
+      {
+        "id": "branch",
+        "from_": "s",
+        "to": "r",
+        "materials": [
+          "A"
+        ],
+        "active": true,
+        "from": "s"
+      },
+      {
+        "id": "deposit",
+        "from_": "s",
+        "to": "w",
+        "materials": [
+          "A"
+        ],
+        "active": true,
+        "from": "s"
+      },
+      {
+        "id": "second",
+        "from_": "b",
+        "to": "r",
+        "materials": [
+          "A"
+        ],
+        "active": true,
+        "from": "b"
+      },
+      {
+        "id": "product",
+        "from_": "r",
+        "to": "w",
+        "materials": [
+          "B"
+        ],
+        "active": true,
+        "from": "r"
+      }
+    ],
+    "pools": [
+      {
+        "item": "A",
+        "order": []
+      },
+      {
+        "item": "B",
+        "order": []
+      }
+    ],
+    "frozen": [],
+    "unlimited": false
+  },
+  "result": {
+    "recipe_priority": false,
+    "status": "sat",
+    "solve_s": 0.003,
+    "variables": 51,
+    "constraints": 147,
+    "net_per_second": {
+      "A": "1",
+      "B": "1"
+    },
+    "net_per_minute": {
+      "A": "60",
+      "B": "60"
+    },
+    "flows": {
+      "trunk": {
+        "A": "1"
+      },
+      "branch": {
+        "A": "0"
+      },
+      "deposit": {
+        "A": "1"
+      },
+      "second": {
+        "A": "1"
+      },
+      "product": {
+        "B": "1"
+      }
+    },
+    "cycles": {
+      "a": "1",
+      "b": "1",
+      "r": "1"
+    },
+    "duties": {},
+    "offers": {
+      "trunk": "1",
+      "branch": "1/2",
+      "deposit": "1",
+      "second": "1",
+      "product": "1"
+    },
+    "demands": {
+      "trunk": "1",
+      "branch": "0",
+      "deposit": "1",
+      "second": "1",
+      "product": "1"
+    },
+    "projection_per_minute": {
+      "A:inflow": "60",
+      "A:outflow": "0",
+      "A:net": "60",
+      "A:potential": "60",
+      "B:inflow": "60",
+      "B:outflow": "0",
+      "B:net": "60",
+      "B:potential": "60"
+    },
+    "ledger_uniqueness": {
+      "result": "sat",
+      "seconds": 0.0,
+      "alternate": {
+        "A:inflow": "5/8",
+        "A:net": "5/8",
+        "A:potential": "5/8"
+      }
+    },
+    "cycle_uniqueness": {
+      "result": "sat",
+      "seconds": 0.0,
+      "alternate": {
+        "A:inflow": "5/8",
+        "A:net": "5/8",
+        "A:potential": "5/8"
+      }
+    },
+    "uniqueness": "sat",
+    "uniqueness_s": 0.0,
+    "different_flows": {
+      "branch": {
+        "A": "3/8"
+      },
+      "deposit": {
+        "A": "5/8"
+      },
+      "second": {
+        "A": "5/8"
+      }
+    }
+  }
+}
