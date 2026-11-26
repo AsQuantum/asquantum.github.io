@@ -35,3 +35,5 @@ A complete random phrase uses a distinct anchor/contour for each four-event melo
 Generated sequences contain a pitched event in every slot, including percussion; manual score edits may still introduce rests. The center is a static tracked-letter wordmark, with no spectrum or analyser.
 
 The playback cursor is the physical machine's cumulative successful input/output count modulo its sequence length, including transfers outside music mode. Only a real simulation reset starts those counters from zero. The ruler is a separate global reference clock; per-lane markers show actual next-event positions. Music settings are grouped in a compact disclosure.
+
+Global bar modulation is enabled by default for new or previously unset preferences. An explicitly saved disabled preference is preserved.

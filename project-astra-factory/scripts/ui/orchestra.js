@@ -5,6 +5,8 @@
  const settings=(()=>{try{const v=JSON.parse(localStorage.getItem('astra-orchestra-v1'));return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch{return {}}})();
  settings.bpm=Number.isFinite(settings.bpm)?Math.max(30,Math.min(360,settings.bpm)):120;
  settings.volume=Number.isFinite(settings.volume)?Math.max(0,Math.min(1,settings.volume)):.6;
+ // Enable shared bar modulation for new scores; respect an explicit opt-out.
+ settings.modulate=typeof settings.modulate==='boolean'?settings.modulate:true;
  const save=()=>{try{localStorage.setItem('astra-orchestra-v1',JSON.stringify(settings))}catch{}};
  const audio=createOrchestraAudio(()=>settings.bpm,()=>settings.volume);
  const wrap=canvas.closest('.canvaswrap'),root=document.createElement('section');
