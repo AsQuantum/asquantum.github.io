@@ -323,7 +323,7 @@ function drawMovingPackets(){
  const rows=beltVisualRows(),music=musicThemeActive(),now=performance.now();if(music){orchestraTheme.beginFrame(now);orchestraTheme.animate(now)}else paintBeltMotion(rows,true);
  for(const row of rows){
   const {r,g}=row,clipped=music&&orchestraTheme.clipUnderpasses(row.underpasses);
-  if(music){orchestraTheme.motion(row);orchestraTheme.gate(row,now)}
+  if(music){orchestraTheme.railPulse(row,now);orchestraTheme.motion(row,now);orchestraTheme.gate(row,now)}
   const packets=sim?.routes?.[r.id];if(!packets?.length){if(clipped)ctx.restore();continue;}
   let ahead=g.n;const smooth=music&&beltConnected(r)&&!simAdvanceBusy;
   for(const packet of packets){

@@ -241,6 +241,36 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   })()`);
   console.log('ORCH_ENDPOINT',JSON.stringify(endpoint));
   assert(endpoint.every(x=>x.visible),JSON.stringify(endpoint));
+  // Check the actual transverse tread pixel, both endpoint hits and decay.
+  const treadPulse=await evaluate(`(()=>{
+   running=false;simClockRemainder=0;orchestraTheme.active=true;orchestraTheme.tempo=120;orchestraTheme.clear();
+   const r=state.routes[0],g=beltPathGeometry(r),d=Math.floor(g.n/2)+.5,[x,y]=beltPathPoint(g,d);
+   camera={x:pix.w/2-x*80,y:pix.h/2-y*80,z:80};sim.routes[r.id]=[];beltMotionPhase.set(r.id,.5);draw();
+   const row=beltVisualRows().find(row=>row.r.id===r.id),t=performance.now()+1000;
+   const read=(dx=0,dy=0)=>Array.from(ctx.getImageData(Math.round((pix.w/2+dx*80)*pix.dpr),Math.round((pix.h/2+dy*80)*pix.dpr),1,1).data).slice(0,3);
+   const sample=time=>{
+    ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(cachedMap,0,0);
+    ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.translate(camera.x,camera.y);ctx.scale(camera.z,camera.z);
+    orchestraTheme.railPulse(row,time);orchestraTheme.motion(row,time);ctx.restore();return [read(),read(.3,-.231),read(.3,.231),read(.3,0)]
+   };
+   const same=(a,b)=>a.every((v,i)=>v===b[i]),sum=a=>a.reduce((n,v)=>n+v,0);
+   const samples=[];
+   for(const dir of ['in','out']){
+    orchestraTheme.clear();const m=machineById((dir==='in'?r.to:r.from).id),port=(dir==='in'?r.to:r.from).port;
+    const idle=sample(t);orchestraTheme.hit(m,dir,port,t+100);orchestraTheme.beginFrame(t);
+    const future=sample(t);orchestraTheme.beginFrame(t+100);const peak=sample(t+100),tail=sample(t+310),end=sample(t+600);
+    const valid=idle.every((v,i)=>same(v,future[i])&&sum(peak[i])>sum(v)+(i===0?45:12)&&sum(tail[i])>sum(v)&&sum(tail[i])<sum(peak[i])&&same(end[i],v)&&Math.max(...peak[i])<243);
+    samples.push({dir,idle,peak,tail,end,valid});
+   }
+   orchestraTheme.clear();return samples;
+  })()`);
+  console.log('ORCH_TREAD_PULSE',JSON.stringify(treadPulse));assert(treadPulse.every(x=>x.valid),JSON.stringify(treadPulse));
+  const halo=await evaluate(`(()=>{
+   const color=orchestraTheme.belt(state.routes[0]),sprite=orchestraTheme.noteHalo(color),c=sprite.getContext('2d');
+   const alpha=x=>c.getImageData(x,32,1,1).data[3],a=[32,44,52,60,63].map(alpha);
+   return {a,reused:sprite===orchestraTheme.noteHalo(color),smooth:a.every((v,i)=>i===0||v<a[i-1])};
+  })()`);
+  console.log('ORCH_NOTE_HALO',JSON.stringify(halo));assert(halo.reused&&halo.smooth&&halo.a[0]>200&&halo.a.at(-1)<10,JSON.stringify(halo));
   // Actual canvas pixels at a crossing: the later-painted route is on top.
   // Both route orders are tested, as well as the unchanged normal renderer.
   const crossing=await evaluate(`(()=>{
@@ -251,16 +281,17 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
    const op=outPort(a,0),ip=inPort(b,0),v={id:'cross-v',from:{id:a.id,port:0},to:{id:b.id,port:0},path:Array.from({length:ip.y-op.y-1},(_,i)=>[x,op.y+i+1])};
    state={...state,machines:[hm,ht,a,b],routes:[h,v]};selection=null;multiSelection=null;draft=null;beltTrim=null;
    resetSimulation();simClockRemainder=0;orchestraTheme.active=true;orchestraTheme.clear();
-   camera={x:pix.w/2-(x+.5)*40,y:pix.h/2-(y+.5)*40,z:40};
+   camera={x:Math.floor(pix.w/2)-(x+.5)*100,y:Math.floor(pix.h/2)-(y+.5)*100,z:100};
    const hp=h.path.findIndex(p=>p[0]===x&&p[1]===y)+.5,vp=v.path.findIndex(p=>p[0]===x&&p[1]===y)+.5;
    if(hp<0||vp<0||!beltConnected(v)||!beltConnected(h))return {valid:false,op,ip,hp,vp,cell};
    const pixel=(dx=0,dy=0)=>Array.from(ctx.getImageData(Math.round((camera.x+(x+.5+dx)*camera.z)*pix.dpr),Math.round((camera.y+(y+.5+dy)*camera.z)*pix.dpr),1,1).data).slice(0,3);
    const same=(a,b)=>a.every((v,i)=>v===b[i]);
    function check(lower,upper,lp,up){
-    state.routes=[lower,upper];sim.routes={[lower.id]:[],[upper.id]:[]};draw();const empty=pixel(),cuts=orchestraTheme.underpasses();
-    sim.routes[lower.id]=[{item:'太空垃圾',distance:lp}];draw(true);const hidden=pixel();
+    orchestraTheme.clear();state.routes=[lower,upper];sim.routes={[lower.id]:[],[upper.id]:[]};draw();const empty=pixel(),cuts=orchestraTheme.underpasses(),edge=lower===h?[.22,0]:[0,.22],upperRail=pixel(...edge);
+    const m=machineById(lower.from.id);orchestraTheme.hit(m,'out',lower.from.port,performance.now());
+    sim.routes[lower.id]=[{item:'太空垃圾',distance:lp}];draw(true);const hidden=pixel(),railHidden=same(upperRail,pixel(...edge)),railPixels=[upperRail,pixel(...edge)];
     sim.routes[upper.id]=[{item:'太空垃圾',distance:up}];draw(true);const visible=pixel();
-    return {cut:cuts.get(lower.id)?.length===1&&!cuts.has(upper.id),hidden:same(empty,hidden),visible:!same(hidden,visible)&&Math.min(...visible)>180};
+    return {cut:cuts.get(lower.id)?.length===1&&!cuts.has(upper.id),hidden:same(empty,hidden),railHidden,railPixels,visible:!same(hidden,visible)&&Math.min(...visible)>180};
    }
    const horizontalBelow=check(h,v,hp,vp),verticalBelow=check(v,h,vp,hp);
    state.routes=[h,v];sim.routes={[h.id]:[],[v.id]:[]};draw();
@@ -275,7 +306,7 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
    return {valid:true,horizontalBelow,verticalBelow,transverse,normalVisible};
   })()`);
   console.log('ORCH_CROSSING',JSON.stringify(crossing));
-  assert(crossing.valid&&crossing.horizontalBelow.cut&&crossing.horizontalBelow.hidden&&crossing.horizontalBelow.visible&&crossing.verticalBelow.cut&&crossing.verticalBelow.hidden&&crossing.verticalBelow.visible&&crossing.transverse&&crossing.normalVisible,JSON.stringify(crossing));
+  assert(crossing.valid&&crossing.horizontalBelow.cut&&crossing.horizontalBelow.hidden&&crossing.horizontalBelow.railHidden&&crossing.horizontalBelow.visible&&crossing.verticalBelow.cut&&crossing.verticalBelow.hidden&&crossing.verticalBelow.railHidden&&crossing.verticalBelow.visible&&crossing.transverse&&crossing.normalVisible,JSON.stringify(crossing));
   const dense=await evaluate(`(async()=>{
    const a=createOrchestraAudio(()=>120,()=>.8);if(!await a.unlock())return {ready:false};
    const events=Array.from({length:1800},(_,i)=>({id:'dense'+i,time:0.05*Math.floor(i/600),instrument:'piano',n:60+(i%3)*4,volume:.7}));

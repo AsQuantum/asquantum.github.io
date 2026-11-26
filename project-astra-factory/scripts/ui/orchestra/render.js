@@ -3,10 +3,10 @@
 // space; hit testing, transforms, edit previews and geometry stay shared.
 const orchestraTheme={
  active:false,score:null,pulses:new Map(),routePulses:new Map(),pendingHits:[],typeHits:new Map(),gateHits:new Map(),dirty:false,
- laneWidth:.50,pulseMs:580,tempo:120,
+ laneWidth:.50,pulseMs:580,tempo:120,noteHalos:new Map(),
  // Visual hierarchy: background < matte keys < colored hit accents
  // < luminous moving notes. Large surfaces must never flash white.
- lighting:{idleFill:.15,hitFill:.12,idleEdge:.72,hitEdge:.76,idleText:.87,hitText:.82},
+ lighting:{idleFill:.17,hitFill:.18,idleEdge:.80,hitEdge:.95,idleText:.94,hitText:.95},
  color(type){return this.score?.color(type)||'#809cb9'},
  belt(r){return this.color(machineById(r.from?.id)?.type)},
  port(p){return p.kind==='in'?'#82d6fb':'#f6a3e3'},
@@ -99,7 +99,7 @@ const orchestraTheme={
  },
  socket(p,energy=0,preview=false,overlay=false){
   ctx.save();ctx.strokeStyle=this.port(p);ctx.globalAlpha=overlay?.90*energy:preview?.9:.60+.40*energy;
-  ctx.lineWidth=.065+.035*energy;ctx.strokeRect(p.x+.24,p.y+.24,.52,.52);ctx.restore();
+  ctx.lineWidth=.075+.055*energy;ctx.strokeRect(p.x+.24,p.y+.24,.52,.52);ctx.restore();
  },
  indicators(m,w,h,energy=0,preview=false,overlay=false){
   const d=V[m.face||'E'],cx=m.x+w/2,cy=m.y+h/2,extent=(d[0]?w:h)/2;
@@ -129,19 +129,19 @@ const orchestraTheme={
    // Three cheap concentric strokes approximate neon bloom without
    // a per-machine blur filter or full-screen postprocessing.
    if(!selected){
-    for(const [width,alpha] of [[.42,.035],[.23,.075],[.12,.16]]){
+    for(const [width,alpha] of [[.48,.055],[.30,.12],[.17,.25]]){
      ctx.strokeStyle=color;ctx.globalAlpha=alpha*energy;ctx.lineWidth=width;ctx.stroke();
     }
    }
   }
   ctx.strokeStyle=accent;
   ctx.globalAlpha=overlay?this.lighting.hitEdge*energy:selected||preview?.9:this.lighting.idleEdge;
-  ctx.lineWidth=selected?.13:overlay?.085+.025*energy:.085;ctx.stroke();
+  ctx.lineWidth=selected?.13:overlay?.095+.055*energy:.095;ctx.stroke();
   // Four short corner brackets give the pad a distinct hit-target shape.
   // Keep them subdued until a note; no full-panel white flash.
   const edge=.17,len=Math.min(.57,mw*.18,mh*.18);
-  ctx.strokeStyle=accent;ctx.globalAlpha=overlay?.75*energy:preview?.6:.26;
-  ctx.lineWidth=overlay?.095:.06;ctx.lineCap='round';ctx.beginPath();
+  ctx.strokeStyle=accent;ctx.globalAlpha=overlay?.95*energy:preview?.6:.30;
+  ctx.lineWidth=overlay?.14:.065;ctx.lineCap='round';ctx.beginPath();
   for(const [cx,cy,sx,sy] of [[x+edge,y+edge,1,1],[x+mw-edge,y+edge,-1,1],[x+edge,y+mh-edge,1,-1],[x+mw-edge,y+mh-edge,-1,-1]]){
    ctx.moveTo(cx+sx*len,cy);ctx.lineTo(cx,cy);ctx.lineTo(cx,cy+sy*len);
   }
@@ -158,9 +158,36 @@ const orchestraTheme={
  // cell and the single note block comfortably between its two rails.
  rails(r,selected){
   const color=selected?'#f3d875':this.belt(r);ctx.save();ctx.lineJoin='round';ctx.lineCap='butt';
-  ctx.strokeStyle=color;ctx.globalAlpha=.075;ctx.lineWidth=.60;ctx.stroke();
-  ctx.globalAlpha=selected?.95:r.to?.76:.40;ctx.lineWidth=this.laneWidth;ctx.stroke();
+  ctx.strokeStyle=color;ctx.globalAlpha=.035;ctx.lineWidth=.56;ctx.stroke();
+  ctx.globalAlpha=selected?.95:r.to?.36:.24;ctx.lineWidth=this.laneWidth;ctx.stroke();
   ctx.strokeStyle='#142234';ctx.globalAlpha=1;ctx.lineWidth=.43;ctx.stroke();
+  ctx.strokeStyle=color;ctx.globalAlpha=selected?.30:r.to?.16:.10;ctx.lineWidth=.036;ctx.stroke();
+  ctx.restore();
+ },
+ // Reuse the exact static lane path, cached for the lifetime of a row.
+ // Only active, connected, unselected belts need an additional stroke.
+ routeEnergy(r,t){const at=this.routePulses.get(r.id);return at==null?0:this.envelope(t,at)},
+ railPulse(row,t){
+  const {r,connected,yellow}=row;
+  if(!connected||yellow)return;
+  const energy=this.routeEnergy(r,t);if(!energy)return;
+  if(!row.pulsePath){
+   const path=new Path2D();
+   const preview=draft?.routeId===r.id&&draft.preview?.length>=r.path.length;
+   for(let i=0;i<r.path.length;i++){
+    if(preview&&i===r.path.length-1)continue;
+    const tile=routeTile(r,i);if(!tile)continue;
+    const [x,y]=r.path[i],a=V[tile.incoming],b=V[tile.outgoing],cx=x+.5,cy=y+.5;
+    path.moveTo(cx+a[0]*.5,cy+a[1]*.5);path.lineTo(cx,cy);path.lineTo(cx+b[0]*.5,cy+b[1]*.5);
+   }
+   row.pulsePath=path;
+  }
+  ctx.save();ctx.lineJoin='round';ctx.lineCap='butt';
+  // Alpha composites with the cached .36 rail to reach about .60.
+  // Keep the footprint at .50 so crossing masks stay exact.
+  ctx.strokeStyle=this.belt(r);ctx.globalAlpha=.375*energy;ctx.lineWidth=this.laneWidth;ctx.stroke(row.pulsePath);
+  ctx.strokeStyle='#142234';ctx.globalAlpha=1;ctx.lineWidth=.43;ctx.stroke(row.pulsePath);
+  ctx.strokeStyle=this.belt(r);ctx.globalAlpha=.16+.30*energy;ctx.lineWidth=.036+.016*energy;ctx.stroke(row.pulsePath);
   ctx.restore();
  },
  // Route paint order defines the same top strand as the static scene.
@@ -188,28 +215,43 @@ const orchestraTheme={
  packetDistance(distance,ahead,end,fraction){
   return Math.max(distance,Math.min(end,ahead,distance+BELT_SPEED*Math.max(0,Math.min(SIMULATION_STEP_SECONDS,fraction))));
  },
+ // Cache one tiny soft-glow texture per instrument color. No blur
+ // filter per moving item and no second scene canvas.
+ noteHalo(color){
+  let sprite=this.noteHalos.get(color);if(sprite)return sprite;
+  sprite=document.createElement('canvas');sprite.width=sprite.height=64;
+  const c=sprite.getContext('2d'),g=c.createRadialGradient(32,32,0,32,32,32);
+  for(const [stop,alpha] of [[0,.92],[.28,.85],[.48,.56],[.68,.24],[.85,.07],[1,0]])g.addColorStop(stop,hexAlpha(color,alpha));
+  c.fillStyle=g;c.fillRect(0,0,64,64);this.noteHalos.set(color,sprite);return sprite;
+ },
  packet(r,x,y){
   const color=this.belt(r);ctx.save();ctx.translate(x,y);
-  // Axis-aligned luminous square, scaled to the half-cell lane.
-  // One colored note with a soft surrounding halo and luminous core.
-  ctx.fillStyle=color;ctx.globalAlpha=.20;ctx.fillRect(-.245,-.245,.49,.49);
-  ctx.globalAlpha=.40;ctx.fillRect(-.18,-.18,.36,.36);
-  ctx.globalAlpha=1;ctx.fillRect(-.13,-.13,.26,.26);
-  ctx.fillStyle='#f3fbff';ctx.globalAlpha=1;ctx.fillRect(-.065,-.065,.13,.13);
+  // A square emitter inside a smoothly fading halo. The white center
+  // remains square and opaque even when crossing machine hit overlays.
+  ctx.globalAlpha=1;ctx.drawImage(this.noteHalo(color),-.36,-.36,.72,.72);
+  ctx.fillStyle=color;ctx.fillRect(-.155,-.155,.31,.31);
+  ctx.fillStyle='#f3fbff';ctx.fillRect(-.09,-.09,.18,.18);
   ctx.restore();
  },
- motion(row){
+ // The moving transverse marks are the belt's rhythm display.
+ // Accent them on either endpoint's scheduled note, without changing
+ // the lane footprint or competing with the luminous packet core.
+ motion(row,t=performance.now()){
   const {r,g,connected}=row;if(!connected)return;
   ctx.save();ctx.lineCap='butt';
-  const phase=beltMotionPhase.get(r.id)??.5,color=this.belt(r),hit=this.routePulses.get(r.id),pulse=hit==null?0:this.envelope(performance.now(),hit);
-  ctx.strokeStyle=color;ctx.globalAlpha=.30+pulse*.08;ctx.lineWidth=.045+pulse*.012;
+  const phase=beltMotionPhase.get(r.id)??.5,color=this.belt(r),pulse=this.routeEnergy(r,t);
+  ctx.strokeStyle=color;
+  const half=.15+.025*pulse;
   ctx.beginPath();
   for(let d=phase%1;d<g.n;d+=1){
-   const [x,y,dx,dy]=beltTreadPoint(g,d),w=.15;
+   const [x,y,dx,dy]=beltTreadPoint(g,d);
    if(x*camera.z+camera.x< -2||y*camera.z+camera.y< -2||x*camera.z+camera.x>pix.w+2||y*camera.z+camera.y>pix.h+2)continue;
-   ctx.moveTo(x-dy*w,y+dx*w);ctx.lineTo(x+dy*w,y-dx*w);
+   ctx.moveTo(x-dy*half,y+dx*half);ctx.lineTo(x+dy*half,y-dx*half);
   }
-  ctx.stroke();ctx.restore();
+  if(pulse>0){
+   ctx.globalAlpha=.07*pulse;ctx.lineWidth=.145;ctx.stroke();
+  }
+  ctx.globalAlpha=.28+pulse*.29;ctx.lineWidth=.045+pulse*.035;ctx.stroke();ctx.restore();
  },
  gate(row,t){
   const {r,g,connected}=row;if(!connected)return;
@@ -223,12 +265,12 @@ const orchestraTheme={
    ctx.strokeStyle=color;ctx.lineWidth=.065;ctx.globalAlpha=.32;
    ctx.beginPath();ctx.moveTo(x-dy*w,y+dx*w);ctx.lineTo(x+dy*w,y-dx*w);ctx.stroke();
    if(energy>0){
-    ctx.globalAlpha=.20*energy;ctx.lineWidth=.23;ctx.stroke();
-    ctx.globalAlpha=.88*energy;ctx.lineWidth=.085;ctx.stroke();
+    ctx.globalAlpha=.27*energy;ctx.lineWidth=.25;ctx.stroke();
+    ctx.globalAlpha=.95*energy;ctx.lineWidth=.115;ctx.stroke();
     // Travel a short distance away from the receptor as a hit echo.
     const offset=(1-energy)*.65,d2=Math.max(0,Math.min(g.n,d+(dir==='out'?offset:-offset)));
     const [xx,yy,ux,uy]=beltTreadPoint(g,d2);
-    ctx.globalAlpha=.48*energy;ctx.lineWidth=.045;ctx.beginPath();
+    ctx.globalAlpha=.58*energy;ctx.lineWidth=.065;ctx.beginPath();
     ctx.moveTo(xx-uy*w,yy+ux*w);ctx.lineTo(xx+uy*w,yy-ux*w);ctx.stroke();
    }
   }
@@ -253,10 +295,10 @@ const orchestraTheme={
     const a=ports.get(v.dir+':'+v.index),p=getPorts(m).find(p=>p.kind===v.dir&&p.index===v.index);
     if(!p)continue;
     const x=p.x+.5,y=p.y+.5,u=1-a;
-    ctx.strokeStyle=this.port(p);ctx.globalAlpha=.92*a;ctx.lineWidth=.12;const radius=.39+u*.46;ctx.beginPath();ctx.roundRect(x-radius,y-radius,radius*2,radius*2,.09+u*.13);ctx.stroke();
-    ctx.globalAlpha=.13*a;ctx.lineWidth=.20;ctx.stroke();
-    ctx.fillStyle=this.port(p);ctx.globalAlpha=.88*a;ctx.fillRect(x-.16,y-.16,.32,.32);
-    ctx.fillStyle='#e4f2ff';ctx.globalAlpha=.64*a;ctx.fillRect(x-.075,y-.075,.15,.15);
+    ctx.strokeStyle=this.port(p);ctx.globalAlpha=.97*a;ctx.lineWidth=.15;const radius=.42+u*.46;ctx.beginPath();ctx.roundRect(x-radius,y-radius,radius*2,radius*2,.09+u*.13);ctx.stroke();
+    ctx.globalAlpha=.24*a;ctx.lineWidth=.27;ctx.stroke();
+    ctx.fillStyle=this.port(p);ctx.globalAlpha=.95*a;ctx.fillRect(x-.18,y-.18,.36,.36);
+    ctx.fillStyle='#e4f2ff';ctx.globalAlpha=.75*a;ctx.fillRect(x-.085,y-.085,.17,.17);
    }
    ctx.restore();
   }
