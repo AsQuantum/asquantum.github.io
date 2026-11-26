@@ -41,8 +41,11 @@ node tests/run-tests.js current
 | 仓库竞争、冻结、条件日历、异常隔离 | boundary-pressure.test.js、components.test.js、causal-calendar.test.js |
 | 自主源、生产树、断头及解析拒证 | components.test.js、tree-events.test.js |
 | 历史布局及合法变体 | historical-optimization.test.js，50布局3933已证率、24变体1440状态 |
+| 音乐彩蛋、共用地图和实际模拟、运行中编辑/复制、8拍随机乐谱、实际混音输出 | orchestra-browser.test.js（--wide、--file --mobile） |
 | 浏览器缓存、编辑、后台、进度 | iteration-worker-browser.test.js；可加 --file --user84、--compare-parallel、--compare-device、--resonance（独立组件缓存） |
 | 冻结、惰性运输及实际快进基准 | tools/iteration/benchmark-frozen-lattice.js、benchmark-lazy-belts.js、benchmark-actual-belts.js、benchmark-simulation.js |
 | 84机研究对比 | tools/iteration/probe-user-84.js，--clock-single [--absolute]、--belts、--frozen、--no-project、--output、--feed --tree-calendar |
 
 测试与研究结果统一维护在 docs/iterative-rate-model.md 的相应主题和验收表。不能将有限预算未完成或未经证明的率填为零，不得降低历史覆盖基线掩盖回归。
+
+- orchestra-unit：和声随机、音符游标周期、同 tick 混音与理论周期投影。音乐模式端到端测试包含在 ui 中。

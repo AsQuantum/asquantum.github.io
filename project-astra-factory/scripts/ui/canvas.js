@@ -1,5 +1,6 @@
 'use strict';
-const makeColor=m=>DEF[m.type]?.color||'#8796ac';
+const musicThemeActive=()=>typeof orchestraTheme!=='undefined'&&orchestraTheme.active;
+const makeColor=m=>musicThemeActive()?orchestraTheme.color(m.type):DEF[m.type]?.color||'#8796ac';
 // An output linked to an open belt does not yet reach any receiving machine.
 function machineOutputWarning(m){
  const ports=getPorts(m).filter(p=>p.kind==='out');
@@ -37,6 +38,7 @@ function machineHintLayout(hints,w,h,z){
 let cachedMap=null,cachedMapCtx=null,staticReady=false,frameLastPaint=0;
 // Input/output ports are transparent squares: blue for input, orange for output.
 function paintPortSocket(port,labelMasks=null){
+ if(musicThemeActive()){orchestraTheme.socket(port,0,true);return}
  ctx.save();
  const x=port.x+.10,y=port.y+.10,w=.8,h=.8;
  // The original port square is always drawn in full, with a transparent
@@ -72,7 +74,7 @@ function paintPortSocket(port,labelMasks=null){
 // Preview machines share the identical port appearance with placed machines.
 function paintPreviewPorts(m){
  ctx.save();ctx.globalAlpha=1;
- const [w,h]=dims(m),labelMasks=typeof machineMaterialTextBounds==='function'?machineMaterialTextBounds(m,w,h):null;
+ const [w,h]=dims(m),labelMasks=!musicThemeActive()&&typeof machineMaterialTextBounds==='function'?machineMaterialTextBounds(m,w,h):null;
  for(const port of getPorts(m))paintPortSocket(port,labelMasks);
  ctx.restore();
 }
@@ -82,6 +84,7 @@ function paintPreviewPorts(m){
 // Control panel: pale-blue 2-cell bar directly on the relevant edge,
 // with 1.5x the original .14-cell thickness (.21 cell).
 function paintMachineIndicators(m,w,h){
+ if(musicThemeActive()){orchestraTheme.indicators(m,w,h,0,true);return}
  const front=m.face||'E',cx=m.x+w/2,cy=m.y+h/2,d=V[front];
  const normalExtent=(d[0]?w:h)/2,tx=-d[1],ty=d[0];
  // World-space lines used to become subpixel strokes when zoomed out.
@@ -111,21 +114,23 @@ function paintMachineIndicators(m,w,h){
 // Never gate machine text on zoom. Canvas will clip naturally at the physical
 // pixel limit, but a zoom threshold must never replace the full name/recipe.
 function paintMachineTextAtZoom(m,w,h,z,preview=false,topInset=0){
- paintMachineText(m,w,h,preview,topInset);
+ if(musicThemeActive())orchestraTheme.text(m,w,h,0,preview);else paintMachineText(m,w,h,preview,topInset);
 }
 function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRect(0,0,pix.w,pix.h);ctx.fillStyle='#0c1622';ctx.fillRect(0,0,pix.w,pix.h);ctx.save();ctx.translate(camera.x,camera.y);ctx.scale(camera.z,camera.z);const z=camera.z;
- ctx.fillStyle='#142434';ctx.fillRect(0,0,72,72);ctx.fillStyle='#344255';ctx.fillRect(CENTER.x,CENTER.y,CENTER.w,CENTER.h);
+ ctx.fillStyle='#142434';ctx.fillRect(0,0,72,72);ctx.fillStyle='#25364a';ctx.fillRect(CENTER.x,CENTER.y,CENTER.w,CENTER.h);
 
- if(z>5){ctx.lineWidth=.03;ctx.strokeStyle='rgba(175,212,232,.12)';ctx.beginPath();for(let x=0;x<=72;x++){ctx.moveTo(x,0);ctx.lineTo(x,72);}for(let y=0;y<=72;y++){ctx.moveTo(0,y);ctx.lineTo(72,y);}ctx.stroke();}
+ if(z>5){ctx.lineWidth=.03;ctx.strokeStyle='rgba(175,212,232,.10)';ctx.beginPath();for(let x=0;x<=72;x++){ctx.moveTo(x,0);ctx.lineTo(x,72);}for(let y=0;y<=72;y++){ctx.moveTo(0,y);ctx.lineTo(72,y);}ctx.stroke();}
+ if(musicThemeActive())orchestraTheme.centerLabel();
  // roads first; same-cell independent cross strands
  const occupancy=new Map();for(let r of state.routes)for(let i=0;i<r.path.length;i++){const key=r.path[i].join(',');const ar=occupancy.get(key)||[];ar.push({r,i});occupancy.set(key,ar);}
+ const musicUnderpasses=musicThemeActive()?orchestraTheme.underpasses(occupancy):null;
  // A belt is an oriented tile, not a polyline between tile centers.
  // Its two arms reach the TILE EDGES, including the first and final belt cells.
  // No extra line is drawn inside machine ports.
  for(let r of state.routes){
   let selected=selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id)||
   draft?.routeId===r.id||beltTrim?.routeId===r.id;
-  ctx.strokeStyle=selected?'#f3d875':r.to?'#50e0a0':'#f2bf4b';ctx.lineWidth=selected?.44:.32;
+  const music=musicThemeActive(),clipped=music&&orchestraTheme.clipUnderpasses(musicUnderpasses.get(r.id));ctx.strokeStyle=selected?'#f3d875':music?orchestraTheme.belt(r):r.to?'#43b68b':'#d2a94b';ctx.lineWidth=selected?.44:.32;
   ctx.lineCap='butt';ctx.lineJoin='round';ctx.beginPath();
   const previewReplacesEnd=draft?.routeId===r.id&&draft.preview?.length>=r.path.length;
   for(let i=0;i<r.path.length;i++){
@@ -139,12 +144,13 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
    ctx.lineTo(cx,cy);
    ctx.lineTo(cx+vout[0]*.5,cy+vout[1]*.5);
   }
-  ctx.stroke();
+  if(music)orchestraTheme.rails(r,selected);else ctx.stroke();if(clipped)ctx.restore();
  }
  // A crossing contains two independent straight belts. Use only a dark X
  // connecting the four corners of their overlapping belt-width square.
  // This is STATIC map artwork and is always painted UNDER moving item dots.
- for(const entries of occupancy.values())if(entries.length===2){
+ // Music mode instead clips the lower strand at the actual upper lane.
+ if(!musicThemeActive())for(const entries of occupancy.values())if(entries.length===2){
   const vertical=entries.find(a=>orientation(a.r,a.i)==='V');
   const horizontal=entries.find(a=>orientation(a.r,a.i)==='H');
   if(!vertical||!horizontal)continue;
@@ -172,9 +178,16 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
   }
  }
  const placement=typeof machinePlacementIssues==='function'?machinePlacementIssues():null;
- for(let m of state.machines){let[w,h]=dims(m),c=makeColor(m);ctx.fillStyle=hexAlpha(c,.18);ctx.fillRect(m.x+.08,m.y+.08,w-.16,h-.16);ctx.lineWidth=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id)) ? .29 : .14;ctx.strokeStyle=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id))?'#f5dc77':c;ctx.strokeRect(m.x+.08,m.y+.08,w-.16,h-.16);
+ for(let m of state.machines){let[w,h]=dims(m),c=makeColor(m);
+ if(musicThemeActive()){
+  const selected=selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id);
+  orchestraTheme.machine(m,w,h,{selected,warn:selected&&!!placement?.geometryIds?.has(m.id)});
+  if(draft?.from.id===m.id){const p=getPorts(m).find(p=>p.kind==='out'&&p.index===draft.from.port);if(p)orchestraTheme.socket(p,1)}
+  continue;
+ }
+ ctx.fillStyle=hexAlpha(c,.15);ctx.fillRect(m.x+.08,m.y+.08,w-.16,h-.16);ctx.lineWidth=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id)) ? .29 : .14;ctx.strokeStyle=(selection?.machineId===m.id||multiSelection?.machineIds.includes(m.id))?'#f5dc77':c;ctx.strokeRect(m.x+.08,m.y+.08,w-.16,h-.16);
  const hints=machineWarningHints(m,placement),hintLayout=machineHintLayout(hints,w,h,z);
- const ports=getPorts(m),labelMasks=typeof machineMaterialTextBounds==='function'?machineMaterialTextBounds(m,w,h,hintLayout.inset):null;
+ const ports=getPorts(m),labelMasks=!musicThemeActive()&&typeof machineMaterialTextBounds==='function'?machineMaterialTextBounds(m,w,h,hintLayout.inset):null;
   for(let p of ports){paintPortSocket(p,labelMasks);if(draft&&draft.from.id===m.id&&draft.from.port===p.index&&p.kind==='out'){ctx.strokeStyle='#ffee88';ctx.lineWidth=.17;ctx.strokeRect(p.x-.06,p.y-.06,1.12,1.12);}}
  // Compositing order: socket squares < always-visible facing/panel marks < text.
  paintMachineIndicators(m,w,h);
@@ -188,10 +201,10 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  }
  // Machine port squares already indicate the contacts. Never add a separate green port stub.
  // The belt shape in its first outer cell already starts at the appropriate grid edge.
- if(stampType&&hoverCell){let d=DEF[stampType],m=getStampMachine(hoverCell.x,hoverCell.y),[w,h]=dims(m),ok=canPlace(m),warn=ok&&placementPortWarningCount(m)>0;ctx.fillStyle=ok?(warn?'#f3d87540':'#4ce4a34b'):'#fe547755';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?(warn?'#f3d875':'#6ef5b0'):'#ff8f91';ctx.lineWidth=.2;ctx.strokeRect(m.x,m.y,w,h);
+ if(stampType&&hoverCell){let d=DEF[stampType],m=getStampMachine(hoverCell.x,hoverCell.y),[w,h]=dims(m),ok=canPlace(m),warn=ok&&placementPortWarningCount(m)>0;if(musicThemeActive())orchestraTheme.machine(m,w,h,{preview:true,valid:ok,warn});else{ctx.fillStyle=ok?(warn?'#f3d87540':musicThemeActive()?hexAlpha(makeColor(m),.3):'#4ce4a34b'):'#fe547755';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?(warn?'#f3d875':musicThemeActive()?makeColor(m):'#6ef5b0'):'#ff8f91';ctx.lineWidth=.2;ctx.strokeRect(m.x,m.y,w,h);
  paintPreviewPorts(m);
  paintMachineIndicators(m,w,h);
- paintMachineTextAtZoom(m,w,h,z,true);}
+ paintMachineTextAtZoom(m,w,h,z,true);}}
  if(draft){let locked=draft.path||[],all=draft.preview||locked;
  let startMachine=machineById(draft.from.id),startPort=startMachine&&outPort(startMachine,draft.from.port);
  const drawCells=(pts,color,dashed,startIndex=0,to=null,endIndex=pts.length)=>{
@@ -223,7 +236,7 @@ function drawStaticScene(){ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);ctx.clearRe
  if(!persisted&&!draft.preview)drawCells(locked,'#f2bf4b',false);
  }
  if(marquee){const m=marquee,a=m.fromWorld||m.from,b=m.toWorld||m.to,x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),w=Math.abs(b.x-a.x),h=Math.abs(b.y-a.y);ctx.fillStyle='rgba(110,180,240,.13)';ctx.fillRect(x,y,w,h);ctx.lineWidth=.16;ctx.strokeStyle='#8dcfff';ctx.setLineDash([.45,.25]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);}
- if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?'#8af7c1':'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=r.to&&plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);ctx.fillStyle=ok?(plan.blockedPortsAdded?'rgba(243,216,117,.25)':'rgba(76,228,163,.3)'):'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?(plan.blockedPortsAdded?'#f3d875':'#6ef5b0'):'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
+ if(groupTransform?.plan){const plan=groupTransform.plan,ok=plan.valid;ctx.save();ctx.globalAlpha=.7;for(const r of plan.routes){ctx.strokeStyle=ok?(musicThemeActive()?orchestraTheme.color(plan.machines.find(m=>m.id===r.from.id)?.type):'#8af7c1'):'#ff828e';ctx.lineWidth=.32;ctx.beginPath();const a=plan.machines.find(m=>m.id===r.from.id),b=r.to&&plan.machines.find(m=>m.id===r.to.id),src=a&&outPort(a,r.from.port),dst=r.to?(b&&inPort(b,r.to.port)):openRouteVirtualEnd(r.path,src);if(!src||!dst)continue;for(let i=0;i<r.path.length;i++){const t=tileShape(r.path,i,src,dst);if(!t)continue;const [x,y]=r.path[i];ctx.moveTo(x+.5+V[t.incoming][0]*.5,y+.5+V[t.incoming][1]*.5);ctx.lineTo(x+.5,y+.5);ctx.lineTo(x+.5+V[t.outgoing][0]*.5,y+.5+V[t.outgoing][1]*.5);}ctx.stroke();}for(const m of plan.machines){const [w,h]=dims(m);if(musicThemeActive()){orchestraTheme.machine(m,w,h,{preview:true,valid:ok,warn:!!plan.blockedPortsAdded});continue}ctx.fillStyle=ok?(plan.blockedPortsAdded?'rgba(243,216,117,.25)':musicThemeActive()?hexAlpha(makeColor(m),.3):'rgba(76,228,163,.3)'):'rgba(254,84,119,.35)';ctx.fillRect(m.x,m.y,w,h);ctx.strokeStyle=ok?(plan.blockedPortsAdded?'#f3d875':musicThemeActive()?makeColor(m):'#6ef5b0'):'#ff8f91';ctx.lineWidth=.23;ctx.strokeRect(m.x,m.y,w,h);paintPreviewPorts(m);paintMachineIndicators(m,w,h);paintMachineTextAtZoom(m,w,h,z,true);}ctx.restore();}
  ctx.strokeStyle='#637991';ctx.lineWidth=.1;ctx.strokeRect(0,0,72,72);ctx.restore();$('beltText').textContent=`${getBeltCount()}格传送带`;}
 // Visual-only belt tread phase, in meters. The simulation counters and
 // physical packet movement remain independent of this display clock.
@@ -232,12 +245,12 @@ const beltMotionPhase=new Map();
 // tile centerline and its incoming/outgoing tangents as compact arrays.
 let beltVisualCache=null;
 function buildBeltVisualCache(){
- const rows=[];
+ const rows=[],cuts=musicThemeActive()?orchestraTheme.underpasses():null;
  for(const r of state.routes){
   const g=beltPathGeometry(r);if(!g)continue;
   const connected=beltConnected(r),selected=selection?.routeId===r.id||multiSelection?.routeIds.includes(r.id)||draft?.routeId===r.id||beltTrim?.routeId===r.id;
   const tiles=g.path.map(([x,y],i)=>{const prev=g.path[i-1],next=g.path[i+1],ax=prev?x-prev[0]:g.sx,ay=prev?y-prev[1]:g.sy,bx=next?next[0]-x:g.tx,by=next?next[1]-y:g.ty;return [x+.5,y+.5,ax,ay,bx,by,ax*by-ay*bx];});
-  rows.push({r,g,tiles,connected,yellow:!connected||selected});
+  rows.push({r,g,tiles,connected,yellow:!connected||selected,underpasses:cuts?.get(r.id)});
  }
  return {layout:state,routes:state.routes,rows};
 }
@@ -248,11 +261,11 @@ function resetBeltMotionClock(){beltMotionLast=null;beltMotionSimLast=simTime;}
 function advanceBeltMotion(t){
  if(simAdvanceBusy){resetBeltMotionClock();return false;}
  const realElapsed=beltMotionLast===null?0:Math.min(.12,Math.max(0,(t-beltMotionLast)/1000));beltMotionLast=t;
- const now=simTime,simElapsed=beltMotionSimLast===null?0:Math.max(0,now-beltMotionSimLast);
+ const music=musicThemeActive(),now=simTime+(music?simClockRemainder:0),simElapsed=beltMotionSimLast===null?0:Math.max(0,now-beltMotionSimLast);
  beltMotionSimLast=now;
  // During actual simulation, use the same completed game-time steps as
  // packets, not a second wall clock. Before running, retain idle preview.
- const elapsed=running?simElapsed:realElapsed;
+ const elapsed=running?simElapsed:music?0:realElapsed;
  let dirty=false;const live=new Set();
  for(const r of state.routes){
   if(!beltConnected(r))continue;
@@ -260,7 +273,7 @@ function advanceBeltMotion(t){
   const old=beltMotionPhase.get(r.id)??.5;
   // A seven-tread repeat avoids the whole pattern appearing stationary
   // when high-speed playback advances an integer number of meters per paint.
-  const phase=beltFullyBlocked(r,sim?.routes?.[r.id])?old:(old+elapsed*BELT_SPEED)%7;
+  const phase=beltFullyBlocked(r,sim?.routes?.[r.id])?old:(old+elapsed*BELT_SPEED)%(music?21:7);
   if(phase!==old)dirty=true;
   beltMotionPhase.set(r.id,phase);
  }
@@ -307,13 +320,18 @@ function paintBeltMotion(rows=beltVisualRows(),clipViewport=false){
 function drawMovingPackets(){
  ctx.save();ctx.setTransform(pix.dpr,0,0,pix.dpr,0,0);
  ctx.translate(camera.x,camera.y);ctx.scale(camera.z,camera.z);
- const rows=beltVisualRows();paintBeltMotion(rows,true);
- for(const {r,g} of rows){
-  const packets=sim?.routes?.[r.id];if(!packets?.length)continue;
+ const rows=beltVisualRows(),music=musicThemeActive(),now=performance.now();if(music){orchestraTheme.beginFrame(now);orchestraTheme.animate(now)}else paintBeltMotion(rows,true);
+ for(const row of rows){
+  const {r,g}=row,clipped=music&&orchestraTheme.clipUnderpasses(row.underpasses);
+  if(music){orchestraTheme.motion(row);orchestraTheme.gate(row,now)}
+  const packets=sim?.routes?.[r.id];if(!packets?.length){if(clipped)ctx.restore();continue;}
+  let ahead=g.n;const smooth=music&&beltConnected(r)&&!simAdvanceBusy;
   for(const packet of packets){
-   const xy=beltPathPoint(g,packet.distance);
-   ctx.fillStyle=materialColor(packet.item);ctx.beginPath();ctx.arc(xy[0],xy[1],.25,0,2*Math.PI);ctx.fill();
+   const distance=smooth?orchestraTheme.packetDistance(packet.distance,ahead,g.n,simClockRemainder):packet.distance;
+   ahead=distance-ITEM_SPACING;const xy=beltPathPoint(g,distance);
+   if(music)orchestraTheme.packet(r,xy[0],xy[1]);else{ctx.fillStyle=materialColor(packet.item);ctx.beginPath();ctx.arc(xy[0],xy[1],.25,0,2*Math.PI);ctx.fill()}
   }
+  if(clipped)ctx.restore();
  }
  ctx.restore();
 }

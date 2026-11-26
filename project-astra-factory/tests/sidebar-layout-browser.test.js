@@ -112,7 +112,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
     [...left.querySelectorAll(':scope > h3')].find(x=>x.textContent.trim()==='机器库'),
     rules.querySelector(':scope > summary'),
     right.querySelector(':scope > .warehouse-panel > summary'),
-    right.querySelector(':scope > h3'),
+    right.querySelector(':scope > #inspectorPanel > summary'),
     right.querySelector(':scope > #auditPanel > summary'),
     right.querySelector(':scope > #logsPanel > summary')
    ];
@@ -125,8 +125,8 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
    const libraryScroll=document.querySelector('.machine-library-scroll');
    libraryScroll.scrollTop=libraryScroll.scrollHeight;
    const rulesRect=rules.getBoundingClientRect(),leftRect=left.getBoundingClientRect();
-   return {styles,propertyDivider:getComputedStyle(right.querySelector(':scope > h3')).borderTopStyle==='solid'&&
-    getComputedStyle(right.querySelector(':scope > h3')).borderTopWidth==='1px',
+   return {styles,defaultDisclosure:[...right.querySelectorAll(":scope > details")].map(d=>[d.id,d.open]),propertyDivider:getComputedStyle(right.querySelector(':scope > #inspectorPanel')).borderTopStyle==='solid'&&
+    getComputedStyle(right.querySelector(':scope > #inspectorPanel')).borderTopWidth==='1px',
     machineDivider:getComputedStyle(labels[1]).borderTopWidth==='1px',
     rulesDivider:getComputedStyle(rules).borderTopWidth==='1px',
     rulesVisible:rulesRect.top>=leftRect.top&&rulesRect.bottom<=leftRect.bottom,
@@ -136,6 +136,7 @@ async function poll(f){for(let i=0;i<120;i++){try{const v=await f();if(v)return 
   console.log('UNIFIED MAIN HEADINGS',JSON.stringify(headings));
   assert(headings.styles.length===7&&headings.styles.every(h=>h.visible&&h.fontSize===15&&
    h.weight===700&&h.color==='rgb(213, 229, 241)'),'main left/right sidebar headings must share the same typography');
+  assert.deepEqual(headings.defaultDisclosure,[['warehousePanel',false],['inspectorPanel',true],['auditPanel',false],['logsPanel',false]]);
   assert(headings.propertyDivider&&headings.machineDivider&&headings.rulesDivider,
    'Property Editing and left sections need a consistent top separator');
   assert(headings.rulesVisible&&headings.rulesOutsideScroll&&headings.rulesStillVisibleAfterListScroll,

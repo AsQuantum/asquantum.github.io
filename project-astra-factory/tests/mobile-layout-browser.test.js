@@ -166,7 +166,7 @@ async function poll(fn){for(let i=0;i<120;i++){try{const v=await fn();if(v)retur
    return{...a,warehouse:{view:document.querySelector('.main').dataset.mobileView,
     open:document.querySelector('#warehousePanel').open,
     warehouseDisplay:getComputedStyle(document.querySelector('#warehousePanel')).display,
-    inspectorHidden:getComputedStyle(document.querySelector('#inspector')).display}};
+    inspectorHidden:getComputedStyle(document.querySelector('#inspectorPanel')).display}};
   })()`);
   console.log('MOBILE RIGHT PANES',JSON.stringify(pane));
   assert.equal(pane.right,'block');assert.equal(pane.warehouseHidden,'none');

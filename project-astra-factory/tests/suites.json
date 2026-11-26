@@ -89,7 +89,15 @@
       "tests/standalone-web-app.test.js",
       "tests/startup-browser.test.js",
       "tests/stock-chart-browser.test.js",
-      "tests/window-motion-browser.test.js"
+      "tests/window-motion-browser.test.js",
+      "tests/orchestra-browser.test.js",
+      {
+        "file": "tests/orchestra-browser.test.js",
+        "args": [
+          "--file",
+          "--mobile"
+        ]
+      }
     ],
     "iteration-unit": [
       "tests/iteration/period-candidate.test.js",
@@ -130,6 +138,11 @@
           "--resonance"
         ]
       }
+    ],
+    "orchestra-unit": [
+      "tests/orchestra-harmony.test.js",
+      "tests/orchestra-period.test.js",
+      "tests/orchestra-audio-period.test.js"
     ]
   },
   "aliases": {
@@ -149,7 +162,8 @@
       "iteration",
       "physical",
       "codec",
-      "ui"
+      "ui",
+      "orchestra-unit"
     ],
     "iteration-quick": [
       "iteration-unit"

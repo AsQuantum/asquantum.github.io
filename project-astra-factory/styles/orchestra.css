@@ -1,0 +1,146 @@
+/* Music theme, same editor shell and map. No modal or second map canvas. */
+.orch-only[hidden],#orchestraScore[hidden],.orch-live-status[hidden],.orch-brand-title[hidden]{display:none!important}
+.orchestra-active .top .brand{font-size:0}
+.orchestra-active .top .brand>span:not(.orch-brand-title),.orchestra-active .top .brand>#changelogOpen{display:none}
+.orchestra-active .top .brand>.orch-brand-title{font-size:16px;color:#c6e4ff;white-space:nowrap;animation:orch-brand-in .9s ease both}
+@keyframes orch-brand-in{from{filter:blur(6px);opacity:.25}to{filter:none;opacity:1}}
+.orchestra-active .top .sim-toolbar{border-color:#46577f;background:#202d45}
+.orchestra-active .sim-toolbar label[for="simSpeed"],.orchestra-active #stepMinute,.orchestra-active #addTestStock{display:none!important}
+.orchestra-active .top .sim-toolbar .orch-only{display:flex;align-items:center;gap:4px}
+.orchestra-active .top .sim-toolbar .orch-control input{width:58px;min-width:0;box-sizing:border-box;color:#cde9ff;background:#132239;border:1px solid #506a8a;border-radius:5px;padding:3px}
+.orchestra-active .canvaswrap{background:#0b1221}
+.orchestra-active .side{background:#121c30;border-color:#344565}
+.orchestra-active .machine-palette-heading{color:#aac9f0}
+/* Main sidebar headings retain the normal theme hierarchy. */
+.orchestra-active .side.right>h3,.orchestra-active .side.right>details>summary{color:var(--ui-heading1)}
+.orchestra-active .machine-palette-mark{box-shadow:0 0 7px var(--palette-machine-color)}
+.orchestra-active .machine-palette-group button:hover{border-color:var(--palette-machine-color)}
+#orchestraScore{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;overflow:hidden;background:#0d1828;color:#dbe6f6;color-scheme:dark}
+#orchestraScore .orch-editor{height:100%;min-height:0}
+#orchestraScore button,#orchestraScore select,#orchestraScore input{font:inherit;color:#dbe6f6;background:#192940;border:1px solid #3a506d;border-radius:6px;box-sizing:border-box;padding:4px 7px;min-height:28px}
+#orchestraScore button:hover{background:#29415d}
+.orch-control{display:flex;align-items:center;gap:5px;color:#9fb5d3;white-space:nowrap}.orch-control input[type=range]{width:65px;padding:0!important}.orch-grow{flex:1}
+.orch-live-status{position:absolute;bottom:9px;left:9px;z-index:6;pointer-events:none;background:#0d192ddd;color:#b9d8fa;border:1px solid #40597c;border-radius:6px;padding:5px 8px;font-size:11px}
+.orch-live-status button{pointer-events:auto;margin-left:5px}
+.orch-live-status button[hidden]{display:none!important}
+.orch-strike{position:fixed;width:0;height:0;pointer-events:none;z-index:10000;mix-blend-mode:screen}
+.orch-editor{flex:1;min-height:0;display:flex;flex-direction:column;background:#0c1524}.orch-edit-toolbar{flex:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#142033;border-bottom:1px solid #30435f;font-size:12px}.orch-loop{color:#a7c7e8;font-variant-numeric:tabular-nums;white-space:nowrap}
+.orch-timeline{--orch-label:218px;flex:1;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain;scrollbar-color:#4a627e #101a2b}.orch-score{position:relative;width:calc(var(--orch-label) + var(--score-width));min-width:100%;min-height:100%;background:#0f1b2c}
+.orch-ruler{height:36px;position:sticky;top:0;z-index:7;display:flex;width:100%;background:#18263b;border-bottom:1px solid #50647d}.orch-left{position:sticky;left:0;z-index:4;flex:0 0 var(--orch-label);width:var(--orch-label);box-sizing:border-box;border-right:1px solid #50647d;background:#152338}.orch-ruler-label{display:flex;align-items:center;padding:0 12px;color:#9fb5d3;font-size:12px;z-index:8}.orch-ruler-time{position:relative;flex:none}.orch-ruler-time span{position:absolute;top:10px;color:#91a6c0;font-size:11px;padding-left:5px;font-variant-numeric:tabular-nums}.orch-ruler-time span.bar{font-size:14px;color:#e4edfb;font-weight:650;top:7px}.orch-ruler-time span.extra{opacity:.4}
+.orch-track,.orch-lane{display:flex;align-items:stretch;border-bottom:1px solid #344960;width:100%}.orch-track-label{display:flex;align-items:center;gap:6px;padding:4px 6px;font-size:11px}.orch-track-label .orch-expand{display:flex;align-items:center;gap:5px;flex:1;min-width:0;text-align:left;padding:3px 5px!important;background:transparent!important;border:0!important}.orch-expand span{white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.orch-track-label select{min-width:0;width:79px;font-size:11px!important;min-height:27px!important;padding:3px 4px!important}.orch-track.selected .orch-left{background:#24415e}.orch-overview,.orch-port-roll{display:block;flex:none;align-self:stretch;cursor:pointer}.orch-overview:hover{filter:brightness(1.18)}.orch-port-roll{cursor:crosshair;touch-action:pan-y;user-select:none}.orch-port-name{padding:0;background:#102032;font-size:11px;position:sticky}.orch-port-name b,.orch-port-name small{position:absolute;left:12px;top:10px;pointer-events:none}.orch-port-name small{top:27px;color:#7691b2}.orch-pitches{position:absolute;right:0;top:0;width:48px;font-size:10px;text-align:right;color:#a1b6d2;box-sizing:border-box}.orch-pitches div{box-sizing:border-box;padding-right:5px;border-bottom:1px solid #283b52;background:#14253a;display:flex;justify-content:flex-end;align-items:center}
+.orch-playhead,.orch-loop-boundary{position:absolute;top:0;bottom:0;pointer-events:none;width:1px;z-index:3;background:#e9f3ff;box-shadow:0 0 6px #e0efffaa}.orch-playhead::before{content:'';position:absolute;left:-4px;top:0;width:9px;height:9px;background:#e9f3ff;clip-path:polygon(0 0,100% 0,50% 100%)}.orch-loop-boundary{background:#5a9dbf;box-shadow:none;border-left:1px dashed #9ebbd0;opacity:.65}
+.orch-editor-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;padding:8px 14px;background:#132033;border-top:1px solid #30435f;color:#91a6c1;font-size:11px}.orch-editor-foot span:last-child{white-space:nowrap;font-variant-numeric:tabular-nums;color:#c1d9ef}.orch-no-tracks{padding:24px;color:#9fb5d3}
+.orch-track-options{height:36px;border-bottom:1px solid #344960;background:#101b2b}.orch-track-options .orch-left{height:100%;display:flex;align-items:center;justify-content:space-between;gap:3px;padding:2px 5px;font-size:10px}.orch-track-options label{display:flex;align-items:center;gap:3px;white-space:nowrap}.orch-track-options input[type=range]{width:43px;padding:0!important;min-height:20px!important}.orch-track-options button,.orch-octave button{min-height:22px!important;font-size:10px!important;padding:2px 4px!important}.orch-octave{position:absolute;top:47px;left:12px;display:flex;gap:3px}
+.orch-strike i,.orch-strike b{position:absolute;left:0;top:0;width:96px;height:96px;border:2px solid #a7eaff;border-radius:50%;box-shadow:0 0 14px #85c8ff, inset 0 0 10px #9fe9ff;transform:translate(-50%,-50%);animation:orch-hit-ring 1.4s cubic-bezier(.12,.68,.2,1) both}
+.orch-strike i:nth-child(2){border-color:#e2eaff;animation-delay:.09s}.orch-strike i:nth-child(3){border:1px dashed #c2dfff;animation-delay:.18s}
+.orch-strike b{border:0;width:66px;height:66px;background:radial-gradient(circle,#fff 0,#b4edff 12%,#8babff80 34%,transparent 72%);animation:orch-hit-flash .65s ease-out both}
+.orch-strike em{position:absolute;left:0;top:0;width:3px;height:18px;border-radius:2px;background:#c3efff;box-shadow:0 0 8px #99dfff;animation:orch-hit-spark .85s ease-out both}
+@keyframes orch-hit-ring{from{transform:translate(-50%,-50%) scale(.28);opacity:1}to{transform:translate(-50%,-50%) scale(5);opacity:0}}
+@keyframes orch-hit-flash{from{transform:translate(-50%,-50%) scale(.5);opacity:1}to{transform:translate(-50%,-50%) scale(3.6);opacity:0}}
+@keyframes orch-hit-spark{from{transform:rotate(var(--angle)) translateY(-17px);opacity:1}to{transform:rotate(var(--angle)) translateY(-170px) scale(.4);opacity:0}}
+@media(max-width:650px){
+.orchestra-active .top .brand>.orch-brand-title{font-size:12px}
+.orchestra-active .top .sim-toolbar{gap:3px;flex-wrap:wrap}
+.orchestra-active .top .sim-toolbar .orch-only{grid-area:auto;font-size:11px;padding:3px}
+.orchestra-active .top .sim-toolbar .orch-control input{width:44px}
+.orch-timeline{--orch-label:142px}.orch-track-label select{width:61px}.orch-edit-toolbar{padding:6px;gap:5px}.orch-editor-foot{font-size:10px;padding:5px}
+}
+@media(prefers-reduced-motion:reduce){.orch-strike{display:none}.orchestra-active .orch-brand-title{animation:none!important}}
+
+/* Music transport uses a stable-sized blue-violet control, even when paused. */
+body.orchestra-active .top .sim-toolbar #run.primary,
+body.orchestra-active .top .sim-toolbar #run.primary.sim-running{
+ background:#344a79!important;color:#e6f1ff!important;border-color:#7188bd!important;
+ box-shadow:none!important;flex:0 0 78px!important;width:78px!important;min-width:78px!important;max-width:78px!important;
+ padding:6px 5px!important;font-size:12px!important;white-space:nowrap;justify-content:center;
+}
+body.orchestra-active .top .sim-toolbar #run.primary.sim-running{background:#293c60!important}
+body.orchestra-active .top .sim-toolbar .sim-toolbar-caption{color:#b1c3ed}
+/* The original brand, scheme picker and Edit menu form one left group.
+   Equal outer columns center only transport, regardless of the left width. */
+.orchestra-active .orch-left-header{display:flex;align-items:center;gap:7px;min-width:0}
+.orchestra-active .orch-left-header .brand{flex:none;margin:0}
+.orchestra-active .orch-left-header .preset-manager{flex:0 1 180px;width:180px;min-width:64px}
+.orchestra-active .orch-left-header #editMenuWrap{flex:none}
+@media(min-width:1161px){
+ body.orchestra-active .top{display:grid;grid-template-columns:minmax(0,1fr) max-content minmax(0,1fr);grid-template-rows:auto;gap:7px;align-items:center}
+ body.orchestra-active .top>.orch-left-header{grid-column:1;grid-row:1;justify-self:stretch}
+ body.orchestra-active .top>#topStats{grid-column:3;grid-row:1;justify-self:end}
+ body.orchestra-active .top>.grow{display:none}
+ body.orchestra-active .top>.sim-toolbar{grid-column:2;grid-row:1;justify-self:center;flex-wrap:nowrap}
+}
+@media(max-width:1160px){
+ body.orchestra-active .top{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:6px}
+ body.orchestra-active .top>.orch-left-header{grid-column:1/-1;grid-row:1;justify-self:start;max-width:100%}
+ body.orchestra-active .top>#topStats{display:none}
+ body.orchestra-active .top>.grow{display:none}
+ body.orchestra-active .top>.sim-toolbar{grid-row:2;grid-column:1/-1;justify-self:center;margin:0;justify-content:center}
+}
+.orch-transition-image{position:absolute;z-index:4;pointer-events:none;max-width:none;max-height:none;object-fit:fill}
+@media(max-width:650px){
+ body.orchestra-active .top .sim-toolbar #run.primary,body.orchestra-active .top .sim-toolbar #run.primary.sim-running{flex-basis:60px!important;width:60px!important;min-width:60px!important;max-width:60px!important;font-size:11px!important}
+ body.orchestra-active .top>.sim-toolbar{justify-content:center}
+ .orchestra-active .orch-left-header{gap:4px;width:100%}
+ .orchestra-active .orch-left-header .brand{font-size:0}
+ .orchestra-active .orch-left-header .preset-manager{flex:1 1 100px;width:auto;min-width:48px}
+ .orchestra-active .orch-left-header #editMenuWrap{width:auto}
+}
+
+/* Explicitly override the ordinary green Factory word, including mobile
+   and inherited theme accents. The original branding is restored on exit. */
+body.orchestra-active .top .brand{font-size:0!important;color:#d6e6fc!important}
+body.orchestra-active .top .brand>span:not(.orch-brand-title){display:none!important}
+body.orchestra-active .top .brand .orch-brand-factory{color:#a5c9ff!important}
+body.orchestra-active .top .brand .orch-brand-orchestra{color:#d5c3ff!important}
+body.orchestra-active .top .brand .brand-mark{filter:hue-rotate(65deg) saturate(1.25)}
+
+.orchestra-active .main{position:relative}
+.orchestra-active .main.orch-score-open>#orchestraScore{z-index:30;inset:0}
+.orchestra-active .main.orch-score-open>.side,.orchestra-active .main.orch-score-open>.canvaswrap{visibility:hidden;pointer-events:none}
+.orchestra-active .main.orch-score-open>#orchestraScore{visibility:visible;pointer-events:auto;animation:orch-score-in .28s ease-out both}
+@keyframes orch-score-in{from{opacity:.25;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.orchestra-active .main.orch-score-open>#orchestraScore{animation:none}}
+
+/* Machine library behaves as a bank of instrument pads. The same type can
+   be played by many machines, but its color envelope is capped at one. */
+.orchestra-active #palette [data-stamp]{position:relative;isolation:isolate}
+.orchestra-active #palette [data-stamp].orch-key-hit{
+ border-color:color-mix(in srgb,var(--palette-machine-color) calc(var(--orch-hit)*85%),#36465d)!important;
+ background:color-mix(in srgb,var(--palette-machine-color) calc(var(--orch-hit)*19%),#172438);
+ box-shadow:inset 2px 0 0 color-mix(in srgb,var(--palette-machine-color) calc(var(--orch-hit)*95%),transparent),0 0 9px color-mix(in srgb,var(--palette-machine-color) calc(var(--orch-hit)*22%),transparent);
+}
+.orchestra-active #palette [data-stamp].orch-key-hit .machine-palette-mark{
+ box-shadow:0 0 10px color-mix(in srgb,var(--palette-machine-color) calc(var(--orch-hit)*95%),transparent);
+}
+.orchestra-active #palette [data-stamp].orch-key-hit .machine-palette-label{color:color-mix(in srgb,var(--palette-machine-color) calc(var(--orch-hit)*68%),#e0eaf9)}
+
+/* Typography only for music mode; prefer locally installed CJK UI faces. */
+.orchestra-active #palette .machine-palette-label,
+#orchestraScore .orch-track-label{
+ font-family:"Microsoft YaHei UI","PingFang SC","Noto Sans CJK SC",sans-serif;
+ font-weight:500;letter-spacing:.025em;
+}
+#orchestraScore .orch-auto-random{cursor:pointer;gap:5px}
+#orchestraScore .orch-auto-random input{min-height:0;width:14px;height:14px;accent-color:#9bb9f5}
+
+#orchestraScore .orch-key-plan{font-size:11px;color:#b5c9ee;white-space:nowrap}
+@media(max-width:650px){
+ body.orchestra-active .top .sim-toolbar .orch-only{padding-inline:3px}
+ body.orchestra-active .top .sim-toolbar [data-orch="random"]{min-width:0}
+}
+
+#orchestraScore [data-orch-period]{color:#a7bde2;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* Compact score toolbar; generation controls stay in one disclosure. */
+#orchestraScore .orch-edit-toolbar{gap:8px;position:relative;z-index:12}
+.orch-now{color:#c7daf7;font-weight:600;white-space:nowrap}
+.orch-settings{position:relative}
+.orch-settings>summary{list-style:none;cursor:pointer;border:1px solid #3a506d;background:#192940;border-radius:6px;padding:5px 9px;color:#dbe6f6;white-space:nowrap}
+.orch-settings>summary::-webkit-details-marker{display:none}
+.orch-settings>summary span{margin-left:6px;color:#9fb5d3}
+.orch-settings-panel{position:absolute;top:calc(100% + 7px);left:0;width:290px;max-width:calc(100vw - 24px);box-sizing:border-box;padding:12px;display:grid;gap:9px;background:#142238;border:1px solid #47617f;border-radius:9px;box-shadow:0 12px 28px #050b1588}
+.orch-settings-heading{font-weight:600;color:#a9c5ee;border-bottom:1px solid #354863;padding-bottom:5px}
+.orch-settings-actions{display:flex;gap:6px;flex-wrap:wrap}
+.orch-playhead{bottom:auto;height:36px;z-index:6;opacity:.65;box-shadow:none}
+[data-orch-cursor]{pointer-events:none}
+@media(max-width:650px){.orch-settings-panel{position:fixed;top:auto;left:12px;right:12px;width:auto;max-width:none}.orch-edit-toolbar{gap:6px!important}.orch-editor-foot{flex-wrap:wrap}.orch-editor-foot>span:first-child{display:none}}

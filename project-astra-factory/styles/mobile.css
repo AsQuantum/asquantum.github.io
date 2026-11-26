@@ -132,8 +132,7 @@
  .main[data-mobile-view="inspector"]>.side.right>#warehousePanel,
  .main[data-mobile-view="inspector"]>.side.right>#auditPanel,
  .main[data-mobile-view="inspector"]>.side.right>#logsPanel{display:none!important}
- .main[data-mobile-view="warehouse"]>.side.right>h3,
- .main[data-mobile-view="warehouse"]>.side.right>#inspector{display:none!important}
+ .main[data-mobile-view="warehouse"]>.side.right>#inspectorPanel{display:none!important}
  .main>.side.right>h3{margin-top:11px}
  .main>.side.right #inspector{padding:0 12px 24px}
  .main>.side.right .warehouse-panel{margin-bottom:12px}

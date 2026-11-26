@@ -5,11 +5,14 @@ function editorCanvasKeyboardActive(){
  if(sel&&!sel.isCollapsed&&sel.toString().length)return false;
  return !!document.getElementById('map')?.matches(':hover');
 }
+// Space tap toggles transport; a held Space with a canvas drag still pans.
+let spacePanUsed=false;
 document.addEventListener('keydown',e=>{
  if(e.key==='Escape'){e.preventDefault();resetEditorMode();return;}
  const target=e.target;
  if(target?.closest?.('input,select,textarea,[contenteditable]'))return;
- if(e.key===' '){spaceDown=true;e.preventDefault();return;}
+ if(e.key===' '&&!e.ctrlKey&&!e.metaKey&&!e.altKey){if(!e.repeat&&!spaceDown){spaceDown=true;spacePanUsed=false}e.preventDefault();return;}
+ if(target?.closest?.('#orchestraScore'))return;
  // Editor clipboard commands are active ONLY while hovering the canvas;
  // browser-native text selection and clipboard actions always win elsewhere.
  if((e.ctrlKey||e.metaKey)&&['c','v','d'].includes(e.key.toLowerCase())&&!editorCanvasKeyboardActive())return;
@@ -36,7 +39,9 @@ document.addEventListener('keydown',e=>{
   if(selection?.routeId){deleteRoute(selection.routeId);e.preventDefault();return;}
  }
 });
-document.addEventListener('keyup',e=>{if(e.key===' ')spaceDown=false;});
+document.addEventListener('keyup',e=>{if(e.key!==' ')return;const toggle=spaceDown&&!spacePanUsed;spaceDown=false;spacePanUsed=false;if(toggle&&!e.target?.closest?.('input,select,textarea,[contenteditable]')&&!simAdvanceBusy){e.preventDefault();$('run').click()}});
+canvas.addEventListener('pointerdown',()=>{if(spaceDown)spacePanUsed=true},true);
+window.addEventListener('blur',()=>{spaceDown=false;spacePanUsed=false});
 window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden){try{localStorage.setItem('factory_lab_v13',compactFactoryJSON());saveCurrentScheme();}catch(e){}}});
 try{stampPrefs=JSON.parse(localStorage.getItem('factory_lab_v3_stamp_prefs')||'{}')||{};}catch(e){stampPrefs={};}
 let savedLayout=null,storageKey=null;

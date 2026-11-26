@@ -1,6 +1,8 @@
 'use strict';
 // Simplified discrete-item experiment, intentionally distinct from a full game-accurate solver.
 let sim=null,simVisualDirty=false,simClockRemainder=0;
+// Optional synchronous observer of successful physical port transfers.
+let simTransferObserver=null;
 // 每个传送带格沿入边中点 -> 中心 -> 出边中点走过1米；直角格两段各0.5米。
 // 线路起点是第一格与机器出口格的共享边中点；终点是最后一格与机器入口格的共享边中点。
 // 物品运动速度2米/秒；堵塞时以1米间距停在格子边中点，满线后背压到生产机器的输出缓存。
@@ -267,7 +269,7 @@ function sendItem(m,s,index,item){const r=simRouteFor(m.id,'out',index);if(!simC
  const outFilter=simPorts(m).find(p=>p.kind==='out'&&p.index===index)?.filter||'';if(outFilter&&outFilter!=='任意'&&outFilter!==item)return false;
  // Material eligibility is checked only on ARRIVAL, not by the sender.
  // A wrongly wired belt can carry items until its head is rejected and backs up.
- simBeltPush(r,item);simVisualDirty=true;s.lastSend[index]=simTime;s.sent[item]=(s.sent[item]||0)+1;return true;}
+ simBeltPush(r,item);simVisualDirty=true;s.lastSend[index]=simTime;s.sent[item]=(s.sent[item]||0)+1;simTransferObserver?.(m,"out",index,item,simTime);return true;}
 function inputCap(m,item,port){let rec=simRecipe(m);
  if(rec){return (rec.inputs[item]||0)*3;}
  if(m.type==='电脑')return 10;
@@ -275,7 +277,10 @@ function inputCap(m,item,port){let rec=simRecipe(m);
  if(m.type==='分流'||m.type==='汇流')return 3;
  return 0;
 }
-function acceptItem(m,port,item){let s=sim.byMachine[m.id];if(m.type==='仓入'){
+function acceptItem(m,port,item){
+ const accepted=simAcceptItem(m,port,item);if(accepted)simTransferObserver?.(m,"in",port,item,simTime);return accepted;
+}
+function simAcceptItem(m,port,item){let s=sim.byMachine[m.id];if(m.type==='仓入'){
    if(!simAccepts(m,item,port))return false;
    if(s)s.received[item]=(s.received[item]||0)+1;
    ware[item]=(ware[item]||0)+1;sim.inbound[item]=(sim.inbound[item]||0)+1;recordWarehouseMovement('inbound',item);return true;
@@ -589,13 +594,15 @@ function stepLoop(t){
   simPaintTimer+=elapsedReal;
   if(simPaintTimer>=.3){simPaintTimer=0;warehouseRefreshLive();inspectorRefreshLive();stockChartMaybeRefresh();}
  }
- // The animation is intentionally limited to 24 fps. RAF still schedules
- // simulation using elapsed time, so the game speed and logical tick are unchanged.
+ // Normal editor retains the 24 fps cap. Music uses each available RAF
+ // while active, with fractional game-time interpolation in the renderer.
+ // The simulation clock and its exact discrete steps remain unchanged.
  // Connected belts have a visual-only motion clock even before simulation
  // starts. Fully jammed and disconnected belts never advance that clock.
- if(!simAdvanceBusy && t-frameLastPaint>=1000/24 && !document.hidden){
+ const music=typeof orchestraTheme!=='undefined'&&orchestraTheme.active;
+ if(!simAdvanceBusy && (music||t-frameLastPaint>=1000/24) && !document.hidden){
   const beltDirty=typeof advanceBeltMotion==='function'&&advanceBeltMotion(t);
-  if(beltDirty||(running&&simVisualDirty)){
+  if(beltDirty||(running&&simVisualDirty)||(music&&orchestraTheme.hasAnimation())){
    frameLastPaint=t;simVisualDirty=false;draw(true);
   }
  }

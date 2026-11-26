@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="styles/main.css?v=20261124-frozen-041-ui2"/>
 <link rel="stylesheet" href="styles/sidebar-polish.css?v=20261124-frozen-041-ui2"/>
 <link rel="stylesheet" href="styles/stock-chart.css"/>
-<link rel="stylesheet" href="styles/mobile.css?v=20261123-039&ui=stock-toolbar-compact-1&ui=selection-menu-3"/>
+<link rel="stylesheet" href="styles/mobile.css?v=20261126-25"/>
 <link rel="stylesheet" href="styles/window-motion.css"/>
 <link rel="stylesheet" href="styles/ast1-dialog.css"/>
 <link rel="stylesheet" href="styles/changelog.css?v=20261123-039"/>
@@ -22,7 +22,8 @@
 <link rel="stylesheet" href="styles/sidebar-resize.css?v=20261124-frozen-041-ui2"/>
 <link rel="stylesheet" href="styles/frozen-factories.css?v=20261126-progress-1"/>
 <link rel="stylesheet" href="styles/checkbox-theme.css?v=20261124-theme-1"/>
-<link rel="stylesheet" href="styles/theme.css?v=20261126-progress-1"/>
+<link rel="stylesheet" href="styles/theme.css?v=20261126-25"/>
+<link rel="stylesheet" href="styles/orchestra.css?v=20261126-25"/>
 </head>
 <body>
 <div class="app">
@@ -163,6 +164,7 @@
     <div class="editor-help-section">
      <b>画布与视角</b>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>鼠标中键</kbd></span><span class="shortcut-desc">按住拖动以平移画布</span></div>
+     <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>空格</kbd></span><span class="shortcut-desc">播放 / 暂停模拟（单击）</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>空格</kbd><span class="key-plus">+</span><kbd>左键拖动</kbd></span><span class="shortcut-desc">平移画布</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>滚轮</kbd></span><span class="shortcut-desc">以光标位置为中心缩放</span></div>
      <div class="editor-shortcut-row"><span class="shortcut-keys"><kbd>左键</kbd></span><span class="shortcut-desc">选择、放置或确认接线</span></div>
@@ -269,7 +271,7 @@
   <div class="stock-chart-resize stock-chart-resize-se" data-stock-resize="se" title="拖动右下角缩放" aria-label="右下角缩放图表"></div>
 </div></section>
 <div class="sidebar-divider" data-sidebar-resize="right" role="separator" aria-orientation="vertical" aria-label="调整右侧栏宽度" tabindex="0" title="拖动调整右侧栏宽度，双击恢复默认"></div>
-<aside class="side right"><details id="warehousePanel" class="warehouse-panel"><summary>仓库材料</summary><div class="block" id="warehouse"></div></details><h3>属性编辑</h3><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div><details class="right-extra-panel" id="auditPanel">
+<aside class="side right"><details id="warehousePanel" class="warehouse-panel"><summary>仓库材料</summary><div class="block" id="warehouse"></div></details><details class="right-extra-panel inspector-panel" id="inspectorPanel" open><summary>属性编辑</summary><div class="block" id="inspector"><div class="boxnotice">点击机器查看配方、接口和实时输入/输出库存；点击绿色传送带查看线路物品。</div></div></details><details class="right-extra-panel" id="auditPanel">
  <summary>工厂检查</summary><div class="block" id="audit"></div>
  </details><details class="right-extra-panel" id="logsPanel">
  <summary>操作记录</summary><div class="block logs" id="logs"></div>
@@ -293,9 +295,9 @@
 <script src="scripts/core/audit.js?v=20261125-audit-focus"></script>
 <script src="scripts/ui/inspector.js?v=20261126-iteration-58"></script>
 <script src="scripts/core/layout-io.js?v=20261124-frozen-041-ui2"></script>
-<script src="scripts/ui/editor-controls.js?v=20261125-completed-belt-two-tap-exit"></script>
+<script src="scripts/ui/editor-controls.js?v=20261126-6"></script>
 <script src="scripts/core/selection-transform.js?v=20261124-port-warn-041"></script>
-<script src="scripts/ui/canvas.js?v=20261125-batched-belt-performance"></script>
+<script src="scripts/ui/canvas.js?v=20261126-25"></script>
 <script src="scripts/engine/math/arithmetic/rational.js?v=20261126-iteration-58"></script>
 <script src="scripts/engine/steady-flow.js?v=20261126-iteration-58"></script>
 <script src="scripts/engine/math/graph/symbolic_physical_spec.js?v=20261126-iteration-58"></script>
@@ -303,7 +305,7 @@
 <script src="scripts/ui/theory-worker.js?v=20261126-iteration-58"></script>
 <script src="scripts/ui/warehouse.js?v=20261126-iteration-58"></script>
 <script src="scripts/ui/frozen-factories.js?v=20261126-iteration-58"></script>
-<script src="scripts/engine/simulation.js?v=20261126-iteration-58"></script>
+<script src="scripts/engine/simulation.js?v=20261126-11"></script>
 <script src="scripts/ui/stock-chart.js?v=20261125-edit-stock-returns"></script>
 <script src="scripts/ui/actions.js?v=20261126-iteration-58"></script>
 <script src="scripts/blueprints/machine-ids.js?v=20261123-039"></script>
@@ -314,10 +316,16 @@
 <script src="scripts/blueprints/ast1-ui.js?v=20261123-039"></script>
 <script src="scripts/ui/presets.js?v=20261124-frozen-041-ui2"></script>
 <script src="scripts/ui/edit-menu.js?v=20261123-039"></script>
-<script src="scripts/data/changelog.js?v=20261126-042"></script>
+<script src="scripts/data/changelog.js?v=20261126-042-orchestra"></script>
 <script src="scripts/ui/changelog.js?v=20261123-039"></script>
-<script src="scripts/ui/startup.js?v=20261124-json13-route-select-1"></script>
+<script src="scripts/ui/startup.js?v=20261126-7"></script>
 <script src="scripts/ui/sidebar-resize.js?v=20261124-1"></script>
-<script src="scripts/ui/mobile.js?v=20261124-final-theory-1"></script>
+<script src="scripts/ui/mobile.js?v=20261126-25"></script>
 <script src="scripts/ui/touch-gestures.js?v=20261124-mr-native-touch-2"></script>
+<script src="scripts/ui/orchestra/audio.js?v=20261126-20"></script>
+<script src="scripts/ui/orchestra/harmony.js?v=20261126-24"></script>
+<script src="scripts/ui/orchestra/period.js?v=20261126-20"></script>
+<script src="scripts/ui/orchestra/score.js?v=20261126-25"></script>
+<script src="scripts/ui/orchestra/render.js?v=20261126-25"></script>
+<script src="scripts/ui/orchestra.js?v=20261126-25"></script>
 </body></html>

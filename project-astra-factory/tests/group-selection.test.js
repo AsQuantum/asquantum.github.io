@@ -141,6 +141,8 @@ ctx.paintedSockets=paintedSockets;
 vm.runInContext(`
 const ctx={color:null, save(){},restore(){},set strokeStyle(v){this.color=v},get strokeStyle(){return this.color},fillRect(){throw Error('Port socket background must be transparent')},strokeRect(x,y,w,h){paintedSockets.push({color:this.color,x,y,w,h,width:this.lineWidth})}};
 `,ctx);
+vm.runInContext(fs.readFileSync(root+'/scripts/ui/orchestra/render.js','utf8'),ctx);
+vm.runInContext(previewScript.slice(previewScript.indexOf("const musicThemeActive="),previewScript.indexOf("const makeColor=")),ctx);
 vm.runInContext(previewPortPainter,ctx);
 for(const face of ['E','S','W','N']){
  paintedSockets.length=0;
@@ -158,6 +160,19 @@ for(const face of ['E','S','W','N']){
   assert.strictEqual(paintedSockets[i].width,.13);
  }
 }
+// The music palette must change the appearance, not the socket positions.
+evalJS('orchestraTheme.active=true');
+paintedSockets.length=0;evalJS('paintPreviewPorts(paintTarget)');
+const musicalPorts=evalJS('getPorts(paintTarget)');
+for(let i=0;i<musicalPorts.length;i++){
+ const port=musicalPorts[i];
+ assert.strictEqual(paintedSockets[i].color,port.kind==='in'?'#82d6fb':'#f6a3e3');
+ assert.strictEqual(paintedSockets[i].x,port.x+.24);
+ assert.strictEqual(paintedSockets[i].y,port.y+.24);
+ assert.strictEqual(paintedSockets[i].w,.52);
+ assert.strictEqual(paintedSockets[i].h,.52);
+}
+evalJS('orchestraTheme.active=false');
 console.log('preview socket rendering tests passed');
 
 // Escape and right-click both restore the same empty default editor state.

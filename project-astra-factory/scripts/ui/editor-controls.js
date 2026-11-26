@@ -230,10 +230,10 @@ function buildPalette(){
  }
  $('palette').innerHTML=Object.entries(grouped).map(([category,list])=>
   `<div class="machine-palette-group"><div class="machine-palette-heading"><span>${esc(category)}</span><small>${list.length} 种</small></div>
-    ${list.map(([key,d])=>`<button type="button" data-stamp="${esc(key)}" style="--palette-machine-color:${d.color}" title="选择 ${esc(d.name)} 放置"><span class="machine-palette-label"><i class="machine-palette-mark" style="background:${d.color}"></i><span>${esc(d.name)}</span></span><small>${d.w}×${d.h}</small></button>`).join('')}
+    ${list.map(([key,d])=>`<button type="button" data-stamp="${esc(key)}" style="--palette-machine-color:${typeof orchestraTheme!=='undefined'&&orchestraTheme.active?orchestraTheme.color(key):d.color}" title="选择 ${esc(d.name)} 放置"><span class="machine-palette-label"><i class="machine-palette-mark" style="background:${typeof orchestraTheme!=='undefined'&&orchestraTheme.active?orchestraTheme.color(key):d.color}"></i><span>${esc(d.name)}</span></span><small>${d.w}×${d.h}</small></button>`).join('')}
    </div>`).join('')||'<div class="tiny" style="padding:12px 3px">没有匹配的机器或配方</div>';
 }
 function screenToCell(px,py){return {x:Math.floor((px-camera.x)/camera.z),y:Math.floor((py-camera.y)/camera.z)};}
 function eventCoords(e){const rect=canvas.getBoundingClientRect();return{x:e.clientX-rect.left,y:e.clientY-rect.top};}
 function autoFit(){camera.z=Math.min((pix.w-40)/72,(pix.h-40)/72);camera.x=(pix.w-72*camera.z)/2;camera.y=(pix.h-72*camera.z)/2;draw();}
-function resize(){let rect=canvas.getBoundingClientRect();pix={w:rect.width,h:rect.height,dpr:Math.max(1,window.devicePixelRatio||1)};canvas.width=Math.round(pix.w*pix.dpr);canvas.height=Math.round(pix.h*pix.dpr);autoFit();}
+function resize(){let rect=canvas.getBoundingClientRect();pix={w:rect.width,h:rect.height,dpr:Math.max(1,window.devicePixelRatio||1)};canvas.width=Math.round(pix.w*pix.dpr);canvas.height=Math.round(pix.h*pix.dpr);if(typeof orchestraTheme!=='undefined'&&orchestraTheme.active)draw();else autoFit();}
