@@ -46,7 +46,8 @@ function warehouseView(theoryRows=false){
  const potentialNet=displayBudget.potentialNet??null,overdraftNet=budget.overdraftNet??null;
  // Theory follows current structural boundary, actual ledger retains history.
  const materials=[...new Set(budget.warehouseItems||[])].filter(Boolean).sort(factoryItemCompare);
- const actualMaterials=[...new Set([...materials,...Object.keys(ware||{}),...Object.keys(sim?.inbound||{}),...Object.keys(sim?.outbound||{})])].filter(Boolean).sort(factoryItemCompare);
+ const previewItems=typeof orchestraTheme!=='undefined'&&orchestraTheme.panelPreview?orchestraTheme.previewItems||[]:[];
+ const actualMaterials=[...new Set([...materials,...previewItems,...Object.keys(ware||{}),...Object.keys(sim?.inbound||{}),...Object.keys(sim?.outbound||{})])].filter(Boolean).sort(factoryItemCompare);
  const theoryCertified=budget?.diagnostics?.certified===true;
  const exactRate=(xs,k)=>xs&&Object.hasOwn(xs,k)?xs[k]:null;
  const directNet=v=>v===null||v===undefined?'<td title="尚未求得结果，不代表零">—</td>':ledgerNetCell(v*60);

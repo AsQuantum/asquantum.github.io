@@ -2,7 +2,7 @@
 // Theme hooks for the original canvas. All coordinates are in its world
 // space; hit testing, transforms, edit previews and geometry stay shared.
 const orchestraTheme={
- active:false,score:null,panelPreview:false,pulses:new Map(),routePulses:new Map(),pendingHits:[],typeHits:new Map(),itemHits:new Map(),warehouseAnimations:new Map(),warehouseHitPending:false,inspectorHits:new Map(),inspectorAnimations:new Map(),inspectorMachine:null,gateHits:new Map(),dirty:false,
+ active:false,score:null,panelPreview:false,pulses:new Map(),routePulses:new Map(),pendingHits:[],typeHits:new Map(),itemHits:new Map(),warehouseAnimations:new Map(),warehouseHitPending:false,inspectorHitPending:false,inspectorHits:new Map(),inspectorAnimations:new Map(),inspectorMachine:null,gateHits:new Map(),dirty:false,
  laneWidth:.50,selectionScale:1.5,pulseMs:580,tempo:120,noteHalos:new Map(),
  // Visual hierarchy: background < matte keys < colored hit accents
  // < luminous moving notes. Large surfaces must never flash white.
@@ -40,7 +40,7 @@ const orchestraTheme={
   ctx.globalAlpha=.33;word('PROJECT : ASTRA',115,31,'500',7,490,'#9aafd3');
   ctx.restore();
  },
- clear(){this.pulses.clear();this.routePulses.clear();this.typeHits.clear();this.itemHits.clear();this.warehouseHitPending=false;for(const a of this.warehouseAnimations.values())for(const animation of a.animations)animation.cancel();this.warehouseAnimations.clear();this.clearInspectorHits();this.gateHits.clear();this.pendingHits.length=0;this.dirty=true},
+ clear(){this.pulses.clear();this.routePulses.clear();this.typeHits.clear();this.itemHits.clear();this.warehouseHitPending=false;this.inspectorHitPending=false;for(const a of this.warehouseAnimations.values())for(const animation of a.animations)animation.cancel();this.warehouseAnimations.clear();this.clearInspectorHits();this.gateHits.clear();this.pendingHits.length=0;this.dirty=true},
  hasAnimation(){return this.dirty||this.pendingHits.length>0||this.pulses.size>0||this.routePulses.size>0},
  hit(m,dir,index,at=performance.now(),item=null){
   const r=routeFor(m.id,dir,index);
@@ -70,7 +70,7 @@ const orchestraTheme={
     this.syncInspectorMachine(v.id);
     const pulse={at:shownAt,now:v.now,color:this.color(v.type)};
     const save=(key,p)=>{if((this.inspectorHits.get(key)?.now??-Infinity)<=p.now)this.inspectorHits.set(key,p)};
-    save('machine',pulse);
+    save('machine',pulse);this.inspectorHitPending=true;
     if(v.item&&(v.dir==='in'||v.dir==='out'))save(JSON.stringify([v.dir,v.item]),{...pulse,color:materialColor(v.item)});
    }
    if(v.route){
@@ -93,9 +93,9 @@ const orchestraTheme={
   for(const [type,at] of this.typeHits)if(t>=at&&!this.envelope(t,at))this.typeHits.delete(type);
  },
  paintPanels(t){
-  for(const [item,pulse] of this.itemHits)if(!this.envelope(t,pulse.at))this.itemHits.delete(item);
+  for(const [item,pulse] of this.itemHits)if(t>=pulse.at&&!this.envelope(t,pulse.at))this.itemHits.delete(item);
   for(const [row,entry] of this.warehouseAnimations){
-   if(!this.active||!row.isConnected||!this.envelope(t,entry.pulse.at)){
+   if(!this.active||!row.isConnected||row.dataset.orchItem!==entry.item||row.querySelector('[data-orch-stock]')!==entry.stock||(t>=entry.pulse.at&&!this.envelope(t,entry.pulse.at))){
     for(const animation of entry.animations)animation.cancel();
     this.warehouseAnimations.delete(row);
    }
@@ -104,7 +104,7 @@ const orchestraTheme={
   const duration=Math.min(this.pulseMs,this.beatMs()*.85),hold=Math.min(40,duration*.14);
   for(const row of document.querySelectorAll('#warehouseLiveActual tr[data-orch-item]')){
    const pulse=this.itemHits.get(row.dataset.orchItem);
-   if(!pulse)continue;
+   if(!pulse||t<pulse.at)continue;
    const old=this.warehouseAnimations.get(row);
    if(old?.pulse===pulse)continue;
    for(const animation of old?.animations||[])animation.cancel();
@@ -115,11 +115,11 @@ const orchestraTheme={
    const stock=row.querySelector('[data-orch-stock]');
    if(stock){const base=getComputedStyle(stock).color;animations.push(stock.animate(points.map(({offset,e})=>({offset,color:'color-mix(in srgb,rgb('+rgb+') '+(e*100)+'%,'+base+')',textShadow:'0 0 8px rgba('+rgb+','+(.8*e)+')'})),{duration,easing:'linear'}))}
    for(const animation of animations)animation.currentTime=Math.max(0,t-pulse.at);
-   this.warehouseAnimations.set(row,{pulse,animations});
+   this.warehouseAnimations.set(row,{pulse,animations,item:row.dataset.orchItem,stock});
   }
  },
  clearInspectorHits(){
-  this.inspectorHits.clear();this.inspectorMachine=null;
+  this.inspectorHits.clear();this.inspectorMachine=null;this.inspectorHitPending=false;
   for(const entry of this.inspectorAnimations.values())for(const animation of entry.animations)animation.cancel();
   this.inspectorAnimations.clear();
  },
@@ -130,13 +130,13 @@ const orchestraTheme={
   const id=typeof selection!=='undefined'?selection?.machineId??null:null;this.syncInspectorMachine(id);
   const root=document.getElementById('inspector');
   if(!this.active||!id||root?.dataset.inspectorKey!=='machine:'+id){this.clearInspectorHits();return}
-  for(const [key,pulse] of this.inspectorHits)if(!this.envelope(t,pulse.at))this.inspectorHits.delete(key);
+  for(const [key,pulse] of this.inspectorHits)if(t>=pulse.at&&!this.envelope(t,pulse.at))this.inspectorHits.delete(key);
   for(const [el,entry] of this.inspectorAnimations){
-   if(!el.isConnected||!this.envelope(t,entry.pulse.at)){for(const a of entry.animations)a.cancel();this.inspectorAnimations.delete(el)}
+   if(!el.isConnected||el.dataset.liveKey!==entry.key||(t>=entry.pulse.at&&!this.envelope(t,entry.pulse.at))){for(const a of entry.animations)a.cancel();this.inspectorAnimations.delete(el)}
   }
   const duration=Math.min(this.pulseMs,this.beatMs()*.85),hold=Math.min(40,duration*.14);
   const animate=(el,pulse,summary=false)=>{
-   if(!el||!pulse)return;
+   if(!el||!pulse||t<pulse.at)return;
    const old=this.inspectorAnimations.get(el);if(old?.pulse===pulse)return;
    for(const a of old?.animations||[])a.cancel();
    const base=getComputedStyle(el),bg=base.backgroundColor,border=base.borderTopColor,c=pulse.color;
@@ -147,7 +147,7 @@ const orchestraTheme={
    const text=el.querySelector(summary?'.machine-summary-name':'.machine-stack-count');
    if(text){const color=getComputedStyle(text).color;animations.push(text.animate(points.map(({offset,e})=>({offset,color:mix(color,e*100),textShadow:'0 0 7px '+mix('transparent',e*75)})),{duration,easing:'linear'}))}
    for(const a of animations)a.currentTime=Math.max(0,t-pulse.at);
-   this.inspectorAnimations.set(el,{pulse,animations});
+   this.inspectorAnimations.set(el,{pulse,animations,key:el.dataset.liveKey});
   };
   animate(root.querySelector('.inspector-machine .machine-summary'),this.inspectorHits.get('machine'),true);
   for(const row of root.querySelectorAll('#inspectorStacks .machine-stack-row')){
@@ -381,7 +381,8 @@ const orchestraTheme={
   const lit=new Map();
   for(const [key,v] of this.pulses){
    const at=v.shownAt??v.now,a=this.envelope(t,at),port=this.portEnvelope(t,at),m=machineById(v.id);
-   if((!a&&!port)||!m||m.type!==v.type){this.pulses.delete(key);continue}
+   if(!m||m.type!==v.type||(t>=at&&!a&&!port)){this.pulses.delete(key);continue}
+   if(t<at)continue;
    let entry=lit.get(v.id);
    if(!entry){entry={m,energy:0,ports:new Map(),hits:[]};lit.set(v.id,entry)}
    entry.energy=Math.max(entry.energy,a);entry.ports.set(v.dir+':'+v.index,port);if(port>0)entry.hits.push(v);
@@ -422,8 +423,8 @@ const orchestraTheme={
     }
    }
   }
-  for(const [id,time] of this.routePulses)if(!this.envelope(t,time))this.routePulses.delete(id);
-  for(const [key,time] of this.gateHits)if(!this.portEnvelope(t,time))this.gateHits.delete(key);
+  for(const [id,time] of this.routePulses)if(t>=time&&!this.envelope(t,time))this.routePulses.delete(id);
+  for(const [key,time] of this.gateHits)if(t>=time&&!this.portEnvelope(t,time))this.gateHits.delete(key);
   this.dirty=false;
  }
 

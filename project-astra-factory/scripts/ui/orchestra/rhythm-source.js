@@ -1,9 +1,10 @@
 'use strict';
-function createOrchestraRhythmSource(score,plan,captureWarehouse=false){
+function createOrchestraRhythmSource(score,plan,captureWarehouse=false,inspectorId=null){
  let preview=null,stock={},time=0,cache=null,remaining=Math.round(plan.phraseSeconds*40),events=[],frames=[],packetFrames=[];
- const frameTicks=5;let ticks=0,warehouseEvent=false;
+ const frameTicks=5;let ticks=0,warehouseEvent=false,inspectorEvent=false;
  const capture=(m,dir,port,item,t)=>{
   const track=score.track(m.type),i=Math.max(0,orchestraTransferCount(m.id,dir)-1);
+  if(m.id===inspectorId)inspectorEvent=true;
   if(m.type==='仓入'&&dir==='in'||m.type==='仓出'&&dir==='out')warehouseEvent=true;
   events.push({id:m.id,type:m.type,dir,port,item,time:t,n:score.pitch(m.type,dir,i,t),instrument:track?.instrument,volume:track?.volume});
  };
@@ -13,7 +14,7 @@ function createOrchestraRhythmSource(score,plan,captureWarehouse=false){
   if(!captureWarehouse)return;
   frames.push({time:simTime,ware:structuredClone(ware),sim:structuredClone({
    inbound:sim.inbound,outbound:sim.outbound,editReturns:sim.editReturns,
-   minuteBuckets:sim.minuteBuckets
+   minuteBuckets:sim.minuteBuckets,byMachine:inspectorId&&sim.byMachine[inspectorId]?{[inspectorId]:sim.byMachine[inspectorId]}:{}
   })});
  }
  // Baked positions only: the renderer uses the belt timbre color for
@@ -40,7 +41,7 @@ function createOrchestraRhythmSource(score,plan,captureWarehouse=false){
     preview=sim;capturePanel();capturePackets();
    }else sim=preview;
    const start=performance.now();
-   do{const n=Math.min(32,remaining);simulateBatchSteps(n,.05,{afterStep:captureWarehouse?()=>{ticks++;if(ticks%2===0)capturePackets();if(warehouseEvent||ticks%frameTicks===0){capturePanel();warehouseEvent=false}}:null});remaining-=n}while(remaining&&performance.now()-start<6);
+   do{const n=Math.min(32,remaining);simulateBatchSteps(n,.05,{afterStep:captureWarehouse?()=>{ticks++;if(ticks%2===0)capturePackets();if(warehouseEvent||inspectorEvent||ticks%frameTicks===0){capturePanel();warehouseEvent=inspectorEvent=false}}:null});remaining-=n}while(remaining&&performance.now()-start<6);
    time=simTime;cache=frozenSimCache;stock=ware;
    return remaining===0;
   }finally{

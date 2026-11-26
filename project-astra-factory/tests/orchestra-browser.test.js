@@ -282,6 +282,30 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   // Actual warehouse note (not a synthetic pulse) must reach the right ledger.
   await poll(()=>evaluate("window.__previewProbe.warehouse"));
   console.log('ORCH_PREVIEW_LIVE',JSON.stringify(await evaluate('window.__previewProbe')));
+  const pulseIdentity=await evaluate(`(()=>{
+   const th=orchestraTheme,root=$('warehouseLiveActual'),body=root.querySelector('.ledger-table tbody'),inlet=state.machines.find(m=>m.type==='仓入'),row=body.querySelector('[data-orch-item]'),item=row.dataset.orchItem,stock=row.querySelector('[data-orch-stock]'),t=performance.now();
+   const original=root.outerHTML,oldSelection=selection,oldInspector=$('inspector').innerHTML,oldKey=$('inspector').dataset.inspectorKey;
+   try{
+    th.clear();selection={machineId:inlet.id};inspectorRefresh();
+    th.hit(inlet,'in',0,t+50,item);th.beginFrame(t+60);
+    // Emulate a canvas RAF running before the sidebar RAF with a newer clock.
+    th.paintPanels(t);th.paintInspector(t);
+    const kept=th.itemHits.has(item)&&th.inspectorHits.has('machine')&&!row.getAnimations().length;
+    th.paintPanels(t+60);th.paintInspector(t+60);
+    const visible=row.getAnimations().length===1&&stock.getAnimations().length===1&&$('inspector').querySelector('.machine-summary').getAnimations().length===1;
+    const template=document.createElement('template');template.innerHTML=original;
+    const b=template.content.querySelector('.ledger-table tbody'),added=row.cloneNode(true);
+    added.dataset.orchItem='__new_material_before';added.querySelector('.ledger-name').textContent='new';
+    b.prepend(added);syncLiveMarkup(root,template.innerHTML);
+    th.paintPanels(t+65);
+    const stable=[...body.querySelectorAll('[data-orch-item]')].find(e=>e.dataset.orchItem===item)===row&&row.querySelector('[data-orch-stock]')===stock&&row.getAnimations().length===1&&!body.firstElementChild.getAnimations().length;
+    syncLiveMarkup(root,original);th.paintPanels(t+70);
+    const removed=!body.querySelector('[data-orch-item="__new_material_before"]')&&body.querySelector('[data-orch-item]')===row;
+    th.clear();const cancelled=!row.getAnimations().length&&!stock.getAnimations().length&&!$('inspector').querySelector('.machine-summary').getAnimations().length;
+    return {kept,visible,stable,removed,cancelled};
+   }finally{th.clear();syncLiveMarkup(root,original);selection=oldSelection;$('inspector').innerHTML=oldInspector;$('inspector').dataset.inspectorKey=oldKey}
+  })()`);
+  console.log('ORCH_PULSE_IDENTITY',JSON.stringify(pulseIdentity));assert(Object.values(pulseIdentity).every(Boolean),JSON.stringify(pulseIdentity));
   const panelHits=await evaluate(`(async()=>{
    const theme=orchestraTheme,normal=state.machines.find(m=>m.type==='垃圾'),inlet=state.machines.find(m=>m.type==='仓入');
    const row=document.querySelector('#warehouseLiveActual tr[data-orch-item]'),item=row?.dataset.orchItem;
@@ -374,14 +398,17 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
    const theme=orchestraTheme,r=theme.rhythm,old=theme.color('垃圾'),before=JSON.stringify(r.model.notes),original=theme.machine,rendered=[];
    theme.machine=function(m,...args){if(ctx.canvas!==canvas&&ctx.canvas!==r.previewCanvas&&m.type==='垃圾')rendered.push(this.color(m.type));return original.call(this,m,...args)};
    try{
+    const retained='__previous_preview_item';theme.previewItems.add(retained);theme.refreshRhythmWarehouse();
+    const find=()=>[...document.querySelectorAll('#warehouseLiveActual [data-orch-item]')].find(e=>e.dataset.orchItem===retained),row=find();
     document.querySelector('[data-orch=random]').click();
+    const preserved=!!row&&find()===row&&row.querySelector('[data-orch-stock]').textContent==='0';
     const color=theme.color('垃圾'),reset=r.model.notes.length===0&&r.model.stats().score===0;
     await new Promise(resolve=>setTimeout(resolve,250));
-    return {changed:color!==old,reset,rebuilt:rendered.includes(color),oldGone:rendered.every(c=>c===color),isolated:ctx.canvas===canvas,real:sim===window.__rhythmOriginal.sim&&simTime===window.__rhythmOriginal.time};
+    return {preserved,stillPresent:find()===row,changed:color!==old,reset,rebuilt:rendered.includes(color),oldGone:rendered.every(c=>c===color),isolated:ctx.canvas===canvas,real:sim===window.__rhythmOriginal.sim&&simTime===window.__rhythmOriginal.time};
    }finally{theme.machine=original}
   })()`);
   console.log('ORCH_REROLL_PREVIEW',JSON.stringify(rerollPreview));
-  assert(rerollPreview.changed&&rerollPreview.reset&&rerollPreview.isolated&&rerollPreview.real&&(mobile||rerollPreview.rebuilt&&rerollPreview.oldGone),JSON.stringify(rerollPreview));
+  assert(rerollPreview.preserved&&rerollPreview.stillPresent&&rerollPreview.changed&&rerollPreview.reset&&rerollPreview.isolated&&rerollPreview.real&&(mobile||rerollPreview.rebuilt&&rerollPreview.oldGone),JSON.stringify(rerollPreview));
   const options=await evaluate(`(()=>{
    const r=orchestraTheme.rhythm,set=(q,v)=>{const e=document.querySelector(q);e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))};
    set('[data-rhythm-difficulty]','advanced');const advanced=r.difficulty==='advanced'&&r.keys.length===4;set('[data-rhythm-count]',6);const six=r.keys.length===6&&document.querySelectorAll('[data-rhythm-lane]').length===6;

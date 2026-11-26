@@ -40,7 +40,7 @@ $('inspector').addEventListener('toggle',e=>{
 function machineStackControls(m){
  const rec=getRecipe(m),s=sim?.byMachine?.[m.id];if(!s||(!rec&&m.type!=='电脑'))return '';
  const computer=m.type==='电脑',inItems=computer?[...new Set([...Object.keys(s.inputs||{}).filter(k=>s.inputs[k]>0),...Object.keys(ware||{}).filter(k=>ware[k]>0&&getPorts(m).some(p=>p.kind==='in'&&acceptsMaterial(m,k,p.index)))])]:Object.keys(rec.inputs||{});
- const row=(item,n,cap,dir,available)=>`<div class="machine-stack-row"><span class="machine-stack-name"><span style="color:${materialColor(item)}">●</span> ${esc(item)} <span class="machine-stack-count">(${n}/${cap})</span></span><button type="button" class="smallbtn machine-stack-button" data-stack-machine="${esc(m.id)}" data-stack-item="${esc(item)}" data-stack-direction="${dir}" ${available<=0||simAdvanceBusy?'disabled':''} title="${dir==='in'?'仓库存入至缓存上限':'取出全部现有成品至仓库'}">${dir==='in'?'存入':'取出'}</button></div>`;
+ const row=(item,n,cap,dir,available)=>`<div class="machine-stack-row" data-live-key="${esc(JSON.stringify([m.id,dir,item]))}"><span class="machine-stack-name"><span style="color:${materialColor(item)}">●</span> ${esc(item)} <span class="machine-stack-count">(${n}/${cap})</span></span><button type="button" class="smallbtn machine-stack-button" data-stack-machine="${esc(m.id)}" data-stack-item="${esc(item)}" data-stack-direction="${dir}" ${available<=0||simAdvanceBusy?'disabled':''} title="${dir==='in'?'仓库存入至缓存上限':'取出全部现有成品至仓库'}">${dir==='in'?'存入':'取出'}</button></div>`;
  const inputs=inItems.sort(factoryItemCompare).map(item=>{
   const n=s.inputs[item]||0,cap=computer?10:rec.inputs[item]*3,free=computer?10-s.consumerQueue.length:cap-n;
   return row(item,n,cap,'in',Math.min(ware[item]||0,free));
@@ -134,6 +134,7 @@ function syncLiveMarkup(node,html){
  template.innerHTML=html.trim();
  const fresh=template.content.firstElementChild;
  if(!fresh)return;
+ const identity=el=>el?.nodeType===1?(el.hasAttribute('data-live-key')?'key:'+el.getAttribute('data-live-key'):el.hasAttribute('data-orch-item')?'item:'+el.getAttribute('data-orch-item'):el.classList.contains('ledger-total')?'ledger-total':null):null;
  function patch(a,b){
   if(a.nodeType!==b.nodeType||(a.nodeType===1&&a.tagName!==b.tagName)){
    a.replaceWith(b.cloneNode(true));return;
@@ -152,8 +153,19 @@ function syncLiveMarkup(node,html){
    if(a.tagName==='DETAILS'&&attr.name==='open')continue;
    if(a.getAttribute(attr.name)!==attr.value)a.setAttribute(attr.name,attr.value);
   }
+  // Reconcile by material/stack identity before patching attributes. An
+  // animated node may never be reassigned to a different material.
+  const keyed=new Map();
+  for(const child of a.childNodes){const k=identity(child);if(k!==null)keyed.set(k,child)}
   for(let i=0;i<b.childNodes.length;i++){
-   const old=a.childNodes[i],next=b.childNodes[i];
+   let old=a.childNodes[i];const next=b.childNodes[i],k=identity(next);
+   if(k!==null){
+    const found=keyed.get(k);
+    if(found&&found.parentNode===a){
+     if(found!==old)a.insertBefore(found,old||null);
+     old=found;
+    }else{a.insertBefore(next.cloneNode(true),old||null);continue}
+   }else if(identity(old)!==null){a.insertBefore(next.cloneNode(true),old||null);continue}
    if(!old)a.appendChild(next.cloneNode(true));
    else patch(old,next);
   }

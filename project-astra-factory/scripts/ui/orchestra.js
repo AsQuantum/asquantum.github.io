@@ -76,13 +76,13 @@
  }
  document.addEventListener('focusin',e=>{if(lockedSide(e))e.target.blur?.()},true);
  function newRhythmSession(plan){
-  return {plan,source:createOrchestraRhythmSource(score,plan,true),song:null,panelFrames:null,packetFrames:null,panelIndex:-1,panelPaintAt:-Infinity,visualQueue:[],chartIndex:0,audioIndex:0,elapsed:-Math.max(1.8,rhythm.lead),anchor:null};
+  return {plan,source:createOrchestraRhythmSource(score,plan,true,selection?.machineId??null),song:null,panelFrames:null,packetFrames:null,panelIndex:-1,panelPaintAt:-Infinity,visualQueue:[],chartIndex:0,audioIndex:0,elapsed:-Math.max(1.8,rhythm.lead),anchor:null};
  }
  function startRhythmSong(restart){
   if(!rhythm.active)return;
   const resume=restart||rhythm.finished||running;
   clearScheduled();factoryPreview.reset();const plan=orchestraRhythmSongPlan();
-  rhythmSession=newRhythmSession(plan);rhythm.start(plan);$('run').disabled=false;
+  rhythmSession=newRhythmSession(plan);rhythm.start(plan);paintRhythmPanels(rhythmSession,0,true);$('run').disabled=false;
   if(resume&&!running)$('run').click();audio.unlock();
  }
  function cancelRhythmTransition(){for(const el of transitionLayers)el.remove();transitionLayers=[];for(const a of rhythm.root.getAnimations())a.cancel()}
@@ -120,13 +120,14 @@
   // pointerup has not yet reached the ordinary editor selection handler.
   if(machine){selection={machineId:machine.id};multiSelection=null;inspectorRefresh()}
   const plan=orchestraRhythmSongPlan();rhythmSession=newRhythmSession(plan);
+  orchestraTheme.previewItems=new Set(warehouseView(false).actualMaterials);
   rhythm.open(plan);factoryPreview.reset();rhythmTempo(true);lockFactory(true);wrap.classList.add('orch-rhythm-open');canvas.style.visibility='hidden';badge.hidden=true;
-  previewFactory(performance.now());rhythmTransition(true);
+  paintRhythmPanels(rhythmSession,0,true);previewFactory(performance.now());rhythmTransition(true);
   if(!running)$('run').click();audio.unlock();
  }
  function closeRhythm(){
   if(!rhythm.active)return;
-  rhythmTransition(false);clearScheduled();rhythm.close();rhythmSession=null;rhythmTempo(false);lockFactory(false);$('run').disabled=false;running=resumeAfterRhythm;
+  rhythmTransition(false);clearScheduled();rhythm.close();rhythmSession=null;orchestraTheme.previewItems=null;rhythmTempo(false);lockFactory(false);$('run').disabled=false;running=resumeAfterRhythm;
   // The real factory never advanced during playback; preserve its
   // original inventory, counters, exact phases and fractional clock.
   resetBeltMotionClock();animationLast=performance.now();wrap.classList.remove('orch-rhythm-open');canvas.style.visibility=root.hidden?'':'hidden';badge.hidden=!root.hidden;draw();warehouseRefresh();warehouseRefreshLive();inspectorRefreshLive();status();
@@ -148,7 +149,8 @@
   paintRhythmPanels(rhythmSession,rhythmSession?.plan.duration||0,true);rhythm.finish(empty);running=false;$('run').disabled=true;audio.stop();orchestraTheme.clear();status();
  }
  function paintRhythmPanels(s,elapsed,force=false){
-  if(!s?.panelFrames?.length)return;
+  if(!s)return;
+  if(!s.panelFrames?.length){if(!force)return;const id=selection?.machineId;return paintPanelSnapshot({time:0,ware:{},sim:{inbound:{},outbound:{},editReturns:{},minuteBuckets:[],byMachine:id?{[id]:simMachineState()}:{} }})}
   const time=Math.max(0,Math.min(s.plan.duration,elapsed));
   const phrase=time>=s.plan.duration?s.plan.phraseSeconds:time%s.plan.phraseSeconds;
   const frames=s.panelFrames,target=phrase*2;
@@ -157,10 +159,13 @@
   const now=performance.now();
   if(!force&&!orchestraTheme.panelRefreshNeeded&&(s.panelIndex===lo||now-s.panelPaintAt<300))return;
   s.panelIndex=lo;s.panelPaintAt=now;orchestraTheme.panelRefreshNeeded=false;
-  const f=frames[lo],saved={sim,ware,simTime,simClockRemainder};
+  paintPanelSnapshot(frames[lo]);
+ }
+ function paintPanelSnapshot(f){
+  const saved={sim,ware,simTime,simClockRemainder};
   try{
    orchestraTheme.panelPreview=true;sim=f.sim;ware=f.ware;simTime=f.time;simClockRemainder=0;
-   warehouseRefreshLive();
+   warehouseRefreshLive();inspectorRefreshLive();
   }finally{orchestraTheme.panelPreview=false;sim=saved.sim;ware=saved.ware;simTime=saved.simTime;simClockRemainder=saved.simClockRemainder}
  }
  function flashGroup(group,hitTime){
@@ -172,7 +177,7 @@
   if(s.source){
    try{
     if(!s.source.step()){rhythm.tick(0,true);return}
-    s.song=s.source.finish();s.panelFrames=s.source.panelFrames();s.packetFrames=s.source.packetFrames();s.source=null;audio.prepare(s.song.map(x=>x.g));audio.setSongProfile(s.song);
+    s.song=s.source.finish();s.panelFrames=s.source.panelFrames();for(const f of s.panelFrames)for(const item of [...Object.keys(f.ware),...Object.keys(f.sim.inbound),...Object.keys(f.sim.outbound)])orchestraTheme.previewItems.add(item);s.packetFrames=s.source.packetFrames();s.source=null;audio.prepare(s.song.map(x=>x.g));audio.setSongProfile(s.song);
    }catch(err){console.error('Rhythm song generation failed',err);s.source=null;s.song=[]}
    if(!s.song.length){finishRhythmSong(true);return}
   }
@@ -200,7 +205,7 @@
   rhythm.tick(now);
   if(now>=s.plan.duration+1.6&&!rhythm.model.notes.length&&s.audioIndex===s.song.length)finishRhythmSong();
  }
- const score=createOrchestraScore(root,settings,save,()=>{scoreRevision++;factoryPreview.reset();buildPalette();draw()},()=>audio.mix(),()=>count,()=>audio.dropped,()=>{if(rhythm.active)startRhythmSong(false);else{rhythmTempo(false);clearScheduled()}});
+ const score=createOrchestraScore(root,settings,save,()=>{scoreRevision++;factoryPreview.reset();buildPalette();draw()},()=>audio.mix(),()=>count,()=>audio.dropped,()=>{if(rhythm.active)startRhythmSong(false);else{rhythmTempo(false);clearScheduled();warehouseRefreshLive();inspectorRefreshLive()}});
  // Move the actual controls (not copies) into the music settings on
  // narrow screens. Their listeners, values and shared volume stay intact.
  const compactTransport=matchMedia('(max-width:900px)');
@@ -350,7 +355,18 @@
     else if(!wrap.getClientRects().length||getComputedStyle(wrap).visibility==='hidden')closeRhythm();else updateRhythmSong();
    }else if(running&&!document.hidden)playEvents();
    else{if(anchor)clearScheduled();events.length=0}
-   if(t-lastPaint>=1000/24){lastPaint=t;orchestraTheme.beginFrame(t);const hit=orchestraTheme.warehouseHitPending;orchestraTheme.warehouseHitPending=false;if(rhythm.active)paintRhythmPanels(rhythmSession,rhythmClock(),hit);else if(hit)warehouseRefreshLive();orchestraTheme.paintPalette(t);orchestraTheme.paintPanels(t);orchestraTheme.paintInspector(t);if(rhythm.active)previewFactory(t);status();if(!root.hidden)score.paint(t)}
+   if(t-lastPaint>=1000/24){
+    lastPaint=t;
+    // RAF's timestamp can precede a canvas draw in the same frame.
+    // All panel consumers must use the current monotonic clock.
+    const now=performance.now();orchestraTheme.beginFrame(now);
+    const hit=orchestraTheme.warehouseHitPending,inspect=orchestraTheme.inspectorHitPending;
+    orchestraTheme.warehouseHitPending=orchestraTheme.inspectorHitPending=false;
+    if(rhythm.active)paintRhythmPanels(rhythmSession,rhythmClock(),hit||inspect);
+    else{if(hit)warehouseRefreshLive();if(inspect)inspectorRefreshLive()}
+    orchestraTheme.paintPalette(now);orchestraTheme.paintPanels(now);orchestraTheme.paintInspector(now);
+    if(rhythm.active)previewFactory(now);status();if(!root.hidden)score.paint(now)
+   }
   }
   requestAnimationFrame(frame)
  }

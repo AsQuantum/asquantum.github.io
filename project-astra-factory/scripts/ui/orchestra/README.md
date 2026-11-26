@@ -169,3 +169,12 @@ On phone-width screens the transport fits a compact row: selection and wiring
 remain available in the Tools tab; BPM and master volume move into Music
 settings. Rhythm hides the reset and score-editor shortcuts. The actual
 controls are moved, not duplicated, and return to the header on desktop.
+
+Panel and canvas pulses use the same monotonic performance clock; a stale
+RAF timestamp cannot prune an onset that has not arrived on its clock.
+Live warehouse rows and inspector stack rows reconcile by material identity
+rather than position, so active animations cannot migrate to another item.
+Rhythm retains the union of initial and baked warehouse items across rerolls
+and phrase repeats; counts reset to the new phrase, not the real simulator.
+The selected machine's baked inspector snapshot refreshes at its transfer
+onsets as well as periodic samples. Real factory state remains isolated.
