@@ -718,3 +718,9 @@
 .side.right #warehouse .ledger-table tr.ledger-total td.positive{color:#7ce8b3}.side.right #warehouse .ledger-table tr.ledger-total td.negative{color:#ff9d9c}
 
 .side.right #warehouse .warehouse-net-window-row{display:flex;justify-content:flex-start;align-items:center;margin:5px 0 8px;min-height:22px}
+
+.side.right #warehouse .warehouse-net-window-row{gap:7px;flex-wrap:wrap}
+.side.right #warehouse .warehouse-actual-mode{display:inline-flex;align-items:center;border:1px solid #50748a;border-radius:5px;overflow:hidden}
+.side.right #warehouse .warehouse-actual-mode button{border:0;border-radius:0;background:transparent;color:inherit;padding:3px 7px;font-size:10px;line-height:1.4;min-height:0}
+.side.right #warehouse .warehouse-actual-mode button+button{border-left:1px solid #50748a}
+.side.right #warehouse .warehouse-actual-mode button[aria-pressed="true"]{background:#35566e;color:#f0f8ff}

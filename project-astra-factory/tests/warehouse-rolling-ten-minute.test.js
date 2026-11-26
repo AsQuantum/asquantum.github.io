@@ -99,3 +99,16 @@ test('theory solution chips retain units on timed, cached and partial results',(
  c.b={diagnostics:{solutionMethod:{kind:'analytic'}}};
  assert.equal(vm.runInContext('theorySolutionChip(b)',c),'精确解 · 件/分钟');
 });
+
+test('quantity mode uses cumulative movements including partial minutes; net stays a windowed rate',()=>{
+ const c=env([{inbound:{A:6},outbound:{A:2}},{inbound:{A:3,B:1},outbound:{A:1}}]);
+ vm.runInContext('warehouseRefreshLive=()=>{};sim.inbound={A:9,B:1};sim.outbound={A:3};simTime=75;warehouseSetNetWindow(60);warehouseSetActualMode("count")',c);
+ const read=()=>vm.runInContext('warehouseActualMarkup(warehouseView(false))',c);
+ const cells=(html,mat)=>[...html.match(new RegExp('<tr data-orch-item="'+mat+'">([\\s\\S]*?)</tr>'))[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(m=>m[1]).slice(1);
+ let html=read();assert.deepEqual(cells(html,'A'),['9','3','—','3']);assert.deepEqual(cells(html,'B'),['1','0','—','2']);assert(html.includes('>总计</td><td>10</td><td>3</td>'));assert(html.includes('data-warehouse-mode="count" aria-pressed="true"'));
+ vm.runInContext('warehouseSetNetWindow(1)',c);html=read();assert.deepEqual(cells(html,'A'),['9','3','+4.00','3']);
+ vm.runInContext('warehouseSetActualMode("rate")',c);html=read();assert.deepEqual(cells(html,'A'),['6.00','2.00','+4.00','3']);
+ vm.runInContext('warehouseSetNetWindow(60)',c);assert.deepEqual(cells(read(),'A'),['—','—','—','3']);
+ vm.runInContext('warehouseSetActualMode("count");sim.inbound={};sim.outbound={};simTime=0',c);assert.deepEqual(cells(read(),'A'),['0','0','—','3']);
+ assert.equal(vm.runInContext('warehouseSetActualMode("invalid")',c),false);
+});

@@ -211,14 +211,14 @@ async function poll(fn){for(let i=0;i<120;i++){try{const result=await fn();if(re
   await evaluate('(()=>{document.querySelector("[data-stock-chart-close]").click();document.querySelector("[data-stock-chart-open]").click()})()');
   const reopened=await chartGeo();
   assert(Math.abs(reopened.left-beforeClose.left)<3&&Math.abs(reopened.width-beforeClose.width)<3&&Math.abs(reopened.height-beforeClose.height)<3,'close/reopen retains chart geometry');
-  await evaluate(`(()=>{const select=$('warehouseNetWindow');select.value='30';select.dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('[data-stock-window="180"]').click();return true;})()`);
+  await evaluate(`(()=>{const select=$('warehouseNetWindow');select.value='30';select.dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('[data-warehouse-mode=count]').click();document.querySelector('[data-stock-window="180"]').click();return true;})()`);
   // Opening after a complete page reload restores the local layout preference.
   await send('Page.reload',{ignoreCache:true});
   await poll(()=>evaluate('document.readyState==="complete" && typeof stockChartOpen==="function"'));
   const restored=await evaluate('(()=>{document.querySelector("[data-stock-chart-open]").click();return stockChartGeometry()})()');
-  const windowPrefs=await evaluate(`({net:warehouseNetWindowMinutes,select:$('warehouseNetWindow').value,chart:stockChartWindow,selected:document.querySelector('[data-stock-window].selected')?.dataset.stockWindow})`);
-  assert.deepEqual(windowPrefs,{net:30,select:'30',chart:'180',selected:'180'});
-  console.log('PASS: both actual net window and chart time range persist across reload');
+  const windowPrefs=await evaluate(`({net:warehouseNetWindowMinutes,select:$('warehouseNetWindow').value,chart:stockChartWindow,selected:document.querySelector('[data-stock-window].selected')?.dataset.stockWindow,mode:warehouseActualMode,pressed:document.querySelector('[data-warehouse-mode=count]').getAttribute('aria-pressed')})`);
+  assert.deepEqual(windowPrefs,{net:30,select:'30',chart:'180',selected:'180',mode:'count',pressed:'true'});
+  console.log('PASS: actual net window, income/expense display mode and chart time range persist across reload');
   console.log('CHART PERSISTED GEOMETRY',JSON.stringify({beforeClose,restored}));
   assert(Math.abs(restored.left-beforeClose.left)<3&&Math.abs(restored.top-beforeClose.top)<3&&Math.abs(restored.width-beforeClose.width)<3&&Math.abs(restored.height-beforeClose.height)<3,'chart should restore position and size across reload');
   // Regression: at 360px panel width, all three time-range buttons must stay

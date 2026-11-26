@@ -68,7 +68,7 @@ $('simSpeed').onchange=e=>{simulationSpeed=Number(e.target.value)||1;updateStepM
 $('stepMinute').onclick=advanceSimulationMinute;
 $('addTestStock').onclick=addWarehouseTestStock;
 $('warehouse').addEventListener('change',e=>{if(e.target?.id==='warehouseNetWindow')warehouseSetNetWindow(e.target.value);});
-$('warehouse').addEventListener('click',e=>{if(e.target.closest('[data-theory-retry]'))retryTheoryCalculation();});
+$('warehouse').addEventListener('click',e=>{const mode=e.target.closest('[data-warehouse-mode]');if(mode){warehouseSetActualMode(mode.dataset.warehouseMode);return}if(e.target.closest('[data-theory-retry]'))retryTheoryCalculation();});
 updateStepMinuteButton();
 $('resetSim').onclick=()=>{resetSimulation();inspectorRefreshLive();notify('已清空模拟库存、生产队列和分钟统计记录');};
 

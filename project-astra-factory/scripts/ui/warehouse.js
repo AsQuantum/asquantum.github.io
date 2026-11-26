@@ -14,7 +14,9 @@ function ledgerNetCell(net){net=Math.abs(Number(net)||0)<0.005?0:Number(net);ret
 
 // Certified rates and explicitly marked conditional mathematical candidates are separate; unresolved is not zero.
 const WAREHOUSE_NET_WINDOWS=[1,10,30,60];
-let warehouseNetWindowMinutes=10;
+let warehouseNetWindowMinutes=10,warehouseActualMode='rate';
+const WAREHOUSE_ACTUAL_MODE_KEY='factory_lab_warehouse_actual_mode_v1';
+try{if(localStorage.getItem(WAREHOUSE_ACTUAL_MODE_KEY)==='count')warehouseActualMode='count'}catch(e){}
 const WAREHOUSE_NET_WINDOW_KEY='factory_lab_warehouse_net_window_v1';
 try{const saved=Number(localStorage.getItem(WAREHOUSE_NET_WINDOW_KEY));if(WAREHOUSE_NET_WINDOWS.includes(saved))warehouseNetWindowMinutes=saved;}catch(e){}
 function warehouseSetNetWindow(value){
@@ -22,6 +24,13 @@ function warehouseSetNetWindow(value){
  if(!WAREHOUSE_NET_WINDOWS.includes(minutes))return false;
  warehouseNetWindowMinutes=minutes;
  try{localStorage.setItem(WAREHOUSE_NET_WINDOW_KEY,String(minutes));}catch(e){}
+ warehouseRefreshLive();
+ return true;
+}
+function warehouseSetActualMode(value){
+ if(value!=='rate'&&value!=='count')return false;
+ warehouseActualMode=value;
+ try{localStorage.setItem(WAREHOUSE_ACTUAL_MODE_KEY,value)}catch(e){}
  warehouseRefreshLive();
  return true;
 }
@@ -93,7 +102,8 @@ function warehouseView(theoryRows=false){
   recentBuckets.push({minute:minute+1,inbound:data?.inbound||{},outbound:data?.outbound||{}});
  }
  return {budget,conditional,materials,actualMaterials,tRows,theoryTotal,elapsedMinutes,recentBuckets,
-  windowMinutes,windowReady,windowTotals,totalsIn,totalsOut,
+  windowMinutes,windowReady,windowTotals,totalsIn,totalsOut,actualMode:warehouseActualMode,
+  cumulativeIn:sim?.inbound||{},cumulativeOut:sim?.outbound||{},
   tenMinuteReady:windowReady,tenMinuteTotals:windowTotals};
 }
 function warehouseSummaryMarkup(v){
@@ -105,23 +115,28 @@ function warehouseActualMarkup(v){
  const missingTitle='尚未累计完整的'+v.windowMinutes+'分钟窗口';
  const missingCell='<td title="'+missingTitle+'">—</td>';
  const rateText=count=>v.windowReady?ledgerNumber(count/v.windowMinutes):'—';
- const rateCell=count=>v.windowReady?'<td>'+rateText(count)+'</td>':missingCell;
+ const countMode=v.actualMode==='count';
+ const flowText=(count,total)=>countMode?String(total):rateText(count);
+ const flowCell=(count,total)=>countMode||v.windowReady?'<td>'+flowText(count,total)+'</td>':missingCell;
  const aRows=v.actualMaterials.map(mat=>{
   const sample=v.windowTotals[mat]||{inbound:0,outbound:0};
   const netCell=v.windowReady?ledgerNetCell((sample.inbound-sample.outbound)/v.windowMinutes):missingCell;
   return '<tr data-orch-item="'+esc(mat)+'"><td class="ledger-name" title="'+esc(mat)+'">'+ledgerMaterialLabel(mat)+
-   '</td>'+rateCell(sample.inbound)+rateCell(sample.outbound)+netCell+'<td data-orch-stock title="拆除返库累计 '+(sim?.editReturns?.[mat]||0)+' 件（不计入常规收入）">'+(ware[mat]||0)+'</td></tr>';
+   '</td>'+flowCell(sample.inbound,v.cumulativeIn[mat]||0)+flowCell(sample.outbound,v.cumulativeOut[mat]||0)+netCell+'<td data-orch-stock title="拆除返库累计 '+(sim?.editReturns?.[mat]||0)+' 件（不计入常规收入）">'+(ware[mat]||0)+'</td></tr>';
  }).join('');
  const income=v.actualMaterials.reduce((sum,mat)=>sum+(v.windowTotals[mat]?.inbound||0),0);
  const expense=v.actualMaterials.reduce((sum,mat)=>sum+(v.windowTotals[mat]?.outbound||0),0);
  const stock=v.actualMaterials.reduce((sum,mat)=>sum+(ware[mat]||0),0);
- const total=warehouseTotalRow(rateText(income),rateText(expense),
+ const total=warehouseTotalRow(flowText(income,v.totalsIn),flowText(expense,v.totalsOut),
   v.windowReady?ledgerNetCell((income-expense)/v.windowMinutes):missingCell,stock);
  const history=v.recentBuckets.map(bucket=>{
   const iCount=Object.values(bucket.inbound).reduce((sum,n)=>sum+n,0);
   const oCount=Object.values(bucket.outbound).reduce((sum,n)=>sum+n,0);
   return '<tr><td>第'+bucket.minute+'分钟</td><td>'+iCount+'</td><td>'+oCount+'</td>'+ledgerNetCell(iCount-oCount)+'</tr>';
  }).join('');
+ const flowTitle=direction=>countMode?'本次模拟累计'+direction+'量（件，含当前未完成分钟）':'最近'+v.windowMinutes+'个完整分钟的平均'+direction+'量（件/分钟）';
+ const modeButtons='<div class="warehouse-actual-mode" role="group" aria-label="收入支出显示方式">'+
+  ['rate','count'].map(mode=>'<button type="button" data-warehouse-mode="'+mode+'" aria-pressed="'+(v.actualMode===mode)+'" title="'+(mode==='rate'?'完整窗口平均件/分钟':'本次模拟累计件数')+'">'+(mode==='rate'?'速率':'数量')+'</button>').join('')+'</div>';
  const windowOptions=WAREHOUSE_NET_WINDOWS.map(n=>'<option value="'+n+'"'+
   (n===v.windowMinutes?' selected':'')+'>'+n+'m</option>').join('');
  return '<div id="warehouseLiveActual" class="ledger-panel">'+
@@ -129,9 +144,9 @@ function warehouseActualMarkup(v){
   '<button type="button" class="warehouse-stock-toggle" data-stock-chart-open title="查看仓库存量随模拟时间变化">▤ 库存趋势</button>'+
   '<span class="ledger-chip">'+(v.windowReady?'近'+v.windowMinutes+'分钟':v.elapsedMinutes>0?
     '已完成'+v.elapsedMinutes+'/'+v.windowMinutes+'分钟':'等待首个完整分钟')+'</span></div>'+
-  '<div class="ledger-card-body"'+(typeof warehouseCardOpen!=='undefined'&&!warehouseCardOpen.actual?' hidden':'')+'><div class="warehouse-net-window-row"><label class="warehouse-net-window" for="warehouseNetWindow">收支窗口 <select id="warehouseNetWindow" aria-label="实际收支计算窗口">'+windowOptions+'</select></label></div>'+
-  '<div class="ledger-table-scroll" tabindex="0" aria-label="实际收支表，可横向滚动"><table class="ledger-table"><thead><tr><th>物品</th><th title="最近'+v.windowMinutes+'个完整分钟的平均入库量（件/分钟）">收入</th>'+
-  '<th title="最近'+v.windowMinutes+'个完整分钟的平均出库量（件/分钟）">支出</th><th title="最近'+v.windowMinutes+
+  '<div class="ledger-card-body"'+(typeof warehouseCardOpen!=='undefined'&&!warehouseCardOpen.actual?' hidden':'')+'><div class="warehouse-net-window-row"><label class="warehouse-net-window" for="warehouseNetWindow">净值窗口 <select id="warehouseNetWindow" aria-label="实际收支速率计算窗口">'+windowOptions+'</select></label>'+modeButtons+'</div>'+
+  '<div class="ledger-table-scroll" tabindex="0" aria-label="实际收支表，可横向滚动"><table class="ledger-table"><thead><tr><th>物品</th><th title="'+flowTitle('入库')+'">收入</th>'+
+  '<th title="'+flowTitle('出库')+'">支出</th><th title="最近'+v.windowMinutes+
   '个完整分钟的平均每分钟净收支（件/分钟）">净值</th><th>库存</th></tr></thead>'+
   '<tbody>'+(aRows||'<tr><td colspan="5">仓库暂无材料</td></tr>')+
   total+'</tbody></table></div>'+
