@@ -272,3 +272,39 @@ body.orchestra-active .top .sim-toolbar .orch-master-volume input[type=range]{wi
 
 .orch-music-presets{max-width:155px;min-width:90px;background:#192940;color:#dbe6f6;border:1px solid #3a506d;border-radius:6px;padding:5px 7px;font:inherit}
 @media(max-width:650px){.orch-music-presets{max-width:120px}}
+
+/* One slim, shared judgement distribution; no extra oversized counters. */
+.orch-rhythm-stats>.orch-rhythm-grade-summary{flex:0 1 auto;min-width:0;gap:0;margin:0}
+.orch-rhythm-stats .orch-rhythm-grade-counts{display:flex;flex-wrap:wrap;justify-content:center;gap:5px 9px}
+.orch-rhythm-stats .orch-rhythm-grade-counts>span{flex-direction:row;gap:3px}
+.orch-rhythm-stats .orch-rhythm-grade-counts small{font-size:9px}
+.orch-rhythm-stats .orch-rhythm-grade-counts b{font-size:13px}
+.orch-rhythm-grade-summary{display:grid;gap:5px;min-width:0}
+.orch-rhythm-grade-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;text-align:center}
+.orch-rhythm-grade-counts>span{display:flex;flex-direction:column;align-items:center;gap:0;min-width:0;color:var(--grade-color)}
+.orch-rhythm-grade-counts small,.orch-rhythm-grade-counts b{color:inherit!important;letter-spacing:0}
+.orch-rhythm-grade-counts small{font-size:9px;line-height:1.15}
+.orch-rhythm-grade-counts b{font-size:12px;line-height:1.25;font-weight:650}
+.orch-rhythm-grade-bar{height:4px;display:flex;overflow:hidden;border-radius:4px;background:#30445e}
+.orch-rhythm-grade-bar i{display:block;flex:none;height:100%}
+.orch-rhythm-result-card .orch-rhythm-grade-counts b{font-size:16px}
+.orch-rhythm-result-card .orch-rhythm-grade-bar{height:6px}
+.orch-rhythm-stacked-note{border-radius:2px;border-width:0.5px;box-shadow:inset 0 0 2px #f3fbff77}
+@media(max-width:850px){.orch-rhythm-stats{row-gap:5px}.orch-rhythm-stats>.orch-rhythm-grade-summary{max-width:280px}.orch-rhythm-grade-counts>span{flex-direction:row;justify-content:center;gap:3px}.orch-rhythm-grade-counts small{font-size:8px}}
+
+/* Phone transport stays on one compact row. The existing Tools tab still
+   provides selection/wiring; audio controls live under Music settings. */
+.orch-mobile-sound-settings[hidden]{display:none!important}
+.orch-mobile-sound-settings{display:grid;gap:8px;padding-bottom:8px;border-bottom:1px solid #354863}
+#orchestraScore .orch-mobile-sound-settings .orch-control{display:flex;justify-content:space-between;gap:8px;min-width:0;border:0;padding:0}
+#orchestraScore .orch-mobile-sound-settings .orch-master-volume input{flex:1;width:auto;min-width:0;max-width:none;accent-color:#9dbaff}
+#orchestraScore .orch-mobile-sound-settings [data-orch-bpm]{width:80px}
+@media(max-width:900px){
+ body.orchestra-active .top .sim-toolbar .mobile-sim-tool{display:none!important}
+ body.orchestra-active .top>.sim-toolbar{display:flex;flex-wrap:nowrap;gap:4px;justify-content:center;overflow-x:auto}
+ body.orchestra-active .top>.sim-toolbar::after{display:none}
+ body.orchestra-active .top .sim-toolbar>.orch-only{order:0}
+ body.orchestra-active .top .sim-toolbar button{min-width:0;white-space:nowrap}
+ body.orchestra-active:has(.orch-rhythm-readonly) .top .sim-toolbar :is(#resetSim,[data-orch="switch"]){display:none!important}
+ #orchestraScore .orch-settings-panel{max-height:min(72dvh,calc(100dvh - 160px));overflow-y:auto;overscroll-behavior:contain}
+}

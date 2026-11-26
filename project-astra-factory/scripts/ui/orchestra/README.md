@@ -156,3 +156,16 @@ Regression suites (node tests/run-tests.js):
   input, sidebars, map fit, packet animation, transitions, visual feedback,
   rerolls and real simulator isolation.
 - orchestra: all five groups (also included in current).
+
+Crazy difficulty preserves every valid grouped audio onset without density,
+chord or recovery caps. Simultaneous overflow is distributed evenly across
+lanes and shown as adjacent colored subnotes; one key press judges all
+same-lane notes at that exact timestamp. Distinct onsets are never merged.
+The live HUD shows four compact colored grade counts only. The result card
+adds a proportional color bar (judged notes only). Audio timing, scoring weights and windows
+remain unchanged.
+
+On phone-width screens the transport fits a compact row: selection and wiring
+remain available in the Tools tab; BPM and master volume move into Music
+settings. Rhythm hides the reset and score-editor shortcuts. The actual
+controls are moved, not duplicated, and return to the header on desktop.

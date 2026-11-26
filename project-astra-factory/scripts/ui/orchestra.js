@@ -201,6 +201,17 @@
   if(now>=s.plan.duration+1.6&&!rhythm.model.notes.length&&s.audioIndex===s.song.length)finishRhythmSong();
  }
  const score=createOrchestraScore(root,settings,save,()=>{scoreRevision++;factoryPreview.reset();buildPalette();draw()},()=>audio.mix(),()=>count,()=>audio.dropped,()=>{if(rhythm.active)startRhythmSong(false);else{rhythmTempo(false);clearScheduled()}});
+ // Move the actual controls (not copies) into the music settings on
+ // narrow screens. Their listeners, values and shared volume stay intact.
+ const compactTransport=matchMedia('(max-width:900px)');
+ const mobileSoundSettings=document.createElement('div');
+ mobileSoundSettings.className='orch-mobile-sound-settings';
+ root.querySelector('.orch-settings-panel').prepend(mobileSoundSettings);
+ function placeSoundControls(){
+  if(compactTransport.matches){mobileSoundSettings.append(volumeControl,bpm);mobileSoundSettings.hidden=false}
+  else{toolbar.insertBefore(volumeControl,randomize);toolbar.insertBefore(bpm,randomize);mobileSoundSettings.hidden=true}
+ }
+ compactTransport.addEventListener('change',placeSoundControls);placeSoundControls();
  orchestraTheme.score=score;
  function scoreSignature(){return state.machines.map(m=>m.type+':'+getPorts(m).map(p=>p.kind+p.index).join(',')).sort().join('|')}
  function syncScore(force=false){

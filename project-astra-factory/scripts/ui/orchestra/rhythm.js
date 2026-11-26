@@ -11,7 +11,8 @@ const ORCHESTRA_RHYTHM_LAYOUTS={
 const ORCHESTRA_RHYTHM_DIFFICULTIES={
  easy:{density:3,chord:1,gap:.40,onsetGap:.30,label:'简单'},
  advanced:{density:6,chord:2,gap:.22,onsetGap:.105,label:'进阶'},
- hard:{density:10,chord:3,gap:.16,onsetGap:.065,label:'困难'}
+ hard:{density:10,chord:3,gap:.16,onsetGap:.065,label:'困难'},
+ crazy:{all:true,label:'疯狂'}
 };
 function orchestraRhythmDifficulty(value){return Object.hasOwn(ORCHESTRA_RHYTHM_DIFFICULTIES,value)?value:'easy'}
 const ORCHESTRA_RHYTHM_LEAD=1.2,ORCHESTRA_RHYTHM_BPM=120,ORCHESTRA_RHYTHM_LOOKAHEAD=3,ORCHESTRA_RHYTHM_MIN_LEAD=.5;
@@ -36,8 +37,9 @@ function orchestraRhythmTime(seconds){const n=Math.max(0,Math.ceil(seconds));ret
 function createOrchestraRhythmModel(laneCount=4,difficulty='easy'){
  let layout=ORCHESTRA_RHYTHM_LAYOUTS[laneCount]||ORCHESTRA_RHYTHM_LAYOUTS[4],last=Array(layout.keys.length).fill(-Infinity),limits=ORCHESTRA_RHYTHM_DIFFICULTIES[orchestraRhythmDifficulty(difficulty)];
  const windows={perfect:.060,great:.115,good:.180},notes=[],recent=[];
+ let chordAt=-Infinity,chordStacks=[];
  let serial=0,score=0,combo=0,maxCombo=0,perfect=0,great=0,good=0,miss=0;
- function clearPending(){notes.length=0;last.fill(-Infinity);recent.length=0}
+ function clearPending(){notes.length=0;last.fill(-Infinity);recent.length=0;chordAt=-Infinity;chordStacks=[]}
  function resetStats(){score=combo=maxCombo=perfect=great=good=miss=0}
  function reset(){clearPending();serial=0;resetStats()}
  function configure(count,difficulty){layout=ORCHESTRA_RHYTHM_LAYOUTS[count]||ORCHESTRA_RHYTHM_LAYOUTS[4];if(difficulty!==undefined)limits=ORCHESTRA_RHYTHM_DIFFICULTIES[orchestraRhythmDifficulty(difficulty)];last=Array(layout.keys.length).fill(-Infinity);reset()}
@@ -47,15 +49,29 @@ function createOrchestraRhythmModel(laneCount=4,difficulty='easy'){
   // Keep a preferred pitch/timbre lane when possible, use a free lane
   // for collisions, and thin bursts independently of audio playback.
   const inst=Object.keys(ORCHESTRA_INSTRUMENTS).indexOf(group.instrument),count=last.length,preferred=((group.n+Math.max(0,inst)*3)%count+count)%count;
-  while(recent.length&&recent[0]<=at-1)recent.shift();
-  if(recent.length>=limits.density||recent.filter(t=>Math.abs(at-t)<.04).length>=limits.chord)return null;
-  const latest=recent.at(-1);
-  if(latest!=null&&at-latest>=.04&&at-latest<limits.onsetGap)return null;
-  let lane=-1;
-  for(let i=0;i<count;i++){const k=(preferred+i)%count;if(at-last[k]>=limits.gap-1e-9){lane=k;break}}
-  if(lane<0)return null;
+  let lane=-1,stack=null,slot=0;
+  if(limits.all){
+   // Keep every audible group at its original time. Spread a chord
+   // across all keys before stacking overflow on the same onset.
+   if(Math.abs(at-chordAt)>1e-9){chordAt=at;chordStacks=Array.from({length:count},()=>({count:0}))}
+   for(let i=0;i<count;i++){
+    const k=(preferred+i)%count;
+    if(lane<0||chordStacks[k].count<chordStacks[lane].count||
+       (chordStacks[k].count===chordStacks[lane].count&&last[k]<last[lane]))lane=k;
+   }
+   stack=chordStacks[lane];slot=stack.count++;
+  }else{
+   while(recent.length&&recent[0]<=at-1)recent.shift();
+   if(recent.length>=limits.density||recent.filter(t=>Math.abs(at-t)<.04).length>=limits.chord)return null;
+   const latest=recent.at(-1);
+   if(latest!=null&&at-latest>=.04&&at-latest<limits.onsetGap)return null;
+   for(let i=0;i<count;i++){const k=(preferred+i)%count;if(at-last[k]>=limits.gap-1e-9){lane=k;break}}
+   if(lane<0)return null;
+   recent.push(at);
+  }
   const note={id:++serial,lane,at,color:ORCHESTRA_INSTRUMENTS[group.instrument]?.color||'#a5c9ff'};
-  notes.push(note);last[lane]=at;recent.push(at);return note;
+  if(stack){note.stack=stack;note.slot=slot}
+  notes.push(note);last[lane]=at;return note;
  }
  function judge(note,grade,delta=0){
   const i=notes.indexOf(note);if(i<0)return null;notes.splice(i,1);
@@ -70,8 +86,13 @@ function createOrchestraRhythmModel(laneCount=4,difficulty='easy'){
  function press(lane,now){
   const expired=expire(now);let best=null,dist=Infinity;
   for(const n of notes)if(n.lane===lane&&Math.abs(now-n.at)<dist){best=n;dist=Math.abs(now-n.at)}
-  const hit=best&&dist<=windows.good?judge(best,dist<=windows.perfect?'PERFECT':dist<=windows.great?'GREAT':'GOOD',now-best.at):null;
-  return {expired,hit};
+  const hits=[];
+  if(best&&dist<=windows.good){
+   const grade=dist<=windows.perfect?'PERFECT':dist<=windows.great?'GREAT':'GOOD';
+   const simultaneous=limits.all?notes.filter(n=>n.lane===lane&&Math.abs(n.at-best.at)<=1e-9):[best];
+   for(const n of simultaneous)hits.push(judge(n,grade,now-n.at));
+  }
+  return {expired,hit:hits[0]||null,hits};
  }
  function stats(){const total=perfect+great+good+miss;return {score,combo,maxCombo,perfect,great,good,miss,accuracy:total?(perfect+great*.7+good*.4)/total:1}}
  return {notes,windows,add,expire,press,autoplay,clearPending,reset,resetStats,configure,stats};
@@ -80,12 +101,17 @@ function orchestraRhythmLead(value,fallback=ORCHESTRA_RHYTHM_LEAD){
  const n=Number(value);return value==null||String(value).trim()===''||!Number.isFinite(n)?fallback:Math.round(Math.max(ORCHESTRA_RHYTHM_MIN_LEAD,Math.min(ORCHESTRA_RHYTHM_LOOKAHEAD,n))*100)/100;
 }
 const ORCHESTRA_RHYTHM_GRADE_COLORS={MISS:'#ff626b',GOOD:'#60aaff',GREAT:'#60e397',PERFECT:'#ffd268'};
+// Shared compact judgement display for the live HUD and final result.
+const ORCHESTRA_RHYTHM_GRADES=['MISS','GOOD','GREAT','PERFECT'];
+function orchestraRhythmGradeMarkup(live=false){
+ return '<div class="orch-rhythm-grade-summary" data-rhythm-grades><div class="orch-rhythm-grade-counts">'+ORCHESTRA_RHYTHM_GRADES.map(g=>'<span style="--grade-color:'+ORCHESTRA_RHYTHM_GRADE_COLORS[g]+'"><small>'+g+'</small><b data-rhythm-grade-count="'+g+'"'+(live&&g==='MISS'?' data-rhythm-miss':'')+'>0</b></span>').join('')+'</div>'+(live?'':'<div class="orch-rhythm-grade-bar" aria-hidden="true">'+ORCHESTRA_RHYTHM_GRADES.map(g=>'<i data-rhythm-grade-segment="'+g+'" style="background:'+ORCHESTRA_RHYTHM_GRADE_COLORS[g]+';width:0%"></i>').join('')+'</div>')+'</div>';
+}
 function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChange=()=>{},onRestart=()=>{},onUnlock=()=>{},onSave=()=>{},settings={}}){
  let laneCount=[4,6,8].includes(settings.lanes)?settings.lanes:4,lead=orchestraRhythmLead(settings.lead),auto=settings.auto===true,difficulty=orchestraRhythmDifficulty(settings.difficulty);
  const model=createOrchestraRhythmModel(laneCount,difficulty),root=document.createElement('section'),els=new Map(),held=new Set(),flashes=new Map(),railFlashes=new Map();
  let active=false,finished=false,lastStats='',lanes=[],keys=[],railOnsets=[],railIndex=0,plan=orchestraRhythmSongPlan(null);
  root.className='orch-rhythm';root.hidden=true;root.setAttribute('aria-label','Factory Rhythm');
- root.innerHTML='<div class="orch-rhythm-top"><div><span class="orch-rhythm-eyebrow">FACTORY ORCHESTRA</span><strong>Rhythm</strong></div><div class="orch-rhythm-stats"><div><small>分数</small><b data-rhythm-score>000000</b></div><div><small>准确率</small><b data-rhythm-accuracy>100.0%</b></div><div><small>连击</small><b data-rhythm-combo>0</b></div><div><small>MISS</small><b data-rhythm-miss>0</b></div></div><button type="button" data-rhythm-close aria-label="关闭音游">×</button></div><div class="orch-rhythm-controls"><label>轨道 <select data-rhythm-count><option value="4">4K</option><option value="6">6K</option><option value="8">8K</option></select></label><label>难度 <select data-rhythm-difficulty aria-label="谱面难度"><option value="easy">简单</option><option value="advanced">进阶</option><option value="hard">困难</option></select></label><label>下落 <input type="number" data-rhythm-lead min="0.5" max="3" step="0.01" inputmode="decimal" aria-label="下落时间（秒）"> 秒</label><label class="orch-rhythm-auto"><input type="checkbox" data-rhythm-auto> 自动演奏</label><span data-rhythm-mode>手动模式</span></div><div class="orch-rhythm-song"><span class="orch-rhythm-tempo">120 BPM</span><span data-rhythm-time>0:00 / 1:04</span><div class="orch-rhythm-progress"><i></i></div><span data-rhythm-plan>限时演奏</span></div><div class="orch-rhythm-body"><div class="orch-rhythm-factory" aria-label="工厂预演"><canvas data-rhythm-factory aria-label="工厂全图"></canvas><span>工厂预演</span></div><div class="orch-rhythm-stage"><div class="orch-rhythm-field"><div class="orch-rhythm-lanes"></div><div class="orch-rhythm-judge-line"></div><div class="orch-rhythm-hint"></div></div><div class="orch-rhythm-keys"></div></div><div class="orch-rhythm-balance" aria-hidden="true"></div></div><div class="orch-rhythm-result" hidden><div class="orch-rhythm-result-card"><small data-rhythm-result-mode></small><strong>演奏结束</strong><b data-rhythm-final-score></b><div data-rhythm-result-detail></div><div class="orch-rhythm-result-actions"><button type="button" data-rhythm-restart>再演奏一次</button><button type="button" data-rhythm-return>返回工厂</button></div></div></div><div class="orch-rhythm-foot"><span>音符抵达判定线时按键 · 触屏可直接点击</span><span>Esc 退出 · 短按空格暂停</span></div>';
+ root.innerHTML='<div class="orch-rhythm-top"><div><span class="orch-rhythm-eyebrow">FACTORY ORCHESTRA</span><strong>Rhythm</strong></div><div class="orch-rhythm-stats"><div><small>分数</small><b data-rhythm-score>000000</b></div><div><small>准确率</small><b data-rhythm-accuracy>100.0%</b></div><div><small>连击</small><b data-rhythm-combo>0</b></div>'+orchestraRhythmGradeMarkup(true)+'</div><button type="button" data-rhythm-close aria-label="关闭音游">×</button></div><div class="orch-rhythm-controls"><label>轨道 <select data-rhythm-count><option value="4">4K</option><option value="6">6K</option><option value="8">8K</option></select></label><label>难度 <select data-rhythm-difficulty aria-label="谱面难度"><option value="easy">简单</option><option value="advanced">进阶</option><option value="hard">困难</option><option value="crazy">疯狂</option></select></label><label>下落 <input type="number" data-rhythm-lead min="0.5" max="3" step="0.01" inputmode="decimal" aria-label="下落时间（秒）"> 秒</label><label class="orch-rhythm-auto"><input type="checkbox" data-rhythm-auto> 自动演奏</label><span data-rhythm-mode>手动模式</span></div><div class="orch-rhythm-song"><span class="orch-rhythm-tempo">120 BPM</span><span data-rhythm-time>0:00 / 1:04</span><div class="orch-rhythm-progress"><i></i></div><span data-rhythm-plan>限时演奏</span></div><div class="orch-rhythm-body"><div class="orch-rhythm-factory" aria-label="工厂预演"><canvas data-rhythm-factory aria-label="工厂全图"></canvas><span>工厂预演</span></div><div class="orch-rhythm-stage"><div class="orch-rhythm-field"><div class="orch-rhythm-lanes"></div><div class="orch-rhythm-judge-line"></div><div class="orch-rhythm-hint"></div></div><div class="orch-rhythm-keys"></div></div><div class="orch-rhythm-balance" aria-hidden="true"></div></div><div class="orch-rhythm-result" hidden><div class="orch-rhythm-result-card"><small data-rhythm-result-mode></small><strong>演奏结束</strong><b data-rhythm-final-score></b><div data-rhythm-result-detail></div>'+orchestraRhythmGradeMarkup()+'<div class="orch-rhythm-result-actions"><button type="button" data-rhythm-restart>再演奏一次</button><button type="button" data-rhythm-return>返回工厂</button></div></div></div><div class="orch-rhythm-foot"><span>音符抵达判定线时按键 · 触屏可直接点击</span><span>Esc 退出 · 短按空格暂停</span></div>';
  wrap.append(root);
  const q=s=>root.querySelector(s),field=q('.orch-rhythm-field'),hint=q('.orch-rhythm-hint');
  function saveOptions(){settings.lanes=laneCount;settings.difficulty=difficulty;settings.lead=lead;settings.auto=auto;onSave()}
@@ -126,7 +152,12 @@ function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChang
   q('[data-rhythm-score]').textContent=String(s.score).padStart(6,'0');
   q('[data-rhythm-accuracy]').textContent=(s.accuracy*100).toFixed(1)+'%';
   q('[data-rhythm-combo]').textContent=s.combo;
-  q('[data-rhythm-miss]').textContent=s.miss;
+  const total=s.miss+s.good+s.great+s.perfect;
+  for(const display of root.querySelectorAll('[data-rhythm-grades]'))for(const grade of ORCHESTRA_RHYTHM_GRADES){
+   const count=s[grade.toLowerCase()];
+   display.querySelector('[data-rhythm-grade-count="'+grade+'"]').textContent=count;
+   const segment=display.querySelector('[data-rhythm-grade-segment="'+grade+'"]');if(segment)segment.style.width=(total?100*count/total:0)+'%';
+  }
  }
  function release(lane){held.delete(lane);keys[lane]?.classList.remove('pressed');lanes[lane]?.classList.remove('pressed')}
  function clearPending(){
@@ -147,7 +178,7 @@ function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChang
   if(finished)return;finished=true;if(!empty)progress(plan.duration);const s=model.stats();paintStats();clearFlashes();
   q('[data-rhythm-result-mode]').textContent=(auto?'AUTO · 演示成绩':'MANUAL · 手动成绩')+' · '+laneCount+'K · '+ORCHESTRA_RHYTHM_DIFFICULTIES[difficulty].label;
   q('[data-rhythm-final-score]').textContent=s.score.toLocaleString();
-  q('[data-rhythm-result-detail]').textContent=empty?'整首曲目没有可播放的音符，请检查工厂是否有正常物流。':'准确率 '+(s.accuracy*100).toFixed(1)+'% · 最大连击 '+s.maxCombo+' · MISS '+s.miss;
+  q('[data-rhythm-result-detail]').textContent=empty?'整首曲目没有可播放的音符，请检查工厂是否有正常物流。':'准确率 '+(s.accuracy*100).toFixed(1)+'% · 最大连击 '+s.maxCombo;
   q('.orch-rhythm-result').hidden=false;hint.textContent='';
  }
 
@@ -158,27 +189,44 @@ function createOrchestraRhythm(wrap,{clock,ready,isRunning,onClose,onTimingChang
   const n=model.add(group,at);if(!n)return;railOnsets.push(n);
   const el=document.createElement('div');el.className='orch-rhythm-note';el.style.setProperty('--note-color',n.color);el.style.transform='translateY(-100px)';lanes[n.lane].append(el);els.set(n.id,el);
  }
- function result(r){
+ function result(r,show=true){
   if(!r)return;els.get(r.note.id)?.remove();els.delete(r.note.id);
-  flash(r.note,r.grade);
+  if(show)flash(r.note,r.grade);
+ }
+ function results(list){
+  const latest=new Map();
+  for(const r of list){if(!r)continue;result(r,false);latest.set(r.note.lane,r)}
+  for(const r of latest.values())flash(r.note,r.grade);
  }
  function press(lane){
   if(!active||finished||!isRunning())return;if(!ready()){onUnlock();return}if(auto||held.has(lane))return;
   held.add(lane);keys[lane].classList.add('pressed');lanes[lane].classList.add('pressed');
-  const r=model.press(lane,clock());r.expired.forEach(result);result(r.hit);paintStats();
+  const r=model.press(lane,clock());results([...r.expired,...r.hits]);paintStats();
  }
  function tick(elapsed=0,preparing=false){
   if(!active||finished)return;progress(elapsed);
   if(preparing){hint.textContent='正在生成'+plan.bars+'小节谱面…';return}
   if(!ready()||!isRunning()){hint.textContent=ready()?'已暂停':'点击任意音轨启用声音';return}
   const now=clock(),height=field.clientHeight,hitY=height*.84;
+  const pulseByLane=new Map();
   while(railIndex<railOnsets.length&&railOnsets[railIndex].at<=now){
-   const n=railOnsets[railIndex++],el=lanes[n.lane]?.querySelector('.orch-rhythm-rail-glow');if(!el)continue;
+   const n=railOnsets[railIndex++];pulseByLane.set(n.lane,n);
+  }
+  for(const n of pulseByLane.values()){
+   const el=lanes[n.lane]?.querySelector('.orch-rhythm-rail-glow');if(!el)continue;
    railFlashes.get(n.lane)?.cancel();el.style.setProperty('--rail-color',n.color);
    railFlashes.set(n.lane,el.animate([{opacity:.85},{opacity:.55,offset:.22},{opacity:0}],{duration:280,easing:'ease-out'}));
   }
-  for(const r of (auto?model.autoplay(now):model.expire(now)))result(r);
-  for(const n of model.notes){const el=els.get(n.id);if(el){const y=hitY*(1-(n.at-now)/lead);el.style.transform='translateY('+Math.round(y)+'px)'}}
+  results(auto?model.autoplay(now):model.expire(now));
+  for(const n of model.notes){
+   const el=els.get(n.id);if(!el)continue;
+   const y=hitY*(1-(n.at-now)/lead);el.style.transform='translateY('+Math.round(y)+'px)';
+   if(n.stack&&n.stack.count>1&&el.dataset.stackSize!==String(n.stack.count)){
+    el.dataset.stackSize=String(n.stack.count);
+    const w=82/n.stack.count;el.style.left=(9+n.slot*w)+'%';el.style.width=w+'%';
+    el.classList.add('orch-rhythm-stacked-note');
+   }
+  }
   root.style.setProperty('--rhythm-tread-offset',((Math.max(0,elapsed)*128)%32)+'px');
   hint.textContent=model.notes.length?'':'等待工厂音符…';paintStats();
  }

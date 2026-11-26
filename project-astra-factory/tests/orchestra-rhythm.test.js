@@ -79,3 +79,23 @@ test('grade colors and bounded fall duration',()=>{
  assert.equal(colors.MISS,'#ff626b');assert.equal(colors.GOOD,'#60aaff');assert.equal(colors.GREAT,'#60e397');assert.equal(colors.PERFECT,'#ffd268');
  assert.equal(lead('1.37'),1.37);assert.equal(lead(.1),.5);assert.equal(lead(99),3);assert.equal(lead('',1.37),1.37);assert.equal(lead(undefined),1.2);
 });
+
+test('crazy preserves every audible group, fills all lanes and groups simultaneous overflow per key',()=>{
+ for(const count of [4,6,8]){
+  const m=make(count,'crazy'),groups=Array.from({length:37},(_,i)=>g(48+i)),before=JSON.stringify(groups);
+  const chord=groups.map(a=>m.add(a,2));assert(chord.every(Boolean));
+  assert.equal(new Set(chord.map(n=>n.lane)).size,count);
+  assert.equal(chord.length,37);assert.equal(JSON.stringify(groups),before);
+  const lane=chord[0].lane,stack=chord.filter(n=>n.lane===lane);
+  assert(stack.every(n=>n.stack.count===stack.length));assert.deepEqual(stack.map(n=>n.slot),Array.from({length:stack.length},(_,i)=>i));
+  const next=m.add(g(60),2.025);assert(next);
+  const pressed=m.press(lane,2);
+  assert.equal(pressed.hits.length,stack.length);assert(pressed.hits.every(r=>r.grade==='PERFECT'&&r.note.at===2));
+  assert(m.notes.includes(next),'a distinct later onset must remain independent');
+  assert.equal(m.autoplay(2.025).length,38-stack.length);
+  assert.equal(m.stats().perfect,38);assert.equal(m.stats().score,38000);
+  m.reset();
+  for(let t=0;t<40;t++)for(let i=0;i<12;i++)assert(m.add(g(48+i),3+t*.025));
+  assert.equal(m.notes.length,480);assert.equal(m.expire(5).length,480);assert.equal(m.stats().miss,480);
+ }
+});

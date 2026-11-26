@@ -47,7 +47,7 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   assert.deepEqual(await evaluate("Array.from(document.querySelectorAll('.side.right > h3,.side.right > details > summary'),e=>getComputedStyle(e).color)"),sidebarColors);
 
   const volumeHeader=await evaluate(`(()=>{const v=document.querySelector('[data-orch-volume]'),b=document.querySelector('[data-orch-bpm]'),toolbar=document.querySelector('.sim-toolbar');v.value=42;v.dispatchEvent(new Event('input',{bubbles:true}));const saved=JSON.parse(localStorage.getItem('astra-orchestra-v1')).volume,visible=v.getBoundingClientRect().width>0,order=v.closest('label').nextElementSibling===b.closest('label');return {saved,visible,order,one:document.querySelectorAll('[data-orch-volume]').length===1,inHeader:toolbar.contains(v),label:document.querySelector('[data-orch-volume-value]').textContent}})()`);
-  assert(volumeHeader.saved===.42&&volumeHeader.visible&&volumeHeader.order&&volumeHeader.one&&volumeHeader.inHeader&&volumeHeader.label==='42%',JSON.stringify(volumeHeader));
+  assert(volumeHeader.saved===.42&&volumeHeader.visible===!mobile&&volumeHeader.order&&volumeHeader.one&&volumeHeader.inHeader===!mobile&&volumeHeader.label==='42%',JSON.stringify(volumeHeader));
   await evaluate("(()=>{const v=document.querySelector('[data-orch-volume]');v.value=60;v.dispatchEvent(new Event('input',{bubbles:true}));return true})()");
   const globalScore=await evaluate("(()=>{const s=JSON.parse(localStorage.getItem('astra-orchestra-v1')),tracks=s.scores['shared-machine-events-v1'],types=Object.keys(DEF).filter(type=>getPorts({type,x:0,y:0,face:'E',mode:defaultModeFor(type)}).length);return {defaultModulate:s.modulate===true&&document.querySelector('[data-orch-modulate]').checked&&s.keyPlan?.length===4&&s.keyPlan.some(n=>n!==0),count:types.length,complete:types.every(k=>!!tracks[k]),lengths16:types.every(k=>Object.values(tracks[k].ports).every(p=>p.length===16&&p.every(Number.isInteger))),unused:types.some(k=>!state.machines.some(m=>m.type===k))}})()");
   assert(globalScore.defaultModulate&&globalScore.complete&&globalScore.lengths16&&globalScore.unused,JSON.stringify(globalScore));
@@ -88,8 +88,11 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   assert.equal(pausedStyle.w,playingStyle.w);assert.match(pausedStyle.bg,/rgb\(52, 74, 121\)/);
   await new Promise(r=>setTimeout(r,1050));
   const headerLayout=await evaluate("(()=>{const a=document.querySelector('.brand').getBoundingClientRect(),b=$('presetDropdown').getBoundingClientRect(),c=$('editMenuWrap').getBoundingClientRect(),d=document.querySelector('.sim-toolbar').getBoundingClientRect();return {ordered:a.right<=b.left+1&&b.right<=c.left+1,center:(d.left+d.right)/2,width:innerWidth,leftFits:c.right<=innerWidth+1,overlap:!(c.right<=d.left+1||c.bottom<=d.top+1),fadeDone:!document.querySelector('.orch-transition-image')}})()");
-  const volumeRows=await evaluate(`(()=>{const v=document.querySelector('[data-orch-volume]').closest('label').getBoundingClientRect(),b=document.querySelector('[data-orch-bpm]').closest('label').getBoundingClientRect(),actions=[...document.querySelectorAll('.sim-toolbar [data-orch]')].map(e=>e.getBoundingClientRect());return {wrapped:b.top>=v.bottom-1&&actions.every(r=>r.top>=v.bottom-1),inline:Math.abs(b.top-v.top)<3&&v.right<=b.left+1,inside:actions.every(r=>r.left>=-1&&r.right<=innerWidth+1)}})()`);
-  assert(volumeRows.inside&&(mobile?volumeRows.wrapped:volumeRows.inline),JSON.stringify(volumeRows));
+  const volumeRows=await evaluate(`(()=>{
+   const v=document.querySelector('[data-orch-volume]').closest('label'),b=document.querySelector('[data-orch-bpm]').closest('label'),vr=v.getBoundingClientRect(),br=b.getBoundingClientRect(),toolbar=document.querySelector('.sim-toolbar'),actions=[...toolbar.querySelectorAll('button')].filter(e=>e.getClientRects().length).map(e=>e.getBoundingClientRect());
+   return {compact:v.parentElement.classList.contains('orch-mobile-sound-settings')&&b.parentElement===v.parentElement,hiddenTools:[...toolbar.querySelectorAll('.mobile-sim-tool')].every(e=>!e.getClientRects().length),oneRow:actions.every(r=>Math.abs(r.top-actions[0].top)<4),inline:Math.abs(br.top-vr.top)<3&&vr.right<=br.left+1,inside:actions.every(r=>r.left>=-1&&r.right<=innerWidth+1)};
+  })()`);
+  assert(volumeRows.inside&&(mobile?volumeRows.compact&&volumeRows.hiddenTools&&volumeRows.oneRow:volumeRows.inline&&!volumeRows.compact),JSON.stringify(volumeRows));
   console.log('ORCH_HEADER',JSON.stringify(headerLayout));
   assert(headerLayout.ordered&&headerLayout.leftFits&&!headerLayout.overlap&&headerLayout.fadeDone&&Math.abs(headerLayout.center-headerLayout.width/2)<3,JSON.stringify(headerLayout));
   if(!mobile){
@@ -159,6 +162,8 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
    const root=document.getElementById('orchestraScore'),score=orchestraTheme.score,field=root.querySelector('[data-orch-code]'),click=action=>root.querySelector('[data-orch='+action+']').click();
    const before=compactFactoryJSON(),oldSim=sim,oldTime=simTime;
    root.querySelector('.orch-settings').open=true;root.querySelector('.orch-code-share').open=true;
+   const sound=root.querySelector('.orch-mobile-sound-settings'),soundControls=matchMedia('(max-width:900px)').matches?sound.querySelector('[data-orch-volume]')?.getClientRects().length>0&&sound.querySelector('[data-orch-bpm]')?.getClientRects().length>0:sound.hidden;
+
    click('export-code');const code=field.value,original=orchestraDecodeCode(code);
    click('random-all');const changed=score.exportCode()!==code;
    field.value='ORCH1:broken';const current=score.exportCode();click('import-code');const badRejected=score.exportCode()===current;
@@ -166,9 +171,9 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
    field.value=code;click('import-code');
    const actual=orchestraDecodeCode(score.exportCode()),status=root.querySelector('[data-orch-code-status]').textContent;
    root.querySelector('.orch-settings').open=false;document.activeElement?.blur();
-   return {prefix:code.startsWith('ORCH1:'),changed,badRejected,incompleteRejected,roundtrip:JSON.stringify(original)===JSON.stringify(actual),unchanged:compactFactoryJSON()===before&&sim===oldSim&&simTime===oldTime,shared:!JSON.parse(localStorage.getItem('astra-orchestra-v1')).autoRandom,complete:Object.keys(original.tracks).length>state.machines.length,status};
+   return {soundControls,prefix:code.startsWith('ORCH1:'),changed,badRejected,incompleteRejected,roundtrip:JSON.stringify(original)===JSON.stringify(actual),unchanged:compactFactoryJSON()===before&&sim===oldSim&&simTime===oldTime,shared:!JSON.parse(localStorage.getItem('astra-orchestra-v1')).autoRandom,complete:Object.keys(original.tracks).length>state.machines.length,status};
   })()`);
-  console.log('ORCH_CODE_SHARE',JSON.stringify(share));assert(share.prefix&&share.changed&&share.badRejected&&share.incompleteRejected&&share.roundtrip&&share.unchanged&&share.shared&&share.complete&&share.status.includes('已导入'),JSON.stringify(share));
+  console.log('ORCH_CODE_SHARE',JSON.stringify(share));assert(share.soundControls&&share.prefix&&share.changed&&share.badRejected&&share.incompleteRejected&&share.roundtrip&&share.unchanged&&share.shared&&share.complete&&share.status.includes('已导入'),JSON.stringify(share));
   await evaluate("document.querySelector('[data-orch=switch]').click();true");
   const levels=[];for(let i=0;i<28;i++){levels.push(await evaluate("(()=>{const a=window.orchAnalyser;if(!a)return 0;const b=new Float32Array(a.fftSize);a.getFloatTimeDomainData(b);return Math.max(...b.map(Math.abs))})()"));await new Promise(r=>setTimeout(r,45))}
   assert(Math.max(...levels)>.001,'audible mixed signal');
@@ -247,7 +252,11 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   await hold();await poll(()=>evaluate('orchestraTheme.rhythm.active'));
   const rhythmLayout=await evaluate(`(()=>{const el=document.querySelector('.orch-rhythm'),r=el.getBoundingClientRect(),w=canvas.closest('.canvaswrap').getBoundingClientRect();return {sameCanvas:document.querySelectorAll('#map').length===1,hiddenMap:getComputedStyle(canvas).visibility==='hidden',fits:Math.abs(r.width-w.width)<1&&Math.abs(r.height-w.height)<1,lanes:el.querySelectorAll('[data-rhythm-lane]').length,lead:orchestraTheme.rhythm.lead,auto:orchestraTheme.rhythm.auto,difficulty:orchestraTheme.rhythm.difficulty,keys:[...el.querySelectorAll('[data-rhythm-key]')].map(b=>b.textContent).join(''),tempo:simulationSpeed,locked:document.querySelector('[data-orch-bpm]').disabled,running}})()`);
   assert(rhythmLayout.sameCanvas&&rhythmLayout.hiddenMap&&rhythmLayout.fits&&rhythmLayout.lanes===4&&rhythmLayout.lead===1.2&&!rhythmLayout.auto&&rhythmLayout.difficulty==='easy'&&rhythmLayout.keys==='DFJK'&&rhythmLayout.tempo===2&&rhythmLayout.locked&&rhythmLayout.running,JSON.stringify(rhythmLayout));
-  assert.equal(await evaluate("(()=>{const v=document.querySelector('[data-orch-volume]');v.value=37;v.dispatchEvent(new Event('input',{bubbles:true}));const ok=!v.disabled&&v.getBoundingClientRect().width>0&&JSON.parse(localStorage.getItem('astra-orchestra-v1')).volume===.37;v.value=60;v.dispatchEvent(new Event('input',{bubbles:true}));return ok})()"),true);
+  assert.equal(await evaluate("(()=>{const v=document.querySelector('[data-orch-volume]');v.value=37;v.dispatchEvent(new Event('input',{bubbles:true}));const ok=!v.disabled&&(v.getBoundingClientRect().width>0)===!matchMedia('(max-width:900px)').matches&&JSON.parse(localStorage.getItem('astra-orchestra-v1')).volume===.37;v.value=60;v.dispatchEvent(new Event('input',{bubbles:true}));return ok})()"),true);
+  if(mobile){
+   const compactRhythm=await evaluate(`(()=>{const t=document.querySelector('.sim-toolbar'),buttons=[...t.querySelectorAll('button')].filter(e=>e.getClientRects().length);return {visible:buttons.map(e=>e.id||e.dataset.orch),fits:buttons.every(e=>e.getBoundingClientRect().right<=innerWidth+1),oneRow:buttons.every(e=>Math.abs(e.offsetTop-buttons[0].offsetTop)<4)}})()`);
+   assert(compactRhythm.fits&&compactRhythm.oneRow&&compactRhythm.visible.join(',')==='run,random,close',JSON.stringify(compactRhythm));
+  }
   assert.equal(await evaluate("$('warehousePanel').open&&warehouseCardOpen.actual"),true);
   const frozen=await evaluate("(()=>{window.__rhythmOriginal={sim,ware,time:simTime,remainder:simClockRemainder,bytes:JSON.stringify({sim,ware}),cache:frozenSimCache,snapshot:simLayoutSnapshot};return {time:simTime,plan:orchestraRhythmSongPlan()}})()");
   assert.equal(frozen.plan.duration,64);assert.equal(frozen.plan.bars,16);assert.equal(frozen.plan.repeats,2);
@@ -377,12 +386,13 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
    const r=orchestraTheme.rhythm,set=(q,v)=>{const e=document.querySelector(q);e.value=v;e.dispatchEvent(new Event('change',{bubbles:true}))};
    set('[data-rhythm-difficulty]','advanced');const advanced=r.difficulty==='advanced'&&r.keys.length===4;set('[data-rhythm-count]',6);const six=r.keys.length===6&&document.querySelectorAll('[data-rhythm-lane]').length===6;
    const only468=[...document.querySelector('[data-rhythm-count]').options].map(e=>e.value).join(',')==='4,6,8';set('[data-rhythm-count]',8);const eight=r.keys.length===8&&document.querySelectorAll('[data-rhythm-key]').length===8&&r.keys[7]==='Semicolon';
-   const independent=r.difficulty==='advanced';set('[data-rhythm-difficulty]','hard');const hard=r.difficulty==='hard'&&r.keys.length===8;set('[data-rhythm-count]',4);set('[data-rhythm-difficulty]','easy');set('[data-rhythm-lead]',.8);
+   const independent=r.difficulty==='advanced';set('[data-rhythm-difficulty]','hard');const hard=r.difficulty==='hard'&&r.keys.length===8;set('[data-rhythm-difficulty]','crazy');const crazy=r.difficulty==='crazy'&&r.keys.length===8;set('[data-rhythm-count]',4);set('[data-rhythm-difficulty]','easy');const easy=r.difficulty==='easy';set('[data-rhythm-difficulty]','crazy');set('[data-rhythm-lead]',.8);
    window.__originalRhythmPlan=orchestraRhythmSongPlan;orchestraRhythmSongPlan=()=>({bars:2,repeats:2,phraseSeconds:4,duration:8});
    const a=document.querySelector('[data-rhythm-auto]');a.checked=true;a.dispatchEvent(new Event('change',{bubbles:true}));
-   return {advanced,independent,hard,easy:r.difficulty==='easy',six,eight,only468,four:r.keys.length===4,lead:r.lead,auto:r.auto,reset:r.model.stats().score===0,stored:JSON.parse(localStorage.getItem('astra-orchestra-v1')).rhythm};
+   window.__crazyAdded=0;window.__originalRhythmAdd=r.add;r.add=function(...args){window.__crazyAdded++;return window.__originalRhythmAdd.apply(this,args)};
+   return {advanced,independent,hard,crazy,easy,six,eight,only468,four:r.keys.length===4,lead:r.lead,auto:r.auto,reset:r.model.stats().score===0,stored:JSON.parse(localStorage.getItem('astra-orchestra-v1')).rhythm};
   })()`);
-  assert(options.advanced&&options.independent&&options.hard&&options.easy&&options.stored.difficulty==='easy'&&options.six&&options.eight&&options.only468&&options.four&&options.lead===.8&&options.auto&&options.reset&&options.stored.auto,JSON.stringify(options));
+  assert(options.advanced&&options.independent&&options.hard&&options.crazy&&options.easy&&options.stored.difficulty==='crazy'&&options.six&&options.eight&&options.only468&&options.four&&options.lead===.8&&options.auto&&options.reset&&options.stored.auto,JSON.stringify(options));
   await poll(()=>evaluate('orchestraTheme.rhythm.model.stats().perfect>0'));
   const autoResult=await evaluate('orchestraTheme.rhythm.model.stats()');
   assert(autoResult.score>0&&autoResult.miss===0&&autoResult.accuracy===1,JSON.stringify(autoResult));
@@ -392,9 +402,17 @@ async function poll(f){for(let i=0;i<75;i++){try{const v=await f();if(v)return v
   while(Date.now()<finishDeadline&&!await evaluate('orchestraTheme.rhythm.finished'))await new Promise(r=>setTimeout(r,40));
   const finish=await evaluate("(()=>{const r=orchestraTheme.rhythm;return {finished:r.finished,paused:!running,locked:$('run').disabled,result:!document.querySelector('.orch-rhythm-result').hidden,score:r.model.stats().score,miss:r.model.stats().miss}})()");
   console.log('ORCH_RHYTHM_FINISH',JSON.stringify(finish));assert(finish.finished&&finish.paused&&finish.locked&&finish.result&&finish.score>=autoResult.score&&finish.miss===0,JSON.stringify(finish));
+  const gradeSummary=await evaluate(`(()=>{
+   const r=orchestraTheme.rhythm,s=r.model.stats(),grades=['MISS','GOOD','GREAT','PERFECT'];
+   const displays=[...r.root.querySelectorAll('[data-rhythm-grades]')].map(el=>({bar:!!el.querySelector('.orch-rhythm-grade-bar'),counts:grades.map(g=>Number(el.querySelector('[data-rhythm-grade-count="'+g+'"]').textContent)),widths:grades.map(g=>parseFloat(el.querySelector('[data-rhythm-grade-segment="'+g+'"]')?.style.width??'0')),colors:grades.map(g=>el.querySelector('[data-rhythm-grade-segment="'+g+'"]')?.style.background??null)}));
+   const added=window.__crazyAdded;r.add=window.__originalRhythmAdd;
+   return {displays,added,perfect:s.perfect,all:s.perfect===added,mode:r.root.querySelector('[data-rhythm-result-mode]').textContent};
+  })()`);
+  console.log('ORCH_CRAZY_GRADES',JSON.stringify(gradeSummary));
+  assert(gradeSummary.all&&gradeSummary.perfect>0&&gradeSummary.mode.includes('疯狂')&&gradeSummary.displays.length===2&&gradeSummary.displays.every(d=>d.counts.join(',')==='0,0,0,'+gradeSummary.perfect)&&!gradeSummary.displays[0].bar&&gradeSummary.displays[1].bar&&gradeSummary.displays[1].widths.join(',')==='0,0,0,100',JSON.stringify(gradeSummary));
   await evaluate("orchestraRhythmSongPlan=window.__originalRhythmPlan;document.querySelector('[data-rhythm-restart]').click();true");
   assert.equal(await evaluate("!orchestraTheme.rhythm.finished&&running&&orchestraTheme.rhythm.model.stats().score===0"),true);
-  await evaluate(`(()=>{const a=document.querySelector('[data-rhythm-auto]');a.checked=false;a.dispatchEvent(new Event('change',{bubbles:true}));const l=document.querySelector('[data-rhythm-lead]');l.value=1.2;l.dispatchEvent(new Event('change',{bubbles:true}));return true})()`);
+  await evaluate(`(()=>{const a=document.querySelector('[data-rhythm-auto]');a.checked=false;a.dispatchEvent(new Event('change',{bubbles:true}));const d=document.querySelector('[data-rhythm-difficulty]');d.value='easy';d.dispatchEvent(new Event('change',{bubbles:true}));const l=document.querySelector('[data-rhythm-lead]');l.value=1.2;l.dispatchEvent(new Event('change',{bubbles:true}));return true})()`);
   const restored=await evaluate("(()=>{const o=window.__rhythmOriginal,same=sim===o.sim&&ware===o.ware&&simTime===o.time&&simClockRemainder===o.remainder&&JSON.stringify({sim,ware})===o.bytes&&frozenSimCache===o.cache&&simLayoutSnapshot===o.snapshot;document.querySelector('[data-rhythm-close]').click();return {same,restored:sim===o.sim&&ware===o.ware&&simTime===o.time&&simClockRemainder===o.remainder&&JSON.stringify({sim,ware})===o.bytes,ghost:!!document.querySelector('.orch-rhythm-transition-ghost')}})()");
   console.log('ORCH_RHYTHM_CONTINUATION',JSON.stringify(restored));assert(restored.same&&restored.restored&&restored.ghost,JSON.stringify(restored));
   await poll(()=>evaluate("!document.querySelector('.orch-rhythm-transition-ghost,.orch-rhythm-transition-map')"));
