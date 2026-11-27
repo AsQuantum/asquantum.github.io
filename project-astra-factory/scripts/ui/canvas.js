@@ -258,9 +258,9 @@ function buildBeltVisualCache(){
 function beltVisualRows(){return beltVisualCache?.layout===state&&beltVisualCache.routes===state.routes?beltVisualCache.rows:buildBeltVisualCache().rows;}
 
 let beltMotionLast=null,beltMotionSimLast=null;
-function resetBeltMotionClock(){beltMotionLast=null;beltMotionSimLast=simTime;}
+function resetBeltMotionClock(){beltMotionLast=null;beltMotionSimLast=simTime+(musicThemeActive()?simClockRemainder:0);}
 function advanceBeltMotion(t){
- if(simAdvanceBusy){resetBeltMotionClock();return false;}
+ if(simAdvanceBusy||typeof orchestraTheme!=='undefined'&&orchestraTheme.rhythm?.active){resetBeltMotionClock();return false;}
  const realElapsed=beltMotionLast===null?0:Math.min(.12,Math.max(0,(t-beltMotionLast)/1000));beltMotionLast=t;
  const music=musicThemeActive(),now=simTime+(music?simClockRemainder:0),simElapsed=beltMotionSimLast===null?0:Math.max(0,now-beltMotionSimLast);
  beltMotionSimLast=now;
@@ -359,7 +359,7 @@ function draw(animationOnly=false){
 // drawing target and camera, never the live factory canvas or its cache.
 function createRhythmFactoryPreview(target){
  const background=document.createElement('canvas');
- let rows=[],width=0,height=0,dpr=0,revision=-1;
+ let rows=[],routeIndices=new Map(),width=0,height=0,dpr=0,revision=-1;
  function render(t,frame=null,offset=0,next=null,scoreRevision=0){
   const bounds=target.getBoundingClientRect();if(bounds.width<1||bounds.height<1)return;
   const nextDpr=Math.min(2,Math.max(1,window.devicePixelRatio||1));
@@ -371,7 +371,7 @@ function createRhythmFactoryPreview(target){
    pix={w:w/dpr,h:h/dpr,dpr};const z=Math.max(.01,Math.min(pix.w-12,pix.h-12)/72);
    camera={x:(pix.w-72*z)/2,y:(pix.h-72*z)/2,z};
    selection=multiSelection=draft=stampType=marquee=groupTransform=beltTrim=null;
-   if(rebuild){ctx=background.getContext('2d');drawStaticScene();rows=buildBeltVisualCache().rows}
+   if(rebuild){ctx=background.getContext('2d');drawStaticScene();rows=buildBeltVisualCache().rows;routeIndices=new Map(state.routes.map((r,i)=>[r.id,i]))}
    ctx=target.getContext('2d');ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(background,0,0);
    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.translate(camera.x,camera.y);ctx.scale(z,z);
    // Pulse and draw only baked packet positions, never the frozen live ones.
@@ -379,15 +379,15 @@ function createRhythmFactoryPreview(target){
    for(const row of rows){
     const clipped=orchestraTheme.clipUnderpasses(row.underpasses);
     orchestraTheme.railPulse(row,t);orchestraTheme.gate(row,t);
-    const positions=frame?.routes[row.r.id]||[],following=next?.routes[row.r.id]||[];
-    const fraction=next?Math.max(0,Math.min(1,offset/(next.time-frame.time))):0;
+    const index=routeIndices.get(row.r.id),sub=Math.max(0,Math.min(.05,offset));
+    if(frame?.motion)orchestraTheme.motion(row,t,frame.motion[index]+(frame.moving[index]?sub*BELT_SPEED:0));
+    const positions=frame?.routes[row.r.id]||[];
     let ahead=row.g.n;
     for(let j=0;j<positions.length;j++){
-     const distance=positions[j],future=following[j];
-     // Interpolate only a physically possible forward movement. A packet
-     // disappearing or a queue shifting at an endpoint is a discrete event.
-     const advance=following.length===positions.length&&future>=distance&&future-distance<=.201?(future-distance)*fraction:0;
-     const d=Math.max(distance,Math.min(ahead,row.g.n,distance+advance));
+     const distance=simMetres(positions[j]);
+     // Same sub-tick interpolation as the live factory. Head pops and
+     // tail pushes are discrete at the next recorded tick.
+     const d=orchestraTheme.packetDistance(distance,ahead,row.g.n,Math.max(0,Math.min(.05,offset)));
      ahead=d-ITEM_SPACING;
      const [x,y]=beltPathPoint(row.g,d);orchestraTheme.packet(row.r,x,y);
     }

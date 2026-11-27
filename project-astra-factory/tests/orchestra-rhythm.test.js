@@ -47,33 +47,14 @@ test('4/6/8 lanes are independent of difficulty and autoplay uses real onsets',(
  const m=make();for(let i=0;i<8;i++)m.add(g(60+i),2);assert.equal(m.notes.length,1);
 });
 
-test('16 bars repeat twice at 120 BPM without resetting the song clock',()=>{
+test('two identical zero-start phrases share one physical clock and reset at the repeat boundary',()=>{
  const plan=vm.runInContext('orchestraRhythmSongPlan',context)();
  assert.equal(plan.bars,16);assert.equal(plan.repeats,2);assert.equal(plan.phraseSeconds,32);assert.equal(plan.duration,64);
- const loop=vm.runInContext('orchestraRhythmLoopGroups',context);
- const groups=[{n:60,time:1},{n:62,time:64},{n:64,time:65}],song=loop(groups,plan);
- assert.deepEqual(Array.from(song,x=>x.at),[.5,32,32.5,64]);assert.deepEqual(Array.from(song,x=>x.g.n),[60,62,60,62]);
+ const loop=vm.runInContext('orchestraRhythmLoopGroups',context),physicalTime=vm.runInContext('orchestraRhythmPhysicalTime',context);
+ const groups=[{n:60,time:.05},{n:62,time:64},{n:64,time:64.05}],song=loop(groups,plan);
+ assert.deepEqual(Array.from(song,x=>x.at),[.025,32,32.025,64]);assert.deepEqual(Array.from(song,x=>x.g.n),[60,62,60,62]);
+ for(const [elapsed,expected] of [[-1,0],[0,0],[.025,.05],[31.975,63.95],[32,0],[32.025,.05],[63.975,63.95],[64,64],[65,64]])assert(Math.abs(physicalTime(plan,elapsed)-expected)<1e-9);
 });
-test('source simulates one 16-bar phrase once and repeats its events',()=>{
- const c=vm.createContext({structuredClone,performance:{now:()=>0},sim:{real:true},ware:{real:9},simTime:777,frozenSimCache:{real:true},simVisualDirty:false,simTransferObserver:()=>{},state:{machines:[{id:'M0',type:'仓入'}],routes:[{id:'R0'}]},simMachineState:()=>({sent:0})});
- vm.runInContext(fs.readFileSync('scripts/ui/orchestra/rhythm.js','utf8'),c);
- vm.runInContext(fs.readFileSync('scripts/ui/orchestra/rhythm-source.js','utf8'),c);
- vm.runInContext(`
- const original={sim,ware,simTime,frozenSimCache,simTransferObserver};let ticks=0,resets=0,last=null;
- function orchestraTransferCount(id){return sim.byMachine[id].sent}
- function orchestraGroupNotes(events){return events}
- function simulateBatchSteps(n,dt,{afterStep}={}){
-  if(sim!==last){last=sim;resets++}
-  for(let i=0;i<n;i++){ticks++;simTime=ticks*dt;ware.count=(ware.count||0)+1;sim.byMachine.M0.sent++;sim.routes.R0=[{item:"test",distance:ticks*.05}];
-   if(ticks===7||ticks%1280===0)simTransferObserver(state.machines[0],'in',0,'item',simTime);afterStep?.();}
- }
- const source=createOrchestraRhythmSource({track:()=>({instrument:'piano',volume:1}),pitch:(type,dir,i)=>i},orchestraRhythmSongPlan(),true,"M0");
- while(!source.step()){};const song=source.finish(),frames=source.panelFrames(),packets=source.packetFrames();
- `,c);
- const result=vm.runInContext('({ticks,resets,ats:song.map(x=>x.at),counts:song.map(x=>x.g.n),frames:frames.length,packetFrames:packets.length,packetLast:packets.at(-1).time,packetStart:packets[1].routes.R0[0],packetEnd:packets.at(-1).routes.R0[0],first:frames[0].time,last:frames.at(-1).time,stock:frames.at(-1).ware.count,inspector:frames.at(-1).sim.byMachine.M0.sent,inspectorFirst:frames[0].sim.byMachine.M0.sent,restored:sim===original.sim&&ware===original.ware&&simTime===original.simTime&&frozenSimCache===original.frozenSimCache&&simTransferObserver===original.simTransferObserver})',c);
- assert.equal(result.ticks,1280);assert.equal(result.resets,1);assert.deepEqual(Array.from(result.ats),[.17500000000000002,32,32.175,64]);assert.deepEqual(Array.from(result.counts),[6,1279,6,1279]);assert.equal(result.frames,258);assert.equal(result.packetFrames,641);assert.equal(result.packetLast,64);assert(Math.abs(result.packetStart-.1)<1e-6);assert.equal(result.packetEnd,64);assert.equal(result.first,0);assert.equal(result.last,64);assert.equal(result.stock,1280);assert.equal(result.inspector,1280);assert.equal(result.inspectorFirst,0);assert(result.restored);
-});
-
 test('grade colors and bounded fall duration',()=>{
  const colors=vm.runInContext('ORCHESTRA_RHYTHM_GRADE_COLORS',context),lead=vm.runInContext('orchestraRhythmLead',context);
  assert.equal(colors.MISS,'#ff626b');assert.equal(colors.GOOD,'#60aaff');assert.equal(colors.GREAT,'#60e397');assert.equal(colors.PERFECT,'#ffd268');

@@ -107,15 +107,15 @@
  }
  function previewFactory(t){
   const s=rhythmSession,frames=s?.packetFrames;
-  if(!frames?.length){factoryPreview.render(t,null,0,null,scoreRevision);return}
-  const elapsed=Math.max(0,Math.min(s.plan.duration,rhythmClock())),target=2*(elapsed>=s.plan.duration?s.plan.phraseSeconds:elapsed%s.plan.phraseSeconds);
+  if(!frames?.length){const initial=s?.source?.initialPackets?.();factoryPreview.render(t,initial||null,initial?-initial.time:0,null,scoreRevision);return}
+  const target=orchestraRhythmPhysicalTime(s.plan,rhythmClock());
   let lo=0,hi=frames.length;
   while(lo+1<hi){const mid=(lo+hi)>>1;if(frames[mid].time<=target+1e-8)lo=mid;else hi=mid}
   factoryPreview.render(t,frames[lo],target-frames[lo].time,frames[lo+1],scoreRevision);
  }
  function openRhythm(machine=null){
   if(!active||rhythm.active||!root.hidden||simAdvanceBusy)return;
-  clearScheduled();document.activeElement?.blur();resumeAfterRhythm=running;
+  rebaseSimulationClock();clearScheduled();document.activeElement?.blur();resumeAfterRhythm=running;
   // The trigger machine remains the selected inspector, even when
   // pointerup has not yet reached the ordinary editor selection handler.
   if(machine){selection={machineId:machine.id};multiSelection=null;inspectorRefresh()}
@@ -150,21 +150,19 @@
  }
  function paintRhythmPanels(s,elapsed,force=false){
   if(!s)return;
-  if(!s.panelFrames?.length){if(!force)return;const id=selection?.machineId;return paintPanelSnapshot({time:0,ware:{},sim:{inbound:{},outbound:{},editReturns:{},minuteBuckets:[],byMachine:id?{[id]:simMachineState()}:{} }})}
-  const time=Math.max(0,Math.min(s.plan.duration,elapsed));
-  const phrase=time>=s.plan.duration?s.plan.phraseSeconds:time%s.plan.phraseSeconds;
-  const frames=s.panelFrames,target=phrase*2;
+  if(!s.panelFrames?.length){if(force&&s.source)paintPanelSnapshot(s.source.initialFrame(),0);return}
+  const frames=s.panelFrames,target=orchestraRhythmPhysicalTime(s.plan,elapsed);
   let lo=0,hi=frames.length;
   while(lo+1<hi){const mid=(lo+hi)>>1;if(frames[mid].time<=target+1e-8)lo=mid;else hi=mid}
   const now=performance.now();
-  if(!force&&!orchestraTheme.panelRefreshNeeded&&(s.panelIndex===lo||now-s.panelPaintAt<300))return;
+  if(!force&&!orchestraTheme.panelRefreshNeeded&&(s.panelIndex===lo||lo>s.panelIndex&&now-s.panelPaintAt<40))return;
   s.panelIndex=lo;s.panelPaintAt=now;orchestraTheme.panelRefreshNeeded=false;
-  paintPanelSnapshot(frames[lo]);
+  paintPanelSnapshot(frames[lo],target);
  }
- function paintPanelSnapshot(f){
+ function paintPanelSnapshot(f,target=f.time){
   const saved={sim,ware,simTime,simClockRemainder};
   try{
-   orchestraTheme.panelPreview=true;sim=f.sim;ware=f.ware;simTime=f.time;simClockRemainder=0;
+   orchestraTheme.panelPreview=true;sim=f.sim;ware=f.ware;simTime=f.simTime;simClockRemainder=Math.max(0,Math.min(.05,target-f.time));
    warehouseRefreshLive();inspectorRefreshLive();
   }finally{orchestraTheme.panelPreview=false;sim=saved.sim;ware=saved.ware;simTime=saved.simTime;simClockRemainder=saved.simClockRemainder}
  }
@@ -188,7 +186,7 @@
    const x=s.song[s.chartIndex++];rhythm.add(x.g,x.at);
   }
   const due=[];
-  while(s.audioIndex<s.song.length&&s.song[s.audioIndex].at<=now+.08)due.push(s.song[s.audioIndex++]);
+  while(s.audioIndex<s.song.length&&s.song[s.audioIndex].at<=now+.18)due.push(s.song[s.audioIndex++]);
   if(due.length){
    const groups=due.map(x=>x.g);audio.prepare(groups);let i=0;
    const starts=audio.batch(groups,()=>s.anchor+due[i++].at);
@@ -198,14 +196,14 @@
   // dropped audio, determine the transfer highlights.
   const heardAt=audio.time;let pending=0;
   for(const entry of s.visualQueue){
-   if(entry.at<=heardAt)flashGroup(entry.g,performance.now());
+   if(entry.at<=heardAt)flashGroup(entry.g,performance.now()-(heardAt-entry.at)*1000);
    else s.visualQueue[pending++]=entry;
   }
   s.visualQueue.length=pending;
   rhythm.tick(now);
   if(now>=s.plan.duration+1.6&&!rhythm.model.notes.length&&s.audioIndex===s.song.length)finishRhythmSong();
  }
- const score=createOrchestraScore(root,settings,save,()=>{scoreRevision++;factoryPreview.reset();buildPalette();draw()},()=>audio.mix(),()=>count,()=>audio.dropped,()=>{if(rhythm.active)startRhythmSong(false);else{rhythmTempo(false);clearScheduled();warehouseRefreshLive();inspectorRefreshLive()}});
+ const score=createOrchestraScore(root,settings,save,()=>{scoreRevision++;factoryPreview.reset();buildPalette();draw()},()=>audio.mix(),()=>count,()=>audio.dropped,()=>{if(rhythm.active)startRhythmSong(false);else{rebaseSimulationClock();rhythmTempo(false);clearScheduled();warehouseRefreshLive();inspectorRefreshLive()}});
  // Move the actual controls (not copies) into the music settings on
  // narrow screens. Their listeners, values and shared volume stay intact.
  const compactTransport=matchMedia('(max-width:900px)');
@@ -229,7 +227,7 @@
   if(previousSim===sim&&simTime>=previousTime)return;
   if(rhythm.active)closeRhythm();previousSim=sim;previousTime=simTime;syncScore(true);count=0;clearScheduled();
  }
- function transfer(m,dir,port,item,time){previousObserver?.(m,dir,port,item,time);resetPlaybackForSimulation();if(!score.track(m.type)?.ports[dir])syncScore();const i=Math.max(0,orchestraTransferCount(m.id,dir)-1);const track=score.track(m.type);events.push({id:m.id,type:m.type,dir,port,item,time,n:score.pitch(m.type,dir,i,time),instrument:track?.instrument,volume:track?.volume});count++}
+ function transfer(m,dir,port,item,time){previousObserver?.(m,dir,port,item,time);if(simAdvanceBusy)return;resetPlaybackForSimulation();if(!score.track(m.type)?.ports[dir])syncScore();const i=Math.max(0,orchestraTransferCount(m.id,dir)-1);const track=score.track(m.type);events.push({id:m.id,type:m.type,dir,port,item,time,n:score.pitch(m.type,dir,i,time),instrument:track?.instrument,volume:track?.volume});count++}
  function playEvents(){
   if(!audio.ready){events.length=0;return}
   if(!events.length)return;
@@ -247,6 +245,14 @@
    flashGroup(groups[i],hitTime)
   }
  }
+ // Transport actions run synchronously, so a pause/resume within one
+ // browser frame cannot leave stale audio queued from the old run.
+ orchestraTheme.onTransport=on=>{
+  if(!active)return;
+  if(!on){if(rhythm.active)pauseRhythmClock();else clearScheduled()}
+  else audio.unlock();
+ };
+ orchestraTheme.onFastForward=()=>{if(!active)return;clearScheduled();count=state.machines.reduce((n,m)=>n+orchestraTransferCount(m.id,'in')+orchestraTransferCount(m.id,'out'),0);previousSim=sim;previousTime=simTime};
  const preset=$('presetDropdown'),edit=$('editMenuWrap'),leftHeader=document.createElement('div');
  leftHeader.className='orch-left-header';
  const headerNodes=[brand,preset,edit],slots=new Map();
@@ -296,18 +302,18 @@
  function transition(){if(!matchMedia('(prefers-reduced-motion: reduce)').matches)canvas.animate([{filter:'brightness(1.1) saturate(1.12)'},{filter:'none'}],{duration:850,easing:'ease-out'})}
  function open(){
   if(active||simAdvanceBusy)return;
-  active=true;priorSpeed=simulationSpeed;simulationSpeed=settings.bpm/60;orchestraTheme.tempo=settings.bpm;bpm.querySelector('input').value=settings.bpm;
+  rebaseSimulationClock();active=true;priorSpeed=simulationSpeed;simulationSpeed=settings.bpm/60;orchestraTheme.tempo=settings.bpm;bpm.querySelector('input').value=settings.bpm;
   previousObserver=simTransferObserver;simTransferObserver=transfer;previousSim=sim;previousTime=simTime;count=state.machines.reduce((n,m)=>n+orchestraTransferCount(m.id,'in')+orchestraTransferCount(m.id,'out'),0);anchor=null;events=[];orchestraTheme.clear();audio.resetDropped();syncScore(true);if(settings.autoRandom)score.randomAll();
   paintVolume();
   setTheme(true);if(!running)$('run').click();transition();audio.unlock();status();
  }
  function close(){
-  if(!active)return;closeRhythm();active=false;simTransferObserver=previousObserver;previousObserver=null;simulationSpeed=priorSpeed;audio.stop();anchor=null;events=[];score.save();orchestraTheme.clear();setTheme(false);$('run').textContent=running?'❚❚ 暂停模拟':simTime>0?'▶ 继续模拟':'▶ 运行模拟';transition();
+  if(!active)return;closeRhythm();rebaseSimulationClock();active=false;simTransferObserver=previousObserver;previousObserver=null;simulationSpeed=priorSpeed;audio.stop();anchor=null;events=[];score.save();orchestraTheme.clear();setTheme(false);$('run').textContent=running?'❚❚ 暂停模拟':simTime>0?'▶ 继续模拟':'▶ 运行模拟';transition();
  }
  switcher.onclick=()=>{if(!active)return;closeRhythm();root.hidden=!root.hidden;workspace.classList.toggle('orch-score-open',!root.hidden);canvas.style.visibility=root.hidden?'':'hidden';badge.hidden=!root.hidden;switcher.textContent=root.hidden?'音符编辑':'返回画布';if(!root.hidden){syncScore();score.render()}else{root.querySelector('.orch-settings').open=false;draw()}audio.unlock()};
  randomize.onclick=()=>{if(active){syncScore();score.randomAll();audio.unlock()}};
  exit.onclick=close;
- bpm.querySelector('input').onchange=e=>{if(rhythm.active){e.target.value=ORCHESTRA_RHYTHM_BPM;return}settings.bpm=Math.max(30,Math.min(360,Math.round(Number(e.target.value)||120)));e.target.value=settings.bpm;simulationSpeed=settings.bpm/60;orchestraTheme.tempo=settings.bpm;clearScheduled();save();audio.unlock()};
+ bpm.querySelector('input').onchange=e=>{if(rhythm.active){e.target.value=ORCHESTRA_RHYTHM_BPM;return}rebaseSimulationClock();settings.bpm=Math.max(30,Math.min(360,Math.round(Number(e.target.value)||120)));e.target.value=settings.bpm;simulationSpeed=settings.bpm/60;orchestraTheme.tempo=settings.bpm;clearScheduled();save();audio.unlock()};
  badge.querySelector('button').onclick=()=>{if(!settings.volume){setVolume(.6)}audio.unlock().then(ok=>{if(ok)audio.tone('chime',69,.8,audio.time+.02)})};
  function worldPoint(e){const r=canvas.getBoundingClientRect();return [(e.clientX-r.left-camera.x)/camera.z,(e.clientY-r.top-camera.y)/camera.z]}
  function center(e){const [x,y]=worldPoint(e);return x>=CENTER.x&&x<CENTER.x+CENTER.w&&y>=CENTER.y&&y<CENTER.y+CENTER.h}

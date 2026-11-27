@@ -49,10 +49,12 @@ corresponding buttons. Escape or the top-right close button returns to
 the map. Space toggles playback only on a short tap (at most 250 ms,
 no pan).
 
-The challenge uses 120 BPM. A private, empty-start simulation computes
-16 bars (32 real seconds, 64 simulated seconds), capturing the actual
-score and transfer events. The phrase repeats twice for 32 total bars
-and 64 seconds of music. Scores and the song clock continue across the repeat.
+The challenge uses 120 BPM. An independent zero-start simulation computes
+16 bars (32 real seconds, 64 simulated seconds) and repeats that same
+phrase twice (32 bars, 64 real seconds). Both audio and factory snapshots
+restart at physical time zero at the repeat boundary, while score and
+song transport continue. The live factory never contributes its queues,
+inventory, port phases or cumulative transfer cursors to the preview.
 It does not rely on a theoretical logistics period. A silent song produces
 a clear result instead of an empty
 one-minute challenge. The original factory is frozen during the song:
@@ -175,6 +177,17 @@ RAF timestamp cannot prune an onset that has not arrived on its clock.
 Live warehouse rows and inspector stack rows reconcile by material identity
 rather than position, so active animations cannot migrate to another item.
 Rhythm retains the union of initial and baked warehouse items across rerolls
-and phrase repeats; counts reset to the new phrase, not the real simulator.
+and phrase boundaries; a reroll restarts from zero.
 The selected machine's baked inspector snapshot refreshes at its transfer
 onsets as well as periodic samples. Real factory state remains isolated.
+
+Clock regression: all physical ticks remain on the 20 Hz integer lattice.
+Transport changes only rebase the wall-clock anchor, preserving the fractional
+simulated step. Fast-forward uses the same tick engine and suppresses obsolete
+audio scheduling while preserving all physical counters. Rhythm uses one
+phrase-relative snapshot clock for audio, chart, ledger, selected inspector
+and integer packet positions; the live exact frozen-service phases stay untouched.
+The preview captures every physical tick using integer packet positions,
+sharing identical blocked packet arrays and completed minute buckets.
+The zero-start preview has its own ledger history and tread phase; it
+never copies an unbounded live history.

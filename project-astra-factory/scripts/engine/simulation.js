@@ -153,9 +153,9 @@ function packetCoords(r,p){const g=beltPathGeometry(r);return g?beltPathPoint(g,
 // Keep a snapshot of physical identities, not just M#/R# record numbers.
 // The AST1 editor renumbers records when a machine or belt is removed.
 let simLayoutSnapshot=null;
-function simMachineState(){
+function simMachineState(time=simTime){
  return {inputs:{},portInputs:{},portItems:{},received:{},sent:{},consumed:{},queue:[],
-  ingredientQueues:{},mergerQueue:[],warehouseQueue:[],lastWarehouseFill:simTime,consumerQueue:[],consumerElapsed:0,
+  ingredientQueues:{},mergerQueue:[],warehouseQueue:[],lastWarehouseFill:time,consumerQueue:[],consumerElapsed:0,
   busy:0,tick:0,lastSend:{},lastReceive:{},roundRobin:0,portQueues:{}};
 }
 function simMachineServiceKey(m){
@@ -587,9 +587,16 @@ function advanceRealtimeSimulation(elapsed){
  simClockRemainder=Math.max(0,simClockRemainder-steps*SIMULATION_STEP_SECONDS);
  simulateBatchSteps(steps,SIMULATION_STEP_SECONDS);
 }
+// A transport action is atomic at the last simulated frame. Rebase only
+// the real-time clock, never consume part of a future tick during a UI
+// action. Keep the existing fractional simulated step intact.
+function rebaseSimulationClock(now=performance.now()){
+ animationLast=Math.max(animationLast,now);
+}
 function stepLoop(t){
+ t=Math.max(animationLast,t);
  const elapsedReal=document.hidden?0:Math.min(.12,Math.max(0,(t-animationLast)/1000));animationLast=t;
- if(running&&!(typeof orchestraTheme!=='undefined'&&orchestraTheme.rhythm?.active)){advanceRealtimeSimulation(elapsedReal*simulationSpeed);
+ if(running&&!simAdvanceBusy&&!(typeof orchestraTheme!=='undefined'&&orchestraTheme.rhythm?.active)){advanceRealtimeSimulation(elapsedReal*simulationSpeed);
   if(!simAdvanceBusy&&!document.hidden&&typeof inspectorRefreshProgress==='function')inspectorRefreshProgress();
   simPaintTimer+=elapsedReal;
   if(simPaintTimer>=.3){simPaintTimer=0;warehouseRefreshLive();inspectorRefreshLive();stockChartMaybeRefresh();}
@@ -676,11 +683,13 @@ function updateStepMinuteButton(){
  btn.title='按逐件规则快进 '+minutes+' 分钟';
 }
 async function advanceSimulationMinute(){
- if(simAdvanceBusy)return;
+ if(simAdvanceBusy||typeof orchestraTheme!=='undefined'&&orchestraTheme.rhythm?.active)return;
  const minutes=Math.max(1,Number($('simSpeed')?.value)||1);
+ if(typeof rebaseSimulationClock==='function')rebaseSimulationClock();
  const previous=running,btn=$('stepMinute'),advanceState=typeof sim==='undefined'?null:sim;
  const sameSimulation=()=>typeof sim==='undefined'||sim===advanceState;
  simAdvanceBusy=true;running=false;
+ if(typeof orchestraTheme!=='undefined')orchestraTheme.onFastForward?.(true);
  if(btn)btn.disabled=true;
  try{
   for(let minute=0;minute<minutes&&sameSimulation();minute++){
@@ -693,6 +702,8 @@ async function advanceSimulationMinute(){
   }
  }finally{
   if(sameSimulation())running=previous;simAdvanceBusy=false;
+  if(typeof animationLast!=='undefined'&&typeof performance!=='undefined')animationLast=performance.now();
+  if(typeof orchestraTheme!=='undefined')orchestraTheme.onFastForward?.(false);
   if(typeof resetBeltMotionClock==='function')resetBeltMotionClock();
   if(btn)btn.disabled=false;
   updateStepMinuteButton();

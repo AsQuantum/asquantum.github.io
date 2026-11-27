@@ -140,7 +140,8 @@
       "tests/orchestra-audio-period.test.js"
     ],
     "orchestra-rhythm": [
-      "tests/orchestra-rhythm.test.js"
+      "tests/orchestra-rhythm.test.js",
+      "tests/orchestra-clock-parity.test.js"
     ],
     "orchestra-desktop": [
       "tests/orchestra-browser.test.js"

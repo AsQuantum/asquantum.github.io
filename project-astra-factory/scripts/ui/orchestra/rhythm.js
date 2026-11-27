@@ -16,7 +16,7 @@ const ORCHESTRA_RHYTHM_DIFFICULTIES={
 };
 function orchestraRhythmDifficulty(value){return Object.hasOwn(ORCHESTRA_RHYTHM_DIFFICULTIES,value)?value:'easy'}
 const ORCHESTRA_RHYTHM_LEAD=1.2,ORCHESTRA_RHYTHM_BPM=120,ORCHESTRA_RHYTHM_LOOKAHEAD=3,ORCHESTRA_RHYTHM_MIN_LEAD=.5;
-// Repeat the first 16-bar factory phrase twice at 120 BPM.
+// Repeat one 16-bar zero-start factory phrase twice at 120 BPM.
 function orchestraRhythmSongPlan(){
  const bars=16,repeats=2,phraseSeconds=bars*4*60/ORCHESTRA_RHYTHM_BPM;
  return {bars,repeats,phraseSeconds,duration:phraseSeconds*repeats};
@@ -29,8 +29,12 @@ function orchestraRhythmLoopGroups(groups,plan){
  }
  return out;
 }
-function orchestraRhythmTimedGroups(groups,plan){
- return groups.map(g=>({g,at:g.time/2})).filter(x=>x.at>=0&&x.at<=plan.duration+1e-9);
+// Both visual consumers use this same phrase-relative physical clock.
+// At a repeat boundary the next phrase starts at zero; at the final
+// endpoint retain the completed last phrase for the result.
+function orchestraRhythmPhysicalTime(plan,elapsed){
+ const t=Math.max(0,Math.min(plan.duration,elapsed));
+ return 2*(t>=plan.duration?plan.phraseSeconds:t%plan.phraseSeconds);
 }
 function orchestraRhythmTime(seconds){const n=Math.max(0,Math.ceil(seconds));return Math.floor(n/60)+':'+String(n%60).padStart(2,'0')}
 

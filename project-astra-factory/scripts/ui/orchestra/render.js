@@ -334,10 +334,10 @@ const orchestraTheme={
  // The moving transverse marks are the belt's rhythm display.
  // Accent them on either endpoint's scheduled note, without changing
  // the lane footprint or competing with the luminous packet core.
- motion(row,t=performance.now()){
+ motion(row,t=performance.now(),phaseOverride=null){
   const {r,g,connected,yellow}=row;if(!connected)return;
   ctx.save();ctx.lineCap='butt';
-  const phase=beltMotionPhase.get(r.id)??.5,pulse=this.routeEnergy(r,t);
+  const phase=phaseOverride??beltMotionPhase.get(r.id)??.5,pulse=this.routeEnergy(r,t);
   const half=yellow?Math.min(.15,this.railInner(pulse,true)*.35):.15+.025*pulse;
   const trim=beltTrim?.routeId===r.id&&beltTrim.hoverAnchor===true?beltTrim.index:Infinity;
   for(const red of trim===Infinity?[false]:[false,true]){
